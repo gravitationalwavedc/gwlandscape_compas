@@ -1,0 +1,40 @@
+---
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gwlandscape-compas-django
+  namespace: gwcloud
+  labels:
+    name: gwlandscape-compas-django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        name: gwlandscape-compas-django
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        name: gwlandscape-compas-django
+    spec:
+      containers:
+        - envFrom:
+            - secretRef:
+                name: compas
+            - secretRef:
+                name: common
+          name: gwlandscape-compas-django
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.8
+          ports:
+            - name: http
+              containerPort: 8000
+          resources: {}
+          tty: true
+      imagePullSecrets:
+      - name: regcred
+... 

@@ -1,0 +1,9 @@
+resources:
+  - gwlandscape_compas_vault_secrets_integrator.yaml
+  - gwlandscape_compas_vault_rbac.yaml
+  - gwlandscape_compas_django_deployment.yaml
+  - gwlandscape_compas_django_service.yaml
+  - gwlandscape_compas_nginx_deployment.yaml
+  - gwlandscape_compas_nginx_service.yaml
+  - gwlandscape_compas_static_deployment.yaml
+  - gwlandscape_compas_static_service.yaml

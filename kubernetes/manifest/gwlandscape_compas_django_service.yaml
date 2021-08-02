@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: gwlandscape-compas-django
+  name: gwlandscape-compas-django
+  namespace: gwcloud
+spec:
+  ports:
+  - name: http
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    name: gwlandscape-compas-django
+  sessionAffinity: None
+  type: ClusterIP

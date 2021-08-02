@@ -1,0 +1,35 @@
+---
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gwlandscape-compas-nginx
+  namespace: gwcloud
+  labels:
+    name: gwlandscape-compas-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        name: gwlandscape-compas-nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        name: gwlandscape-compas-nginx
+    spec:
+      containers:
+        - name: gwlandscape-compas-nginx
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_nginx:0.1
+          ports:
+            - name: http
+              containerPort: 8000
+          resources: {}
+          tty: true
+      imagePullSecrets:
+      - name: regcred
+... 

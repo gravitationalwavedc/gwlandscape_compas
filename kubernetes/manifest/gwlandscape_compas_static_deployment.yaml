@@ -1,0 +1,35 @@
+---
+# 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gwlandscape-compas-static
+  namespace: gwcloud
+  labels:
+    name: gwlandscape-compas-static
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        name: gwlandscape-compas-static
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        name: gwlandscape-compas-static
+    spec:
+      containers:
+        - name: gwlandscape-compas-static
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.4
+          ports:
+            - name: http
+              containerPort: 8000
+          resources: {}
+          tty: true
+      imagePullSecrets:
+      - name: regcred
+... 
