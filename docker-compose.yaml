@@ -22,7 +22,7 @@ services:
     build:
       dockerfile: ./docker/gwlandscape_compas_nginx.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_nginx:0.1
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_nginx:0.2
     container_name: gwlandscape_compas_nginx
     ports:
       - "8000:8000"
