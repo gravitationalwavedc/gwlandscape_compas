@@ -9,6 +9,7 @@ import DuplicateJobForm from './Components/Forms/DuplicateJobForm';
 import ViewJob from './Pages/ViewJob';
 import Loading from './Components/Loading';
 import {RedirectException} from 'found';
+import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
@@ -93,6 +94,10 @@ function getRoutes() {
                 })}
                 render={handleRender}
             />
+            <Route
+                path="single-binary-form"
+                Component={NewSingleBinaryJob}
+                render={handleRender}/>
         </Route>
     );
 }

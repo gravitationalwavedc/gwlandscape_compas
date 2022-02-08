@@ -1,4 +1,9 @@
+import os.path
+
+import django.urls
+import django_filters
 import graphene
+import requests
 from django_filters import FilterSet, OrderingFilter
 from graphene import relay
 from graphene_django.filter import DjangoFilterConnectionField
@@ -6,13 +11,15 @@ from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
-from .models import CompasJob, Label, Data, Search
+from .models import CompasJob, Label, Data, Search, SingleBinaryJob
 from .status import JobStatus
 from .types import OutputStartType, JobStatusType, AbstractDataType, AbstractSearchType
 from .utils.db_search.db_search import perform_db_search
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
-from .views import create_compas_job, update_compas_job
+from .views import create_compas_job, update_compas_job, create_single_binary_job
+from django.conf import settings
+import os.path
 
 
 def parameter_resolvers(name):
@@ -222,6 +229,21 @@ class CompasPublicJobConnection(relay.Connection):
         node = CompasPublicJobNode
 
 
+class SingleBinaryJobFilter(django_filters.FilterSet):
+    class Meta:
+        model = SingleBinaryJob
+        fields = '__all__'
+
+
+class SingleBinaryJobNode(DjangoObjectType):
+    """
+    Type for Single Binary Jobs without authentication
+    """
+    class Meta:
+        model = SingleBinaryJob
+        fields = '__all__'
+        interfaces = (relay.Node,)
+
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
@@ -236,6 +258,9 @@ class Query(object):
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
 
     gwclouduser = graphene.Field(UserDetails)
+
+    single_binary_job = relay.Node.Field(SingleBinaryJobNode)
+    single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
 
     @login_required
     def resolve_all_labels(self, info, **kwargs):
@@ -357,6 +382,14 @@ class CompasJobCreationResult(graphene.ObjectType):
     job_id = graphene.String()
 
 
+class SingleBinaryJobCreationResult(graphene.ObjectType):
+    job_id = graphene.String()
+    grid_file_path = graphene.String()
+    plot_file_path = graphene.String()
+    van_plot_file_path = graphene.String()
+    run_details_path = graphene.String()
+
+
 class CompasJobMutation(relay.ClientIDMutation):
     class Input:
         start = StartInput()
@@ -413,7 +446,73 @@ class UniqueNameMutation(relay.ClientIDMutation):
         return UniqueNameMutation(result=name)
 
 
+class SingleBinaryJobMutation(relay.ClientIDMutation):
+    class Input:
+        # input parameters to create the job
+        # better to use a class rather than individually
+        mass1 = graphene.Float()
+        mass2 = graphene.Float()
+        metallicity = graphene.Float()
+        eccentricity = graphene.Float()
+        separation = graphene.Float()
+        orbital_period = graphene.Float()
+        velocity_random_number_1 = graphene.Float()
+        velocity_random_number_2 = graphene.Float()
+        velocity_1 = graphene.Float()
+        velocity_2 = graphene.Float()
+        theta_1 = graphene.Float()
+        theta_2 = graphene.Float()
+        phi_1 = graphene.Float()
+        phi_2 = graphene.Float()
+        mean_anomaly_1 = graphene.Float()
+        mean_anomaly_2 = graphene.Float()
+
+
+    # single_binary_job = graphene.Field(SingleBinaryJobNode)
+    result = graphene.Field(SingleBinaryJobCreationResult)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        job = create_single_binary_job(
+            mass1=input.get("mass1"),
+            mass2=input.get("mass2"),
+            metallicity=input.get("metallicity"),
+            eccentricity=input.get("eccentricity"),
+            separation=input.get("separation"),
+            orbital_period=input.get("orbital_period"),
+            velocity_random_number_1=input.get("velocity_random_number_1"),
+            velocity_random_number_2=input.get("velocity_random_number_2"),
+            theta_1=input.get("theta_1"),
+            theta_2=input.get("theta_2"),
+            phi_1=input.get("phi_1"),
+            phi_2=input.get("phi_2"),
+            mean_anomaly_1=input.get("mean_anomaly_1"),
+            mean_anomaly_2=input.get("mean_anomaly_2"),
+
+        )
+        # run_details = ''
+        # run_details_path = f'{settings.MEDIA_ROOT}jobs/{job.id}/COMPAS_Output/Run_Details'
+        # print(f'path: {run_details_path}')
+        # if os.path.exists(run_details_path):
+        #     print('exists')
+        # with open(run_details_path, 'r') as f:
+        #     run_details = f.read()
+        #     print(run_details)
+
+        return SingleBinaryJobMutation(
+            # single_binary_job=job
+            result=SingleBinaryJobCreationResult(
+                job_id=job.id,
+                plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
+                grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
+                van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
+                run_details_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Run_Details'
+            )
+        )
+
+
 class Mutation(graphene.ObjectType):
     new_compas_job = CompasJobMutation.Field()
     update_compas_job = UpdateCompasJobMutation.Field()
     is_name_unique = UniqueNameMutation.Field()
+    new_single_binary = SingleBinaryJobMutation.Field()

@@ -1,4 +1,5 @@
 {
+    "phabricator.uri" : "https://phab.adacs.org.au",
 	"load": ["arcutils"],
 	"unit.engine": "DjangoJestUnitTestEngine",
 	"unit.engine.django.manage_py_dir": "src",

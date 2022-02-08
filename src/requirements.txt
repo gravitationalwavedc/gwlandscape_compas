@@ -8,9 +8,10 @@ aniso8601==7.0.0          # via graphene
 certifi==2020.6.20        # via requests
 cffi==1.14.3              # via cryptography
 chardet==3.0.4            # via requests
-click==7.1.2              # via pip-tools
+click==8.0.3              # via pip-tools
 coverage==4.5.4           # via -r requirements.in
 cryptography==3.2         # via jwcrypto
+deprecated==1.2.13        # via redis
 django-cors-headers==3.5.0  # via -r requirements.in
 django-filter==2.4.0      # via -r requirements.in
 django-graphql-jwt==0.3.1  # via -r requirements.in
@@ -33,6 +34,7 @@ pyflakes==2.2.0           # via -r requirements.in, flake8
 pyjwt==1.7.1              # via django-graphql-jwt
 python-jwt==3.3.0         # via -r requirements.in
 pytz==2020.1              # via django
+redis==4.0.2              # via -r requirements.in
 requests==2.24.0          # via -r requirements.in
 rx==1.6.1                 # via graphql-core
 singledispatch==3.4.0.3   # via graphene-django
@@ -40,6 +42,7 @@ six==1.15.0               # via cryptography, graphene, graphene-django, graphql
 sqlparse==0.4.1           # via django
 unidecode==1.1.1          # via graphene-django
 urllib3==1.25.11          # via requests
+wrapt==1.13.3             # via deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

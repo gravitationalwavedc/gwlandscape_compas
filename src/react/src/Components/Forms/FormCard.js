@@ -5,9 +5,11 @@ const FormCard = ({title, children, disabled, ...rest}) =>
     <Card className={disabled ? 'gw-form-card disabled' : 'gw-form-card'} {...rest}>
         <Card.Body>
             <Row>
-                <Col md={4}>
+                <Col>
                     <h3>{title}</h3>
                 </Col>
+            </Row>
+            <Row>
                 <Col>
                     {children}
                 </Col>

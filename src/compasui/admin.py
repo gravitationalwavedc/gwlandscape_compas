@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search
+from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search, SingleBinaryJob
 
 
 # Register your models here.
@@ -49,3 +49,8 @@ class CompasJobAdmin(admin.ModelAdmin):
         InlineDataParameterAdmin,
         InlineSearchParameterAdmin
     )
+
+
+@admin.register(SingleBinaryJob)
+class SingleBinaryJobAdmin(admin.ModelAdmin):
+    pass
