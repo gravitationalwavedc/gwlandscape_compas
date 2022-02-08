@@ -119,7 +119,8 @@ def update_compas_job(job_id, user, private=None, labels=None):
 def create_single_binary_job(
         mass1, mass2, metallicity, eccentricity, separation, orbital_period,
         velocity_random_number_1, velocity_random_number_2,
-        theta_1, theta_2, phi_1, phi_2, mean_anomaly_1, mean_anomaly_2):
+        theta_1, theta_2, phi_1, phi_2, mean_anomaly_1, mean_anomaly_2,
+        common_envelope_alpha, common_envelope_lambda_prescription, common_envelope_lambda):
     single_binary_job = SingleBinaryJob(
         mass1=mass1,
         mass2=mass2,
@@ -134,7 +135,10 @@ def create_single_binary_job(
         phi_1=phi_1,
         phi_2=phi_2,
         mean_anomaly_1=mean_anomaly_1,
-        mean_anomaly_2=mean_anomaly_2
+        mean_anomaly_2=mean_anomaly_2,
+        common_envelope_alpha=common_envelope_alpha,
+        common_envelope_lambda_prescription=common_envelope_lambda_prescription,
+        common_envelope_lambda=common_envelope_lambda
     )
     single_binary_job.save()
     model_id = str(single_binary_job.id)
@@ -165,8 +169,8 @@ def create_single_binary_job(
     # run compas as a Celery task
     # task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
     #                             link=run_plotting.s(detailed_output_file_path, plot_path))
-    task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
-                                  link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path))
+    # task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
+    #                               link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path))
 
 
     # request.session[model_id] = task.id

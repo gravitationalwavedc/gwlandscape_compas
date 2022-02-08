@@ -90,7 +90,16 @@ let validationSchema = Yup.object().shape({
     meanAnomaly2: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI)
+        .max(2 * Math.PI),
+    commonEnvelopeAlpha: Yup
+        .number()
+        .min(0.0),
+    commonEnvelopeLambdaPrescription: Yup
+        .string(),
+    commonEnvelopeLambda: Yup
+        .number()
+        .min(0.0)
+
 }, [['mass1', 'mass2'], ['separation', 'orbitalPeriod']]);
 
 export default validationSchema;

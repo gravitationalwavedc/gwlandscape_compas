@@ -466,6 +466,10 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
         phi_2 = graphene.Float()
         mean_anomaly_1 = graphene.Float()
         mean_anomaly_2 = graphene.Float()
+        common_envelope_alpha = graphene.Float()
+        common_envelope_lambda_prescription = graphene.String()
+        common_envelope_lambda = graphene.Float()
+
 
 
     # single_binary_job = graphene.Field(SingleBinaryJobNode)
@@ -488,6 +492,9 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             phi_2=input.get("phi_2"),
             mean_anomaly_1=input.get("mean_anomaly_1"),
             mean_anomaly_2=input.get("mean_anomaly_2"),
+            common_envelope_alpha=input.get('common_envelope_alpha'),
+            common_envelope_lambda_prescription=input.get('common_envelope_lambda_prescription'),
+            common_envelope_lambda=input.get('common_envelope_lambda'),
 
         )
         # run_details = ''

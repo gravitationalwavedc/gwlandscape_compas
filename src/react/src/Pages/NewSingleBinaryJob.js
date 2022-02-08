@@ -10,6 +10,8 @@ import { useFormik } from 'formik';
 // import SearchParametersForm from '../Components/Forms/SearchParametersForm';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import KickParametersForm from '../Components/Forms/KickParametersForm';
+import CommonEnvelopeParametersForm from '../Components/Forms/CommonEnvelopeParametersForm';
+
 // import ReviewJob from '../Components/Forms/ReviewJob';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
@@ -68,12 +70,15 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                 phi2: values.phi2,
                 meanAnomaly1: values.meanAnomaly1,
                 meanAnomaly2: values.meanAnomaly2,
+                commonEnvelopeAlpha: values.commonEnvelopeAlpha,
+                commonEnvelopeLambdaPrescription: values.commonEnvelopeLambdaPrescription,
+                commonEnvelopeLambda: values.commonEnvelopeLambda,
             }
         };
 
         // setGridFile(gridFile + ' Eman ');
         // setPlotFile('http://127.0.0.1:8003/files/jobs/64/COMPAS_Output/Detailed_Output/gw151226evol.png');
-
+        console.log((variables));
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
             variables: variables,
@@ -97,16 +102,17 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
     return (
         <Container fluid>
             <Row>
-                <Col md={4}>
+                <Col md={5}>
                     <BasicParametersForm formik={formik}/>
                     <KickParametersForm formik={formik}/>
+                    <CommonEnvelopeParametersForm formik={formik}/>
 
                     <ReviewSingleBinaryJob
                         formik={formik}
                         values={formik.values}
                         handleSubmit={formik.handleSubmit}/>
                 </Col>
-                <Col md={8}>
+                <Col md={7}>
                     <JobOutput
                         gridfileName={gridFile}
                         detailedplotfilename={plotFile}

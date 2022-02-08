@@ -11,6 +11,9 @@ const initialValues = {
     theta2: 1.646224,
     phi1: 5.2694,
     phi2: 5.0389,
+    commonEnvelopeAlpha: 1.0,
+    commonEnvelopeLambdaPrescription: 'LAMBDA_NANJING',
+    commonEnvelopeLambda: 0.1,
 };
 
 export default initialValues;
