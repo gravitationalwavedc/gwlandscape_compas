@@ -120,7 +120,14 @@ def create_single_binary_job(
         mass1, mass2, metallicity, eccentricity, separation, orbital_period,
         velocity_random_number_1, velocity_random_number_2,
         theta_1, theta_2, phi_1, phi_2, mean_anomaly_1, mean_anomaly_2,
-        common_envelope_alpha, common_envelope_lambda_prescription, common_envelope_lambda):
+        common_envelope_alpha, common_envelope_lambda_prescription, common_envelope_lambda,
+        remnant_mass_prescription, fryer_supernova_engine, black_hole_kicks,
+        kick_velocity_distribution, kick_velocity_sigma_CCSN_NS, kick_velocity_sigma_CCSN_BH,
+        kick_velocity_sigma_ECSN, kick_velocity_sigma_USSN, pair_instability_supernovae,
+        pisn_lower_limit, pisn_upper_limit, pulsational_pair_instability_supernovae,
+        ppi_lower_limit, ppi_upper_limit, pulsational_pair_instability_prescription,
+        maximum_neutron_star_mass
+):
     single_binary_job = SingleBinaryJob(
         mass1=mass1,
         mass2=mass2,
@@ -138,7 +145,23 @@ def create_single_binary_job(
         mean_anomaly_2=mean_anomaly_2,
         common_envelope_alpha=common_envelope_alpha,
         common_envelope_lambda_prescription=common_envelope_lambda_prescription,
-        common_envelope_lambda=common_envelope_lambda
+        common_envelope_lambda=common_envelope_lambda,
+        remnant_mass_prescription=remnant_mass_prescription,
+        fryer_supernova_engine=fryer_supernova_engine,
+        black_hole_kicks=black_hole_kicks,
+        kick_velocity_distribution=kick_velocity_distribution,
+        kick_velocity_sigma_CCSN_NS=kick_velocity_sigma_CCSN_NS,
+        kick_velocity_sigma_CCSN_BH=kick_velocity_sigma_CCSN_BH,
+        kick_velocity_sigma_ECSN=kick_velocity_sigma_ECSN,
+        kick_velocity_sigma_USSN=kick_velocity_sigma_USSN,
+        pair_instability_supernovae=pair_instability_supernovae,
+        pisn_lower_limit=pisn_lower_limit,
+        pisn_upper_limit=pisn_upper_limit,
+        pulsational_pair_instability_supernovae=pulsational_pair_instability_supernovae,
+        ppi_lower_limit=ppi_lower_limit,
+        ppi_upper_limit=ppi_upper_limit,
+        pulsational_pair_instability_prescription=pulsational_pair_instability_prescription,
+        maximum_neutron_star_mass=maximum_neutron_star_mass,
     )
     single_binary_job.save()
     model_id = str(single_binary_job.id)

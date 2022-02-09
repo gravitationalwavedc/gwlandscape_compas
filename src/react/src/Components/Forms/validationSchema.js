@@ -98,8 +98,70 @@ let validationSchema = Yup.object().shape({
         .string(),
     commonEnvelopeLambda: Yup
         .number()
+        .min(0.0),
+    remnantMassPrescription: Yup
+        .string(),
+    fryerSupernovaEngine: Yup
+        .string(),
+    blackHoleKicks: Yup
+        .string(),
+    kickVelocityDistribution: Yup
+        .string(),
+    kickVelocitySigmaCcsnNs: Yup
+        .number()
+        .min(0.0),
+    kickVelocitySigmaCcsnBh: Yup
+        .number()
+        .min(0.0),
+    kickVelocitySigmaEcsn: Yup
+        .number()
+        .min(0.0),
+    kickVelocitySigmaUssn: Yup
+        .number()
+        .min(0.0),
+    pairInstabilitySupernovae: Yup
+        .bool(),
+    pisnLowerLimit: Yup
+        .number()
         .min(0.0)
+        .test(
+            'pisnLowerLimit vs pisnUpperLimit',
+            'PISN Upper Limit should be > PISN lower Limit',
+            (value) => value < pisnUpperLimit.value
+        ),
+    pisnUpperLimit: Yup
+        .number()
+        .min(0.0)
+        .test(
+            'pisnUpperLimit vs pisnLowerLimit',
+            'PISN Lower Limit should be < PISN Upper Limit',
+            (value) => value > pisnLowerLimit.value
+        ),
+    pulsationalPairInstabilitySupernovae: Yup
+        .bool(),
+    ppiLowerLimit: Yup
+        .number()
+        .min(0.0)
+        .test(
+            'ppiLowerLimit vs ppiUpperLimit',
+            'PPI Upper Limit should be > PPI lower Limit',
+            (value) => value < ppiUpperLimit.value
+        ),
+    ppiUpperLimit: Yup
+        .number()
+        .min(0.0)
+        .test(
+            'ppiUpperLimit vs ppiLowerLimit',
+            'PPI Lower Limit should be < PPi Upper Limit',
+            (value) => value > ppiLowerLimit.value
+        ),
+    pulsationalPairInstabilityPrescription: Yup
+        .string(),
+    maximumNeutronStarMass: Yup
+        .number()
+        .min(0.0),
 
-}, [['mass1', 'mass2'], ['separation', 'orbitalPeriod']]);
+}, [['mass1', 'mass2'], ['separation', 'orbitalPeriod'],
+    ['pisnLowerLimit', 'pisnUpperLimit'], ['ppiLowerLimit', 'ppiUpperLimit']]);
 
 export default validationSchema;

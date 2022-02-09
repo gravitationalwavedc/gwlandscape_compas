@@ -14,6 +14,16 @@ const initialValues = {
     commonEnvelopeAlpha: 1.0,
     commonEnvelopeLambdaPrescription: 'LAMBDA_NANJING',
     commonEnvelopeLambda: 0.1,
+    kickVelocitySigmaCcsnNs: 265.0,
+    kickVelocitySigmaCcsnBh: 265.0,
+    maximumNeutronStarMass: 2.5,
+    kickVelocitySigmaEcsn: 30.0,
+    kickVelocitySigmaUssn: 30.0,
+    pisnLowerLimit: 60.0,
+    pisnUpperLimit: 135.0,
+    ppiLowerLimit: 35.0,
+    ppiUpperLimit: 60.0,
+
 };
 
 export default initialValues;

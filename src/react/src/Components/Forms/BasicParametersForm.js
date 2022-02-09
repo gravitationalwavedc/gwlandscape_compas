@@ -13,7 +13,7 @@ const BasicParametersForm = ({formik}) => {
                             <Col>
                                 <Input
                                     formik={formik}
-                                    title="Mass 1"
+                                    title="Mass 1 (M&#9737;)"
                                     name="mass1"
                                     type="number"
                                     help="Mass of the initially more massive star.  0 < Value < 150"
@@ -37,7 +37,7 @@ const BasicParametersForm = ({formik}) => {
                             <Col>
                                 <Input
                                     formik={formik}
-                                    title="Mass 2"
+                                    title="Mass 2 (M&#9737;)"
                                     name="mass2"
                                     type="number"
                                     help="Mass of the initially less massive star. 0 < Value < 150"

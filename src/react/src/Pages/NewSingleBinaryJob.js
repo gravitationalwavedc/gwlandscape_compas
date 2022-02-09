@@ -11,6 +11,7 @@ import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import KickParametersForm from '../Components/Forms/KickParametersForm';
 import CommonEnvelopeParametersForm from '../Components/Forms/CommonEnvelopeParametersForm';
+import SupernovaParametersForm from '../Components/Forms/SupernovaParametersForm';
 
 // import ReviewJob from '../Components/Forms/ReviewJob';
 import initialValues from '../Components/Forms/initialValues';
@@ -106,6 +107,7 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                     <BasicParametersForm formik={formik}/>
                     <KickParametersForm formik={formik}/>
                     <CommonEnvelopeParametersForm formik={formik}/>
+                    <SupernovaParametersForm formik={formik}/>
 
                     <ReviewSingleBinaryJob
                         formik={formik}

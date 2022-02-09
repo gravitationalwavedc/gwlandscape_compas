@@ -469,8 +469,22 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
         common_envelope_alpha = graphene.Float()
         common_envelope_lambda_prescription = graphene.String()
         common_envelope_lambda = graphene.Float()
-
-
+        remnant_mass_prescription = graphene.String()
+        fryer_supernova_engine = graphene.String()
+        black_hole_kicks = graphene.String()
+        kick_velocity_distribution = graphene.String()
+        kick_velocity_sigma_CCSN_NS = graphene.Float()
+        kick_velocity_sigma_CCSN_BH = graphene.Float()
+        kick_velocity_sigma_ECSN = graphene.Float()
+        kick_velocity_sigma_USSN = graphene.Float()
+        pair_instability_supernovae = graphene.Boolean()
+        pisn_lower_limit = graphene.Float()
+        pisn_upper_limit = graphene.Float()
+        pulsational_pair_instability_supernovae = graphene.Boolean()
+        ppi_lower_limit = graphene.Float()
+        ppi_upper_limit = graphene.Float()
+        pulsational_pair_instability_prescription = graphene.String()
+        maximum_neutron_star_mass = graphene.Float()
 
     # single_binary_job = graphene.Field(SingleBinaryJobNode)
     result = graphene.Field(SingleBinaryJobCreationResult)
@@ -495,6 +509,22 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             common_envelope_alpha=input.get('common_envelope_alpha'),
             common_envelope_lambda_prescription=input.get('common_envelope_lambda_prescription'),
             common_envelope_lambda=input.get('common_envelope_lambda'),
+            remnant_mass_prescription=input.get('remnant_mass_prescription'),
+            fryer_supernova_engine=input.get('fryer_supernova_engine'),
+            black_hole_kicks=input.get('black_hole_kicks'),
+            kick_velocity_distribution=input.get('kick_velocity_distribution'),
+            kick_velocity_sigma_CCSN_NS=input.get('kick_velocity_sigma_CCSN_NS'),
+            kick_velocity_sigma_CCSN_BH=input.get('kick_velocity_sigma_CCSN_BH'),
+            kick_velocity_sigma_ECSN=input.get('kick_velocity_sigma_ECSN'),
+            kick_velocity_sigma_USSN=input.get('kick_velocity_sigma_USSN'),
+            pair_instability_supernovae=input.get('pair_instability_supernovae'),
+            pisn_lower_limit=input.get('pisn_lower_limit'),
+            pisn_upper_limit=input.get('pisn_upper_limit'),
+            pulsational_pair_instability_supernovae=input.get('pulsational_pair_instability_supernovae'),
+            ppi_lower_limit=input.get('ppi_lower_limit'),
+            ppi_upper_limit=input.get('ppi_upper_limit'),
+            pulsational_pair_instability_prescription=input.get('pulsational_pair_instability_prescription'),
+            maximum_neutron_star_mass=input.get('maximum_neutron_star_mass'),
 
         )
         # run_details = ''

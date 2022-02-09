@@ -3,7 +3,7 @@ import {Form} from 'react-bootstrap';
 
 const SelectInput = ({ title, formik, name, options, help, ...rest }) =>
     <React.Fragment>
-        <Form.Group controlId="name">
+        <Form.Group controlId={name}>
             <Form.Label>{ title }</Form.Label>
             <Form.Control
                 name= {name}

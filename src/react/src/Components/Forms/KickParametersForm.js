@@ -20,7 +20,7 @@ const KickParametersForm = ({formik}) => {
                                 />
                                 <Input
                                     formik={formik}
-                                    title="Velocity 1(km/s)"
+                                    title="Velocity 1 (km/s)"
                                     name="velocity1"
                                     type="number"
                                     help="Value to be used as the (drawn) kick magnitude for the primary star of a binary system when evolving in BSE mode, should the star undergo a supernova event (km s −1 ), Value > 0"
@@ -57,7 +57,7 @@ const KickParametersForm = ({formik}) => {
                                 />
                                 <Input
                                     formik={formik}
-                                    title="Velocity 2(km/s)"
+                                    title="Velocity 2 (km/s)"
                                     name="velocity2"
                                     type="number"
                                     help="Value to be used as the (drawn) kick magnitude for the second star of a binary system when evolving in BSE mode, should the star undergo a supernova event (km s −1 ), Value > 0"
