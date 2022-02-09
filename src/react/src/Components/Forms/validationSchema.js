@@ -120,7 +120,7 @@ let validationSchema = Yup.object().shape({
         .number()
         .min(0.0),
     pairInstabilitySupernovae: Yup
-        .bool(),
+        .boolean(),
     pisnLowerLimit: Yup
         .number()
         .min(0.0)
@@ -138,7 +138,7 @@ let validationSchema = Yup.object().shape({
             (value) => value > pisnLowerLimit.value
         ),
     pulsationalPairInstabilitySupernovae: Yup
-        .bool(),
+        .boolean(),
     ppiLowerLimit: Yup
         .number()
         .min(0.0)
@@ -158,6 +158,16 @@ let validationSchema = Yup.object().shape({
     pulsationalPairInstabilityPrescription: Yup
         .string(),
     maximumNeutronStarMass: Yup
+        .number()
+        .min(0.0),
+    massTransferAngularMomentumLossPrescription: Yup
+        .string(),
+    massTransferAccertionEfficiencyPrescription: Yup
+        .string(),
+    massTransferFa: Yup
+        .number()
+        .min(0.0),
+    massTransferJloss: Yup
         .number()
         .min(0.0),
 

@@ -542,44 +542,44 @@ class SingleBinaryJob(models.Model):
         default=3.0,
         help_text="--maximum-neutron-star-mass: Maximum mass of a neutron star, Value > 0",
     )
-    #
-    # # Mass transfer
-    # # --mass-transfer-angular-momentum-loss-prescription
-    # mass_transfer_angular_momentum_loss_prescription = models.CharField(
-    #     choices=MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_CHOICES,
-    #     max_length=55,
-    #     blank=True,
-    #     null=True,
-    #     default=MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_ISOTROPIC_VALUE,
-    #     help_text="--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular Momentum Loss prescription",
-    # )
-    # # --mass-transfer-accretion-efficiency-prescription
-    # mass_transfer_accertion_efficiency_prescription = models.CharField(
-    #     choices=MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_CHOICES,
-    #     max_length=55,
-    #     blank=True,
-    #     null=True,
-    #     default=MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
-    #     help_text="--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion efficiency prescription",
-    # )
-    # # Ideally should only appear if using --mass-transfer-accretion-efficiency-prescription FIXED
-    # # --mass-transfer-fa
-    # mass_transfer_fa = models.FloatField(
-    #     blank=True,
-    #     null=True,
-    #     validators=[MinValueValidator(0.0)],
-    #     default=0.5,
-    #     help_text='--mass-transfer-fa: Mass Transfer fraction accreted in FIXED prescription',
-    # )
-    # # Ideally should only appear if using --mass-transfer-angular-momentum-loss-prescription ARBITRARY
-    # # --mass-transfer-jloss
-    # mass_transfer_jloss = models.FloatField(
-    #     blank=True,
-    #     null=True,
-    #     validators=[MinValueValidator(0.0)],
-    #     default=1.0,
-    #     help_text='--mass-transfer-jloss: Specific angular momentum with which the non-accreted system leaves the system',
-    # )
+
+    # Mass transfer
+    # --mass-transfer-angular-momentum-loss-prescription
+    mass_transfer_angular_momentum_loss_prescription = models.CharField(
+        choices=MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_CHOICES,
+        max_length=55,
+        blank=True,
+        null=True,
+        default=MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_ISOTROPIC_VALUE,
+        help_text="--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular Momentum Loss prescription",
+    )
+    # --mass-transfer-accretion-efficiency-prescription
+    mass_transfer_accertion_efficiency_prescription = models.CharField(
+        choices=MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_CHOICES,
+        max_length=55,
+        blank=True,
+        null=True,
+        default=MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
+        help_text="--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion efficiency prescription",
+    )
+    # Ideally should only appear if using --mass-transfer-accretion-efficiency-prescription FIXED
+    # --mass-transfer-fa
+    mass_transfer_fa = models.FloatField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0.0)],
+        default=0.5,
+        help_text='--mass-transfer-fa: Mass Transfer fraction accreted in FIXED prescription',
+    )
+    # Ideally should only appear if using --mass-transfer-angular-momentum-loss-prescription ARBITRARY
+    # --mass-transfer-jloss
+    mass_transfer_jloss = models.FloatField(
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(0.0)],
+        default=1.0,
+        help_text='--mass-transfer-jloss: Specific angular momentum with which the non-accreted system leaves the system',
+    )
 
     def save(self, *args, **kwargs):
         """

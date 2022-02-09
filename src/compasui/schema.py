@@ -485,6 +485,10 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
         ppi_upper_limit = graphene.Float()
         pulsational_pair_instability_prescription = graphene.String()
         maximum_neutron_star_mass = graphene.Float()
+        mass_transfer_angular_momentum_loss_prescription = graphene.String()
+        mass_transfer_accertion_efficiency_prescription = graphene.String()
+        mass_transfer_fa = graphene.Float()
+        mass_transfer_jloss = graphene.Float()
 
     # single_binary_job = graphene.Field(SingleBinaryJobNode)
     result = graphene.Field(SingleBinaryJobCreationResult)
@@ -525,6 +529,10 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             ppi_upper_limit=input.get('ppi_upper_limit'),
             pulsational_pair_instability_prescription=input.get('pulsational_pair_instability_prescription'),
             maximum_neutron_star_mass=input.get('maximum_neutron_star_mass'),
+            mass_transfer_angular_momentum_loss_prescription=input.get('mass_transfer_angular_momentum_loss_prescription'),
+            mass_transfer_accertion_efficiency_prescription=input.get('mass_transfer_accertion_efficiency_prescription'),
+            mass_transfer_fa=input.get('mass_transfer_fa'),
+            mass_transfer_jloss=input.get('mass_transfer_jloss')
 
         )
         # run_details = ''

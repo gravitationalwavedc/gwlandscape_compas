@@ -28,7 +28,7 @@ const CommonEnvelopeParametersForm = ({formik}) => {
                                     formik={formik}
                                     title="Alpha"
                                     name="commonEnvelopeAlpha"
-                                    type="string"
+                                    type="number"
                                     help="--common-envelope-alpha: Common Envelope efficiency alpha, Value > 0"
                                 />
                             </Col>

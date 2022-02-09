@@ -173,7 +173,7 @@ const SupernovaParametersForm = ({formik}) => {
                                         id="pulsationalPairInstabilitySupernovae"
                                         type="checkbox"
                                         name="pulsationalPairInstabilitySupernovae"
-                                        label="Pulsational_pair_instability_supernovae Supernovae"
+                                        label="Pulsational Pair Instability Supernovae"
                                         onChange={formik.handleChange}
                                     />
                                     <Form.Text>--pulsational-pair-instability: Enable mass loss due to pulsational-pair-instability (PPI)</Form.Text>

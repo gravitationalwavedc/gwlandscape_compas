@@ -126,7 +126,8 @@ def create_single_binary_job(
         kick_velocity_sigma_ECSN, kick_velocity_sigma_USSN, pair_instability_supernovae,
         pisn_lower_limit, pisn_upper_limit, pulsational_pair_instability_supernovae,
         ppi_lower_limit, ppi_upper_limit, pulsational_pair_instability_prescription,
-        maximum_neutron_star_mass
+        maximum_neutron_star_mass, mass_transfer_angular_momentum_loss_prescription,
+        mass_transfer_accertion_efficiency_prescription, mass_transfer_fa, mass_transfer_jloss
 ):
     single_binary_job = SingleBinaryJob(
         mass1=mass1,
@@ -162,6 +163,10 @@ def create_single_binary_job(
         ppi_upper_limit=ppi_upper_limit,
         pulsational_pair_instability_prescription=pulsational_pair_instability_prescription,
         maximum_neutron_star_mass=maximum_neutron_star_mass,
+        mass_transfer_angular_momentum_loss_prescription=mass_transfer_angular_momentum_loss_prescription,
+        mass_transfer_accertion_efficiency_prescription=mass_transfer_accertion_efficiency_prescription,
+        mass_transfer_fa=mass_transfer_fa,
+        mass_transfer_jloss=mass_transfer_jloss,
     )
     single_binary_job.save()
     model_id = str(single_binary_job.id)

@@ -12,6 +12,7 @@ import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import KickParametersForm from '../Components/Forms/KickParametersForm';
 import CommonEnvelopeParametersForm from '../Components/Forms/CommonEnvelopeParametersForm';
 import SupernovaParametersForm from '../Components/Forms/SupernovaParametersForm';
+import MassTransferParametersForm from '../Components/Forms/MassTransferParametersForm';
 
 // import ReviewJob from '../Components/Forms/ReviewJob';
 import initialValues from '../Components/Forms/initialValues';
@@ -74,6 +75,26 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                 commonEnvelopeAlpha: values.commonEnvelopeAlpha,
                 commonEnvelopeLambdaPrescription: values.commonEnvelopeLambdaPrescription,
                 commonEnvelopeLambda: values.commonEnvelopeLambda,
+                remnantMassPrescription: values.remnantMassPrescription,
+                fryerSupernovaEngine: values.fryerSupernovaEngine,
+                blackHoleKicks: values.blackHoleKicks,
+                kickVelocityDistribution: values.kickVelocityDistribution,
+                kickVelocitySigmaCcsnNs: values.kickVelocitySigmaCcsnNs,
+                kickVelocitySigmaCcsnBh: values.kickVelocitySigmaCcsnBh,
+                kickVelocitySigmaEcsn: values.kickVelocitySigmaEcsn,
+                kickVelocitySigmaUssn: values.kickVelocitySigmaUssn,
+                pairInstabilitySupernovae: values.pairInstabilitySupernovae,
+                pisnLowerLimit: values.pisnLowerLimit,
+                pisnUpperLimit: values.pisnUpperLimit,
+                pulsationalPairInstabilitySupernovae: values.pulsationalPairInstabilitySupernovae,
+                ppiLowerLimit: values.ppiLowerLimit,
+                ppiUpperLimit: values.ppiUpperLimit,
+                pulsationalPairInstabilityPrescription: values.pulsationalPairInstabilityPrescription,
+                maximumNeutronStarMass: values.maximumNeutronStarMass,
+                massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
+                massTransferAccertionEfficiencyPrescription: values.massTransferAccertionEfficiencyPrescription,
+                massTransferFa: values.massTransferFa,
+                massTransferJloss: values.massTransferJloss,
             }
         };
 
@@ -108,6 +129,7 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                     <KickParametersForm formik={formik}/>
                     <CommonEnvelopeParametersForm formik={formik}/>
                     <SupernovaParametersForm formik={formik}/>
+                    <MassTransferParametersForm formik={formik}/>
 
                     <ReviewSingleBinaryJob
                         formik={formik}
