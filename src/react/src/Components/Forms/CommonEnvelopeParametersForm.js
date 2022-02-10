@@ -1,22 +1,25 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Col, Form, Row} from 'react-bootstrap';
 import FormCard from './FormCard';
 import Input from './Atoms/Input';
-import SelectInput from "./Atoms/SelectInput";
+import SelectInput from './Atoms/SelectInput';
+
+const lambdaPrescriptionOptions = [
+    {'value': 'LAMBDA_FIXED', 'label': 'LAMBDA_FIXED'},
+    {'value': 'LAMBDA_LOVERIDGE', 'label': 'LAMBDA_LOVERIDGE'},
+    {'value': 'LAMBDA_NANJING', 'label': 'LAMBDA_NANJING'},
+    {'value': 'LAMBDA_KRUCKOW', 'label': 'LAMBDA_KRUCKOW'},
+    {'value': 'LAMBDA_DEWI', 'label': 'LAMBDA_DEWI'},
+];
 
 const CommonEnvelopeParametersForm = ({formik}) => {
-    // const testOptions = [
-    //     {'value': 'value1', 'label': 'Label 1'},
-    //     {'value': 'value2', 'label': 'Label 2'},
-    // ]
+    const [showLambda, setShowLambda] = useState(false);
+    const handleLambdaPrescriptionOnChange = (e) => {
+        // console.log("value", e.target.value);
+        formik.setFieldValue('commonEnvelopeLambdaPrescription', e.target.value);
+        setShowLambda(e.target.value === 'LAMBDA_FIXED');
+    };
 
-    const lambdaPrescriptionOptions = [
-        {'value': 'LAMBDA_FIXED', 'label': 'LAMBDA_FIXED'},
-        {'value': 'LAMBDA_LOVERIDGE', 'label': 'LAMBDA_LOVERIDGE'},
-        {'value': 'LAMBDA_NANJING', 'label': 'LAMBDA_NANJING'},
-        {'value': 'LAMBDA_KRUCKOW', 'label': 'LAMBDA_KRUCKOW'},
-        {'value': 'LAMBDA_DEWI', 'label': 'LAMBDA_DEWI'},
-    ];
     return (
         <React.Fragment>
             <Row>
@@ -38,31 +41,6 @@ const CommonEnvelopeParametersForm = ({formik}) => {
                         </Row>
                         <Row>
                             <Col>
-                                {/*<Input*/}
-                                {/*    formik={formik}*/}
-                                {/*    title="Lambda Prescription"*/}
-                                {/*    name="commonEnvelopeLambdaPrescription"*/}
-                                {/*    type="number"*/}
-                                {/*    help="--common-envelope-lambda-prescription: CE lambda prescription"*/}
-                                {/*/>*/}
-
-                                {/*<Form.Group controlId="commonEnvelopeLambdaPrescription">*/}
-                                {/*    <Form.Label>Lambda Prescription</Form.Label>*/}
-                                {/*    <Form.Control*/}
-                                {/*        name="commonEnvelopeLambdaPrescription"*/}
-                                {/*        as="select"*/}
-                                {/*        custom*/}
-                                {/*        {...formik.getFieldProps('commonEnvelopeLambdaPrescription')}>*/}
-                                {/*        {lambdaPrescriptionOptions.map(({value, label}) =>*/}
-                                {/*            <option value={value} key={value}>{label}</option>*/}
-                                {/*        )}*/}
-                                {/*    </Form.Control>*/}
-                                {/*    <Form.Text>--common-envelope-lambda-prescription: CE lambda prescription</Form.Text>*/}
-                                {/*    <Form.Control.Feedback type='invalid'>*/}
-                                {/*        {formik.errors[name]}*/}
-                                {/*    </Form.Control.Feedback>*/}
-                                {/*</Form.Group>*/}
-
                                 <SelectInput
                                     formik={formik}
                                     title='Lambda Prescription'
@@ -70,11 +48,18 @@ const CommonEnvelopeParametersForm = ({formik}) => {
                                     type='string'
                                     help='--common-envelope-lambda-prescription: CE lambda prescription'
                                     options={lambdaPrescriptionOptions}
+                                    onChange={handleLambdaPrescriptionOnChange}
+                                    // onChange={e => {
+                                    //     console.log("e.target.value", e.target.value);
+                                    //     formik.setFieldValue('commonEnvelopeLambdaPrescription', e.target.value);
+                                    //     setShowLambda(e.target.value === 'LAMBDA_FIXED');
+                                    // }}
                                 />
                             </Col>
                             <Col>
                                 <Input
                                     formik={formik}
+                                    show={showLambda}
                                     title="Lambda"
                                     name="commonEnvelopeLambda"
                                     type="number"

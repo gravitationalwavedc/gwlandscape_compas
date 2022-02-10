@@ -481,7 +481,6 @@ class SingleBinaryJob(models.Model):
     pair_instability_supernovae = models.BooleanField(
         blank=True,
         null=True,
-        default=True,
         help_text="--pair-instability-supernovae: Enable pair instability supernovae (PISN)"
     )
 
@@ -503,7 +502,6 @@ class SingleBinaryJob(models.Model):
     )
     # --pulsational-pair-instability
     pulsational_pair_instability_supernovae = models.BooleanField(
-        default=True,
         null=True,
         blank=True,
         help_text="--pulsational-pair-instability: Enable mass loss due to pulsational-pair-instability (PPI)",

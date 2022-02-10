@@ -1,14 +1,15 @@
 import React from 'react';
 import {Form} from 'react-bootstrap';
 
-const SelectInput = ({ title, formik, name, options, help, ...rest }) =>
+const SelectInput = ({ title, formik, name, options, show=true, help, ...rest }) =>
     <React.Fragment>
-        <Form.Group controlId={name}>
+        <Form.Group controlId={name} className={show? '' : 'hidden'}>
             <Form.Label>{ title }</Form.Label>
             <Form.Control
                 name= {name}
                 as="select"
                 custom
+                // value={formik.values[name]}
                 isValid={formik.touched[name] && !formik.errors[name]}
                 isInvalid={!!formik.errors[name]}
                 {...formik.getFieldProps(name)} {...rest}>
@@ -20,7 +21,6 @@ const SelectInput = ({ title, formik, name, options, help, ...rest }) =>
                             {label}
                         </option>
                     )}
-                {/*onChange={(e) => console.log(e.target.value)}*/}
             </Form.Control>
             <Form.Text>{help}</Form.Text>
             <Form.Control.Feedback type='invalid'>

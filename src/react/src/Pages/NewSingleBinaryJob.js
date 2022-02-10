@@ -83,10 +83,10 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                 kickVelocitySigmaCcsnBh: values.kickVelocitySigmaCcsnBh,
                 kickVelocitySigmaEcsn: values.kickVelocitySigmaEcsn,
                 kickVelocitySigmaUssn: values.kickVelocitySigmaUssn,
-                pairInstabilitySupernovae: values.pairInstabilitySupernovae,
+                pairInstabilitySupernovae: Boolean(values.pairInstabilitySupernovae),
                 pisnLowerLimit: values.pisnLowerLimit,
                 pisnUpperLimit: values.pisnUpperLimit,
-                pulsationalPairInstabilitySupernovae: values.pulsationalPairInstabilitySupernovae,
+                pulsationalPairInstabilitySupernovae: Boolean(values.pulsationalPairInstabilitySupernovae),
                 ppiLowerLimit: values.ppiLowerLimit,
                 ppiUpperLimit: values.ppiUpperLimit,
                 pulsationalPairInstabilityPrescription: values.pulsationalPairInstabilityPrescription,
@@ -97,18 +97,16 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                 massTransferJloss: values.massTransferJloss,
             }
         };
-
         // setGridFile(gridFile + ' Eman ');
         // setPlotFile('http://127.0.0.1:8003/files/jobs/64/COMPAS_Output/Detailed_Output/gw151226evol.png');
-        console.log((variables));
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
             variables: variables,
             onCompleted: (response, errors) => {
                 if (!errors) {
                     // router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
-                    console.log('all done');
-                    console.log(response);
+                    // console.log('all done');
+                    // console.log(response);
 
                     setTimeout( () => {
                         setGridFile('http://localhost:8003' + response.newSingleBinary.result.gridFilePath);

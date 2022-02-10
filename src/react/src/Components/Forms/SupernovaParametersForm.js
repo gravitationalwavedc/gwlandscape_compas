@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Col, Form, Row} from 'react-bootstrap';
 import FormCard from './FormCard';
 import Input from './Atoms/Input';
@@ -41,6 +41,14 @@ const pulsationalPairInstabilityPrescriptionOptions = [
 ];
 
 const SupernovaParametersForm = ({formik}) => {
+    const [showFryerSupernovaEngine, setShowFryerSupernovaEngine] = useState(true);
+    const [pisn, setPisn] = useState(formik.values['pairInstabilitySupernovae']);
+    const [ppi, setPpi] = useState(formik.values['pulsationalPairInstabilitySupernovae']);
+    const handleRemnantMassPrescriptionOnChange = (e) => {
+        // console.log("value", e.target.value);
+        formik.setFieldValue('remnantMassPrescription', e.target.value);
+        setShowFryerSupernovaEngine(e.target.value === 'FRYER2012');
+    };
     return (
         <React.Fragment>
             <Row>
@@ -55,11 +63,13 @@ const SupernovaParametersForm = ({formik}) => {
                                     type='string'
                                     help='--remnant-mass-prescription: Remnant mass prescription'
                                     options={remnantMassPrescriptionOptions}
+                                    onChange={handleRemnantMassPrescriptionOnChange}
                                 />
                             </Col>
                             <Col>
                                 <SelectInput
                                     formik={formik}
+                                    show={showFryerSupernovaEngine}
                                     title='Fryer Supernova Engine'
                                     name='fryerSupernovaEngine'
                                     type='string'
@@ -139,7 +149,14 @@ const SupernovaParametersForm = ({formik}) => {
                                         type="checkbox"
                                         name="pairInstabilitySupernovae"
                                         label="Pair Instability Supernovae"
-                                        onChange={formik.handleChange}
+                                        checked={pisn}
+                                        value={pisn}
+                                        // onChange={formik.handleChange}
+                                        onChange={(e) => {
+                                            // console.log('value' + e.target.checked);
+                                            setPisn(e.target.checked);
+                                            formik.setFieldValue('pairInstabilitySupernovae', e.target.checked);
+                                        }}
                                     />
                                     <Form.Text>--pair-instability-supernovae: Enable pair instability supernovae (PISN)</Form.Text>
                                 </Form.Group>
@@ -174,7 +191,14 @@ const SupernovaParametersForm = ({formik}) => {
                                         type="checkbox"
                                         name="pulsationalPairInstabilitySupernovae"
                                         label="Pulsational Pair Instability Supernovae"
-                                        onChange={formik.handleChange}
+                                        checked={ppi}
+                                        value={ppi}
+                                        // onChange={formik.handleChange}
+                                        onChange={(e) => {
+                                            // console.log('value' + e.target.checked);
+                                            setPpi(e.target.checked);
+                                            formik.setFieldValue('pulsationalPairInstabilitySupernovae',e.target.checked);
+                                        }}
                                     />
                                     <Form.Text>--pulsational-pair-instability: Enable mass loss due to pulsational-pair-instability (PPI)</Form.Text>
                                 </Form.Group>

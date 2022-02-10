@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-const Input = ({formik, title, name, type, help, ...rest}) =>
-    <Form.Group controlId={ name }>
+const Input = ({formik, title, name, type, help, show= true, ...rest}) =>
+    <Form.Group controlId={ name } className={show? '' : 'hidden'}>
         <Form.Label>{ title }</Form.Label>
         <Form.Control 
             name={ name }

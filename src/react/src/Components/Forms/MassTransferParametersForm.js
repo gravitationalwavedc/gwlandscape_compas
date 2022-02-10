@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Col, Form, Row} from 'react-bootstrap';
 import FormCard from './FormCard';
 import Input from './Atoms/Input';
@@ -17,6 +17,20 @@ const massTransferAccertionEfficiencyPrescriptionOptions = [
 ];
 
 const MassTransferParametersForm = ({formik}) => {
+    const [showMassTransferFa, setShowMassTransferFa] = useState(false);
+    const [showMassTransferJloss, setshowMassTransferJloss] = useState(false);
+
+    const handleAngularMomentumLossPrescriptionOnChange = (e) => {
+        // console.log("value", e.target.value);
+        formik.setFieldValue('massTransferAngularMomentumLossPrescription', e.target.value);
+        setShowMassTransferFa(e.target.value === 'ARBITRARY');
+    };
+
+    const handleAccertionEfficiencyPrescriptionOnChange = (e) => {
+        // console.log("value", e.target.value);
+        formik.setFieldValue('massTransferAccertionEfficiencyPrescription', e.target.value);
+        setshowMassTransferJloss(e.target.value === 'FIXED');
+    };
 
     return (
         <React.Fragment>
@@ -32,11 +46,13 @@ const MassTransferParametersForm = ({formik}) => {
                                     type='string'
                                     help='--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular Momentum Loss prescription'
                                     options={massTransferAngularMomentumLossPrescriptionOptions}
+                                    onChange={handleAngularMomentumLossPrescriptionOnChange}
                                 />
                             </Col>
                             <Col>
                                 <Input
                                     formik={formik}
+                                    show={showMassTransferFa}
                                     title="Fraction Accreted"
                                     name="massTransferFa"
                                     type="number"
@@ -53,11 +69,13 @@ const MassTransferParametersForm = ({formik}) => {
                                     type='string'
                                     help='--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion efficiency prescription'
                                     options={massTransferAccertionEfficiencyPrescriptionOptions}
+                                    onChange={handleAccertionEfficiencyPrescriptionOnChange}
                                 />
                             </Col>
                             <Col>
                                 <Input
                                     formik={formik}
+                                    show={showMassTransferJloss}
                                     title="JLoss"
                                     name="massTransferJloss"
                                     type="number"

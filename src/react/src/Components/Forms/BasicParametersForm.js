@@ -21,14 +21,14 @@ const BasicParametersForm = ({formik}) => {
 
                                 <Input
                                     formik={formik}
-                                    title="Metallicity"
+                                    title="Metallicity (Z&#9737;)"
                                     name="metallicity"
                                     type="number"
                                     help="Metallicity of stars.  1E-4 < Value < 0.03"
                                 />
                                 <Input
                                     formik={formik}
-                                    title="Separation(AU)"
+                                    title="Separation (AU)"
                                     name="separation"
                                     type="number"
                                     help="Value > 0. Only used with no Orbital Period"
@@ -51,7 +51,7 @@ const BasicParametersForm = ({formik}) => {
                                 />
                                 <Input
                                     formik={formik}
-                                    title="Orbital Period"
+                                    title="Orbital Period (days)"
                                     name="orbitalPeriod"
                                     type="number"
                                     help="Value > 0. Only used with no Separation"
