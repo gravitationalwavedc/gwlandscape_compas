@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 import FormCard from './FormCard';
 import Input from './Atoms/Input';
 import SelectInput from './Atoms/SelectInput';
@@ -35,9 +35,7 @@ const CommonEnvelopeParametersForm = ({formik}) => {
                                     help="--common-envelope-alpha: Common Envelope efficiency alpha, Value > 0"
                                 />
                             </Col>
-                            <Col>
-
-                            </Col>
+                            <Col/>
                         </Row>
                         <Row>
                             <Col>
@@ -49,11 +47,6 @@ const CommonEnvelopeParametersForm = ({formik}) => {
                                     help='--common-envelope-lambda-prescription: CE lambda prescription'
                                     options={lambdaPrescriptionOptions}
                                     onChange={handleLambdaPrescriptionOnChange}
-                                    // onChange={e => {
-                                    //     console.log("e.target.value", e.target.value);
-                                    //     formik.setFieldValue('commonEnvelopeLambdaPrescription', e.target.value);
-                                    //     setShowLambda(e.target.value === 'LAMBDA_FIXED');
-                                    // }}
                                 />
                             </Col>
                             <Col>

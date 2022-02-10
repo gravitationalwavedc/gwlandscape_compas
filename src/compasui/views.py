@@ -197,8 +197,8 @@ def create_single_binary_job(
     # run compas as a Celery task
     # task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
     #                             link=run_plotting.s(detailed_output_file_path, plot_path))
-    # task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
-    #                               link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path))
+    task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
+                                  link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path))
 
 
     # request.session[model_id] = task.id

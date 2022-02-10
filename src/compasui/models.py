@@ -593,9 +593,11 @@ class SingleBinaryJob(models.Model):
         content = ""
 
         for field in self._meta.get_fields():
+
             field_value = getattr(self, field.name)
-            if field_value and (field.name in FIELD_COMMANDS):
+            if (field_value is not None) and (field.name in FIELD_COMMANDS):
                 content += f'{FIELD_COMMANDS[field.name]} {field_value}' + " "
+        print(content)
 
         # path where the file is saved: media_root/job_key
         storage_location = os.path.join(settings.MEDIA_ROOT, 'jobs', str(self.id))
