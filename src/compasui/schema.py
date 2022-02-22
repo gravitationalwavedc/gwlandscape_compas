@@ -387,7 +387,7 @@ class SingleBinaryJobCreationResult(graphene.ObjectType):
     grid_file_path = graphene.String()
     plot_file_path = graphene.String()
     van_plot_file_path = graphene.String()
-    run_details_path = graphene.String()
+    detailed_output_file_path = graphene.String()
 
 
 class CompasJobMutation(relay.ClientIDMutation):
@@ -495,65 +495,63 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
-        job = create_single_binary_job(
-            mass1=input.get("mass1"),
-            mass2=input.get("mass2"),
-            metallicity=input.get("metallicity"),
-            eccentricity=input.get("eccentricity"),
-            separation=input.get("separation"),
-            orbital_period=input.get("orbital_period"),
-            velocity_random_number_1=input.get("velocity_random_number_1"),
-            velocity_random_number_2=input.get("velocity_random_number_2"),
-            theta_1=input.get("theta_1"),
-            theta_2=input.get("theta_2"),
-            phi_1=input.get("phi_1"),
-            phi_2=input.get("phi_2"),
-            mean_anomaly_1=input.get("mean_anomaly_1"),
-            mean_anomaly_2=input.get("mean_anomaly_2"),
-            common_envelope_alpha=input.get('common_envelope_alpha'),
-            common_envelope_lambda_prescription=input.get('common_envelope_lambda_prescription'),
-            common_envelope_lambda=input.get('common_envelope_lambda'),
-            remnant_mass_prescription=input.get('remnant_mass_prescription'),
-            fryer_supernova_engine=input.get('fryer_supernova_engine'),
-            black_hole_kicks=input.get('black_hole_kicks'),
-            kick_velocity_distribution=input.get('kick_velocity_distribution'),
-            kick_velocity_sigma_CCSN_NS=input.get('kick_velocity_sigma_CCSN_NS'),
-            kick_velocity_sigma_CCSN_BH=input.get('kick_velocity_sigma_CCSN_BH'),
-            kick_velocity_sigma_ECSN=input.get('kick_velocity_sigma_ECSN'),
-            kick_velocity_sigma_USSN=input.get('kick_velocity_sigma_USSN'),
-            pair_instability_supernovae=input.get('pair_instability_supernovae'),
-            pisn_lower_limit=input.get('pisn_lower_limit'),
-            pisn_upper_limit=input.get('pisn_upper_limit'),
-            pulsational_pair_instability_supernovae=input.get('pulsational_pair_instability_supernovae'),
-            ppi_lower_limit=input.get('ppi_lower_limit'),
-            ppi_upper_limit=input.get('ppi_upper_limit'),
-            pulsational_pair_instability_prescription=input.get('pulsational_pair_instability_prescription'),
-            maximum_neutron_star_mass=input.get('maximum_neutron_star_mass'),
-            mass_transfer_angular_momentum_loss_prescription=input.get('mass_transfer_angular_momentum_loss_prescription'),
-            mass_transfer_accertion_efficiency_prescription=input.get('mass_transfer_accertion_efficiency_prescription'),
-            mass_transfer_fa=input.get('mass_transfer_fa'),
-            mass_transfer_jloss=input.get('mass_transfer_jloss')
+        try:
+            job = create_single_binary_job(
+                mass1=input.get("mass1"),
+                mass2=input.get("mass2"),
+                metallicity=input.get("metallicity"),
+                eccentricity=input.get("eccentricity"),
+                separation=input.get("separation"),
+                orbital_period=input.get("orbital_period"),
+                velocity_random_number_1=input.get("velocity_random_number_1"),
+                velocity_random_number_2=input.get("velocity_random_number_2"),
+                theta_1=input.get("theta_1"),
+                theta_2=input.get("theta_2"),
+                phi_1=input.get("phi_1"),
+                phi_2=input.get("phi_2"),
+                mean_anomaly_1=input.get("mean_anomaly_1"),
+                mean_anomaly_2=input.get("mean_anomaly_2"),
+                common_envelope_alpha=input.get('common_envelope_alpha'),
+                common_envelope_lambda_prescription=input.get('common_envelope_lambda_prescription'),
+                common_envelope_lambda=input.get('common_envelope_lambda'),
+                remnant_mass_prescription=input.get('remnant_mass_prescription'),
+                fryer_supernova_engine=input.get('fryer_supernova_engine'),
+                black_hole_kicks=input.get('black_hole_kicks'),
+                kick_velocity_distribution=input.get('kick_velocity_distribution'),
+                kick_velocity_sigma_CCSN_NS=input.get('kick_velocity_sigma_CCSN_NS'),
+                kick_velocity_sigma_CCSN_BH=input.get('kick_velocity_sigma_CCSN_BH'),
+                kick_velocity_sigma_ECSN=input.get('kick_velocity_sigma_ECSN'),
+                kick_velocity_sigma_USSN=input.get('kick_velocity_sigma_USSN'),
+                pair_instability_supernovae=input.get('pair_instability_supernovae'),
+                pisn_lower_limit=input.get('pisn_lower_limit'),
+                pisn_upper_limit=input.get('pisn_upper_limit'),
+                pulsational_pair_instability_supernovae=input.get('pulsational_pair_instability_supernovae'),
+                ppi_lower_limit=input.get('ppi_lower_limit'),
+                ppi_upper_limit=input.get('ppi_upper_limit'),
+                pulsational_pair_instability_prescription=input.get('pulsational_pair_instability_prescription'),
+                maximum_neutron_star_mass=input.get('maximum_neutron_star_mass'),
+                mass_transfer_angular_momentum_loss_prescription=input.get('mass_transfer_angular_momentum_loss_prescription'),
+                mass_transfer_accertion_efficiency_prescription=input.get('mass_transfer_accertion_efficiency_prescription'),
+                mass_transfer_fa=input.get('mass_transfer_fa'),
+                mass_transfer_jloss=input.get('mass_transfer_jloss')
 
-        )
-        # run_details = ''
-        # run_details_path = f'{settings.MEDIA_ROOT}jobs/{job.id}/COMPAS_Output/Run_Details'
-        # print(f'path: {run_details_path}')
-        # if os.path.exists(run_details_path):
-        #     print('exists')
-        # with open(run_details_path, 'r') as f:
-        #     run_details = f.read()
-        #     print(run_details)
-
-        return SingleBinaryJobMutation(
-            # single_binary_job=job
-            result=SingleBinaryJobCreationResult(
-                job_id=job.id,
-                plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
-                grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
-                van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
-                run_details_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Run_Details'
             )
-        )
+            return SingleBinaryJobMutation(
+                # single_binary_job=job
+                result=SingleBinaryJobCreationResult(
+                    job_id=job.id,
+                    plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
+                    grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
+                    van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
+                    detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+                )
+            )
+        except Exception as e:
+            print(f"COMPAS job #{e} didn't run successfully")
+            return SingleBinaryJobMutation(
+                result=SingleBinaryJobCreationResult(
+                    job_id=str(e), plot_file_path='', grid_file_path='',
+                    van_plot_file_path='', detailed_output_file_path=''))
 
 
 class Mutation(graphene.ObjectType):

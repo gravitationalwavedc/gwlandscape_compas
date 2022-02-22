@@ -36,8 +36,6 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
         result = check_output_file_generated(detailed_output_file_path)
 
     except SoftTimeLimitExceeded as timeout_err:
-        # If job timed out, clean up output directory
-        # cleanup_timeout_task(outputfilepath)
         print(timeout_err)
         result = TASK_TIMEOUT
 
@@ -61,8 +59,6 @@ def run_plotting(jobstate, detailed_output_file_path, plot_path):
 
     if jobstate == TASK_SUCCESS:
         # sending output file path to generate the plot into
-        # TODO: modify it to work with compas running in Docker
-
         result = None
         try:
             main(detailed_output_file_path, plot_path)
@@ -81,13 +77,14 @@ def run_plotting(jobstate, detailed_output_file_path, plot_path):
 def run_detailed_evol_plotting(jobstate, detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
 
     if jobstate == TASK_SUCCESS:
-        # sending output file path to generate the plot into
-        # TODO: modify it to work with compas running in Docker
 
         result = None
         try:
             main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             result = check_output_file_generated(vanDenHeuval_plot_path)
+        except SoftTimeLimitExceeded as timeout_err:
+            print(timeout_err)
+            result = TASK_TIMEOUT
         except Exception as e:
             print(e)
             result = TASK_FAIL
