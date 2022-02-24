@@ -40,7 +40,7 @@ const pulsationalPairInstabilityPrescriptionOptions = [
     {'value': 'MARCHANT', 'label': 'MARCHANT'},
 ];
 
-const SupernovaParametersForm = ({formik}) => {
+const SupernovaParametersForm = ({formik, collapsed, onTitleClick}) => {
     const [showFryerSupernovaEngine, setShowFryerSupernovaEngine] = useState(true);
     const [pisn, setPisn] = useState(formik.values['pairInstabilitySupernovae']);
     const [ppi, setPpi] = useState(formik.values['pulsationalPairInstabilitySupernovae']);
@@ -53,7 +53,7 @@ const SupernovaParametersForm = ({formik}) => {
         <React.Fragment>
             <Row>
                 <Col>
-                    <FormCard title="Supernova Parameters">
+                    <FormCard title="Supernova Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
                         <Row>
                             <Col>
                                 <SelectInput

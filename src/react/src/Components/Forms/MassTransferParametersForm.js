@@ -16,7 +16,7 @@ const massTransferAccertionEfficiencyPrescriptionOptions = [
     {'value': 'FIXED', 'label': 'FIXED'},
 ];
 
-const MassTransferParametersForm = ({formik}) => {
+const MassTransferParametersForm = ({formik, collapsed, onTitleClick}) => {
     const [showMassTransferFa, setShowMassTransferFa] = useState(false);
     const [showMassTransferJloss, setshowMassTransferJloss] = useState(false);
 
@@ -36,7 +36,7 @@ const MassTransferParametersForm = ({formik}) => {
         <React.Fragment>
             <Row>
                 <Col>
-                    <FormCard title="Common Envelope Parameters">
+                    <FormCard title="Common Envelope Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
                         <Row>
                             <Col>
                                 <SelectInput

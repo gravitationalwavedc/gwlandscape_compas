@@ -12,7 +12,7 @@ const lambdaPrescriptionOptions = [
     {'value': 'LAMBDA_DEWI', 'label': 'LAMBDA_DEWI'},
 ];
 
-const CommonEnvelopeParametersForm = ({formik}) => {
+const CommonEnvelopeParametersForm = ({formik, collapsed, onTitleClick}) => {
     const [showLambda, setShowLambda] = useState(false);
     const handleLambdaPrescriptionOnChange = (e) => {
         // console.log("value", e.target.value);
@@ -24,7 +24,7 @@ const CommonEnvelopeParametersForm = ({formik}) => {
         <React.Fragment>
             <Row>
                 <Col>
-                    <FormCard title="Common Envelope Parameters">
+                    <FormCard title="Common Envelope Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
                         <Row>
                             <Col>
                                 <Input

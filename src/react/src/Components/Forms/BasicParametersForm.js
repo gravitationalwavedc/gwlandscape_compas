@@ -3,12 +3,12 @@ import {Col, Row} from 'react-bootstrap';
 import FormCard from './FormCard';
 import Input from './Atoms/Input';
 
-const BasicParametersForm = ({formik}) => {
+const BasicParametersForm = ({formik, collapsed, onTitleClick}) => {
     return (
         <React.Fragment>
             <Row>
                 <Col>
-                    <FormCard title="Initial Parameters">
+                    <FormCard title="Initial Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
                         <Row>
                             <Col>
                                 <Input

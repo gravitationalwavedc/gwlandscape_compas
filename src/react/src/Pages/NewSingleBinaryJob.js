@@ -28,30 +28,6 @@ const submitMutation = graphql`
   }
 `;
 
-// const checkFileExist = (urlToFile, timeout=3000) => {
-//     return new Promise((resolve, reject) => {
-//         if(urlToFile == ''){
-//             reject(new Error('Plot was not created successfully'));
-//         }
-//         let timer = setTimeout(() => {
-//             reject(new Error('Plot was not created successfully'));
-//         }, timeout);
-//
-//         let xhr = new XMLHttpRequest();
-//         let exist = false;
-//         while (!exist) {
-//             xhr.open('HEAD', urlToFile, false);
-//             xhr.send();
-//
-//             if (xhr.status != '404') {
-//                 exist = true;
-//             }
-//         }
-//         clearTimeout(timer);
-//         resolve(true);
-//     });
-// };
-
 const checkFileExist = (urlToFile) => {
     let xhr = new XMLHttpRequest();
 
@@ -69,7 +45,6 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
         validationSchema: validationSchema,
     });
 
-    // const [gridFile, setGridFile] = useState('');
     const [plotFile, setPlotFile] = useState('');
     const [vanPlotFile, setVanPlotFile] = useState('');
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
@@ -77,6 +52,12 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
     const [detailedPlotLoaded, setDetailedPlotLoaded] = useState(false);
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
+    const [isBasicCollapsed, setIsBasicCollapsed] = useState(false);
+    const [isKickCollapsed, setIsKickCollapsed] = useState(true);
+    const [isCECollapsed, setIsCECollapsed] = useState(true);
+    const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
+    const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
+
 
     const handleJobSubmission = (values) => {
         setIsLoadingOutput(true);
@@ -173,11 +154,26 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
         <Container fluid>
             <Row>
                 <Col md={5}>
-                    <BasicParametersForm formik={formik}/>
-                    <KickParametersForm formik={formik}/>
-                    <CommonEnvelopeParametersForm formik={formik}/>
-                    <SupernovaParametersForm formik={formik}/>
-                    <MassTransferParametersForm formik={formik}/>
+                    <BasicParametersForm
+                        formik={formik}
+                        onTitleClick={()=>setIsBasicCollapsed(!isBasicCollapsed)}
+                        collapsed={isBasicCollapsed}/>
+                    <KickParametersForm
+                        formik={formik}
+                        onTitleClick={()=>setIsKickCollapsed(!isKickCollapsed)}
+                        collapsed={isKickCollapsed}/>
+                    <CommonEnvelopeParametersForm
+                        formik={formik}
+                        onTitleClick={()=>setIsCECollapsed(!isCECollapsed)}
+                        collapsed={isCECollapsed}/>
+                    <SupernovaParametersForm
+                        formik={formik}
+                        onTitleClick={()=>setIsSupernovaCollapsed(!isSupernovaCollapsed)}
+                        collapsed={isSupernovaCollapsed}/>
+                    <MassTransferParametersForm
+                        formik={formik}
+                        onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}
+                        collapsed={isMassTransferCollapsed}/>
 
                     <ReviewSingleBinaryJob
                         formik={formik}
