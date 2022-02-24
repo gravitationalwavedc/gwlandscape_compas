@@ -1,11 +1,7 @@
 from celery import shared_task
 
-from django.conf import settings
 import os
-import subprocess
-import traceback
 
-# from .utils.celery_single_sys_plotter import main
 from .utils.celery_detailed_evol_plot import main
 from .utils.celery_pythonSubmit import run_compas_cmd
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_FAIL_OTHER, TASK_TIMEOUT
@@ -50,31 +46,35 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
     finally:
         return result
 
+
 @shared_task
 def test_task(job_id):
     print(f"Task Recieved {job_id}")
 
+
+# @shared_task
+# def run_plotting(jobstate, detailed_output_file_path, plot_path):
+#
+#     if jobstate == TASK_SUCCESS:
+#         # sending output file path to generate the plot into
+#         result = None
+#         try:
+#             main(detailed_output_file_path, plot_path)
+#             result = check_output_file_generated(plot_path)
+#         except Exception as e:
+#             print(e)
+#             result = TASK_FAIL
+#         finally:
+#             return result
+#
+#     elif jobstate == TASK_FAIL or jobstate == TASK_TIMEOUT:
+#         print("COMPAS Model didn't run successfully! Couldn't generate plot")
+#         return TASK_FAIL
+
+
 @shared_task
-def run_plotting(jobstate, detailed_output_file_path, plot_path):
-
-    if jobstate == TASK_SUCCESS:
-        # sending output file path to generate the plot into
-        result = None
-        try:
-            main(detailed_output_file_path, plot_path)
-            result = check_output_file_generated(plot_path)
-        except Exception as e:
-            print(e)
-            result = TASK_FAIL
-        finally:
-            return result
-
-    elif jobstate == TASK_FAIL or jobstate == TASK_TIMEOUT:
-        print("COMPAS Model didn't run successfully! Couldn't generate plot")
-        return TASK_FAIL
-
-@shared_task
-def run_detailed_evol_plotting(jobstate, detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
+def run_detailed_evol_plotting(jobstate, detailed_output_file_path,
+                               detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
 
     if jobstate == TASK_SUCCESS:
 

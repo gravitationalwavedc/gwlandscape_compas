@@ -1,9 +1,6 @@
 import numpy as np
-import subprocess
 import sys
 import os
-import pickle
-import itertools
 from subprocess import call
 
 # Check if we are using python 3
@@ -56,7 +53,9 @@ class pythonProgramOptions:
 
     if compas_logs_output_override is None:
         output = os.getcwd()
-        output_container = None  # names the directory to be created and in which log files are created.  Default in COMPAS is "COMPAS_Output"
+        output_container = None
+        # names the directory to be created and in which log files are created.
+        # Default in COMPAS is "COMPAS_Output"
     else:
         output = compas_logs_output_override
         output_container = None
@@ -71,7 +70,8 @@ class pythonProgramOptions:
     # -- option to make a grid of hyperparameter values at which to produce populations.
     # -- If this is set to true, it will divide the number_of_binaries parameter equally
     # -- amoungst the grid points (as closely as possible). See the hyperparameterGrid method below
-    # -- for more details. If this is set to True, some hyperparameter values defined in this method'gridOutputs/'+str(i)
+    # -- for more details. If this is set to True, some hyperparameter values defined
+    # in this method'gridOutputs/'+str(i)
     # -- will be overwritten
     hyperparameterGrid = False
     hyperparameterList = False
@@ -81,16 +81,16 @@ class pythonProgramOptions:
 
     grid_filename = None  # grid file name (e.g. 'mygrid.txt')
 
-    if grid_filename != None:
-        if compas_input_path_override == None:
+    if grid_filename is not None:
+        if compas_input_path_override is None:
             grid_filename = os.getcwd() + '/' + grid_filename
         else:
             grid_filename = compas_input_path_override + '/' + grid_filename
 
     logfile_definitions = None  # logfile record definitions file name (e.g. 'logdefs.txt')
 
-    if logfile_definitions != None:
-        if compas_input_path_override == None:
+    if logfile_definitions is not None:
+        if compas_input_path_override is None:
             logfile_definitions = os.getcwd() + '/' + logfile_definitions
         else:
             logfile_definitions = compas_input_path_override + '/' + logfile_definitions
@@ -222,10 +222,10 @@ class pythonProgramOptions:
     black_hole_kicks = 'FALLBACK'
     kick_magnitude_distribution = 'MAXWELLIAN'
 
-    kick_magnitude_sigma_CCSN_NS = 265.0  #  [km/s]
-    kick_magnitude_sigma_CCSN_BH = 265.0  #  [km/s]
-    kick_magnitude_sigma_ECSN = 30.0  #  [km/s]
-    kick_magnitude_sigma_USSN = 30.0  #  [km/s]
+    kick_magnitude_sigma_CCSN_NS = 265.0  # [km/s]
+    kick_magnitude_sigma_CCSN_BH = 265.0  # [km/s]
+    kick_magnitude_sigma_ECSN = 30.0  # [km/s]
+    kick_magnitude_sigma_USSN = 30.0  # [km/s]
 
     fix_dimensionless_kick_magnitude = -1
     kick_direction = 'ISOTROPIC'
@@ -244,9 +244,15 @@ class pythonProgramOptions:
     kick_magnitude_1 = (
         None  # (BSE) (drawn) kick magnitude for the primary star should it undergo a supernova event [km/s]
     )
-    kick_theta_1 = None  # (BSE) angle between the orbital plane and the 'z' axis of the supernova vector for the primary star should it undergo a supernova event [radians]
-    kick_phi_1 = None  # (BSE) angle between 'x' and 'y', both in the orbital plane of the supernova vector, for the primary star should it undergo a supernova event [radians]
-    kick_mean_anomaly_1 = None  # (BSE) mean anomaly at the instant of the supernova for the primary star should it undergo a supernova event - should be uniform in [0, 2pi) [radians]
+    kick_theta_1 = None
+    # (BSE) angle between the orbital plane and the 'z' axis of the supernova vector for the primary star should it
+    # undergo a supernova event [radians]
+    kick_phi_1 = None
+    # (BSE) angle between 'x' and 'y', both in the orbital plane of the supernova vector, for the primary star should
+    # it undergo a supernova event [radians]
+    kick_mean_anomaly_1 = None
+    # (BSE) mean anomaly at the instant of the supernova for the primary star should it undergo a supernova event
+    # - should be uniform in [0, 2pi) [radians]
 
     kick_magnitude_random_2 = (
         None  # (BSE) used to draw the kick velocity for the secondary star should it undergo a supernova event
@@ -254,9 +260,15 @@ class pythonProgramOptions:
     kick_magnitude_2 = (
         None  # (BSE) (drawn) kick magnitude for the secondary star should it undergo a supernova event [km/s]
     )
-    kick_theta_2 = None  # (BSE) angle between the orbital plane and the 'z' axis of the supernova vector for the secondary star should it undergo a supernova event [radians]
-    kick_phi_2 = None  # (BSE) angle between 'x' and 'y', both in the orbital plane of the supernova vector, for the secondary star should it undergo a supernova event [radians]
-    kick_mean_anomaly_2 = None  # (BSE) mean anomaly at the instant of the supernova for the secondary star should it undergo a supernova event - should be uniform in [0, 2pi) [radians]
+    kick_theta_2 = None
+    # (BSE) angle between the orbital plane and the 'z' axis of the supernova vector for the secondary star should
+    # it undergo a supernova event [radians]
+    kick_phi_2 = None
+    # (BSE) angle between 'x' and 'y', both in the orbital plane of the supernova vector, for the secondary star should
+    # it undergo a supernova event [radians]
+    kick_mean_anomaly_2 = None
+    # (BSE) mean anomaly at the instant of the supernova for the secondary star should it undergo a supernova event
+    # - should be uniform in [0, 2pi) [radians]
 
     muller_mandel_kick_multiplier_BH = (
         200.0  # scaling prefactor for BH kicks when using the 'MULLERMANDEL' kick magnitude distribution
@@ -275,7 +287,7 @@ class pythonProgramOptions:
 
     pulsational_pair_instability_prescription = 'MARCHANT'
 
-    maximum_neutron_star_mass = 2.5  #  [Msol]
+    maximum_neutron_star_mass = 2.5  # [Msol]
 
     log_level = 0
     log_classes = []
@@ -293,7 +305,8 @@ class pythonProgramOptions:
     #
     # set to None (e.g. logfile_BSE_supernovae = None) to use the default filename
     # set to a string (e.g. logfile_BSE_supernovae = 'mySNfilename') to use that string as the filename
-    # set to empty string (e.g. logfile_BSE_supernovae = '""') to disable logging for that file (the file will not be created)
+    # set to empty string (e.g. logfile_BSE_supernovae = '""') to disable logging for
+    # that file (the file will not be created)
     #
     # We don't really need the 'BSE' or 'SSE' prefixes any more - they were put there because
     # prior to the implementation of the containing folder it was too hard to locate the files
@@ -699,20 +712,20 @@ class pythonProgramOptions:
         nList = len(listChoices)
         assert len(listCommands) == nList
 
-        ### Collect all options into a dictionary mapping option name to option value
+        # Collect all options into a dictionary mapping option name to option value
 
         command = {'compas_executable': self.compas_executable}
 
         for i in range(nBoolean):
-            if booleanChoices[i] == True:
+            if booleanChoices[i]:
                 command.update({booleanCommands[i]: ''})
 
         for i in range(nNumerical):
-            if not numericalChoices[i] == None:
+            if numericalChoices[i] is not None:
                 command.update({numericalCommands[i]: str(numericalChoices[i])})
 
         for i in range(nString):
-            if not stringChoices[i] == None:
+            if stringChoices[i] is not None:
                 command.update({stringCommands[i]: stringChoices[i]})
 
         for i in range(nList):
@@ -742,8 +755,8 @@ def run_compas_cmd(gridFileName, outputPath):
     # -- Get program options
     programOptions = pythonProgramOptions()
 
-    with open(gridFileName, 'r') as f:
-        content = f.readlines()
+    # with open(gridFileName, 'r') as f:
+    #     content = f.readlines()
 
     programOptions.grid_filename = gridFileName
     programOptions.output = outputPath

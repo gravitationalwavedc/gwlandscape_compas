@@ -4,38 +4,32 @@
 #                                                                 #
 ###################################################################
 
-import os, sys
-import math
+import os
 import numpy as np
 import h5py as h5
-import pandas as pd
-from scipy import ndimage
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-from matplotlib.legend import Legend
-from matplotlib import rcParams, transforms, patches
-import matplotlib.gridspec as gridspec
+from matplotlib import rcParams
 
 compasRootDir = os.path.expandvars(os.environ['COMPAS_ROOT_DIR'])
 
 
 def main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
-    ### Read file and create dataframe.
-    try:
-        optional_input = sys.argv[1]
-        if optional_input is not None:
-            data_path = optional_input
-    except IndexError:  # default
-        data_path = 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+    # Read file and create dataframe.
+    # try:
+    #     optional_input = sys.argv[1]
+    #     if optional_input is not None:
+    #         data_path = optional_input
+    # except IndexError:  # default
+    #     data_path = 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
 
     Data = h5.File(detailed_output_file_path, 'r')
 
-    ### Collect the important events in the detailed evolution
+    # Collect the important events in the detailed evolution
     events = allEvents(Data).allEvents  # Calculate the events here, for use in plot sizing parameters
     printEvolutionaryHistory(evol_text_path, events=events)
     events = [event for event in events if event.eventClass != 'Stype']  # want to ignore simple stellar type changes
 
-    ### Produce the two plots
+    # Produce the two plots
     makeDetailedPlots(detailed_plot_path, Data, events)
     plotVanDenHeuval(events=events)
     plt.savefig(vanDenHeuval_plot_path, bbox_inches='tight', pad_inches=0)
@@ -57,8 +51,7 @@ fontparams = {
 }
 
 
-####### Functions to organize and call the plotting functions
-
+# Functions to organize and call the plotting functions
 def makeDetailedPlots(detailed_plot_path, Data=None, events=None):
     listOfPlots = [plotMassAttributes, plotLengthAttributes, plotStellarTypeAttributes, plotEccentricity]
 
@@ -87,12 +80,15 @@ def makeDetailedPlots(detailed_plot_path, Data=None, events=None):
 
         # Add the event letters to the first plot
         if ii == 0:
-            spaced_out_event_times = space_out(event_times, min_separation=ax.get_xlim()[
-                                                                               1] / 75)  # min_separation of xmax/50 was found to fit the letter sizes well
+            spaced_out_event_times = \
+                space_out(event_times, min_separation=ax.get_xlim()[1] / 75)
+            # min_separation of xmax/50 was found to fit the letter sizes well
             for jj in range(num_events):
                 yOffsetFactor = 1.5 if (ax.get_yscale() == 'log') else 1.02
                 ax.text(x=spaced_out_event_times[jj], y=ax.get_ylim()[1] * yOffsetFactor, s=chr(
-                    ord('@') + 1 + jj))  # The unicode representation of the capital letters - works as long as there are less than 26 images to show
+                    ord('@') + 1 + jj))
+                # The unicode representation of the capital letters - works as long as
+                # there are less than 26 images to show
 
         if ii < len(listOfPlots):
             ax.axes.xaxis.set_ticklabels([])
@@ -103,16 +99,16 @@ def makeDetailedPlots(detailed_plot_path, Data=None, events=None):
         if (ii == len(listOfPlots) - 1):  # last of the regular plots
             ax.set_xlabel('Time / Myr')
 
-    #### Finalize the boundaries, save, and show
+    # Finalize the boundaries, save, and show
     fig.suptitle('Detailed evolution for seed = {}'.format(Data['SEED'][()][0]), fontsize=18)
     fig.tight_layout(h_pad=1, rect=(0., 0.08, 1., .98), pad=0.)  # (left, bottom, right, top)
     plt.savefig(detailed_plot_path, bbox_inches='tight', pad_inches=0)
 
 
-######## Plotting functions
+# Plotting functions
 
 def plotMassAttributes(fig=None, ax=None, Data=None):
-    ### Plot mass attributes
+    # Plot mass attributes
     # Create new column for total mass
     Mtot = Data['Mass(1)'][()] + Data['Mass(2)'][()]
     ax.plot(Data['Time'][()], Mtot, linestyle='-', c='k', label='System Mass')
@@ -129,7 +125,7 @@ def plotMassAttributes(fig=None, ax=None, Data=None):
 
 
 def plotLengthAttributes(fig=None, ax=None, Data=None):
-    ### Plot radius attributes
+    # Plot radius attributes
     ax.plot(Data['Time'][()], Data['SemiMajorAxis'][()], linestyle='-', c='k', label='Semi-Major Axis')
     ax.plot(Data['Time'][()], Data['Radius(1)'][()], linestyle='-', c='r', label='Stellar Radius 1')
     ax.plot(Data['Time'][()], Data['Radius(2)'][()], linestyle='-', c='b', label='Stellar Radius 2')
@@ -148,7 +144,7 @@ def plotLengthAttributes(fig=None, ax=None, Data=None):
 
 
 def plotEccentricity(fig=None, ax=None, Data=None):
-    ### Plot eccentricity
+    # Plot eccentricity
     ax.plot(Data['Time'][()], Data['Eccentricity'][()], linestyle='-', c='k')  # , label= 'Eccentricity')
     ax.set_ylabel('Eccentricity')
 
@@ -159,7 +155,7 @@ def plotEccentricity(fig=None, ax=None, Data=None):
 
 
 def plotStellarTypeAttributes(fig=None, ax=None, Data=None):
-    ### Plot stellar types
+    # Plot stellar types
     stellarTypes, useTypes, typeNameMap = getStellarTypes(Data)
 
     ax.plot(Data['Time'][()], typeNameMap(Data['Stellar_Type(1)'][()]), linestyle='-', c='r', label='Stellar Type 1')
@@ -180,20 +176,20 @@ def plotStellarTypeAttributesAndEccentricity(fig=None, ax=None, Data=None):
     ax1 = ax
     ax2 = ax.twinx()
 
-    ### Plot stellar types
+    # Plot stellar types
     stellarTypes, useTypes, typeNameMap = getStellarTypes(Data)
 
-    handle1 = ax1.plot(Data['Time'][()], typeNameMap(Data['Stellar_Type(1)'][()]), linestyle='-', c='r',
-                       label='Stellar Type 1')
-    handle2 = ax1.plot(Data['Time'][()], typeNameMap(Data['Stellar_Type(2)'][()]), linestyle='-', c='b',
-                       label='Stellar Type 2')
+    # handle1 = ax1.plot(Data['Time'][()], typeNameMap(Data['Stellar_Type(1)'][()]), linestyle='-', c='r',
+    #                    label='Stellar Type 1')
+    # handle2 = ax1.plot(Data['Time'][()], typeNameMap(Data['Stellar_Type(2)'][()]), linestyle='-', c='b',
+    #                    label='Stellar Type 2')
     ax1.set_ylabel('Stellar Type')
     ax1.set_yticks(range(useTypes.shape[0]))
     ax1.set_yticklabels([stellarTypes[typeNum] for typeNum in useTypes])
 
-    ### Plot eccentricity
-    handle3 = ax2.plot(Data['Time'][()], Data['Eccentricity'][()] - .01, linestyle='-', c='k',
-                       label='Eccentricity')  # the minor subtraction makes the curve easier to find
+    # Plot eccentricity
+    # handle3 = ax2.plot(Data['Time'][()], Data['Eccentricity'][()] - .01, linestyle='-', c='k',
+    #                    label='Eccentricity')  # the minor subtraction makes the curve easier to find
     ax2.set_ylabel('Eccentricity', labelpad=10)
     ax2.set_yticks([0, .25, .5, .75, 1.0])
     ax2.set_ylim(-0.05, 1.05)
@@ -228,8 +224,8 @@ def plotVanDenHeuval(events=None):
         axs[ii].yaxis.set_label_position("right")
         plt.subplots_adjust(hspace=0)
 
-        pltString = "$t$ = {:.1f} Myr, $a = {:.1f}$ $R_\odot$ \n $M_1$ = {:.1f} $M_\odot$, $M_2$ = {:.1f} $M_\odot$ \n" + \
-                    events[ii].eventString
+        pltString = "$t$ = {:.1f} Myr, $a = {:.1f}$ $R_\odot$ \n $M_1$ = {:.1f} $M_\odot$, $M_2$ = {:.1f} $M_\odot$ \n"\
+                    + events[ii].eventString
         pltString = pltString.format(events[ii].time, events[ii].a, events[ii].m1, events[ii].m2)
 
         pad = 5
@@ -239,7 +235,7 @@ def plotVanDenHeuval(events=None):
                          fontweight='bold')
 
 
-### Helper functions
+# Helper functions
 
 def getStellarTypes(Data):
     """
@@ -276,7 +272,7 @@ def space_out(original_vals, min_separation=None):
     """
 
     vals = np.array(original_vals).copy()
-    if min_separation == None:
+    if min_separation is None:
         min_separation = np.max(vals) / 50  # is this a good value?
     nudge = min_separation / 10  # keep the nudge small so that you don't overdo the jump
 
@@ -288,13 +284,7 @@ def space_out(original_vals, min_separation=None):
     return vals
 
 
-###########################################################
-###
-### Evolutionary Events
-###
-###########################################################
-
-
+# Evolutionary Events
 class Event(object):
 
     def __init__(self, Data, index, eventClass, stellarTypeMap, **kwargs):
@@ -427,9 +417,9 @@ class Event(object):
                 image_num = None
 
             elif state == "Merger":
-                mTot = m1 + m2
-                mHe = Data['Mass_He_Core(1)'][-1] + Data['Mass_He_Core(2)'][-1]
-                mCO = Data['Mass_CO_Core(1)'][-1] + Data['Mass_CO_Core(2)'][-1]
+                # mTot = m1 + m2
+                # mHe = Data['Mass_He_Core(1)'][-1] + Data['Mass_He_Core(2)'][-1]
+                # mCO = Data['Mass_CO_Core(1)'][-1] + Data['Mass_CO_Core(2)'][-1]
                 eventString = r'Stellar Merger: {}+{}'.format(self.stypeName1, self.stypeName2)
                 image_num = 37
 
@@ -440,7 +430,7 @@ class Event(object):
         else:
             raise ValueError("Unknown event class: {}".format(self.eventClass))
 
-        if image_num != None:
+        if image_num is not None:
             self.eventImage = self.getEventImage(image_num, rotate_image)
 
         return eventString
@@ -472,10 +462,10 @@ class allEvents(object):
 
         Data = self.Data
 
-        ### Add first timestep
+        # Add first timestep
         self.addEvent(0, eventClass='Beg')
 
-        ### Get all intermediary events
+        # Get all intermediary events
         for ii in range(Data['Time'].size):
 
             # Ignore first timestep, it's accounted for above
@@ -484,31 +474,31 @@ class allEvents(object):
 
                 # Note: These should all be if clauses, not elif/else, because they are not mutually exclusive
 
-            ### Mass transfer happened
+            # Mass transfer happened
             if (Data['MT_History'][ii] > 0) and not (
                     Data['MT_History'][ii] == Data['MT_History'][ii - 1]):  # Not a repeated entry
                 self.addEvent(ii, eventClass='MT')
 
-            ### Type of star 1 changed
+            # Type of star 1 changed
             if Data['Stellar_Type(1)'][ii] != Data['Stellar_Type(1)'][ii - 1]:
                 if (Data['Stellar_Type(1)'][ii] in [13, 14]):  # SN star 1
                     self.addEvent(ii, eventClass='SN', whichStar=1)
                 else:
                     self.addEvent(ii, eventClass='Stype', whichStar=1)
 
-            ### Type of star 2 changed
+            # Type of star 2 changed
             if Data['Stellar_Type(2)'][ii] != Data['Stellar_Type(2)'][ii - 1]:
                 if (Data['Stellar_Type(2)'][ii] in [13, 14]):  # SN star 2
                     self.addEvent(ii, eventClass='SN', whichStar=2)
                 else:
                     self.addEvent(ii, eventClass='Stype', whichStar=2)
 
-        ### Add an event for final state of the binary
+        # Add an event for final state of the binary
         isDCO = (Data['Stellar_Type(1)'][-1] in np.arange(10, 15)) and (
                     Data['Stellar_Type(2)'][-1] in np.arange(10, 15))  # Both stars are WDs, NSs, or BHs
         isUnbound = (Data['Eccentricity'][-1] > 1 or Data['SemiMajorAxis'][-1] < 0)
-        isMerger = (Data['Time'][
-                        -1] < 14000) and not isDCO and not isUnbound  # System must have merged with at least one standard component
+        isMerger = (Data['Time'][-1] < 14000) and not isDCO and not isUnbound
+        # System must have merged with at least one standard component
 
         if isDCO:
             state = "DCO"
@@ -528,33 +518,27 @@ class allEvents(object):
         self.allEvents.append(newEvent)
 
 
-###########################################################
-###
-### Printing events
-###
-###########################################################
-
-
+# Printing events
 def printEvolutionaryHistory(evol_text_path, Data=None, events=None):
     """
-    This function prints a synopsys of the evolutionary history to the command line; it can eventually include cartoons as well.
+    This function prints a synopsys of the evolutionary history to the command line;
+    it can eventually include cartoons as well.
     """
-    if events != None:
+    if events is not None:
         Data = events[0].Data
-    elif Data != None:
-        events = getAllEvents(Data)
+    # elif Data != None:
+    #     events = getAllEvents(Data)
     else:
         raise ValueError("No usable input given")
 
     evolution = 'Time (Myr), Event,                            M1 (M_o), type1, M2 (M_o), type2, a (R_o),   e\n'
 
-
     for event in events:
         ii = event.index
-        evolution += printFormattedEvolutionLine(Data['Time'][ii], event.eventString.replace('$', ''), \
-                Data['Mass(1)'][ii], Data['Stellar_Type(1)'][ii], \
-                Data['Mass(2)'][ii], Data['Stellar_Type(2)'][ii], \
-                Data['SemiMajorAxis'][ii], Data['Eccentricity'][ii])
+        evolution += printFormattedEvolutionLine(Data['Time'][ii], event.eventString.replace('$', ''),
+                                                 Data['Mass(1)'][ii], Data['Stellar_Type(1)'][ii],
+                                                 Data['Mass(2)'][ii], Data['Stellar_Type(2)'][ii],
+                                                 Data['SemiMajorAxis'][ii], Data['Eccentricity'][ii])
 
     print(evolution)
     with open(evol_text_path, 'w') as f:
@@ -564,9 +548,10 @@ def printEvolutionaryHistory(evol_text_path, Data=None, events=None):
 def printFormattedEvolutionLine(time, event, m1, t1, m2, t2, a, e):
     # All values are floats except event which is a string and t1, t2 which are ints (stellar types)
     # print(
-    #     "{:10.6f}   {:31}  {:7.3f}    {:2}    {:7.3f}    {:2}   {:8.3f}  {:5.3f}".format(time, event, m1, t1, m2, t2, a,
+    # "{:10.6f}   {:31}  {:7.3f}    {:2}    {:7.3f}    {:2}   {:8.3f}  {:5.3f}".format(time, event, m1, t1, m2, t2, a,
     #                                                                                      e))
-    evol_line = "{:10.6f}   {:31}  {:7.3f}    {:2}    {:7.3f}    {:2}   {:8.3f}  {:5.3f}\n".format(time, event, m1, t1, m2, t2, a, e)
+    evol_line = "{:10.6f}   {:31}  {:7.3f}    {:2}    {:7.3f}    {:2}   {:8.3f}  {:5.3f}\n"\
+        .format(time, event, m1, t1, m2, t2, a, e)
     return evol_line
 
 

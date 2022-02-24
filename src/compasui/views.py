@@ -7,10 +7,11 @@ import requests
 from django.conf import settings
 from django.db import transaction
 
-# from .forms import CompasJobForm
 from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search, SingleBinaryJob
-from .tasks import run_compas, run_plotting, run_detailed_evol_plotting,test_task
-from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
+from .tasks import run_compas, run_detailed_evol_plotting
+from .utils.constants import TASK_FAIL, TASK_TIMEOUT
+
+
 def create_compas_job(user, start, data, data_parameters, search_parameters):
     # validate_form = CompasJobForm(data={**start, **data, **signal, **sampler})
     # should be making use of cleaned_data below
@@ -173,17 +174,23 @@ def create_single_binary_job(
 
     grid_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'BSE_grid.txt')
     output_path = os.path.join(settings.COMPAS_IO_PATH, model_id)
-    detailed_output_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output','Detailed_Output', 'BSE_Detailed_Output_0.h5')
-    detailed_plot_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output','Detailed_Output', 'detailedEvolutionPlot.png')
-    vanDenHeuval_plot_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output','Detailed_Output', 'vanDenHeuvalPlot.png')
-    evol_text_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output','Detailed_Output', 'detailed_evol.txt')
+    detailed_output_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
+                                             'Detailed_Output', 'BSE_Detailed_Output_0.h5')
+    detailed_plot_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
+                                      'Detailed_Output', 'detailedEvolutionPlot.png')
+    vanDenHeuval_plot_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
+                                          'Detailed_Output', 'vanDenHeuvalPlot.png')
+    evol_text_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
+                                  'Detailed_Output', 'detailed_evol.txt')
 
     # run compas as a Celery task
-    task = run_compas.apply_async((grid_file_path, output_path, detailed_output_file_path),
-                                  link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path))
+    task = run_compas.apply_async(
+        (grid_file_path, output_path, detailed_output_file_path),
+        link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path,
+                                          vanDenHeuval_plot_path, evol_text_path))
     # get task result
     result = task.get()
     if result in (TASK_FAIL, TASK_TIMEOUT):
-        raise Exception(model_id);
+        raise Exception(model_id)
 
     return single_binary_job

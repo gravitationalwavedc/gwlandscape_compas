@@ -1,9 +1,5 @@
-import os.path
-
-import django.urls
 import django_filters
 import graphene
-import requests
 from django_filters import FilterSet, OrderingFilter
 from graphene import relay
 from graphene_django.filter import DjangoFilterConnectionField
@@ -19,7 +15,6 @@ from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from django.conf import settings
-import os.path
 
 
 def parameter_resolvers(name):
@@ -243,6 +238,7 @@ class SingleBinaryJobNode(DjangoObjectType):
         model = SingleBinaryJob
         fields = '__all__'
         interfaces = (relay.Node,)
+
 
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
@@ -530,8 +526,10 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 ppi_upper_limit=input.get('ppi_upper_limit'),
                 pulsational_pair_instability_prescription=input.get('pulsational_pair_instability_prescription'),
                 maximum_neutron_star_mass=input.get('maximum_neutron_star_mass'),
-                mass_transfer_angular_momentum_loss_prescription=input.get('mass_transfer_angular_momentum_loss_prescription'),
-                mass_transfer_accertion_efficiency_prescription=input.get('mass_transfer_accertion_efficiency_prescription'),
+                mass_transfer_angular_momentum_loss_prescription=input.get(
+                    'mass_transfer_angular_momentum_loss_prescription'),
+                mass_transfer_accertion_efficiency_prescription=input.get(
+                    'mass_transfer_accertion_efficiency_prescription'),
                 mass_transfer_fa=input.get('mass_transfer_fa'),
                 mass_transfer_jloss=input.get('mass_transfer_jloss')
 
@@ -540,10 +538,13 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 # single_binary_job=job
                 result=SingleBinaryJobCreationResult(
                     job_id=job.id,
-                    plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
+                    plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                   f'/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
                     grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
-                    van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
-                    detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+                    van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                       f'/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
+                    detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                              f'/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
                 )
             )
         except Exception as e:
