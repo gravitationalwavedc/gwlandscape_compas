@@ -247,7 +247,7 @@ class SingleBinaryJob(models.Model):
     mass1 = models.FloatField(
         blank=False,
         null=False,
-        default=35.4,
+        default=35.0,
         validators=[MinValueValidator(0.0), MaxValueValidator(150.0)],
         help_text="Mass of the initially more massive star.  0 < Value < 150",
     )
@@ -255,7 +255,7 @@ class SingleBinaryJob(models.Model):
     mass2 = models.FloatField(
         blank=False,
         null=False,
-        default=31.3,
+        default=31.0,
         validators=[MinValueValidator(0.1), MaxValueValidator(150.0)],
         help_text="Mass of the initially less massive star. 0 < Value < 150",
     )
