@@ -12,3 +12,4 @@ pyflakes
 flake8
 coverage<5
 redis
+celery
