@@ -1,3 +1,4 @@
+import django_filters
 import graphene
 from django_filters import FilterSet, OrderingFilter
 from graphene import relay
@@ -6,13 +7,14 @@ from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
-from .models import CompasJob, Label, Data, Search
+from .models import CompasJob, Label, Data, Search, SingleBinaryJob
 from .status import JobStatus
 from .types import OutputStartType, JobStatusType, AbstractDataType, AbstractSearchType
 from .utils.db_search.db_search import perform_db_search
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
-from .views import create_compas_job, update_compas_job
+from .views import create_compas_job, update_compas_job, create_single_binary_job
+from django.conf import settings
 
 
 def parameter_resolvers(name):
@@ -222,6 +224,22 @@ class CompasPublicJobConnection(relay.Connection):
         node = CompasPublicJobNode
 
 
+class SingleBinaryJobFilter(django_filters.FilterSet):
+    class Meta:
+        model = SingleBinaryJob
+        fields = '__all__'
+
+
+class SingleBinaryJobNode(DjangoObjectType):
+    """
+    Type for Single Binary Jobs without authentication
+    """
+    class Meta:
+        model = SingleBinaryJob
+        fields = '__all__'
+        interfaces = (relay.Node,)
+
+
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
@@ -236,6 +254,9 @@ class Query(object):
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
 
     gwclouduser = graphene.Field(UserDetails)
+
+    single_binary_job = relay.Node.Field(SingleBinaryJobNode)
+    single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
 
     @login_required
     def resolve_all_labels(self, info, **kwargs):
@@ -357,6 +378,14 @@ class CompasJobCreationResult(graphene.ObjectType):
     job_id = graphene.String()
 
 
+class SingleBinaryJobCreationResult(graphene.ObjectType):
+    job_id = graphene.String()
+    grid_file_path = graphene.String()
+    plot_file_path = graphene.String()
+    van_plot_file_path = graphene.String()
+    detailed_output_file_path = graphene.String()
+
+
 class CompasJobMutation(relay.ClientIDMutation):
     class Input:
         start = StartInput()
@@ -413,7 +442,121 @@ class UniqueNameMutation(relay.ClientIDMutation):
         return UniqueNameMutation(result=name)
 
 
+class SingleBinaryJobMutation(relay.ClientIDMutation):
+    class Input:
+        # input parameters to create the job
+        # better to use a class rather than individually
+        mass1 = graphene.Float()
+        mass2 = graphene.Float()
+        metallicity = graphene.Float()
+        eccentricity = graphene.Float()
+        separation = graphene.Float()
+        orbital_period = graphene.Float()
+        velocity_random_number_1 = graphene.Float()
+        velocity_random_number_2 = graphene.Float()
+        velocity_1 = graphene.Float()
+        velocity_2 = graphene.Float()
+        theta_1 = graphene.Float()
+        theta_2 = graphene.Float()
+        phi_1 = graphene.Float()
+        phi_2 = graphene.Float()
+        mean_anomaly_1 = graphene.Float()
+        mean_anomaly_2 = graphene.Float()
+        common_envelope_alpha = graphene.Float()
+        common_envelope_lambda_prescription = graphene.String()
+        common_envelope_lambda = graphene.Float()
+        remnant_mass_prescription = graphene.String()
+        fryer_supernova_engine = graphene.String()
+        black_hole_kicks = graphene.String()
+        kick_velocity_distribution = graphene.String()
+        kick_velocity_sigma_CCSN_NS = graphene.Float()
+        kick_velocity_sigma_CCSN_BH = graphene.Float()
+        kick_velocity_sigma_ECSN = graphene.Float()
+        kick_velocity_sigma_USSN = graphene.Float()
+        pair_instability_supernovae = graphene.Boolean()
+        pisn_lower_limit = graphene.Float()
+        pisn_upper_limit = graphene.Float()
+        pulsational_pair_instability_supernovae = graphene.Boolean()
+        ppi_lower_limit = graphene.Float()
+        ppi_upper_limit = graphene.Float()
+        pulsational_pair_instability_prescription = graphene.String()
+        maximum_neutron_star_mass = graphene.Float()
+        mass_transfer_angular_momentum_loss_prescription = graphene.String()
+        mass_transfer_accertion_efficiency_prescription = graphene.String()
+        mass_transfer_fa = graphene.Float()
+        mass_transfer_jloss = graphene.Float()
+
+    # single_binary_job = graphene.Field(SingleBinaryJobNode)
+    result = graphene.Field(SingleBinaryJobCreationResult)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        try:
+            job = create_single_binary_job(
+                mass1=input.get("mass1"),
+                mass2=input.get("mass2"),
+                metallicity=input.get("metallicity"),
+                eccentricity=input.get("eccentricity"),
+                separation=input.get("separation"),
+                orbital_period=input.get("orbital_period"),
+                velocity_random_number_1=input.get("velocity_random_number_1"),
+                velocity_random_number_2=input.get("velocity_random_number_2"),
+                theta_1=input.get("theta_1"),
+                theta_2=input.get("theta_2"),
+                phi_1=input.get("phi_1"),
+                phi_2=input.get("phi_2"),
+                mean_anomaly_1=input.get("mean_anomaly_1"),
+                mean_anomaly_2=input.get("mean_anomaly_2"),
+                common_envelope_alpha=input.get('common_envelope_alpha'),
+                common_envelope_lambda_prescription=input.get('common_envelope_lambda_prescription'),
+                common_envelope_lambda=input.get('common_envelope_lambda'),
+                remnant_mass_prescription=input.get('remnant_mass_prescription'),
+                fryer_supernova_engine=input.get('fryer_supernova_engine'),
+                black_hole_kicks=input.get('black_hole_kicks'),
+                kick_velocity_distribution=input.get('kick_velocity_distribution'),
+                kick_velocity_sigma_CCSN_NS=input.get('kick_velocity_sigma_CCSN_NS'),
+                kick_velocity_sigma_CCSN_BH=input.get('kick_velocity_sigma_CCSN_BH'),
+                kick_velocity_sigma_ECSN=input.get('kick_velocity_sigma_ECSN'),
+                kick_velocity_sigma_USSN=input.get('kick_velocity_sigma_USSN'),
+                pair_instability_supernovae=input.get('pair_instability_supernovae'),
+                pisn_lower_limit=input.get('pisn_lower_limit'),
+                pisn_upper_limit=input.get('pisn_upper_limit'),
+                pulsational_pair_instability_supernovae=input.get('pulsational_pair_instability_supernovae'),
+                ppi_lower_limit=input.get('ppi_lower_limit'),
+                ppi_upper_limit=input.get('ppi_upper_limit'),
+                pulsational_pair_instability_prescription=input.get('pulsational_pair_instability_prescription'),
+                maximum_neutron_star_mass=input.get('maximum_neutron_star_mass'),
+                mass_transfer_angular_momentum_loss_prescription=input.get(
+                    'mass_transfer_angular_momentum_loss_prescription'),
+                mass_transfer_accertion_efficiency_prescription=input.get(
+                    'mass_transfer_accertion_efficiency_prescription'),
+                mass_transfer_fa=input.get('mass_transfer_fa'),
+                mass_transfer_jloss=input.get('mass_transfer_jloss')
+
+            )
+            return SingleBinaryJobMutation(
+                # single_binary_job=job
+                result=SingleBinaryJobCreationResult(
+                    job_id=job.id,
+                    plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                   f'/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
+                    grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
+                    van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                       f'/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
+                    detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                              f'/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+                )
+            )
+        except Exception as e:
+            print(f"COMPAS job #{e} didn't run successfully")
+            return SingleBinaryJobMutation(
+                result=SingleBinaryJobCreationResult(
+                    job_id=str(e), plot_file_path='', grid_file_path='',
+                    van_plot_file_path='', detailed_output_file_path=''))
+
+
 class Mutation(graphene.ObjectType):
     new_compas_job = CompasJobMutation.Field()
     update_compas_job = UpdateCompasJobMutation.Field()
     is_name_unique = UniqueNameMutation.Field()
+    new_single_binary = SingleBinaryJobMutation.Field()

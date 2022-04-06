@@ -9,13 +9,15 @@ import DuplicateJobForm from './Components/Forms/DuplicateJobForm';
 import ViewJob from './Pages/ViewJob';
 import Loading from './Components/Loading';
 import {RedirectException} from 'found';
+import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
         return <Loading/>;
 
-    if (!harnessApi.hasAuthToken())
-        throw new RedirectException('/auth/?next=' + props.match.location.pathname);
+    if (! Component === NewSingleBinaryJob)
+        if (!harnessApi.hasAuthToken())
+            throw new RedirectException('/auth/?next=' + props.match.location.pathname);
   
     return <Component data={props} {...props}/>;
 };
@@ -76,7 +78,7 @@ function getRoutes() {
                     count: 100,
                     timeRange: 'all',
                 })}
-                environment={harnessApi.getEnvironment('compas')}
+
                 Component={MyJobs}
                 render={handleRender}/>
             <Route
@@ -93,6 +95,11 @@ function getRoutes() {
                 })}
                 render={handleRender}
             />
+            <Route
+                path="single-binary-form"
+                environment={harnessApi.getEnvironment('compas')}
+                Component={NewSingleBinaryJob}
+                render={handleRender}/>
         </Route>
     );
 }
