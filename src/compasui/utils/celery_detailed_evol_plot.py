@@ -441,7 +441,7 @@ class Event(object):
         on the stellar types, to get the van Den Heuval diagrams.
         """
 
-        self.imgFile = compasRootDir + '/utils/media/vanDenHeuval_figures/{}.png'.format(image_num)
+        self.imgFile = compasRootDir + '/utils/media/vanDenHeuvel_figures/{}.png'.format(image_num)
         img = plt.imread(self.imgFile)  # import image
         if rotate_image:
             img = img[:, ::-1, :]  # flip across y-axis
