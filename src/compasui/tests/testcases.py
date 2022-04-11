@@ -40,3 +40,4 @@ class CompasTestCase(testcases.TestCase):
     GRAPHQL_SCHEMA = schema
     GRAPHQL_URL = "/graphql"
     client_class = CompasJSONWebTokenClient
+    maxDiff = None

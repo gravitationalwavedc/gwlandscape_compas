@@ -6,10 +6,20 @@ from django.db import models
 
 
 class Keyword(models.Model):
-    tag = models.CharField(max_length=255, blank=False, null=False)
+    tag = models.CharField(max_length=255, blank=False, null=False, unique=True)
 
     def __str__(self):
         return self.tag
+
+    @classmethod
+    def create_keyword(cls, tag):
+        return cls.objects.create(
+            tag=tag
+        )
+
+    @classmethod
+    def delete_keyword(cls, _id):
+        cls.objects.get(id=_id).delete()
 
 
 def job_directory_path(instance, filename):

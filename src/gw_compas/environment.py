@@ -1,3 +1,4 @@
+import json
 import os
 
 MYSQL_DATABASE = os.getenv('MYSQL_DATABASE')
@@ -21,3 +22,5 @@ DATABASES = {
         'PASSWORD': MYSQL_PASSWORD,
     },
 }
+
+PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = json.loads(os.getenv('PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS'))

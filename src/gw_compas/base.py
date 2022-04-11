@@ -186,3 +186,5 @@ RUN_COMPAS_COMMAND = [
     'python3',
     os.path.join(BASE_DIR, 'compasui/utils/celery_pythonSubmit.py'),
 ]
+
+PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
