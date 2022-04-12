@@ -6,6 +6,8 @@ RUN apt-get install -y curl git python3 python3-virtualenv rsync
 
 # Copy the compas source code in to the container
 COPY src /src
+# add COMPAS_ROOT_DIR variable so that compose stop complaining about it when parsing COMPAS scripts
+ENV COMPAS_ROOT_DIR /COMPAS
 
 # Pull down and set up the compas repo
 RUN cd /tmp && rsync -arv /src /tmp/gwlandscape-compas/

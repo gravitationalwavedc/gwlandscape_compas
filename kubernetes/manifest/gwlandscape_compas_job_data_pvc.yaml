@@ -1,0 +1,14 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gwlandscape-compas-nfs-job-data-pvc
+  namespace: gwcloud
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 256Gi
+  selector:
+    matchLabels:
+      volume: gwlandscape-compas-nfs-job-data-pv

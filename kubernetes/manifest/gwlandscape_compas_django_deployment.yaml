@@ -29,12 +29,19 @@ spec:
             - secretRef:
                 name: common
           name: gwlandscape-compas-django
-          image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.2
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.3
           ports:
             - name: http
               containerPort: 8000
           resources: {}
           tty: true
+          volumeMounts:
+            - name: gwlandscape-compas-nfs-job-data
+              mountPath: "/files/"
       imagePullSecrets:
-      - name: regcred
+        - name: regcred
+      volumes:
+        - name: gwlandscape-compas-nfs-job-data
+          persistentVolumeClaim:
+            claimName: gwlandscape-compas-nfs-job-data-pvc
 ... 

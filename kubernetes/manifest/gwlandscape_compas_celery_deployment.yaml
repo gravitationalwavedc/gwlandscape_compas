@@ -3,15 +3,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gwlandscape-compas-nginx
+  name: gwlandscape-compas-celery
   namespace: gwcloud
   labels:
-    name: gwlandscape-compas-nginx
+    name: gwlandscape-compas-celery
 spec:
   replicas: 1
   selector:
     matchLabels:
-        name: gwlandscape-compas-nginx
+        name: gwlandscape-compas-celery
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -20,14 +20,16 @@ spec:
   template:
     metadata:
       labels:
-        name: gwlandscape-compas-nginx
+        name: gwlandscape-compas-celery
     spec:
       containers:
-        - name: gwlandscape-compas-nginx
-          image: nexus.gwdc.org.au/docker/gwlandscape_compas_nginx:0.3
-          ports:
-            - name: http
-              containerPort: 8000
+        - envFrom:
+            - secretRef:
+                name: compas
+            - secretRef:
+                name: common
+          name: gwlandscape-compas-celery
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.1
           resources: {}
           tty: true
           volumeMounts:

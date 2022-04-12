@@ -14,6 +14,8 @@ EMAIL_PORT = 25
 GWCLOUD_JOB_CONTROLLER_API_URL = "http://gwcloud-job-server:8000/job/apiv1"
 GWCLOUD_AUTH_API_URL = "http://gwcloud-auth:8000/auth/graphql"
 GWCLOUD_DB_SEARCH_API_URL = "http://gwcloud-db-search:8000/graphql"
+CELERY_BROKER_URL = 'redis://gwlandscape-compas-redis:6379'                                                                            
+CELERY_RESULT_BACKEND = 'redis://gwlandscape-compas-redis:6379'
 
 try:
     from .environment import *
