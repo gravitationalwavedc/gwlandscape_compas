@@ -22,8 +22,16 @@ class KeywordNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
+class KeywordConnection(relay.Connection):
+    class Meta:
+        node = KeywordNode
+
+
 class Query(object):
-    keywords = relay.Node.Field(KeywordNode)
+    keywords = relay.ConnectionField(KeywordConnection)
+
+    def resolve_keywords(root, info, **kwargs):
+        return Keyword.all()
 
 
 class AddKeywordMutation(relay.ClientIDMutation):

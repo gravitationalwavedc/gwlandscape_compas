@@ -29,6 +29,19 @@ class TestKeywordSchema(CompasTestCase):
             }
         """
 
+        self.keyword_query = """
+            query {
+                keywords {
+                    edges {
+                        node {
+                            id
+                            tag
+                        }
+                    }
+                }
+            }
+        """
+
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_authenticated(self):
         self.client.authenticate(self.user)
@@ -232,3 +245,53 @@ class TestKeywordSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
 
         self.assertEqual(Keyword.objects.all().count(), 1)
+
+    def test_keyword_query_unauthenticated(self):
+        Keyword.create_keyword('test')
+        Keyword.create_keyword('test1')
+        Keyword.create_keyword('test2')
+        Keyword.create_keyword('first')
+
+        response = self.client.execute(
+            self.keyword_query
+        )
+
+        expected = {
+            'keywords': {
+                'edges': [
+                    {'node': {'tag': 'first', 'id': to_global_id('KeywordNode', 4)}},
+                    {'node': {'tag': 'test', 'id': to_global_id('KeywordNode', 1)}},
+                    {'node': {'tag': 'test1', 'id': to_global_id('KeywordNode', 2)}},
+                    {'node': {'tag': 'test2', 'id': to_global_id('KeywordNode', 3)}}
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_keyword_query_authenticated(self):
+        self.client.authenticate(self.user)
+
+        Keyword.create_keyword('test')
+        Keyword.create_keyword('test1')
+        Keyword.create_keyword('test2')
+        Keyword.create_keyword('first')
+
+        response = self.client.execute(
+            self.keyword_query
+        )
+
+        expected = {
+            'keywords': {
+                'edges': [
+                    {'node': {'tag': 'first', 'id': to_global_id('KeywordNode', 4)}},
+                    {'node': {'tag': 'test', 'id': to_global_id('KeywordNode', 1)}},
+                    {'node': {'tag': 'test1', 'id': to_global_id('KeywordNode', 2)}},
+                    {'node': {'tag': 'test2', 'id': to_global_id('KeywordNode', 3)}}
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)

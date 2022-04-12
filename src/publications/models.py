@@ -21,6 +21,10 @@ class Keyword(models.Model):
     def delete_keyword(cls, _id):
         cls.objects.get(id=_id).delete()
 
+    @classmethod
+    def all(cls):
+        return cls.objects.all().order_by('tag')
+
 
 def job_directory_path(instance, filename):
     """
