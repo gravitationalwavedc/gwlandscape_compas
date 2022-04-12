@@ -3,9 +3,9 @@ from django.conf import settings
 from graphene import relay
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required, user_passes_test
-from graphql_relay import from_global_id
+from graphql_relay import from_global_id, to_global_id
 
-from publications.models import Keyword
+from publications.models import Keyword, CompasPublication
 
 
 def check_publication_management_user(user):
@@ -59,9 +59,53 @@ class DeleteKeywordMutation(relay.ClientIDMutation):
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, id):
         Keyword.delete_keyword(from_global_id(id)[1])
-        return AddKeywordMutation(result=True)
+        return DeleteKeywordMutation(result=True)
+
+
+class AddPublicationMutation(relay.ClientIDMutation):
+    class Input:
+        author = graphene.String(required=True)
+        # published defines if the job was published in a journal/arxiv
+        published = graphene.Boolean()
+        title = graphene.String(required=True)
+        year = graphene.Int()
+        journal = graphene.String()
+        journal_doi = graphene.String()
+        dataset_doi = graphene.String()
+        description = graphene.String()
+        # public defines if the job is publicly accessible
+        public = graphene.Boolean()
+        download_link = graphene.String()
+        arxiv_id = graphene.String(required=True)
+        keywords = graphene.List(graphene.String)
+
+    result = graphene.Boolean()
+    id = graphene.ID()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, **kwargs):
+        publication = CompasPublication.create_publication(**kwargs)
+        return AddPublicationMutation(result=True, id=to_global_id('CompasPublication', publication.id))
+
+
+class DeletePublicationMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID()
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id):
+        CompasPublication.delete_publication(from_global_id(id)[1])
+        return DeletePublicationMutation(result=True)
 
 
 class Mutation(graphene.ObjectType):
     add_keyword = AddKeywordMutation.Field()
     delete_keyword = DeleteKeywordMutation.Field()
+    add_publication = AddPublicationMutation.Field()
+    delete_publication = DeletePublicationMutation.Field()

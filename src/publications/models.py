@@ -3,6 +3,7 @@ import tarfile
 
 import h5py
 from django.db import models
+from graphql_relay import from_global_id
 
 
 class Keyword(models.Model):
@@ -47,8 +48,8 @@ class CompasPublication(models.Model):
     title = models.CharField(max_length=255, blank=False, null=False)
     year = models.IntegerField(null=True)
     journal = models.CharField(max_length=255, null=True)
-    journal_DOI = models.CharField(max_length=255, null=True)
-    dataset_DOI = models.CharField(max_length=255, null=True)
+    journal_doi = models.CharField(max_length=255, null=True)
+    dataset_doi = models.CharField(max_length=255, null=True)
     creation_time = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
     # public defines if the job is publicly accessible
@@ -57,12 +58,27 @@ class CompasPublication(models.Model):
     arxiv_id = models.CharField(max_length=255, blank=False)
     keywords = models.ManyToManyField(Keyword)
 
+    def __str__(self):
+        return self.title
+
     @classmethod
     def filter_by_keyword(cls, keyword=None):
         return cls.objects.all().filter(keywords__tag=keyword) if keyword else cls.objects.all()
 
-    def __str__(self):
-        return self.title
+    @classmethod
+    def create_publication(cls, **kwargs):
+        if keyword_ids := kwargs.get('keywords', []):
+            del kwargs['keywords']
+
+        result = cls.objects.create(**kwargs)
+
+        [result.keywords.add(Keyword.objects.get(id=from_global_id(_id)[1])) for _id in keyword_ids]
+
+        return result
+
+    @classmethod
+    def delete_publication(cls, _id):
+        cls.objects.get(id=_id).delete()
 
 
 class CompasModel(models.Model):

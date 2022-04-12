@@ -13,3 +13,6 @@ flake8
 coverage<5
 redis
 celery
+pyhumps
+h5py
+matplotlib
