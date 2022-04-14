@@ -4,7 +4,6 @@ resources:
   - gwlandscape_compas_job_data_pv.yaml
   - gwlandscape_compas_job_data_pvc.yaml
   - gwlandscape_compas_celery_deployment.yaml
-  - gwlandscape_compas_celery_service.yaml
   - gwlandscape_compas_django_deployment.yaml
   - gwlandscape_compas_django_service.yaml
   - gwlandscape_compas_nginx_deployment.yaml
