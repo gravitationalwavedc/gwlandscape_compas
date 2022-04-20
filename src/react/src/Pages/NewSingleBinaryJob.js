@@ -37,6 +37,10 @@ const checkFileExist = (urlToFile) => {
     return (xhr.status != '404')? true : false;
 };
 
+
+const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+const server_url = IS_DEV ? "http://localhost:8003" : ""
+
 const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
 
     const formik = useFormik({
@@ -120,8 +124,8 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                     // console.log(response);
 
                     const myinterval = setInterval(() => {
-                        if((!vanPlotLoaded) && checkFileExist('http://localhost:8003' + response.newSingleBinary.result.vanPlotFilePath)){
-                            setVanPlotFile('http://localhost:8003' + response.newSingleBinary.result.vanPlotFilePath);
+                        if((!vanPlotLoaded) && checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
+                            setVanPlotFile(server_url + response.newSingleBinary.result.vanPlotFilePath);
                             setVanPlotLoaded(true);
                         }
 
