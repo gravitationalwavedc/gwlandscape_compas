@@ -39,6 +39,7 @@ const checkFileExist = (urlToFile) => {
 
 
 const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
 const server_url = IS_DEV ? "http://localhost:8003" : "https://gwlandscape.org.au";
 
 const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
