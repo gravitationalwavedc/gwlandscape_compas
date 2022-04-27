@@ -40,7 +40,7 @@ const checkFileExist = (urlToFile) => {
 
 const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
-const server_url = IS_DEV ? "http://localhost:8003" : "https://gwlandscape.org.au";
+const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
 const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
 
@@ -125,12 +125,14 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                     // console.log(response);
 
                     const myinterval = setInterval(() => {
-                        if((!vanPlotLoaded) && checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
+                        if((!vanPlotLoaded) &&
+                            checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
                             setVanPlotFile(server_url + response.newSingleBinary.result.vanPlotFilePath);
                             setVanPlotLoaded(true);
                         }
 
-                        if((!detailedPlotLoaded) && checkFileExist(server_url + response.newSingleBinary.result.plotFilePath)){
+                        if((!detailedPlotLoaded) &&
+                            checkFileExist(server_url + response.newSingleBinary.result.plotFilePath)){
                             setPlotFile(server_url + response.newSingleBinary.result.plotFilePath);
                             setDetailedPlotLoaded(true);
                         }
