@@ -39,7 +39,7 @@ const JobOutput = (props) => {
                     <Row>
                         <Col>
                             {detailedoutput
-                                ? <a href={detailedoutput}>Download Output File</a>
+                                ? <a data-testid="download-link" href={detailedoutput}>Download Output File</a>
                                 : (isLoading && <div>Loading...</div>)
                             }
                         </Col>
