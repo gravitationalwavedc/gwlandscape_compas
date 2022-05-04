@@ -13,7 +13,7 @@ const JobOutput = (props) => {
 
     return (
         <Container fluid>
-            {error && <Alert variant="danger">{error}</Alert> }
+            {error && <Alert data-testid='error-msg'  variant="danger">{error}</Alert> }
             <React.Fragment>
                 <FormCard title="Evolution History">
                     <Row>

@@ -58,6 +58,33 @@ describe('new single binary job page', () => {
         expect(getByTestId('download-link')).toBeTruthy();
         jest.useRealTimers();
     });
+
+    const mockNewSingleBinaryResult = {
+        SingleBinaryJobCreationResult() {
+            return {
+                jobId: '100',
+                gridFilePath: '',
+                plotFilePath: '',
+                vanPlotFilePath: '',
+                detailedOutputFilePath: ''
+            }
+        }
+    };
+
+    it('error message is displayed when error is reported from backend', async () => {
+        expect.hasAssertions();
+
+        const {getByText, getByTestId} = render(<NewSingleBinaryJob router={global.router}/>);
+
+        fireEvent.click(getByText('Submit your job'));
+        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+        global.environment.mock.resolve(
+            operation,
+            MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
+        );
+
+        expect(getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
+    });
 });
 
 
