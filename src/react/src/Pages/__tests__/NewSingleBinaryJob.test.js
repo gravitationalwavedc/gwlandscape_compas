@@ -85,7 +85,47 @@ describe('new single binary job page', () => {
 
         expect(getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
     });
+
+    it('test output files have been generated successfully', async () => {
+        // expect.hasAssertions();
+
+        jest.useFakeTimers();
+        jest.spyOn(global, 'scrollTo').mockImplementation();
+
+        const mockRequest = mockXMLHttpRequest(200);
+        const {getByText, getByTestId, getAllByText} = render(<NewSingleBinaryJob router={global.router}/>);
+
+        fireEvent.click(getByText('Submit your job'));
+        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+        global.environment.mock.resolve(
+            operation,
+            MockPayloadGenerator.generate(operation)
+        );
+
+        act(() => {
+            jest.advanceTimersByTime(6000);
+        });
+
+        const req = new XMLHttpRequest();
+        req.open('HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">', false);
+        req.send();
+        expect(req).toEqual(mockRequest);
+
+        req.open('HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">', false);
+        req.send();
+        expect(req).toEqual(mockRequest);
+
+        req.open('HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">', false);
+        req.send();
+        expect(req).toEqual(mockRequest);
+
+        expect(getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
+        expect(getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
+        expect(getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
+        jest.useRealTimers();
+    });
 });
+
 
 
 
