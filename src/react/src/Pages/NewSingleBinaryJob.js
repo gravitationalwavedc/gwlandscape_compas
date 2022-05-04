@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import { Container, Col, Row, Tab, Nav } from 'react-bootstrap';
+import { Container, Col, Row} from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import KickParametersForm from '../Components/Forms/KickParametersForm';

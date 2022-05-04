@@ -67,7 +67,7 @@ describe('new single binary job page', () => {
                 plotFilePath: '',
                 vanPlotFilePath: '',
                 detailedOutputFilePath: ''
-            }
+            };
         }
     };
 
@@ -93,7 +93,7 @@ describe('new single binary job page', () => {
         jest.spyOn(global, 'scrollTo').mockImplementation();
 
         const mockRequest = mockXMLHttpRequest(200);
-        const {getByText, getByTestId, getAllByText} = render(<NewSingleBinaryJob router={global.router}/>);
+        const {getByText, getByTestId} = render(<NewSingleBinaryJob router={global.router}/>);
 
         fireEvent.click(getByText('Submit your job'));
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
