@@ -5,7 +5,7 @@ from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
 
-from publications.models import Keyword, CompasPublication
+from publications.models import Keyword, CompasPublication, CompasModel
 
 
 def check_publication_management_user(user):
@@ -104,8 +104,41 @@ class DeletePublicationMutation(relay.ClientIDMutation):
         return DeletePublicationMutation(result=True)
 
 
+class AddCompasModelMutation(relay.ClientIDMutation):
+    class Input:
+        name = graphene.String()
+        summary = graphene.String()
+        description = graphene.String()
+
+    result = graphene.Boolean()
+    id = graphene.ID()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, name, summary, description):
+        model = CompasModel.create_model(name, summary, description)
+        return AddCompasModelMutation(result=True, id=to_global_id('CompasModel', model.id))
+
+
+class DeleteCompasModelMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID()
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id):
+        CompasModel.delete_model(from_global_id(id)[1])
+        return DeleteCompasModelMutation(result=True)
+
+
 class Mutation(graphene.ObjectType):
     add_keyword = AddKeywordMutation.Field()
     delete_keyword = DeleteKeywordMutation.Field()
     add_publication = AddPublicationMutation.Field()
     delete_publication = DeletePublicationMutation.Field()
+    add_compas_model = AddCompasModelMutation.Field()
+    delete_compas_model = DeleteCompasModelMutation.Field()

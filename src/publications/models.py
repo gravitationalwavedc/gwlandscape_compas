@@ -89,6 +89,18 @@ class CompasModel(models.Model):
     def __str__(self):
         return self.name
 
+    @classmethod
+    def create_model(cls, name, summary, description):
+        return cls.objects.create(
+            name=name,
+            summary=summary,
+            description=description
+        )
+
+    @classmethod
+    def delete_model(cls, _id):
+        cls.objects.get(id=_id).delete()
+
 
 class CompasDatasetModel(models.Model):
     compas_publication = models.ForeignKey(CompasPublication, models.CASCADE)
