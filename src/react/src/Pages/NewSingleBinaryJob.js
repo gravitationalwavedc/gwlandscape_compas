@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import { Container, Col, Row, Tab, Nav } from 'react-bootstrap';
+import { Container, Col, Row} from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import KickParametersForm from '../Components/Forms/KickParametersForm';
@@ -37,7 +37,12 @@ const checkFileExist = (urlToFile) => {
     return (xhr.status != '404')? true : false;
 };
 
-const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
+
+const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
+
+const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
+
+const NewSingleBinaryJob = ({initialValues}) => {
 
     const formik = useFormik({
         initialValues: initialValues,
@@ -120,18 +125,20 @@ const NewSingleBinaryJob = ({initialValues, router, ...props}) => {
                     // console.log(response);
 
                     const myinterval = setInterval(() => {
-                        if((!vanPlotLoaded) && checkFileExist('http://localhost:8003' + response.newSingleBinary.result.vanPlotFilePath)){
-                            setVanPlotFile('http://localhost:8003' + response.newSingleBinary.result.vanPlotFilePath);
+                        if((!vanPlotLoaded) &&
+                            checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
+                            setVanPlotFile(server_url + response.newSingleBinary.result.vanPlotFilePath);
                             setVanPlotLoaded(true);
                         }
 
-                        if((!detailedPlotLoaded) && checkFileExist('http://localhost:8003' + response.newSingleBinary.result.plotFilePath)){
-                            setPlotFile('http://localhost:8003' + response.newSingleBinary.result.plotFilePath);
+                        if((!detailedPlotLoaded) &&
+                            checkFileExist(server_url + response.newSingleBinary.result.plotFilePath)){
+                            setPlotFile(server_url + response.newSingleBinary.result.plotFilePath);
                             setDetailedPlotLoaded(true);
                         }
 
                         // setGridFile('http://localhost:8003' + response.newSingleBinary.result.gridFilePath);
-                        setDetailedOutputFile('http://localhost:8003' + response.newSingleBinary.result.detailedOutputFilePath);
+                        setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                     }, 2000);
 
                     if(vanPlotLoaded && detailedPlotLoaded){

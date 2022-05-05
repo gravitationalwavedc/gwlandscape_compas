@@ -13,13 +13,13 @@ const JobOutput = (props) => {
 
     return (
         <Container fluid>
-            {error && <Alert variant="danger">{error}</Alert> }
+            {error && <Alert data-testid='error-msg'  variant="danger">{error}</Alert> }
             <React.Fragment>
                 <FormCard title="Evolution History">
                     <Row>
                         <Col>
                             {vanplot
-                                ? <img src={vanplot} />
+                                ? <img data-testid='van-plot' src={vanplot} />
                                 : (isLoading && <div>Loading...</div>)
                             }
                         </Col>
@@ -29,7 +29,7 @@ const JobOutput = (props) => {
                     <Row>
                         <Col >
                             {detailedplot
-                                ? <img src={detailedplot}  width='700px' height='1200px'/>
+                                ? <img data-testid='detailed-plot' src={detailedplot}  width='700px' height='1200px'/>
                                 : (isLoading && <div>Loading...</div>)
                             }
                         </Col>
@@ -39,7 +39,7 @@ const JobOutput = (props) => {
                     <Row>
                         <Col>
                             {detailedoutput
-                                ? <a href={detailedoutput}>Download Output File</a>
+                                ? <a data-testid="download-link" href={detailedoutput}>Download Output File</a>
                                 : (isLoading && <div>Loading...</div>)
                             }
                         </Col>
