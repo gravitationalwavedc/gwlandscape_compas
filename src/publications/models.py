@@ -35,10 +35,10 @@ def job_directory_path(instance, filename):
     """
     # change file name if it has spaces
     fname = filename.replace(" ", "_")
-    dataset_id = str(instance.compasjob.id)
-    model_id = str(instance.compasmodel.id)
+    dataset_id = str(instance.compas_publication.id)
+    model_id = str(instance.compas_model.id)
     # dataset files will be saved in MEDIA_ROOT/datasets/dataset_id/model_id/
-    return os.path.join("datasets", dataset_id, model_id, fname)
+    return os.path.join("publications", dataset_id, model_id, fname)
 
 
 class CompasPublication(models.Model):
@@ -105,7 +105,15 @@ class CompasModel(models.Model):
 class CompasDatasetModel(models.Model):
     compas_publication = models.ForeignKey(CompasPublication, models.CASCADE)
     compas_model = models.ForeignKey(CompasModel, models.CASCADE)
-    files = models.FileField(upload_to=job_directory_path, blank=True, null=True)
+    file = models.FileField(upload_to=job_directory_path, blank=True, null=True)
+
+    @classmethod
+    def create_dataset_model(cls, publication, model, file):
+        return cls.objects.create(
+            compas_publication=publication,
+            compas_model=model,
+            file=file
+        )
 
     def __str__(self):
         return f"{self.compas_publication.title} - {self.compas_model.name}"
@@ -116,18 +124,18 @@ class CompasDatasetModel(models.Model):
         """
         super().save(*args, **kwargs)
         # Check file name is not empty after saving the model and uploading file
-        if self.files.name:
+        if self.file.name:
             # Check the uploaded file could be decompressed using tarfile
-            if tarfile.is_tarfile(self.files.path):
+            if tarfile.is_tarfile(self.file.path):
                 self.decompress_tar_file()
             # If the uploaded file is an individual file
             else:
-                self.create_upload(self.files.name)
+                Upload.create_upload(self.file.name, self)
 
     def decompress_tar_file(self):
         # Get the actual path for uploaded file
-        dataset_dir = os.path.dirname(self.files.path)
-        dataset_tar = tarfile.open(self.files.path)
+        dataset_dir = os.path.dirname(self.file.path)
+        dataset_tar = tarfile.open(self.file.path)
         # dataset_tar.extractall(dataset_dir)
         for member in dataset_tar.getmembers():
             # ignore any directory but include its contents
@@ -135,26 +143,17 @@ class CompasDatasetModel(models.Model):
                 # extract files into dataset directory
                 # (this will create subdirectories as well, exactly as in the tarball)
                 dataset_tar.extract(member, dataset_dir)
-                self.create_upload(os.path.join(os.path.dirname(self.files.name), member.name))
+                Upload.create_upload(os.path.join(os.path.dirname(self.file.name), member.name), self)
+
         dataset_tar.close()
         # remove the tar file after decompression
-        os.remove(self.files.path)
-
-    # create an Upload model for an uploaded file
-    def create_upload(self, filepath):
-        """
-        filepath is the relative path of the uploaded file within MEDIA_ROOT
-        """
-        upload = Upload()
-        upload.file = filepath
-        upload.dataset_model = self
-        upload.save()
+        os.remove(self.file.path)
 
     def get_run_details(self):
         """
         query file: "run_details.txt"
         """
-        return self.upload_set.filter(file__iendswith="Run_Details.txt")
+        return self.upload_set.filter(file__iendswith="Run_Details")
 
     def get_data(self):
         """
@@ -166,6 +165,17 @@ class CompasDatasetModel(models.Model):
 class Upload(models.Model):
     file = models.FileField(blank=True, null=True)
     dataset_model = models.ForeignKey(CompasDatasetModel, models.CASCADE)
+
+    # create an Upload model for an uploaded file
+    @classmethod
+    def create_upload(cls, filepath, dataset_model):
+        """
+        filepath is the relative path of the uploaded file within MEDIA_ROOT
+        """
+        upload = Upload()
+        upload.file = filepath
+        upload.dataset_model = dataset_model
+        upload.save()
 
     def __str__(self):
         return os.path.basename(self.file.name)
