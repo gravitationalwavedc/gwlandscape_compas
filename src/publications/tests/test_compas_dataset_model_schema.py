@@ -1,13 +1,12 @@
 from tempfile import TemporaryDirectory
 
-import humps
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from graphql_relay import to_global_id
 
 from compasui.tests.testcases import CompasTestCase
-from publications.models import CompasPublication, Keyword, CompasModel, CompasDatasetModel, Upload
+from publications.models import CompasPublication, CompasModel, CompasDatasetModel, Upload
 
 User = get_user_model()
 

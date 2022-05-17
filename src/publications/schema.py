@@ -134,8 +134,8 @@ class DeleteCompasModelMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, id):
         CompasModel.delete_model(from_global_id(id)[1])
         return DeleteCompasModelMutation(result=True)
-    
-    
+
+
 class AddCompasDatasetModelMutation(relay.ClientIDMutation):
     class Input:
         compas_publication = graphene.String(required=True)
