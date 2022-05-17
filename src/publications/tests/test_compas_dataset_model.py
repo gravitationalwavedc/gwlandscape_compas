@@ -6,7 +6,7 @@ from django.test import testcases, override_settings
 from publications.models import Upload, CompasPublication, CompasModel, CompasDatasetModel
 
 
-class TestUploadModel(testcases.TestCase):
+class TestCompasDatasetModel(testcases.TestCase):
     def setUp(self):
         self.model = CompasModel.create_model('test', 'summary', 'description')
 
@@ -39,6 +39,19 @@ class TestUploadModel(testcases.TestCase):
         self.assertEqual(CompasDatasetModel.objects.all().count(), 1)
         self.assertEqual(CompasDatasetModel.objects.last().compas_publication, self.publication)
         self.assertEqual(CompasDatasetModel.objects.last().compas_model, self.model)
+
+    @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
+    def test_delete(self):
+        model = CompasDatasetModel.create_dataset_model(
+            self.publication,
+            self.model,
+            self.test_job_archive
+        )
+
+        CompasDatasetModel.delete_dataset_model(model.id)
+
+        self.assertEqual(CompasDatasetModel.objects.all().count(), 0)
+        self.assertEqual(Upload.objects.all().count(), 0)
 
     @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
     def test_str(self):

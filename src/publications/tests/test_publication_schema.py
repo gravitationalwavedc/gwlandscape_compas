@@ -133,8 +133,6 @@ class TestPublicationSchema(CompasTestCase):
         )
 
     def test_add_publication_unauthenticated(self):
-        self.client.authenticate(self.user)
-
         response = self.client.execute(
             self.add_publication_mutation,
             self.publication_input_required

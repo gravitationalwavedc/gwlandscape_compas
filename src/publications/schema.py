@@ -2,10 +2,11 @@ import graphene
 from django.conf import settings
 from graphene import relay
 from graphene_django import DjangoObjectType
+from graphene_file_upload.scalars import Upload
 from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
 
-from publications.models import Keyword, CompasPublication, CompasModel
+from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel
 
 
 def check_publication_management_user(user):
@@ -133,6 +134,41 @@ class DeleteCompasModelMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, id):
         CompasModel.delete_model(from_global_id(id)[1])
         return DeleteCompasModelMutation(result=True)
+    
+    
+class AddCompasDatasetModelMutation(relay.ClientIDMutation):
+    class Input:
+        compas_publication = graphene.String(required=True)
+        compas_model = graphene.String(required=True)
+        file = Upload(required=True)
+
+    result = graphene.Boolean()
+    id = graphene.ID()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, compas_publication, compas_model, file):
+        dataset_model = CompasDatasetModel.create_dataset_model(
+            CompasPublication.objects.get(id=from_global_id(compas_publication)[1]),
+            CompasModel.objects.get(id=from_global_id(compas_model)[1]),
+            file
+        )
+        return AddCompasDatasetModelMutation(result=True, id=to_global_id('CompasDatasetModel', dataset_model.id))
+
+
+class DeleteCompasDatasetModelMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID()
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id):
+        CompasDatasetModel.delete_dataset_model(from_global_id(id)[1])
+        return DeleteCompasDatasetModelMutation(result=True)
 
 
 class Mutation(graphene.ObjectType):
@@ -142,3 +178,5 @@ class Mutation(graphene.ObjectType):
     delete_publication = DeletePublicationMutation.Field()
     add_compas_model = AddCompasModelMutation.Field()
     delete_compas_model = DeleteCompasModelMutation.Field()
+    add_compas_dataset_model = AddCompasDatasetModelMutation.Field()
+    delete_compas_dataset_model = DeleteCompasDatasetModelMutation.Field()
