@@ -633,4 +633,3 @@ class SingleBinaryJob(models.Model):
         # write parameters string to file
         with open(grid_file_path, 'w') as f:
             f.write(content)
-
