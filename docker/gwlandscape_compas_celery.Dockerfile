@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED 1
 # Update the container and install the required packages
 WORKDIR /
 RUN apt-get update
+RUN apt-get install -y texlive-latex-extra cm-super dvipng
 RUN apt-get install -y git g++ libhdf5-serial-dev libboost-all-dev libgsl-dev zip
 RUN apt-get -y install python3-virtualenv default-libmysqlclient-dev python3-dev build-essential curl
 
