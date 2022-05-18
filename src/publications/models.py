@@ -108,12 +108,16 @@ class CompasDatasetModel(models.Model):
     file = models.FileField(upload_to=job_directory_path, blank=True, null=True)
 
     @classmethod
-    def create_dataset_model(cls, publication, model, file):
+    def create_dataset_model(cls, compas_publication, compas_model, file):
         return cls.objects.create(
-            compas_publication=publication,
-            compas_model=model,
+            compas_publication=compas_publication,
+            compas_model=compas_model,
             file=file
         )
+
+    @classmethod
+    def delete_dataset_model(cls, _id):
+        cls.objects.get(id=_id).delete()
 
     def __str__(self):
         return f"{self.compas_publication.title} - {self.compas_model.name}"
