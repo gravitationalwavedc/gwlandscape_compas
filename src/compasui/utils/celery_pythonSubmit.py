@@ -1,3 +1,5 @@
+import traceback
+
 import numpy as np
 import sys
 import os
@@ -751,24 +753,27 @@ def combineCommandLineOptionsDictIntoShellCommand(commandOptions):
 
 
 def run_compas_cmd(gridFileName, outputPath):
+    try:
+        # -- Get program options
+        programOptions = pythonProgramOptions()
 
-    # -- Get program options
-    programOptions = pythonProgramOptions()
+        # with open(gridFileName, 'r') as f:
+        #     content = f.readlines()
 
-    # with open(gridFileName, 'r') as f:
-    #     content = f.readlines()
+        programOptions.grid_filename = gridFileName
+        programOptions.output = outputPath
 
-    programOptions.grid_filename = gridFileName
-    programOptions.output = outputPath
+        commandOptions = programOptions.generateCommandLineOptionsDict()
 
-    commandOptions = programOptions.generateCommandLineOptionsDict()
+        # -- Convert options into a shell string
+        shellCommand = combineCommandLineOptionsDictIntoShellCommand(commandOptions)
 
-    # -- Convert options into a shell string
-    shellCommand = combineCommandLineOptionsDictIntoShellCommand(commandOptions)
-
-    # -- Run exectute COMPAS shell string
-    print(shellCommand)
-    call(shellCommand, shell=True)
+        # -- Run exectute COMPAS shell string
+        print(shellCommand)
+        call(shellCommand, shell=True)
+    except Exception as e:
+        traceback.print_exc()
+        raise e
 
 
 if __name__ == "__main__":

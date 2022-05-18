@@ -1,3 +1,5 @@
+import traceback
+
 import django_filters
 import graphene
 from django_filters import FilterSet, OrderingFilter
@@ -532,7 +534,6 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                     'mass_transfer_accertion_efficiency_prescription'),
                 mass_transfer_fa=input.get('mass_transfer_fa'),
                 mass_transfer_jloss=input.get('mass_transfer_jloss')
-
             )
             return SingleBinaryJobMutation(
                 # single_binary_job=job
@@ -547,11 +548,12 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                                               f'/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
                 )
             )
-        except Exception as e:
-            print(f"COMPAS job #{e} didn't run successfully")
+        except Exception:
+            traceback.print_exc()
+            print("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
-                    job_id=str(e), plot_file_path='', grid_file_path='',
+                    job_id='', plot_file_path='', grid_file_path='',
                     van_plot_file_path='', detailed_output_file_path=''))
 
 
