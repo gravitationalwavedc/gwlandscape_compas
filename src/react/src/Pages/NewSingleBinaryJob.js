@@ -64,9 +64,8 @@ const NewSingleBinaryJob = ({initialValues}) => {
     const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
     const [myinterval, setMyinterval] = useState(null);
 
-    // This block that checks for plots to be loaded by checking state had to be done in useEffect
-    // That is because changing state using useState hook within setInterval won't be reflected to the component
-    // on its own
+    // This block that checks for plots to be loaded by checking state had to be done in useEffect. That is because
+    // changing state using useState hook within setInterval won't be reflected to the component on its own
     useEffect(() => {
         if(vanPlotLoaded && detailedPlotLoaded){
             clearInterval(myinterval);
@@ -134,10 +133,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 if (!errors && (response.newSingleBinary.result.vanPlotFilePath!='')) {
                     console.log('No errors');
 
-                    // router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
-                    // console.log('all done');
-                    // console.log(response);
-
                     setMyinterval(() => setInterval(() => {
                         if((!vanPlotLoaded) &&
                             checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
@@ -197,7 +192,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 </Col>
                 <Col md={7}>
                     <JobOutput
-                        // gridfileName={gridFile}
                         detailedplotfilename={plotFile}
                         vanplotfilename={vanPlotFile}
                         detailedOutputFileName={detailedOutputFile}
