@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
@@ -62,10 +62,24 @@ const NewSingleBinaryJob = ({initialValues}) => {
     const [isCECollapsed, setIsCECollapsed] = useState(true);
     const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
     const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
+    const [myinterval, setMyinterval] = useState(null);
 
+    // This block that checks for plots to be loaded by checking state had to be done in useEffect
+    // That is because changing state using useState hook within setInterval won't be reflected to the component
+    // on its own
+    useEffect(() => {
+        if(vanPlotLoaded && detailedPlotLoaded){
+            clearInterval(myinterval);
+            setVanPlotLoaded(false);
+            setDetailedPlotLoaded(false);
+            setIsLoadingOutput(false);
+        }
+    }, [vanPlotLoaded, detailedPlotLoaded, isLoadingOutput]);
+    
 
     const handleJobSubmission = (values) => {
         setIsLoadingOutput(true);
+
         scrollTo(0, 0);
 
         const variables = {
@@ -124,28 +138,23 @@ const NewSingleBinaryJob = ({initialValues}) => {
                     // console.log('all done');
                     // console.log(response);
 
-                    const myinterval = setInterval(() => {
+                    setMyinterval(() => setInterval(() => {
                         if((!vanPlotLoaded) &&
                             checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
                             setVanPlotFile(server_url + response.newSingleBinary.result.vanPlotFilePath);
                             setVanPlotLoaded(true);
+                            console.log(vanPlotFile);
                         }
 
                         if((!detailedPlotLoaded) &&
                             checkFileExist(server_url + response.newSingleBinary.result.plotFilePath)){
                             setPlotFile(server_url + response.newSingleBinary.result.plotFilePath);
                             setDetailedPlotLoaded(true);
+                            console.log(plotFile);
                         }
 
                         setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
-                    }, 2000);
-
-                    if(vanPlotLoaded && detailedPlotLoaded){
-                        clearInterval(myinterval);
-                        setVanPlotLoaded(false);
-                        setDetailedPlotLoaded(false);
-                        setIsLoadingOutput(false);
-                    }
+                    }, 2000));
                 }
                 else{
                     console.log('something went wrong');
