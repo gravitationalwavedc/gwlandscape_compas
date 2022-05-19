@@ -1,6 +1,7 @@
 from celery import shared_task
 
 import os
+import traceback
 
 from .utils.celery_detailed_evol_plot import main
 from .utils.celery_pythonSubmit import run_compas_cmd
@@ -25,7 +26,7 @@ def check_output_file_generated(outputfilepath):
 
 @shared_task
 def run_compas(grid_file_path, output_path, detailed_output_file_path):
-
+    print('new task')
     result = None
     try:
         run_compas_cmd(grid_file_path, output_path)
@@ -34,14 +35,13 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
     except SoftTimeLimitExceeded as timeout_err:
         print(timeout_err)
         result = TASK_TIMEOUT
-
-    except Exception as e:
+    except Exception:
         # return fail code if job failed for some other reason
-        print(e)
+        traceback.print_exc()
         result = TASK_FAIL
     # An example of adding in another error (would need to go above Exception above)
-    except TaskRevokedError as revoked_err:
-        print(revoked_err)
+    except TaskRevokedError:
+        traceback.print_exc()
         result = TASK_FAIL_OTHER
     finally:
         return result
@@ -50,26 +50,6 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
 @shared_task
 def test_task(job_id):
     print(f"Task Recieved {job_id}")
-
-
-# @shared_task
-# def run_plotting(jobstate, detailed_output_file_path, plot_path):
-#
-#     if jobstate == TASK_SUCCESS:
-#         # sending output file path to generate the plot into
-#         result = None
-#         try:
-#             main(detailed_output_file_path, plot_path)
-#             result = check_output_file_generated(plot_path)
-#         except Exception as e:
-#             print(e)
-#             result = TASK_FAIL
-#         finally:
-#             return result
-#
-#     elif jobstate == TASK_FAIL or jobstate == TASK_TIMEOUT:
-#         print("COMPAS Model didn't run successfully! Couldn't generate plot")
-#         return TASK_FAIL
 
 
 @shared_task
@@ -82,11 +62,11 @@ def run_detailed_evol_plotting(jobstate, detailed_output_file_path,
         try:
             main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             result = check_output_file_generated(vanDenHeuval_plot_path)
-        except SoftTimeLimitExceeded as timeout_err:
-            print(timeout_err)
+        except SoftTimeLimitExceeded:
+            traceback.print_exc()
             result = TASK_TIMEOUT
-        except Exception as e:
-            print(e)
+        except Exception:
+            traceback.print_exc()
             result = TASK_FAIL
         finally:
             return result

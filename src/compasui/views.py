@@ -6,6 +6,7 @@ import jwt
 import requests
 from django.conf import settings
 from django.db import transaction
+from celery import chain
 
 from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search, SingleBinaryJob
 from .tasks import run_compas, run_detailed_evol_plotting
@@ -183,11 +184,9 @@ def create_single_binary_job(
     evol_text_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
                                   'Detailed_Output', 'detailed_evol.txt')
 
-    # run compas as a Celery task
-    task = run_compas.apply_async(
-        (grid_file_path, output_path, detailed_output_file_path),
-        link=run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path,
-                                          vanDenHeuval_plot_path, evol_text_path))
+    task = chain(run_compas.s(grid_file_path, output_path, detailed_output_file_path),
+                 run_detailed_evol_plotting.s(detailed_output_file_path, detailed_plot_path,
+                                              vanDenHeuval_plot_path, evol_text_path))()
     # get task result
     result = task.get()
     if result in (TASK_FAIL, TASK_TIMEOUT):

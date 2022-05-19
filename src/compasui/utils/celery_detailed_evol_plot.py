@@ -5,6 +5,8 @@
 ###################################################################
 
 import os
+import traceback
+
 import numpy as np
 import h5py as h5
 import matplotlib.pyplot as plt
@@ -21,19 +23,24 @@ def main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, 
     #         data_path = optional_input
     # except IndexError:  # default
     #     data_path = 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+    try:
 
-    Data = h5.File(detailed_output_file_path, 'r')
+        Data = h5.File(detailed_output_file_path, 'r')
 
-    # Collect the important events in the detailed evolution
-    events = allEvents(Data).allEvents  # Calculate the events here, for use in plot sizing parameters
-    printEvolutionaryHistory(evol_text_path, events=events)
-    events = [event for event in events if event.eventClass != 'Stype']  # want to ignore simple stellar type changes
+        # Collect the important events in the detailed evolution
+        events = allEvents(Data).allEvents  # Calculate the events here, for use in plot sizing parameters
+        printEvolutionaryHistory(evol_text_path, events=events)
+        # want to ignore simple stellar type changes
+        events = [event for event in events if event.eventClass != 'Stype']
 
-    # Produce the two plots
-    makeDetailedPlots(detailed_plot_path, Data, events)
-    plotVanDenHeuval(events=events)
-    plt.savefig(vanDenHeuval_plot_path, bbox_inches='tight', pad_inches=0)
-    # plt.show()
+        # Produce the two plots
+        makeDetailedPlots(detailed_plot_path, Data, events)
+        plotVanDenHeuval(events=events)
+        plt.savefig(vanDenHeuval_plot_path, bbox_inches='tight', pad_inches=0)
+        # plt.show()
+    except Exception as e:
+        traceback.print_exc()
+        raise e
 
 
 fontparams = {
