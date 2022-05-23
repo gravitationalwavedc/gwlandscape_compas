@@ -32,8 +32,8 @@ spec:
           image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.4
           resources:
             limits:
-              cpu: "4000m"
-              memory: "4096M"
+              cpu: "8000m"
+              memory: "8192M"
             requests:
               cpu: "1000m"
               memory: "2048M"
@@ -47,4 +47,6 @@ spec:
         - name: gwlandscape-compas-nfs-job-data
           persistentVolumeClaim:
             claimName: gwlandscape-compas-nfs-job-data-pvc
+      nodeSelector:
+        kubernetes.io/hostname: node7
 ... 
