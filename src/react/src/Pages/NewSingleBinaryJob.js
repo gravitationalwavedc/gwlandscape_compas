@@ -131,28 +131,24 @@ const NewSingleBinaryJob = ({initialValues}) => {
             variables: variables,
             onCompleted: async (response, errors) => {
                 if (!errors && (response.newSingleBinary.result.vanPlotFilePath!='')) {
-                    console.log('No errors');
 
                     setMyinterval(() => setInterval(() => {
                         if((!vanPlotLoaded) &&
                             checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
                             setVanPlotFile(server_url + response.newSingleBinary.result.vanPlotFilePath);
                             setVanPlotLoaded(true);
-                            console.log(vanPlotFile);
                         }
 
                         if((!detailedPlotLoaded) &&
                             checkFileExist(server_url + response.newSingleBinary.result.plotFilePath)){
                             setPlotFile(server_url + response.newSingleBinary.result.plotFilePath);
                             setDetailedPlotLoaded(true);
-                            console.log(plotFile);
                         }
 
                         setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                     }, 2000));
                 }
                 else{
-                    console.log('something went wrong');
                     setOutputError('Output could not be generated');
                     setIsLoadingOutput(false);
                 }
