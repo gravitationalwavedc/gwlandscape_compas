@@ -77,6 +77,9 @@ const NewSingleBinaryJob = ({initialValues}) => {
     
 
     const handleJobSubmission = (values) => {
+        setVanPlotFile('');
+        setDetailedOutputFile('');
+        setPlotFile('');
         setIsLoadingOutput(true);
 
         scrollTo(0, 0);
