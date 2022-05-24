@@ -158,6 +158,3 @@ describe('new single binary job page', () => {
     });
 });
 
-
-
-
