@@ -148,7 +148,6 @@ describe('new single binary job page', () => {
             global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
         });
 
-        screen.debug();
         expect(screen.getAllByText('Loading...')).toHaveLength(3);
 
         expect(screen.queryByTestId('van-plot')).not.toBeInTheDocument();
