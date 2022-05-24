@@ -21,7 +21,7 @@ const mockXMLHttpRequest = (status) => {
         status: status
     };
 
-    jest.spyOn(global,'XMLHttpRequest').mockImplementation(() => mock);
+    jest.spyOn(global, 'XMLHttpRequest').mockImplementation(() => mock);
 
     return mock;
 };
