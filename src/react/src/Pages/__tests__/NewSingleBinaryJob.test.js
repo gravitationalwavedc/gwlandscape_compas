@@ -1,6 +1,6 @@
 import React from 'react';
 import { MockPayloadGenerator } from 'relay-test-utils';
-import {render, fireEvent, waitFor, act} from '@testing-library/react';
+import {screen, render, fireEvent, waitFor, act} from '@testing-library/react';
 import NewSingleBinaryJob from '../NewSingleBinaryJob';
 import 'regenerator-runtime/runtime';
 
@@ -36,26 +36,35 @@ describe('new single binary job page', () => {
         jest.spyOn(global, 'scrollTo').mockImplementation();
 
         const mockRequest = mockXMLHttpRequest(404);
-        const {getByText, getByTestId, getAllByText} = render(<NewSingleBinaryJob router={global.router}/>);
 
-        fireEvent.click(getByText('Submit your job'));
+        await waitFor(() => {
+            render(<NewSingleBinaryJob router={global.router}/>);
+            fireEvent.click(screen.getByText('Submit your job'));
+        });
+
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(
-            operation,
-            MockPayloadGenerator.generate(operation)
-        );
+        await waitFor(() => {
+            global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
+        });
 
         expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
-        expect(getAllByText('Loading...')).toHaveLength(3);
+        expect(screen.getAllByText('Loading...')).toHaveLength(3);
 
-        act(() => {
-            jest.advanceTimersToNextTimer();
+        await waitFor(() => {
+            jest.advanceTimersByTime(2000);
         });
 
         expect(mockRequest.open).toHaveBeenNthCalledWith(1, 'HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">', false);
         expect(mockRequest.open).toHaveBeenNthCalledWith(2, 'HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">', false);
 
-        expect(getByTestId('download-link')).toBeTruthy();
+        await waitFor(() => {
+            jest.advanceTimersByTime(2000);
+        });
+
+        expect(mockRequest.open).toHaveBeenNthCalledWith(3, 'HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">', false);
+        expect(mockRequest.open).toHaveBeenNthCalledWith(4, 'HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">', false);
+
+        expect(screen.getByTestId('download-link')).toBeTruthy();
         jest.useRealTimers();
     });
 
@@ -74,35 +83,41 @@ describe('new single binary job page', () => {
     it('error message is displayed when error is reported from backend', async () => {
         expect.hasAssertions();
 
-        const {getByText, getByTestId} = render(<NewSingleBinaryJob router={global.router}/>);
+        act(() => {
+            render(<NewSingleBinaryJob router={global.router}/>);
+            fireEvent.click(screen.getByText('Submit your job'));
+        });
 
-        fireEvent.click(getByText('Submit your job'));
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(
-            operation,
-            MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
-        );
+        act(() => {
+            global.environment.mock.resolve(
+                operation,
+                MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
+            );
+        });
 
-        expect(getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
+        expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
     });
 
     it('test output files have been generated successfully', async () => {
-        // expect.hasAssertions();
+        expect.hasAssertions();
 
         jest.useFakeTimers();
         jest.spyOn(global, 'scrollTo').mockImplementation();
 
         const mockRequest = mockXMLHttpRequest(200);
-        const {getByText, getByTestId} = render(<NewSingleBinaryJob router={global.router}/>);
-
-        fireEvent.click(getByText('Submit your job'));
-        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(
-            operation,
-            MockPayloadGenerator.generate(operation)
-        );
 
         act(() => {
+            render(<NewSingleBinaryJob router={global.router}/>);
+            fireEvent.click(screen.getByText('Submit your job'));
+        });
+
+        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+        act(() => {
+            global.environment.mock.resolve(
+                operation,
+                MockPayloadGenerator.generate(operation)
+            );
             jest.advanceTimersByTime(6000);
         });
 
@@ -119,9 +134,9 @@ describe('new single binary job page', () => {
         req.send();
         expect(req).toEqual(mockRequest);
 
-        expect(getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
-        expect(getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
-        expect(getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
+        expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
+        expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
+        expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
         jest.useRealTimers();
     });
 });
