@@ -21,13 +21,13 @@ const mockXMLHttpRequest = (status) => {
         status: status
     };
 
-    jest.spyOn(global, 'XMLHttpRequest').mockImplementation(() => mock);
+    jest.spyOn(global,'XMLHttpRequest').mockImplementation(() => mock);
 
     return mock;
 };
 
 describe('new single binary job page', () => {
-    it('setInterval is called', async () => {
+    it('should call setInterval and check if output files are generated when user clicks submit', async () => {
         expect.hasAssertions();
 
         jest.useFakeTimers();
@@ -80,7 +80,7 @@ describe('new single binary job page', () => {
         }
     };
 
-    it('error message is displayed when error is reported from backend', async () => {
+    it('should display error message when error is reported from backend', async () => {
         expect.hasAssertions();
 
         act(() => {
@@ -99,7 +99,8 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
     });
 
-    it('test output files have been generated successfully', async () => {
+    it('should generate output files when user clicks submit ' +
+        'and reset all files when user clicks submit again', async () => {
         expect.hasAssertions();
 
         jest.useFakeTimers();
@@ -138,7 +139,6 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
         expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
 
-        // jest.clearAllTimers();
         act(() => {
             fireEvent.click(screen.getByText('Submit your job'));
         });
