@@ -137,6 +137,24 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
         expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
         expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
+
+        // jest.clearAllTimers();
+        act(() => {
+            fireEvent.click(screen.getByText('Submit your job'));
+        });
+
+        const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
+        await waitFor(() => {
+            global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
+        });
+
+        screen.debug();
+        expect(screen.getAllByText('Loading...')).toHaveLength(3);
+
+        expect(screen.queryByTestId('van-plot')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('detailed-plot')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('download-link')).not.toBeInTheDocument();
+
         jest.useRealTimers();
     });
 });
