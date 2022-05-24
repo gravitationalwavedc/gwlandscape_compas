@@ -36,16 +36,11 @@ describe('new single binary job page', () => {
         jest.spyOn(global, 'scrollTo').mockImplementation();
 
         const mockRequest = mockXMLHttpRequest(404);
-
-        await waitFor(() => {
-            render(<NewSingleBinaryJob router={global.router}/>);
-            fireEvent.click(screen.getByText('Submit your job'));
-        });
+        render(<NewSingleBinaryJob router={global.router}/>);
+        fireEvent.click(screen.getByText('Submit your job'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        await waitFor(() => {
-            global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
-        });
+        global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
 
         expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
         expect(screen.getAllByText('Loading...')).toHaveLength(3);
@@ -83,18 +78,15 @@ describe('new single binary job page', () => {
     it('should display error message when error is reported from backend', async () => {
         expect.hasAssertions();
 
-        act(() => {
-            render(<NewSingleBinaryJob router={global.router}/>);
-            fireEvent.click(screen.getByText('Submit your job'));
-        });
+        render(<NewSingleBinaryJob router={global.router}/>);
+        fireEvent.click(screen.getByText('Submit your job'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        act(() => {
-            global.environment.mock.resolve(
-                operation,
-                MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
-            );
-        });
+
+        global.environment.mock.resolve(
+            operation,
+            MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
+        );
 
         expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
     });
@@ -108,17 +100,17 @@ describe('new single binary job page', () => {
 
         const mockRequest = mockXMLHttpRequest(200);
 
-        act(() => {
-            render(<NewSingleBinaryJob router={global.router}/>);
-            fireEvent.click(screen.getByText('Submit your job'));
-        });
+        render(<NewSingleBinaryJob router={global.router}/>);
+        fireEvent.click(screen.getByText('Submit your job'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+
+        global.environment.mock.resolve(
+            operation,
+            MockPayloadGenerator.generate(operation)
+        );
+
         act(() => {
-            global.environment.mock.resolve(
-                operation,
-                MockPayloadGenerator.generate(operation)
-            );
             jest.advanceTimersByTime(6000);
         });
 
@@ -139,17 +131,12 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
         expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
 
-        act(() => {
-            fireEvent.click(screen.getByText('Submit your job'));
-        });
+        fireEvent.click(screen.getByText('Submit your job'));
 
         const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        await waitFor(() => {
-            global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
-        });
+        global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
 
         expect(screen.getAllByText('Loading...')).toHaveLength(3);
-
         expect(screen.queryByTestId('van-plot')).not.toBeInTheDocument();
         expect(screen.queryByTestId('detailed-plot')).not.toBeInTheDocument();
         expect(screen.queryByTestId('download-link')).not.toBeInTheDocument();
