@@ -77,6 +77,10 @@ const NewSingleBinaryJob = ({initialValues}) => {
     
 
     const handleJobSubmission = (values) => {
+        Object.entries(values)
+            .filter(([key, value]) => value === '')
+            .map(([key, value]) => values[key] = null);
+
         setVanPlotFile('');
         setDetailedOutputFile('');
         setPlotFile('');
@@ -91,7 +95,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 metallicity: values.metallicity,
                 eccentricity: values.eccentricity,
                 separation: values.separation,
-                orbitalPeriod: values.orbitPeriod,
+                orbitalPeriod: values.orbitalPeriod,
                 velocityRandomNumber1: values.velocityRandomNumber1,
                 velocityRandomNumber2: values.velocityRandomNumber2,
                 velocity1: values.velocity1,

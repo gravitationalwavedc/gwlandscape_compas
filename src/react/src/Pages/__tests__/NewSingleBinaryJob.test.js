@@ -131,6 +131,13 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
         expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
 
+        //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
+        const separationInput = screen.getByLabelText('Separation (AU)');
+        const orbitalInput = screen.getByLabelText('Orbital Period (days)');
+        fireEvent.change(separationInput,{target: {value: ''}});
+        fireEvent.change(orbitalInput,{target: {value: 1.3}});
+        expect(separationInput.value).toBe('');
+        expect(orbitalInput.value).toBe('1.3');
         fireEvent.click(screen.getByText('Submit your job'));
 
         const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
