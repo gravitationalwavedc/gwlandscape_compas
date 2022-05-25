@@ -3,6 +3,7 @@ import { MockPayloadGenerator } from 'relay-test-utils';
 import {screen, render, fireEvent, waitFor, act} from '@testing-library/react';
 import NewSingleBinaryJob from '../NewSingleBinaryJob';
 import 'regenerator-runtime/runtime';
+import userEvent from '@testing-library/user-event';
 
 /* global global */
 
@@ -134,20 +135,25 @@ describe('new single binary job page', () => {
         //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
         const separationInput = screen.getByLabelText('Separation (AU)');
         const orbitalInput = screen.getByLabelText('Orbital Period (days)');
-        fireEvent.change(separationInput,{target: {value: ''}});
-        fireEvent.change(orbitalInput,{target: {value: 1.3}});
-        expect(separationInput.value).toBe('');
-        expect(orbitalInput.value).toBe('1.3');
-        fireEvent.click(screen.getByText('Submit your job'));
+        await waitFor(() => userEvent.type(separationInput, ''));
+        await waitFor(() => userEvent.type(orbitalInput, 1.3));
+        await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
 
         const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
         global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
 
+        // check if plots were reset
         expect(screen.getAllByText('Loading...')).toHaveLength(3);
         expect(screen.queryByTestId('van-plot')).not.toBeInTheDocument();
         expect(screen.queryByTestId('detailed-plot')).not.toBeInTheDocument();
         expect(screen.queryByTestId('download-link')).not.toBeInTheDocument();
 
+        act(() => {
+            jest.advanceTimersByTime(6000);
+        });
+
+        // check no errors were reported
+        expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
         jest.useRealTimers();
     });
 });
