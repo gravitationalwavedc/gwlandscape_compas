@@ -17,7 +17,7 @@ class TestCeleryTasks(TestCase):
         with TemporaryDirectory() as output_dir:
             output_path = output_dir
             detailed_output_path = os.path.join(output_path, 'COMPAS_Output',
-                                                   'Detailed_Output', 'BSE_Detailed_Output_0.h5')
+                                                'Detailed_Output', 'BSE_Detailed_Output_0.h5')
             result = run_compas(self.grid_file, output_path, detailed_output_path)
             self.assertEqual(result, TASK_SUCCESS)
 
