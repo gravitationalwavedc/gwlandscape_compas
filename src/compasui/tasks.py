@@ -26,14 +26,13 @@ def check_output_file_generated(outputfilepath):
 
 @shared_task
 def run_compas(grid_file_path, output_path, detailed_output_file_path):
-    print('new task')
     result = None
     try:
         run_compas_cmd(grid_file_path, output_path)
         result = check_output_file_generated(detailed_output_file_path)
 
-    except SoftTimeLimitExceeded as timeout_err:
-        print(timeout_err)
+    except SoftTimeLimitExceeded:
+        traceback.print_exc()
         result = TASK_TIMEOUT
     except Exception:
         # return fail code if job failed for some other reason
