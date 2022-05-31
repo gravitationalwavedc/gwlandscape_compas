@@ -7,6 +7,7 @@ default:
     - export DEBIAN_FRONTEND=noninteractive
     - apt -y update
     - apt -y upgrade
+    - apt -y install texlive-latex-extra cm-super dvipng
     - apt -y install apt-utils net-tools python3.8 python3-pip git curl g++ libboost-all-dev libgsl-dev libhdf5-serial-dev
     - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
     - export WD=`pwd`
