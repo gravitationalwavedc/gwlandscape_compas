@@ -38,17 +38,8 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
         # return fail code if job failed for some other reason
         traceback.print_exc()
         result = TASK_FAIL
-    # An example of adding in another error (would need to go above Exception above)
-    except TaskRevokedError:
-        traceback.print_exc()
-        result = TASK_FAIL_OTHER
     finally:
         return result
-
-
-@shared_task
-def test_task(job_id):
-    print(f"Task Recieved {job_id}")
 
 
 @shared_task
