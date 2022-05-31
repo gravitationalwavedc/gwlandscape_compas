@@ -10,6 +10,7 @@ from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 class TestCeleryTasks(TestCase):
     def setUp(self):
         self.grid_file = './compasui/tests/test_data/BSE_grid.txt'
+        self.detailed_output_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
 
     def test_run_compas_success(self):
         print("Test run_compas task success")
@@ -43,11 +44,10 @@ class TestCeleryTasks(TestCase):
     def test_run_detailed_evol_plotting_success(self):
         print("Test run_detailed_evol_plotting success")
         with TemporaryDirectory() as output_dir:
-            detailed_output_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
             detailed_plot_path = os.path.join(output_dir, 'detailedEvolutionPlot.png')
             vanDenHeuval_plot_path = os.path.join(output_dir, 'vanDenHeuvalPlot.png')
             evol_text_path = os.path.join(output_dir, 'detailed_evol.txt')
-            result = run_detailed_evol_plotting(TASK_SUCCESS, detailed_output_path,
+            result = run_detailed_evol_plotting(TASK_SUCCESS, self.detailed_output_path,
                                                 detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             self.assertEqual(result, TASK_SUCCESS)
 
@@ -55,12 +55,11 @@ class TestCeleryTasks(TestCase):
     def test_run_detailed_evol_plotting_failure(self, plotting_main):
         print("Test run_detailed_evol_plotting failure")
         with TemporaryDirectory() as output_dir:
-            detailed_output_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
             detailed_plot_path = os.path.join(output_dir, 'detailedEvolutionPlot.png')
             vanDenHeuval_plot_path = os.path.join(output_dir, 'vanDenHeuvalPlot.png')
             evol_text_path = os.path.join(output_dir, 'detailed_evol.txt')
             plotting_main.side_effect = Exception
-            result = run_detailed_evol_plotting(TASK_SUCCESS, detailed_output_path,
+            result = run_detailed_evol_plotting(TASK_SUCCESS, self.detailed_output_path,
                                                 detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             self.assertEqual(result, TASK_FAIL)
 
@@ -68,26 +67,24 @@ class TestCeleryTasks(TestCase):
     def test_run_detailed_evol_plotting_timeout(self, plotting_main):
         print("Test run_detailed_evol_plotting timeout")
         with TemporaryDirectory() as output_dir:
-            detailed_output_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
             detailed_plot_path = os.path.join(output_dir, 'detailedEvolutionPlot.png')
             vanDenHeuval_plot_path = os.path.join(output_dir, 'vanDenHeuvalPlot.png')
             evol_text_path = os.path.join(output_dir, 'detailed_evol.txt')
             plotting_main.side_effect = SoftTimeLimitExceeded
-            result = run_detailed_evol_plotting(TASK_SUCCESS, detailed_output_path,
+            result = run_detailed_evol_plotting(TASK_SUCCESS, self.detailed_output_path,
                                                 detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             self.assertEqual(result, TASK_TIMEOUT)
 
     def test_run_detailed_evol_plotting_failure_when_run_compas_fails(self):
         print("Test run_detailed_evol_plotting failure after run_compas task failure or timewout")
         with TemporaryDirectory() as output_dir:
-            detailed_output_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
             detailed_plot_path = os.path.join(output_dir, 'detailedEvolutionPlot.png')
             vanDenHeuval_plot_path = os.path.join(output_dir, 'vanDenHeuvalPlot.png')
             evol_text_path = os.path.join(output_dir, 'detailed_evol.txt')
-            result = run_detailed_evol_plotting(TASK_FAIL, detailed_output_path,
+            result = run_detailed_evol_plotting(TASK_FAIL, self.detailed_output_path,
                                                 detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             self.assertEqual(result, TASK_FAIL)
 
-            result = run_detailed_evol_plotting(TASK_TIMEOUT, detailed_output_path,
+            result = run_detailed_evol_plotting(TASK_TIMEOUT, self.detailed_output_path,
                                                 detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             self.assertEqual(result, TASK_FAIL)
