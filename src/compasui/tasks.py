@@ -3,10 +3,10 @@ from celery import shared_task
 import os
 import traceback
 
-from .utils.celery_detailed_evol_plot import main
+from .utils.celery_detailed_evol_plot import main as plotting_main
 from .utils.celery_pythonSubmit import run_compas_cmd
-from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_FAIL_OTHER, TASK_TIMEOUT
-from celery.exceptions import TaskRevokedError, SoftTimeLimitExceeded
+from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
+from celery.exceptions import SoftTimeLimitExceeded
 
 
 def check_output_file_generated(outputfilepath):
@@ -50,7 +50,7 @@ def run_detailed_evol_plotting(jobstate, detailed_output_file_path,
 
         result = None
         try:
-            main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
+            plotting_main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
             result = check_output_file_generated(vanDenHeuval_plot_path)
         except SoftTimeLimitExceeded:
             traceback.print_exc()
