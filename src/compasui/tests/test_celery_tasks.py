@@ -14,7 +14,7 @@ class TestCeleryTasks(TestCase):
         self.output_dir = TemporaryDirectory()
         self.output_path = self.output_dir.name
         self.detailed_output_path = os.path.join(self.output_path, 'COMPAS_Output',
-                                            'Detailed_Output', 'BSE_Detailed_Output_0.h5')
+                                                 'Detailed_Output', 'BSE_Detailed_Output_0.h5')
         self.plotting_file_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
 
         self.detailed_plot_path = os.path.join(self.output_path, 'detailedEvolutionPlot.png')
