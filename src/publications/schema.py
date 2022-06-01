@@ -62,15 +62,34 @@ class CompasPublicationNode(DjangoObjectType):
         return CompasPublication.public_filter(queryset, info)
 
 
+class CompasModelNode(DjangoObjectType):
+    """
+    Type for CompasModels without authentication
+    """
+    class Meta:
+        model = CompasModel
+        fields = ['name', 'summary', 'description']
+        filter_fields = {
+            'name': ['exact', 'icontains'],
+            'summary': ['exact', 'icontains'],
+            'description': ['exact', 'icontains']
+        }
+        interfaces = (relay.Node,)
+
+
 class Query(object):
     keywords = DjangoFilterConnectionField(KeywordNode)
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
+    compas_models = DjangoFilterConnectionField(CompasModelNode)
 
     def resolve_keywords(root, info, **kwargs):
         return Keyword.all()
 
     def resolve_compas_publications(root, info, **kwargs):
         return CompasPublication.all()
+
+    def resolve_compas_models(root, info, **kwargs):
+        return CompasModel.all()
 
 
 class AddKeywordMutation(relay.ClientIDMutation):

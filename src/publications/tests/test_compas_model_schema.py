@@ -1,3 +1,4 @@
+import humps
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from graphql_relay import to_global_id
@@ -24,6 +25,20 @@ class TestCompasModelSchema(CompasTestCase):
             mutation DeleteCompasModelMutation($input: DeleteCompasModelMutationInput!) {
                 deleteCompasModel(input: $input) {
                     result
+                }
+            }
+        """
+
+        self.model_query = """
+            query {
+                compasModels {
+                    edges {
+                        node {
+                            name
+                            summary
+                            description
+                        }
+                    }
                 }
             }
         """
@@ -207,3 +222,61 @@ class TestCompasModelSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
 
         self.assertEqual(CompasModel.objects.all().count(), 1)
+
+    def test_model_query_unauthenticated(self):
+        compas_model_input = {
+            'input': {
+                'name': 'test',
+                'summary': 'summary',
+                'description': 'description'
+            }
+        }
+
+        CompasModel.create_model(**humps.decamelize(compas_model_input['input']))
+
+        response = self.client.execute(
+            self.model_query
+        )
+
+        expected = {
+            'compasModels': {
+                'edges': [
+                    {
+                        'node': compas_model_input['input']
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_model_query_authenticated(self):
+        self.client.authenticate(self.user)
+
+        compas_model_input = {
+            'input': {
+                'name': 'test',
+                'summary': 'summary',
+                'description': 'description'
+            }
+        }
+
+        CompasModel.create_model(**humps.decamelize(compas_model_input['input']))
+
+        response = self.client.execute(
+            self.model_query
+        )
+
+        expected = {
+            'compasModels': {
+                'edges': [
+                    {
+                        'node': compas_model_input['input']
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)

@@ -114,6 +114,10 @@ class CompasModel(models.Model):
     def delete_model(cls, _id):
         cls.objects.get(id=_id).delete()
 
+    @classmethod
+    def all(cls):
+        return cls.objects.all().order_by('name')
+
 
 class CompasDatasetModel(models.Model):
     compas_publication = models.ForeignKey(CompasPublication, models.CASCADE)
