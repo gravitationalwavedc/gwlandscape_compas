@@ -5,6 +5,8 @@ import h5py
 from django.db import models
 from graphql_relay import from_global_id
 
+from publications.utils import check_publication_management_user
+
 
 class Keyword(models.Model):
     tag = models.CharField(max_length=255, blank=False, null=False, unique=True)
@@ -79,6 +81,17 @@ class CompasPublication(models.Model):
     @classmethod
     def delete_publication(cls, _id):
         cls.objects.get(id=_id).delete()
+
+    @classmethod
+    def public_filter(cls, queryset, info):
+        if not check_publication_management_user(info.context.user):
+            return queryset.exclude(public=False)
+        else:
+            return queryset
+
+    @classmethod
+    def all(cls):
+        return cls.objects.all().order_by('title')
 
 
 class CompasModel(models.Model):

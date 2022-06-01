@@ -59,6 +59,36 @@ class TestPublicationSchema(CompasTestCase):
         for keyword_id in self.keywords_ids:
             self.publication_input_optional['keywords'].append(keyword_id)
 
+        self.publication_query = """
+            query {
+                compasPublications {
+                    edges {
+                        node {
+                            id
+                            author
+                            published
+                            title
+                            year
+                            journal
+                            journalDoi
+                            datasetDoi
+                            creationTime
+                            description
+                            downloadLink
+                            arxivId
+                            keywords {
+                                edges {
+                                    node {
+                                        tag
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        """
+
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_publication_authenticated(self):
         self.client.authenticate(self.user)
@@ -235,7 +265,7 @@ class TestPublicationSchema(CompasTestCase):
 
         publication_input = {
             'input': {
-                'id': to_global_id('Publication', publication.id+1),
+                'id': to_global_id('Publication', publication.id + 1),
             }
         }
 
@@ -252,3 +282,113 @@ class TestPublicationSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
 
         self.assertEqual(CompasPublication.objects.all().count(), 1)
+
+    def test_publication_query_unauthenticated(self):
+        self.publication_input_required['input'].update(self.publication_input_optional)
+        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+
+        response = self.client.execute(
+            self.publication_query
+        )
+
+        expected = {
+            'compasPublications': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                            'author': 'test author',
+                            'published': True,
+                            'title': 'test title',
+                            'year': 1983,
+                            'journal': 'test journal',
+                            'journalDoi': 'test journal doi',
+                            'datasetDoi': 'test dataset doi',
+                            'creationTime': publication.creation_time.isoformat(),
+                            'description': 'test description',
+                            'downloadLink': 'test download link',
+                            'arxivId': 'test arxiv_id',
+                            'keywords': {
+                                'edges': [
+                                    {
+                                        'node': {
+                                            'tag': 'keyword1'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword2'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag':
+                                                'keyword3'
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_publication_query_authenticated(self):
+        self.client.authenticate(self.user)
+
+        self.publication_input_required['input'].update(self.publication_input_optional)
+        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+
+        response = self.client.execute(
+            self.publication_query
+        )
+
+        expected = {
+            'compasPublications': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                            'author': 'test author',
+                            'published': True,
+                            'title': 'test title',
+                            'year': 1983,
+                            'journal': 'test journal',
+                            'journalDoi': 'test journal doi',
+                            'datasetDoi': 'test dataset doi',
+                            'creationTime': publication.creation_time.isoformat(),
+                            'description': 'test description',
+                            'downloadLink': 'test download link',
+                            'arxivId': 'test arxiv_id',
+                            'keywords': {
+                                'edges': [
+                                    {
+                                        'node': {
+                                            'tag': 'keyword1'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword2'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag':
+                                                'keyword3'
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
