@@ -322,8 +322,7 @@ class TestPublicationSchema(CompasTestCase):
                                     },
                                     {
                                         'node': {
-                                            'tag':
-                                                'keyword3'
+                                            'tag': 'keyword3'
                                         }
                                     }
                                 ]
@@ -378,8 +377,7 @@ class TestPublicationSchema(CompasTestCase):
                                     },
                                     {
                                         'node': {
-                                            'tag':
-                                                'keyword3'
+                                            'tag': 'keyword3'
                                         }
                                     }
                                 ]
