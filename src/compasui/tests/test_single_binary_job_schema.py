@@ -54,7 +54,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         }
 
     def test_new_single_binary_job_exception_no_redis_raised(self):
-        print("Not mocking tasks or redis. Tasks fail as celery cannot connect to redis")
+        # Not mocking tasks or redis. Tasks fail as celery cannot connect to redis
         response = self.client.execute(
             self.create_single_binary_job_mutation,
             self.single_binary_job_input
@@ -77,8 +77,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
     @patch('compasui.views.run_compas')
     @patch('compasui.views.run_detailed_evol_plotting')
     def test_celery_tasks_called(self, run_detailed_evol_plotting, run_compas, chain):
-        print("mocking celery task calls")
-
         run_compas.s.return_value = TASK_SUCCESS
         run_detailed_evol_plotting.s.return_value = TASK_FAIL
 
@@ -106,7 +104,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
     @patch('compasui.views.chain')
     def test_new_single_binary_mutation_when_tasks_fail(self, chain):
-        print("mocking celery tasks failure")
         chain()().get.return_value = TASK_FAIL
 
         response = self.client.execute(
@@ -127,8 +124,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
     @patch('compasui.views.chain')
     def test_new_single_binary_mutation_when_tasks_succeed(self, chain):
-        print("mocking celery tasks success")
-
         plot_file_path = f'{settings.MEDIA_URL}jobs/1/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png'
         grid_file_path = f'{settings.MEDIA_URL}jobs/1/BSE_grid.txt'
         van_plot_file_path = f'{settings.MEDIA_URL}jobs/1/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png'
