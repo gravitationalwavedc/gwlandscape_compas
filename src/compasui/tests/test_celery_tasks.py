@@ -8,6 +8,7 @@ from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 
 
 class TestCeleryTasks(TestCase):
+
     def setUp(self):
         self.grid_file = './compasui/tests/test_data/BSE_grid.txt'
         self.output_dir = TemporaryDirectory()
@@ -19,6 +20,9 @@ class TestCeleryTasks(TestCase):
         self.detailed_plot_path = os.path.join(self.output_path, 'detailedEvolutionPlot.png')
         self.vanDenHeuval_plot_path = os.path.join(self.output_path, 'vanDenHeuvalPlot.png')
         self.evol_text_path = os.path.join(self.output_path, 'detailed_evol.txt')
+
+    def tearDown(self):
+        self.output_dir.cleanup()
 
     def test_run_compas_success(self):
         result = run_compas(self.grid_file, self.output_path, self.detailed_output_path)
@@ -63,6 +67,3 @@ class TestCeleryTasks(TestCase):
         result = run_detailed_evol_plotting(TASK_TIMEOUT, self.detailed_output_path, self.detailed_plot_path,
                                             self.vanDenHeuval_plot_path, self.evol_text_path)
         self.assertEqual(result, TASK_FAIL)
-
-    def tearDown(self):
-        self.output_dir.cleanup()
