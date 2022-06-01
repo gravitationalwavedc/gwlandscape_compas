@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'compasui.apps.CompasConfig',
     'graphene_django',
     'django_jenkins',
-    'publications'
+    'publications',
+    'django_filters'
 ]
 
 MIDDLEWARE = [

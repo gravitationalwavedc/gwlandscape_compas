@@ -1,16 +1,13 @@
 import graphene
-from django.conf import settings
 from graphene import relay
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 from graphene_file_upload.scalars import Upload
 from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
 
 from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel
-
-
-def check_publication_management_user(user):
-    return user.user_id in settings.PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS
+from publications.utils import check_publication_management_user
 
 
 class KeywordNode(DjangoObjectType):
@@ -20,19 +17,60 @@ class KeywordNode(DjangoObjectType):
     class Meta:
         model = Keyword
         fields = ['tag']
+        filter_fields = {
+            'tag': ['exact', 'icontains']
+        }
         interfaces = (relay.Node,)
 
 
-class KeywordConnection(relay.Connection):
+class CompasPublicationNode(DjangoObjectType):
+    """
+    Type for CompasPublication without authentication
+    """
+
     class Meta:
-        node = KeywordNode
+        model = CompasPublication
+        fields = [
+            'author',
+            'published',
+            'title',
+            'year',
+            'journal',
+            'journal_doi',
+            'dataset_doi',
+            'creation_time',
+            'description',
+            'download_link',
+            'arxiv_id',
+            'keywords'
+        ]
+        filter_fields = {
+            'author': ['exact', 'icontains'],
+            'published': ['exact'],
+            'title': ['exact', 'icontains'],
+            'year': ['exact', 'gt', 'lt', 'gte', 'lte'],
+            'journal': ['exact', 'icontains'],
+            'journal_doi': ['exact', 'icontains'],
+            'dataset_doi': ['exact', 'icontains'],
+            'description': ['exact', 'icontains']
+        }
+        interfaces = (relay.Node,)
+
+    @classmethod
+    def queryset(parent, queryset, info):
+        # Make sure we filter out any publications that are not public if the current user isn't a publication manager
+        return CompasPublication.public_filter(queryset, info)
 
 
 class Query(object):
-    keywords = relay.ConnectionField(KeywordConnection)
+    keywords = DjangoFilterConnectionField(KeywordNode)
+    compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
 
     def resolve_keywords(root, info, **kwargs):
         return Keyword.all()
+
+    def resolve_compas_publications(root, info, **kwargs):
+        return CompasPublication.all()
 
 
 class AddKeywordMutation(relay.ClientIDMutation):
