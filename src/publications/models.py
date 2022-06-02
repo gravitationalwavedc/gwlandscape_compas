@@ -1,7 +1,6 @@
 import os
 import tarfile
 
-import h5py
 from django.db import models
 from graphql_relay import from_global_id
 
@@ -38,7 +37,7 @@ def job_directory_path(instance, filename):
     fname = filename.replace(" ", "_")
     dataset_id = str(instance.compas_publication.id)
     model_id = str(instance.compas_model.id)
-    # dataset files will be saved in MEDIA_ROOT/datasets/dataset_id/model_id/
+    # dataset files will be saved in MEDIA_ROOT/publications/dataset_id/model_id/
     return os.path.join("publications", dataset_id, model_id, fname)
 
 
@@ -167,18 +166,6 @@ class CompasDatasetModel(models.Model):
         # remove the tar file after decompression
         os.remove(self.file.path)
 
-    def get_run_details(self):
-        """
-        query file: "run_details.txt"
-        """
-        return self.upload_set.filter(file__iendswith="Run_Details")
-
-    def get_data(self):
-        """
-        query file: "*.h5"
-        """
-        return self.upload_set.filter(file__iendswith=".h5")
-
 
 class Upload(models.Model):
     file = models.FileField(blank=True, null=True)
@@ -197,29 +184,3 @@ class Upload(models.Model):
 
     def __str__(self):
         return os.path.basename(self.file.name)
-
-    def get_content(self):
-        """
-        get the content of a file; will be called only on txt files
-        """
-        if self.file.storage.exists(self.file.name):
-
-            with self.file.open("r") as f:
-                return f.read()
-        else:
-            return "File not found"
-
-    def read_stats(self):
-        """
-        read data length in h5 file
-        """
-        data_stats = {}
-
-        if self.file.storage.exists(self.file.name):
-            data = h5py.File(self.file, "r")
-            for key in data.keys():
-                prim_key = list(data[key])[0]
-                stat = len(data[key][prim_key])
-                data_stats[key] = stat
-
-        return data_stats

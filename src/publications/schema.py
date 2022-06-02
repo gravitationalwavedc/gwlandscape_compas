@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType
@@ -79,10 +81,30 @@ class CompasModelNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
+class CompasDatasetModelNode(DjangoObjectType):
+    """
+    Type for CompasDatasetModel without authentication
+    """
+    files = graphene.List(graphene.String)
+
+    class Meta:
+        model = CompasDatasetModel
+        fields = ['compas_publication', 'compas_model']
+        filter_fields = {
+            'compas_publication': ['exact'],
+            'compas_model': ['exact']
+        }
+        interfaces = (relay.Node,)
+
+    def resolve_files(root, info, **kwargs):
+        return [Path(f.file.url).absolute() for f in root.upload_set.all()]
+
+
 class Query(object):
     keywords = DjangoFilterConnectionField(KeywordNode)
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
     compas_models = DjangoFilterConnectionField(CompasModelNode)
+    compas_dataset_models = DjangoFilterConnectionField(CompasDatasetModelNode)
 
 
 class AddKeywordMutation(relay.ClientIDMutation):
