@@ -40,6 +40,7 @@ class CompasPublicationNode(DjangoObjectType):
             'dataset_doi',
             'creation_time',
             'description',
+            'public',
             'download_link',
             'arxiv_id',
             'keywords'
@@ -57,7 +58,7 @@ class CompasPublicationNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
     @classmethod
-    def queryset(parent, queryset, info):
+    def get_queryset(parent, queryset, info):
         # Make sure we filter out any publications that are not public if the current user isn't a publication manager
         return CompasPublication.public_filter(queryset, info)
 
@@ -85,8 +86,8 @@ class Query(object):
     def resolve_keywords(root, info, **kwargs):
         return Keyword.all()
 
-    def resolve_compas_publications(root, info, **kwargs):
-        return CompasPublication.all()
+    # def resolve_compas_publications(root, info, **kwargs):
+    #     return CompasPublication.all()
 
     def resolve_compas_models(root, info, **kwargs):
         return CompasModel.all()
