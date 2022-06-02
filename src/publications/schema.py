@@ -53,7 +53,8 @@ class CompasPublicationNode(DjangoObjectType):
             'journal': ['exact', 'icontains'],
             'journal_doi': ['exact', 'icontains'],
             'dataset_doi': ['exact', 'icontains'],
-            'description': ['exact', 'icontains']
+            'description': ['exact', 'icontains'],
+            'public': ['exact']
         }
         interfaces = (relay.Node,)
 
