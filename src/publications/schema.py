@@ -84,15 +84,6 @@ class Query(object):
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
     compas_models = DjangoFilterConnectionField(CompasModelNode)
 
-    def resolve_keywords(root, info, **kwargs):
-        return Keyword.all()
-
-    # def resolve_compas_publications(root, info, **kwargs):
-    #     return CompasPublication.all()
-
-    def resolve_compas_models(root, info, **kwargs):
-        return CompasModel.all()
-
 
 class AddKeywordMutation(relay.ClientIDMutation):
     class Input:
