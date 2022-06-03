@@ -6,7 +6,7 @@ from django.test import override_settings
 from graphql_relay import to_global_id
 
 from compasui.tests.testcases import CompasTestCase
-from publications.models import CompasPublication, CompasModel, CompasDatasetModel, Upload
+from publications.models import CompasPublication, CompasModel, CompasDatasetModel, Upload, Keyword
 
 User = get_user_model()
 
@@ -18,11 +18,19 @@ class TestCompasDatasetModelSchema(CompasTestCase):
 
         self.model = CompasModel.create_model('test', 'summary', 'description')
 
+        self.keywords = [
+            Keyword.create_keyword('keyword1'),
+            Keyword.create_keyword('keyword2'),
+            Keyword.create_keyword('keyword3')
+        ]
+
         self.publication = CompasPublication.create_publication(
             author='test author',
             title='test title',
             arxiv_id='test arxiv_id'
         )
+
+        self.publication.keywords.set(self.keywords)
 
         self.add_compas_dataset_model_mutation = """
             mutation AddCompasDatasetModelMutation($input: AddCompasDatasetModelMutationInput!) {
@@ -68,6 +76,38 @@ class TestCompasDatasetModelSchema(CompasTestCase):
                 'file': self.test_job_single
             }
         }
+
+        self.dataset_model_query = """
+            query {
+                compasDatasetModels {
+                    edges {
+                        node {
+                            id
+                            compasPublication {
+                                id
+                                author
+                                title
+                                arxivId
+                                keywords {
+                                    edges {
+                                        node {
+                                            tag
+                                        }
+                                    }
+                                }
+                            }
+                            compasModel {
+                                id
+                                name
+                                summary
+                                description
+                            }
+                            files
+                        }
+                    }
+                }
+            }
+        """
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_compas_dataset_model_authenticated_archive(self):
@@ -294,3 +334,133 @@ class TestCompasDatasetModelSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
 
         self.assertEqual(CompasPublication.objects.all().count(), 1)
+
+    def test_compas_dataset_model_query_unauthenticated(self):
+        CompasDatasetModel.create_dataset_model(
+            self.publication,
+            self.model,
+            self.test_job_archive
+        )
+
+        response = self.client.execute(
+            self.dataset_model_query
+        )
+
+        expected = {
+            'compasDatasetModels': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzRGF0YXNldE1vZGVsTm9kZTox',
+                            'compasPublication': {
+                                'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                                'author': 'test author',
+                                'title': 'test title',
+                                'arxivId': 'test arxiv_id',
+                                'keywords': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'tag': 'keyword1'
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'tag': 'keyword2'
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'tag': 'keyword3'
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            'compasModel': {
+                                'id': 'Q29tcGFzTW9kZWxOb2RlOjE=',
+                                'name': 'test',
+                                'summary': 'summary',
+                                'description': 'description'
+                            },
+                            'files': [
+                                '/compas/files/publications/1/1/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5',
+                                '/compas/files/publications/1/1/COMPAS_Output/Detailed_Output/gw151226evol.png',
+                                '/compas/files/publications/1/1/COMPAS_Output/COMPAS_Output.h5',
+                                '/compas/files/publications/1/1/COMPAS_Output/Run_Details',
+                                '/compas/files/publications/1/1/BSE_grid.txt'
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_compas_dataset_model_query_authenticated(self):
+        self.client.authenticate(self.user)
+
+        CompasDatasetModel.create_dataset_model(
+            self.publication,
+            self.model,
+            self.test_job_archive
+        )
+
+        response = self.client.execute(
+            self.dataset_model_query
+        )
+
+        expected = {
+            'compasDatasetModels': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzRGF0YXNldE1vZGVsTm9kZTox',
+                            'compasPublication': {
+                                'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                                'author': 'test author',
+                                'title': 'test title',
+                                'arxivId': 'test arxiv_id',
+                                'keywords': {
+                                    'edges': [
+                                        {
+                                            'node': {
+                                                'tag': 'keyword1'
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'tag': 'keyword2'
+                                            }
+                                        },
+                                        {
+                                            'node': {
+                                                'tag': 'keyword3'
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            'compasModel': {
+                                'id': 'Q29tcGFzTW9kZWxOb2RlOjE=',
+                                'name': 'test',
+                                'summary': 'summary',
+                                'description': 'description'
+                            },
+                            'files': [
+                                '/compas/files/publications/1/1/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5',
+                                '/compas/files/publications/1/1/COMPAS_Output/Detailed_Output/gw151226evol.png',
+                                '/compas/files/publications/1/1/COMPAS_Output/COMPAS_Output.h5',
+                                '/compas/files/publications/1/1/COMPAS_Output/Run_Details',
+                                '/compas/files/publications/1/1/BSE_grid.txt'
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
