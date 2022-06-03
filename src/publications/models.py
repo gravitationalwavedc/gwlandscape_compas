@@ -9,6 +9,9 @@ from publications.utils import check_publication_management_user
 
 
 class Keyword(models.Model):
+    class Meta:
+        ordering = ['tag']
+
     tag = models.CharField(max_length=255, blank=False, null=False, unique=True)
 
     def __str__(self):
@@ -23,10 +26,6 @@ class Keyword(models.Model):
     @classmethod
     def delete_keyword(cls, _id):
         cls.objects.get(id=_id).delete()
-
-    @classmethod
-    def all(cls):
-        return cls.objects.all().order_by('tag')
 
 
 def job_directory_path(instance, filename):
@@ -44,6 +43,9 @@ def job_directory_path(instance, filename):
 
 
 class CompasPublication(models.Model):
+    class Meta:
+        ordering = ['title']
+
     author = models.CharField(max_length=255, blank=False, null=False)
     # published defines if the job was published in a journal/arxiv
     published = models.BooleanField(default=False)
@@ -89,12 +91,11 @@ class CompasPublication(models.Model):
         else:
             return queryset
 
-    @classmethod
-    def all(cls):
-        return cls.objects.all().order_by('title')
-
 
 class CompasModel(models.Model):
+    class Meta:
+        ordering = ['name']
+
     name = models.CharField(max_length=50, null=True, blank=True)
     summary = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -113,10 +114,6 @@ class CompasModel(models.Model):
     @classmethod
     def delete_model(cls, _id):
         cls.objects.get(id=_id).delete()
-
-    @classmethod
-    def all(cls):
-        return cls.objects.all().order_by('name')
 
 
 class CompasDatasetModel(models.Model):

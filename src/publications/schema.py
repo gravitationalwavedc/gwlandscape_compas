@@ -40,6 +40,7 @@ class CompasPublicationNode(DjangoObjectType):
             'dataset_doi',
             'creation_time',
             'description',
+            'public',
             'download_link',
             'arxiv_id',
             'keywords'
@@ -52,12 +53,13 @@ class CompasPublicationNode(DjangoObjectType):
             'journal': ['exact', 'icontains'],
             'journal_doi': ['exact', 'icontains'],
             'dataset_doi': ['exact', 'icontains'],
-            'description': ['exact', 'icontains']
+            'description': ['exact', 'icontains'],
+            'public': ['exact']
         }
         interfaces = (relay.Node,)
 
     @classmethod
-    def queryset(parent, queryset, info):
+    def get_queryset(parent, queryset, info):
         # Make sure we filter out any publications that are not public if the current user isn't a publication manager
         return CompasPublication.public_filter(queryset, info)
 
@@ -81,15 +83,6 @@ class Query(object):
     keywords = DjangoFilterConnectionField(KeywordNode)
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
     compas_models = DjangoFilterConnectionField(CompasModelNode)
-
-    def resolve_keywords(root, info, **kwargs):
-        return Keyword.all()
-
-    def resolve_compas_publications(root, info, **kwargs):
-        return CompasPublication.all()
-
-    def resolve_compas_models(root, info, **kwargs):
-        return CompasModel.all()
 
 
 class AddKeywordMutation(relay.ClientIDMutation):
