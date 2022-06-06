@@ -43,36 +43,6 @@ class TestUploadModel(testcases.TestCase):
         for f in files:
             self.assertTrue(Upload.objects.filter(file__contains=f, dataset_model=self.dataset_model).exists())
 
-    def test_get_content(self):
-        upload = Upload.objects.get(file__contains='BSE_grid.txt', dataset_model=self.dataset_model)
-        self.assertEqual(
-            upload.get_content(),
-            '--initial-mass-1 20.0 --initial-mass-2 10.0 --metallicity 0.0142 --orbital-period 1.0 '
-        )
-
-        upload.file.delete(False)
-
-        upload = Upload.objects.get(file__contains='BSE_grid.txt', dataset_model=self.dataset_model)
-        self.assertEqual(
-            upload.get_content(),
-            'File not found'
-        )
-
-    def test_read_stats(self):
-        upload = Upload.objects.get(file__contains='COMPAS_Output.h5', dataset_model=self.dataset_model)
-        self.assertEqual(
-            upload.read_stats(),
-            {'BSE_Common_Envelopes': 1, 'BSE_RLOF': 1, 'BSE_System_Parameters': 1}
-        )
-
-        upload.file.delete(False)
-
-        upload = Upload.objects.get(file__contains='COMPAS_Output.h5', dataset_model=self.dataset_model)
-        self.assertEqual(
-            upload.read_stats(),
-            {}
-        )
-
     def test_str(self):
         upload = Upload.objects.get(file__contains='COMPAS_Output.h5', dataset_model=self.dataset_model)
         self.assertEqual(str(upload), 'COMPAS_Output.h5')

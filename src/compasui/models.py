@@ -1,16 +1,15 @@
-import os
 import math
+import os
 
 from django.conf import settings
-from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
 
+from .utils import constants
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.jobs.request_file_list import request_file_list
 from .utils.jobs.request_job_status import request_job_status
 from .variables import compas_parameters
-
-from .utils import constants
 
 
 class Label(models.Model):

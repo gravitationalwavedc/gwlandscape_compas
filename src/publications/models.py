@@ -1,7 +1,6 @@
 import os
 import tarfile
 
-import h5py
 from django.db import models
 from graphql_relay import from_global_id
 
@@ -9,6 +8,9 @@ from publications.utils import check_publication_management_user
 
 
 class Keyword(models.Model):
+    class Meta:
+        ordering = ['tag']
+
     tag = models.CharField(max_length=255, blank=False, null=False, unique=True)
 
     def __str__(self):
@@ -24,10 +26,6 @@ class Keyword(models.Model):
     def delete_keyword(cls, _id):
         cls.objects.get(id=_id).delete()
 
-    @classmethod
-    def all(cls):
-        return cls.objects.all().order_by('tag')
-
 
 def job_directory_path(instance, filename):
     """
@@ -39,11 +37,14 @@ def job_directory_path(instance, filename):
     fname = filename.replace(" ", "_")
     dataset_id = str(instance.compas_publication.id)
     model_id = str(instance.compas_model.id)
-    # dataset files will be saved in MEDIA_ROOT/datasets/dataset_id/model_id/
+    # dataset files will be saved in MEDIA_ROOT/publications/dataset_id/model_id/
     return os.path.join("publications", dataset_id, model_id, fname)
 
 
 class CompasPublication(models.Model):
+    class Meta:
+        ordering = ['title']
+
     author = models.CharField(max_length=255, blank=False, null=False)
     # published defines if the job was published in a journal/arxiv
     published = models.BooleanField(default=False)
@@ -89,12 +90,11 @@ class CompasPublication(models.Model):
         else:
             return queryset
 
-    @classmethod
-    def all(cls):
-        return cls.objects.all().order_by('title')
-
 
 class CompasModel(models.Model):
+    class Meta:
+        ordering = ['name']
+
     name = models.CharField(max_length=50, null=True, blank=True)
     summary = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -113,10 +113,6 @@ class CompasModel(models.Model):
     @classmethod
     def delete_model(cls, _id):
         cls.objects.get(id=_id).delete()
-
-    @classmethod
-    def all(cls):
-        return cls.objects.all().order_by('name')
 
 
 class CompasDatasetModel(models.Model):
@@ -170,18 +166,6 @@ class CompasDatasetModel(models.Model):
         # remove the tar file after decompression
         os.remove(self.file.path)
 
-    def get_run_details(self):
-        """
-        query file: "run_details.txt"
-        """
-        return self.upload_set.filter(file__iendswith="Run_Details")
-
-    def get_data(self):
-        """
-        query file: "*.h5"
-        """
-        return self.upload_set.filter(file__iendswith=".h5")
-
 
 class Upload(models.Model):
     file = models.FileField(blank=True, null=True)
@@ -200,29 +184,3 @@ class Upload(models.Model):
 
     def __str__(self):
         return os.path.basename(self.file.name)
-
-    def get_content(self):
-        """
-        get the content of a file; will be called only on txt files
-        """
-        if self.file.storage.exists(self.file.name):
-
-            with self.file.open("r") as f:
-                return f.read()
-        else:
-            return "File not found"
-
-    def read_stats(self):
-        """
-        read data length in h5 file
-        """
-        data_stats = {}
-
-        if self.file.storage.exists(self.file.name):
-            data = h5py.File(self.file, "r")
-            for key in data.keys():
-                prim_key = list(data[key])[0]
-                stat = len(data[key][prim_key])
-                data_stats[key] = stat
-
-        return data_stats

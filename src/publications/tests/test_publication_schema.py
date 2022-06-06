@@ -74,6 +74,7 @@ class TestPublicationSchema(CompasTestCase):
                             datasetDoi
                             creationTime
                             description
+                            public
                             downloadLink
                             arxivId
                             keywords {
@@ -306,6 +307,7 @@ class TestPublicationSchema(CompasTestCase):
                             'datasetDoi': 'test dataset doi',
                             'creationTime': publication.creation_time.isoformat(),
                             'description': 'test description',
+                            'public': True,
                             'downloadLink': 'test download link',
                             'arxivId': 'test arxiv_id',
                             'keywords': {
@@ -361,6 +363,7 @@ class TestPublicationSchema(CompasTestCase):
                             'datasetDoi': 'test dataset doi',
                             'creationTime': publication.creation_time.isoformat(),
                             'description': 'test description',
+                            'public': True,
                             'downloadLink': 'test download link',
                             'arxivId': 'test arxiv_id',
                             'keywords': {
@@ -382,6 +385,230 @@ class TestPublicationSchema(CompasTestCase):
                                     }
                                 ]
                             }
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_publication_query_filter_public_unauthenticated(self):
+        self.publication_input_required['input'].update(self.publication_input_optional)
+        publication = CompasPublication.create_publication(
+            **humps.decamelize(self.publication_input_required['input']))
+
+        # Add another publication with public=False - this should not show up in the output of the query for an
+        # anonymous query
+        self.publication_input_required['input']['public'] = False
+        CompasPublication.create_publication(
+            **humps.decamelize(self.publication_input_required['input']))
+
+        response = self.client.execute(
+            self.publication_query
+        )
+
+        expected = {
+            'compasPublications': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                            'author': 'test author',
+                            'published': True,
+                            'title': 'test title',
+                            'year': 1983,
+                            'journal': 'test journal',
+                            'journalDoi': 'test journal doi',
+                            'datasetDoi': 'test dataset doi',
+                            'creationTime': publication.creation_time.isoformat(),
+                            'description': 'test description',
+                            'public': True,
+                            'downloadLink': 'test download link',
+                            'arxivId': 'test arxiv_id',
+                            'keywords': {
+                                'edges': [
+                                    {
+                                        'node': {
+                                            'tag': 'keyword1'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword2'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword3'
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_publication_query_filter_public_authenticated(self):
+        self.client.authenticate(self.user)
+
+        self.publication_input_required['input'].update(self.publication_input_optional)
+        publication = CompasPublication.create_publication(
+            **humps.decamelize(self.publication_input_required['input']))
+
+        # Add another publication with public=False - this should not show up in the output of the query for an
+        # authenticated user who is not a publication manager
+        self.publication_input_required['input']['public'] = False
+        CompasPublication.create_publication(
+            **humps.decamelize(self.publication_input_required['input']))
+
+        response = self.client.execute(
+            self.publication_query
+        )
+
+        expected = {
+            'compasPublications': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                            'author': 'test author',
+                            'published': True,
+                            'title': 'test title',
+                            'year': 1983,
+                            'journal': 'test journal',
+                            'journalDoi': 'test journal doi',
+                            'datasetDoi': 'test dataset doi',
+                            'creationTime': publication.creation_time.isoformat(),
+                            'description': 'test description',
+                            'public': True,
+                            'downloadLink': 'test download link',
+                            'arxivId': 'test arxiv_id',
+                            'keywords': {
+                                'edges': [
+                                    {
+                                        'node': {
+                                            'tag': 'keyword1'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword2'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword3'
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+
+        self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_publication_query_filter_public_authenticated_publication_manager(self):
+        self.client.authenticate(self.user)
+
+        self.publication_input_required['input'].update(self.publication_input_optional)
+        publication = CompasPublication.create_publication(
+            **humps.decamelize(self.publication_input_required['input']))
+
+        # Add another publication with public=False - this should show up in the output of the query for a publication
+        # manager
+        self.publication_input_required['input']['public'] = False
+        publication2 = CompasPublication.create_publication(
+            **humps.decamelize(self.publication_input_required['input']))
+
+        response = self.client.execute(
+            self.publication_query
+        )
+
+        expected = {
+            'compasPublications': {
+                'edges': [
+                    {
+                        'node': {
+                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                            'author': 'test author',
+                            'published': True,
+                            'title': 'test title',
+                            'year': 1983,
+                            'journal': 'test journal',
+                            'journalDoi': 'test journal doi',
+                            'datasetDoi': 'test dataset doi',
+                            'creationTime': publication.creation_time.isoformat(),
+                            'description': 'test description',
+                            'public': True,
+                            'downloadLink': 'test download link',
+                            'arxivId': 'test arxiv_id',
+                            'keywords': {
+                                'edges': [
+                                    {
+                                        'node': {
+                                            'tag': 'keyword1'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword2'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword3'
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        'node': {
+                            'arxivId': 'test arxiv_id',
+                            'author': 'test author',
+                            'creationTime': publication2.creation_time.isoformat(),
+                            'datasetDoi': 'test dataset doi',
+                            'description': 'test description',
+                            'public': False,
+                            'downloadLink': 'test download link',
+                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjI=',
+                            'journal': 'test journal',
+                            'journalDoi': 'test journal doi',
+                            'keywords': {
+                                'edges': [
+                                    {
+                                        'node': {
+                                            'tag': 'keyword1'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword2'
+                                        }
+                                    },
+                                    {
+                                        'node': {
+                                            'tag': 'keyword3'
+                                        }
+                                    }
+                                ]
+                            },
+                            'published': True,
+                            'title': 'test title',
+                            'year': 1983
                         }
                     }
                 ]
