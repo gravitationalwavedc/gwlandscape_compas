@@ -36,7 +36,7 @@ const MassTransferParametersForm = ({formik, collapsed, onTitleClick}) => {
         <React.Fragment>
             <Row>
                 <Col>
-                    <FormCard title="Common Envelope Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
+                    <FormCard title="Mass Transfer Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
                         <Row>
                             <Col>
                                 <SelectInput
