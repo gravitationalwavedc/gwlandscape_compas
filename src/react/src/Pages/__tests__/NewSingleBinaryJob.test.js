@@ -203,5 +203,24 @@ describe('new single binary job page', () => {
 
         jest.useRealTimers();
     });
+
+    it('should reset parameter values to defauls when use clicks reser form button', async () => {
+        expect.hasAssertions();
+
+        jest.spyOn(global, 'scrollTo').mockImplementation();
+
+        render(<NewSingleBinaryJob router={global.router}/>);
+        //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
+        const separationInput = screen.getByTestId('separation');
+        const orbitalInput = screen.getByTestId('orbitalPeriod');
+
+        fireEvent.change(separationInput, {target: {value: ''}});
+        fireEvent.change(orbitalInput, {target: {value: 1.3}});
+
+        await waitFor(() => userEvent.click(screen.getByText('Reset Form')));
+        expect(separationInput).toHaveValue(1.02);
+        expect(orbitalInput).toHaveValue(null);
+        screen.debug();
+    });
 });
 
