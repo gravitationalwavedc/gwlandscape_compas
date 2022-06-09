@@ -187,14 +187,13 @@ describe('new single binary job page', () => {
         //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
         const separationInput = screen.getByTestId('separation');
         const orbitalInput = screen.getByTestId('orbitalPeriod');
-        fireEvent.change(separationInput, {target: {value: ''}});
-        fireEvent.change(orbitalInput, {target: {value: 1.3}});
 
-        // clear some number parameters
-        fireEvent.change(screen.getByTestId('theta1'), {target: {value:''}});
-        fireEvent.change(screen.getByTestId('theta2'), {target: {value:''}});
-        fireEvent.change(screen.getByTestId('phi1'), {target: {value:''}});
-        fireEvent.change(screen.getByTestId('phi2'), {target: {value:''}});
+        userEvent.clear(separationInput);
+        userEvent.type(orbitalInput, '1.3');
+        userEvent.clear(screen.getByTestId('theta1'));
+        userEvent.clear(screen.getByTestId('theta2'));
+        userEvent.clear(screen.getByTestId('phi1'));
+        userEvent.clear(screen.getByTestId('phi2'));
 
         await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
 
@@ -208,7 +207,7 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
 
         // clear orbital period again
-        fireEvent.change(orbitalInput, {target: {value: ''}});
+        userEvent.clear(orbitalInput);
 
         // check no errors on separation
         expect(screen.queryByRole('alert', {name: 'Separation (AU)'})).not.toBeInTheDocument();
