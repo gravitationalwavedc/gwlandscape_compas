@@ -11,7 +11,7 @@ const massTransferAngularMomentumLossPrescriptionOptions = [
     {'value': 'ARBITRARY', 'label': 'ARBITRARY'},
 ];
 
-const massTransferAccertionEfficiencyPrescriptionOptions = [
+const massTransferAccretionEfficiencyPrescriptionOptions = [
     {'value': 'THERMAL', 'label': 'THERMAL'},
     {'value': 'FIXED', 'label': 'FIXED'},
 ];
@@ -25,8 +25,8 @@ const MassTransferParametersForm = ({formik, collapsed, onTitleClick}) => {
         setshowMassTransferJloss(e.target.value === 'ARBITRARY');
     };
 
-    const handleAccertionEfficiencyPrescriptionOnChange = (e) => {
-        formik.setFieldValue('massTransferAccertionEfficiencyPrescription', e.target.value);
+    const handleAccretionEfficiencyPrescriptionOnChange = (e) => {
+        formik.setFieldValue('massTransferAccretionEfficiencyPrescription', e.target.value);
         setShowMassTransferFa(e.target.value === 'FIXED');
     };
 
@@ -65,12 +65,12 @@ const MassTransferParametersForm = ({formik, collapsed, onTitleClick}) => {
                                 <SelectInput
                                     formik={formik}
                                     title='Accretion Efficiency Prescription'
-                                    name='massTransferAccertionEfficiencyPrescription'
+                                    name='massTransferAccretionEfficiencyPrescription'
                                     type='string'
                                     help='--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion
                                     efficiency prescription'
-                                    options={massTransferAccertionEfficiencyPrescriptionOptions}
-                                    onChange={handleAccertionEfficiencyPrescriptionOnChange}
+                                    options={massTransferAccretionEfficiencyPrescriptionOptions}
+                                    onChange={handleAccretionEfficiencyPrescriptionOnChange}
                                 />
                             </Col>
                             <Col>

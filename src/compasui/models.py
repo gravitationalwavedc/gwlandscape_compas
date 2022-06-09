@@ -569,12 +569,12 @@ class SingleBinaryJob(models.Model):
         Mass Transfer Angular Momentum Loss prescription",
     )
     # --mass-transfer-accretion-efficiency-prescription
-    mass_transfer_accertion_efficiency_prescription = models.CharField(
-        choices=constants.MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_CHOICES,
+    mass_transfer_accretion_efficiency_prescription = models.CharField(
+        choices=constants.MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_CHOICES,
         max_length=55,
         blank=True,
         null=True,
-        default=constants.MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
+        default=constants.MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
         help_text="--mass-transfer-accretion-efficiency-prescription: \
         Mass transfer accretion efficiency prescription",
     )

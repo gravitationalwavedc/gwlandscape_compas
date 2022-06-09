@@ -35,7 +35,7 @@ const initialValues = {
     ppiUpperLimit: 60.0,
     pulsationalPairInstabilityPrescription: 'MARCHANT',
     massTransferAngularMomentumLossPrescription: 'ISOTROPIC',
-    massTransferAccertionEfficiencyPrescription: 'THERMAL',
+    massTransferAccretionEfficiencyPrescription: 'THERMAL',
     massTransferFa: 0.5,
     massTransferJloss: 0.1,
 

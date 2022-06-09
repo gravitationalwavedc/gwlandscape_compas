@@ -141,7 +141,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 pulsationalPairInstabilityPrescription: values.pulsationalPairInstabilityPrescription,
                 maximumNeutronStarMass: values.maximumNeutronStarMass,
                 massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
-                massTransferAccertionEfficiencyPrescription: values.massTransferAccertionEfficiencyPrescription,
+                massTransferAccretionEfficiencyPrescription: values.massTransferAccretionEfficiencyPrescription,
                 massTransferFa: values.massTransferFa,
                 massTransferJloss: values.massTransferJloss,
             }

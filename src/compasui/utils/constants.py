@@ -191,21 +191,21 @@ MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_CHOICES = [
     ),
 ]
 
-MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_LABEL = 'mass-transfer-accertion-efficieny-prescription'
-MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL = 'THERMAL'
-MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE = 'THERMAL'
-MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_FIXED = 'FIXED'
-MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_FIXED_VALUE = 'FIXED'
+MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_LABEL = 'mass-transfer-accretion-efficieny-prescription'
+MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL = 'THERMAL'
+MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE = 'THERMAL'
+MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_FIXED = 'FIXED'
+MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_FIXED_VALUE = 'FIXED'
 
 
-MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_CHOICES = [
+MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_CHOICES = [
     (
-        MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
-        MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL,
+        MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
+        MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL,
     ),
     (
-        MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_FIXED_VALUE,
-        MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_FIXED,
+        MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_FIXED_VALUE,
+        MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_FIXED,
     ),
 ]
 
@@ -252,10 +252,10 @@ NAME_VALUES.update(
             MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_JEANS_VALUE,
         MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_CIRCUMBINARY:
             MASS_TRANSFER_ANGULAR_MOMENTUM_LOSS_PRESCRIPTION_CIRCUMBINARY_VALUE,
-        MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL:
-            MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
-        MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_FIXED:
-            MASS_TRANSFER_ACCERTION_EFFICIENCY_PRESCRIPTION_FIXED_VALUE,
+        MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL:
+            MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_THERMAL_VALUE,
+        MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_FIXED:
+            MASS_TRANSFER_ACCRETION_EFFICIENCY_PRESCRIPTION_FIXED_VALUE,
     }
 )
 
@@ -298,7 +298,7 @@ FIELD_COMMANDS = dict(
         'pulsational_pair_instability_prescription': '--pulsational-pair-instability-prescription',
         'maximum_neutron_star_mass': '--maximum-neutron-star-mass',
         'mass_transfer_angular_momentum_loss_prescription': '--mass-transfer-angular-momentum-loss-prescription',
-        'mass_transfer_accertion_efficiency_prescription': '--mass-transfer-accretion-efficiency-prescription',
+        'mass_transfer_accretion_efficiency_prescription': '--mass-transfer-accretion-efficiency-prescription',
         'mass_transfer_fa': '--mass-transfer-fa',
         'mass_transfer_jloss': '--mass-transfer-jloss',
     }
@@ -345,7 +345,7 @@ ADVANCED_SETTINGS = [
     'pulsational_pair_instability_prescription',
     'maximum_neutron_star_mass',
     'mass_transfer_angular_momentum_loss_prescription',
-    'mass_transfer_accertion_efficiency_prescription',
+    'mass_transfer_accretion_efficiency_prescription',
     'mass_transfer_fa',
     'mass_transfer_jloss',
     'kick_enabled',
@@ -394,7 +394,7 @@ SUPERNOVA_SETTINGS = [
 
 MASS_TRANSFER_SETTINGS = [
     'mass_transfer_angular_momentum_loss_prescription',
-    'mass_transfer_accertion_efficiency_prescription',
+    'mass_transfer_accretion_efficiency_prescription',
     'mass_transfer_fa',
     'mass_transfer_jloss',
 ]

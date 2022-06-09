@@ -202,7 +202,7 @@ let validationSchema = Yup.object().shape({
         .nullable(),
     massTransferAngularMomentumLossPrescription: Yup
         .string(),
-    massTransferAccertionEfficiencyPrescription: Yup
+    massTransferAccretionEfficiencyPrescription: Yup
         .string(),
     massTransferFa: Yup
         .number()
