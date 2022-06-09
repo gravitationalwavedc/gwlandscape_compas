@@ -28,6 +28,24 @@ const mockXMLHttpRequest = (status) => {
 };
 
 describe('new single binary job page', () => {
+    it('should reset parameter values to defauls when use clicks reser form button', async () => {
+        expect.hasAssertions();
+
+        jest.spyOn(global, 'scrollTo').mockImplementation();
+
+        render(<NewSingleBinaryJob router={global.router}/>);
+        //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
+        const separationInput = screen.getByTestId('separation');
+        const orbitalInput = screen.getByTestId('orbitalPeriod');
+
+        fireEvent.change(separationInput, {target: {value: ''}});
+        fireEvent.change(orbitalInput, {target: {value: 1.3}});
+
+        await waitFor(() => userEvent.click(screen.getByText('Reset Form')));
+        expect(separationInput).toHaveValue(1.02);
+        expect(orbitalInput).toHaveValue(null);
+    });
+
     it('should call setInterval and check if output files are generated when user clicks submit', async () => {
         expect.hasAssertions();
 
@@ -202,25 +220,6 @@ describe('new single binary job page', () => {
         expect(screen.queryByRole('alert', {name: 'Phi 2'})).not.toBeInTheDocument();
 
         jest.useRealTimers();
-    });
-
-    it('should reset parameter values to defauls when use clicks reser form button', async () => {
-        expect.hasAssertions();
-
-        jest.spyOn(global, 'scrollTo').mockImplementation();
-
-        render(<NewSingleBinaryJob router={global.router}/>);
-        //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
-        const separationInput = screen.getByTestId('separation');
-        const orbitalInput = screen.getByTestId('orbitalPeriod');
-
-        fireEvent.change(separationInput, {target: {value: ''}});
-        fireEvent.change(orbitalInput, {target: {value: 1.3}});
-
-        await waitFor(() => userEvent.click(screen.getByText('Reset Form')));
-        expect(separationInput).toHaveValue(1.02);
-        expect(orbitalInput).toHaveValue(null);
-        screen.debug();
     });
 });
 
