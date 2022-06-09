@@ -74,8 +74,23 @@ const NewSingleBinaryJob = ({initialValues}) => {
             setIsLoadingOutput(false);
         }
     }, [vanPlotLoaded, detailedPlotLoaded, isLoadingOutput]);
-    
 
+    const handleFormReset = () => {
+        formik.resetForm();
+        setVanPlotFile('');
+        setDetailedOutputFile('');
+        setPlotFile('');
+        setIsLoadingOutput(false);
+        setVanPlotLoaded(false);
+        setDetailedPlotLoaded(false);
+        setOutputError('');
+        setIsBasicCollapsed(false);
+        setIsKickCollapsed(true);
+        setIsCECollapsed(true);
+        setIsSupernovaCollapsed(true);
+        setIsMassTransferCollapsed(true);
+        setMyinterval(null);
+    };
     const handleJobSubmission = (values) => {
         Object.entries(values)
             .filter(([key, value]) => value === '')
@@ -126,7 +141,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 pulsationalPairInstabilityPrescription: values.pulsationalPairInstabilityPrescription,
                 maximumNeutronStarMass: values.maximumNeutronStarMass,
                 massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
-                massTransferAccertionEfficiencyPrescription: values.massTransferAccertionEfficiencyPrescription,
+                massTransferAccretionEfficiencyPrescription: values.massTransferAccretionEfficiencyPrescription,
                 massTransferFa: values.massTransferFa,
                 massTransferJloss: values.massTransferJloss,
             }
@@ -191,7 +206,9 @@ const NewSingleBinaryJob = ({initialValues}) => {
                     <ReviewSingleBinaryJob
                         formik={formik}
                         values={formik.values}
-                        handleSubmit={formik.handleSubmit}/>
+                        handleSubmit={formik.handleSubmit}
+                        handleReset={handleFormReset}
+                    />
                 </Col>
                 <Col md={7}>
                     <JobOutput

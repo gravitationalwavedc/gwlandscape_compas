@@ -30,6 +30,7 @@ const BasicParametersForm = ({formik, collapsed, onTitleClick}) => {
                                     formik={formik}
                                     title="Separation (AU)"
                                     name="separation"
+                                    data-testid="separation"
                                     type="number"
                                     help="Value > 0. Only used with no Orbital Period"
                                 />
@@ -53,6 +54,7 @@ const BasicParametersForm = ({formik, collapsed, onTitleClick}) => {
                                     formik={formik}
                                     title="Orbital Period (days)"
                                     name="orbitalPeriod"
+                                    data-testid="orbitalPeriod"
                                     type="number"
                                     help="Value > 0. Only used with no Separation"
                                 />

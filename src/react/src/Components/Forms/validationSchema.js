@@ -1,12 +1,6 @@
 import * as Yup from 'yup';
 
 let validationSchema = Yup.object().shape({
-    // name: Yup.string()
-    //     .min(5, 'Make the title longer than 5 characters.')
-    //     .max(30, 'Make the title less than 30 characters.')
-    //     .matches(/^[0-9a-z\_\-]+$/i, 'Remove any spaces or special characters.')
-    //     .required(),
-
     mass1: Yup
         .number()
         .required()
@@ -40,6 +34,8 @@ let validationSchema = Yup.object().shape({
     separation: Yup
         .number()
         .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable()
         .test(
             'Spearation or Orbital Period',
             'Separation and Orbital Period cannot be used together. Specify only one of them',
@@ -48,6 +44,8 @@ let validationSchema = Yup.object().shape({
     orbitalPeriod: Yup
         .number()
         .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable()
         .test(
             'Spearation or Orbital Period',
             'Separation and Orbital Period cannot be used together. Specify only one of them',
@@ -56,49 +54,73 @@ let validationSchema = Yup.object().shape({
     velocityRandomNumber1: Yup
         .number()
         .min(0.0)
-        .max(1.0),
+        .max(1.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     velocityRandomNumber2: Yup
         .number()
         .min(0.0)
-        .max(1.0),
+        .max(1.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     velocity1: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     velocity2: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     theta1: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI),
+        .max(2 * Math.PI)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     theta2: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI),
+        .max(2 * Math.PI)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     phi1: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI),
+        .max(2 * Math.PI)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     phi2: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI),
+        .max(2 * Math.PI)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     meanAnomaly1: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI),
+        .max(2 * Math.PI)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     meanAnomaly2: Yup
         .number()
         .min(0.0)
-        .max(2 * Math.PI),
+        .max(2 * Math.PI)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     commonEnvelopeAlpha: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     commonEnvelopeLambdaPrescription: Yup
         .string(),
     commonEnvelopeLambda: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     remnantMassPrescription: Yup
         .string(),
     fryerSupernovaEngine: Yup
@@ -109,21 +131,31 @@ let validationSchema = Yup.object().shape({
         .string(),
     kickVelocitySigmaCcsnNs: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     kickVelocitySigmaCcsnBh: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     kickVelocitySigmaEcsn: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     kickVelocitySigmaUssn: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     pairInstabilitySupernovae: Yup
         .boolean(),
     pisnLowerLimit: Yup
         .number()
         .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable()
         .test(
             'pisnLowerLimit vs pisnUpperLimit',
             'PISN Upper Limit should be > PISN lower Limit',
@@ -132,6 +164,8 @@ let validationSchema = Yup.object().shape({
     pisnUpperLimit: Yup
         .number()
         .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable()
         .test(
             'pisnUpperLimit vs pisnLowerLimit',
             'PISN Lower Limit should be < PISN Upper Limit',
@@ -142,6 +176,8 @@ let validationSchema = Yup.object().shape({
     ppiLowerLimit: Yup
         .number()
         .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable()
         .test(
             'ppiLowerLimit vs ppiUpperLimit',
             'PPI Upper Limit should be > PPI lower Limit',
@@ -150,6 +186,8 @@ let validationSchema = Yup.object().shape({
     ppiUpperLimit: Yup
         .number()
         .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable()
         .test(
             'ppiUpperLimit vs ppiLowerLimit',
             'PPI Lower Limit should be < PPi Upper Limit',
@@ -159,17 +197,23 @@ let validationSchema = Yup.object().shape({
         .string(),
     maximumNeutronStarMass: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     massTransferAngularMomentumLossPrescription: Yup
         .string(),
-    massTransferAccertionEfficiencyPrescription: Yup
+    massTransferAccretionEfficiencyPrescription: Yup
         .string(),
     massTransferFa: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
     massTransferJloss: Yup
         .number()
-        .min(0.0),
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
 
 }, [['mass1', 'mass2'], ['separation', 'orbitalPeriod'],
     ['pisnLowerLimit', 'pisnUpperLimit'], ['ppiLowerLimit', 'ppiUpperLimit']]);

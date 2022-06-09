@@ -28,6 +28,24 @@ const mockXMLHttpRequest = (status) => {
 };
 
 describe('new single binary job page', () => {
+    it('should reset parameter values to defauls when use clicks reser form button', async () => {
+        expect.hasAssertions();
+
+        jest.spyOn(global, 'scrollTo').mockImplementation();
+
+        render(<NewSingleBinaryJob router={global.router}/>);
+        //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
+        const separationInput = screen.getByTestId('separation');
+        const orbitalInput = screen.getByTestId('orbitalPeriod');
+
+        fireEvent.change(separationInput, {target: {value: ''}});
+        fireEvent.change(orbitalInput, {target: {value: 1.3}});
+
+        await waitFor(() => userEvent.click(screen.getByText('Reset Form')));
+        expect(separationInput).toHaveValue(1.02);
+        expect(orbitalInput).toHaveValue(null);
+    });
+
     it('should call setInterval and check if output files are generated when user clicks submit', async () => {
         expect.hasAssertions();
 
@@ -135,8 +153,8 @@ describe('new single binary job page', () => {
         //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
         const separationInput = screen.getByLabelText('Separation (AU)');
         const orbitalInput = screen.getByLabelText('Orbital Period (days)');
-        await waitFor(() => userEvent.type(separationInput, ''));
-        await waitFor(() => userEvent.type(orbitalInput, 1.3));
+        fireEvent.change(separationInput, {target: {value:''}});
+        fireEvent.change(orbitalInput, {target: {value:1.3}});
         await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
 
         const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
@@ -154,6 +172,52 @@ describe('new single binary job page', () => {
 
         // check no errors were reported
         expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
+        jest.useRealTimers();
+    });
+
+    it('should run the job successfully when orbitalPeriod is used instead of separation ' +
+        'then there should be no validation errors for any empty number parameters', async () => {
+        expect.hasAssertions();
+
+        jest.useFakeTimers();
+        jest.spyOn(global, 'scrollTo').mockImplementation();
+
+        render(<NewSingleBinaryJob router={global.router}/>);
+
+        //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
+        const separationInput = screen.getByTestId('separation');
+        const orbitalInput = screen.getByTestId('orbitalPeriod');
+
+        userEvent.clear(separationInput);
+        userEvent.type(orbitalInput, '1.3');
+        userEvent.clear(screen.getByTestId('theta1'));
+        userEvent.clear(screen.getByTestId('theta2'));
+        userEvent.clear(screen.getByTestId('phi1'));
+        userEvent.clear(screen.getByTestId('phi2'));
+
+        await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
+
+        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+        global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
+
+        act(() => {
+            jest.advanceTimersByTime(6000);
+        });
+        // check that job ran successfully and plot is generated
+        expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
+
+        // clear orbital period again
+        userEvent.clear(orbitalInput);
+
+        // check no errors on separation
+        expect(screen.queryByRole('alert', {name: 'Separation (AU)'})).not.toBeInTheDocument();
+        // check no errors on theta 1
+        expect(screen.queryByRole('alert', {name: 'Theta 1'})).not.toBeInTheDocument();
+        // check no errors on phi 1
+        expect(screen.queryByRole('alert', {name: 'Phi 1'})).not.toBeInTheDocument();
+        // check no errors on phi 2
+        expect(screen.queryByRole('alert', {name: 'Phi 2'})).not.toBeInTheDocument();
+
         jest.useRealTimers();
     });
 });

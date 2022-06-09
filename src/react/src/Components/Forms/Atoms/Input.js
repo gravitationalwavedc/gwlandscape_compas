@@ -11,9 +11,11 @@ const Input = ({formik, title, name, type, help, show= true, ...rest}) =>
             isInvalid={!!formik.errors[name]}
             {...formik.getFieldProps(name)} {...rest}/>
         <Form.Text>{help}</Form.Text>
-        <Form.Control.Feedback type='invalid'>
-            {formik.errors[name]}
-        </Form.Control.Feedback>
+        {formik.errors[name] &&
+            <Form.Control.Feedback type='invalid' role='alert'>
+                {formik.errors[name]}
+            </Form.Control.Feedback>
+        }
     </Form.Group>;
 
 

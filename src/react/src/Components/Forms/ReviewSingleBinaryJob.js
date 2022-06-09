@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
-import {Button, Col, Row, Table,} from 'react-bootstrap';
-import FormCard from './FormCard';
+import {Button, Col, Row} from 'react-bootstrap';
 
-const ReviewSingleBinaryJob = ({values, handleSubmit, formik}) => {
+const ReviewSingleBinaryJob = ({handleSubmit, formik, handleReset}) => {
     const [errors, setErrors] = useState([]);
 
     const submitReview = async () => {
@@ -21,6 +20,7 @@ const ReviewSingleBinaryJob = ({values, handleSubmit, formik}) => {
                     <Button onClick={submitReview}>Submit your job</Button>
                 </Col>
                 <Col>
+                    <Button onClick={handleReset}>Reset Form</Button>
                     <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
                 </Col>
             </Row>}
