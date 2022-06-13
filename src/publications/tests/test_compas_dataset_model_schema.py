@@ -35,7 +35,6 @@ class TestCompasDatasetModelSchema(CompasTestCase):
         self.add_compas_dataset_model_mutation = """
             mutation AddCompasDatasetModelMutation($input: AddCompasDatasetModelMutationInput!) {
                 addCompasDatasetModel(input: $input) {
-                    result
                     id
                 }
             }
@@ -120,8 +119,7 @@ class TestCompasDatasetModelSchema(CompasTestCase):
 
         expected = {
             'addCompasDatasetModel': {
-                'result': True,
-                'id': to_global_id('CompasDatasetModel', 1)
+                'id': to_global_id('CompasDatasetModel', CompasDatasetModel.objects.last().id),
             }
         }
 
@@ -158,8 +156,7 @@ class TestCompasDatasetModelSchema(CompasTestCase):
 
         expected = {
             'addCompasDatasetModel': {
-                'result': True,
-                'id': to_global_id('CompasDatasetModel', 1)
+                'id': to_global_id('CompasDatasetModel', CompasDatasetModel.objects.last().id),
             }
         }
 

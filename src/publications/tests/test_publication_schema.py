@@ -22,7 +22,6 @@ class TestPublicationSchema(CompasTestCase):
         self.add_publication_mutation = """
             mutation AddPublicationMutation($input: AddPublicationMutationInput!) {
                 addPublication(input: $input) {
-                    result
                     id
                 }
             }
@@ -101,7 +100,6 @@ class TestPublicationSchema(CompasTestCase):
 
         expected = {
             'addPublication': {
-                'result': True,
                 'id': to_global_id('CompasPublication', 1)
             }
         }
@@ -123,7 +121,6 @@ class TestPublicationSchema(CompasTestCase):
 
         expected = {
             'addPublication': {
-                'result': True,
                 'id': to_global_id('CompasPublication', 2)
             }
         }
