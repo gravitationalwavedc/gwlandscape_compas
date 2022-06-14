@@ -20,6 +20,7 @@ class KeywordNode(DjangoObjectType):
         model = Keyword
         fields = ['tag']
         filter_fields = {
+            'id': ['exact'],
             'tag': ['exact', 'icontains']
         }
         interfaces = (relay.Node,)
@@ -48,6 +49,7 @@ class CompasPublicationNode(DjangoObjectType):
             'keywords'
         ]
         filter_fields = {
+            'id': ['exact'],
             'author': ['exact', 'icontains'],
             'published': ['exact'],
             'title': ['exact', 'icontains'],
@@ -74,6 +76,7 @@ class CompasModelNode(DjangoObjectType):
         model = CompasModel
         fields = ['name', 'summary', 'description']
         filter_fields = {
+            'id': ['exact'],
             'name': ['exact', 'icontains'],
             'summary': ['exact', 'icontains'],
             'description': ['exact', 'icontains']
@@ -91,6 +94,7 @@ class CompasDatasetModelNode(DjangoObjectType):
         model = CompasDatasetModel
         fields = ['compas_publication', 'compas_model']
         filter_fields = {
+            'id': ['exact'],
             'compas_publication': ['exact'],
             'compas_model': ['exact']
         }
