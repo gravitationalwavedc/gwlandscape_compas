@@ -111,14 +111,14 @@ class AddKeywordMutation(relay.ClientIDMutation):
     class Input:
         tag = graphene.String()
 
-    result = graphene.Boolean()
+    id = graphene.String()
 
     @classmethod
     @login_required
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, tag):
-        Keyword.create_keyword(tag)
-        return AddKeywordMutation(result=True)
+        keyword = Keyword.create_keyword(tag)
+        return AddKeywordMutation(to_global_id("Keyword", keyword.id))
 
 
 class DeleteKeywordMutation(relay.ClientIDMutation):
@@ -152,7 +152,6 @@ class AddPublicationMutation(relay.ClientIDMutation):
         arxiv_id = graphene.String(required=True)
         keywords = graphene.List(graphene.String)
 
-    result = graphene.Boolean()
     id = graphene.ID()
 
     @classmethod
@@ -160,7 +159,7 @@ class AddPublicationMutation(relay.ClientIDMutation):
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, **kwargs):
         publication = CompasPublication.create_publication(**kwargs)
-        return AddPublicationMutation(result=True, id=to_global_id('CompasPublication', publication.id))
+        return AddPublicationMutation(id=to_global_id('CompasPublication', publication.id))
 
 
 class DeletePublicationMutation(relay.ClientIDMutation):
@@ -183,7 +182,6 @@ class AddCompasModelMutation(relay.ClientIDMutation):
         summary = graphene.String()
         description = graphene.String()
 
-    result = graphene.Boolean()
     id = graphene.ID()
 
     @classmethod
@@ -191,7 +189,7 @@ class AddCompasModelMutation(relay.ClientIDMutation):
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, name, summary, description):
         model = CompasModel.create_model(name, summary, description)
-        return AddCompasModelMutation(result=True, id=to_global_id('CompasModel', model.id))
+        return AddCompasModelMutation(id=to_global_id('CompasModel', model.id))
 
 
 class DeleteCompasModelMutation(relay.ClientIDMutation):
@@ -214,7 +212,6 @@ class AddCompasDatasetModelMutation(relay.ClientIDMutation):
         compas_model = graphene.String(required=True)
         file = Upload(required=True)
 
-    result = graphene.Boolean()
     id = graphene.ID()
 
     @classmethod
@@ -226,7 +223,7 @@ class AddCompasDatasetModelMutation(relay.ClientIDMutation):
             CompasModel.objects.get(id=from_global_id(compas_model)[1]),
             file
         )
-        return AddCompasDatasetModelMutation(result=True, id=to_global_id('CompasDatasetModel', dataset_model.id))
+        return AddCompasDatasetModelMutation(id=to_global_id('CompasDatasetModel', dataset_model.id))
 
 
 class DeleteCompasDatasetModelMutation(relay.ClientIDMutation):

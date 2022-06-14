@@ -16,7 +16,7 @@ class TestKeywordSchema(CompasTestCase):
         self.add_keyword_mutation = """
             mutation AddKeywordMutation($input: AddKeywordMutationInput!) {
                 addKeyword(input: $input) {
-                    result
+                    id
                 }
             }
         """
@@ -59,7 +59,7 @@ class TestKeywordSchema(CompasTestCase):
 
         expected = {
             'addKeyword': {
-                'result': True
+                'id': to_global_id('Keyword', Keyword.objects.last().id),
             }
         }
 

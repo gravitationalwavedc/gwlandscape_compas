@@ -16,7 +16,7 @@ class TestCompasModelSchema(CompasTestCase):
         self.add_compas_model_mutation = """
             mutation AddCompasModelMutation($input: AddCompasModelMutationInput!) {
                 addCompasModel(input: $input) {
-                    result
+                    id
                 }
             }
         """
@@ -62,7 +62,7 @@ class TestCompasModelSchema(CompasTestCase):
 
         expected = {
             'addCompasModel': {
-                'result': True
+                'id': to_global_id('CompasModel', CompasModel.objects.last().id),
             }
         }
 
