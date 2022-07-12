@@ -22,7 +22,7 @@ The frontend is in `gwlandscape-compas/src/react/` and the backend is in `gwland
 
 ## Project Setup
 
-First, check out the [gwcloud-react-host](https://gitlab.com/CAS-eResearch/GWDC/code/gwcloud_react_host) and [gwcloud-auth](https://gitlab.com/CAS-eResearch/GWDC/code/gwcloud_auth) repositories in to the same directory as this project, such that the directory structure looks similar to:
+First, check out the [gwcloud-react-host](https://github.com/gravitationalwavedc/gwcloud_react_host) and [gwcloud-auth](https://github.com/gravitationalwavedc/gwcloud_auth) repositories in to the same directory as this project, such that the directory structure looks similar to:
 
 ```
 gwlandscape/
@@ -133,7 +133,7 @@ Start Node in a new terminal:
 
 
 
-(Refer to port mappings used by the react-host for local development in https://gitlab.com/CAS-eResearch/GWDC/code/gwcloud_react_host/-/blob/master/src/src/modules.js)
+(Refer to port mappings used by the react-host for local development in https://github.com/gravitationalwavedc/gwcloud_react_host/blob/master/src/src/modules.js)
 
 
 
