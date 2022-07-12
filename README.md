@@ -9,7 +9,7 @@ GW Landscape Compas module for running Compas jobs from the web.
 * Python 3.8+ with the virtualenv module installed
 * Node Version Manager (NVM) installed
 * In some instances `npm run relay` may raise an error that requires the `watchman` package to be installed.
-
+* COMPAS (refer to the [docs](https://compas.readthedocs.io/en/latest/pages/Getting%20started/getting-started.html) to install it)
 
 
 ## Project Structure
@@ -22,7 +22,7 @@ The frontend is in `gwlandscape-compas/src/react/` and the backend is in `gwland
 
 ## Project Setup
 
-First, check out the [gwcloud-react-host](https://phab.adacs.org.au/source/gwcloud-react-host/) and [gwcloud-auth](https://phab.adacs.org.au/source/gwcloud-auth/) repositories in to the same directory as this project, such that the directory structure looks similar to:
+First, check out the [gwcloud-react-host](https://github.com/gravitationalwavedc/gwcloud_react_host) and [gwcloud-auth](https://github.com/gravitationalwavedc/gwcloud_auth) repositories in to the same directory as this project, such that the directory structure looks similar to:
 
 ```
 gwlandscape/
@@ -77,8 +77,6 @@ Set up the node environments:
   * `nvm use $(cat .nvmrc)`
 
   * `npm install`
-
-    
 
 ## Running the project
 
@@ -135,7 +133,7 @@ Start Node in a new terminal:
 
 
 
-(Refer to port mappings used by the react-host for local development in https://phab.adacs.org.au/source/gwcloud-react-host/browse/master/src/src/modules.js)
+(Refer to port mappings used by the react-host for local development in https://github.com/gravitationalwavedc/gwcloud_react_host/blob/master/src/src/modules.js)
 
 
 
