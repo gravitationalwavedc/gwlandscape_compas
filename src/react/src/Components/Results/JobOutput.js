@@ -29,7 +29,7 @@ const JobOutput = (props) => {
                     <Row>
                         <Col >
                             {detailedplot
-                                ? <img data-testid='detailed-plot' src={detailedplot}  width='700px' height='1200px'/>
+                                ? <img data-testid='detailed-plot' src={detailedplot}  width='700px' height='450px'/>
                                 : (isLoading && <div>Loading...</div>)
                             }
                         </Col>
