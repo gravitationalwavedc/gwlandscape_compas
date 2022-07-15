@@ -5,6 +5,9 @@
   ],
   "plugins": [
     "transform-class-properties",
-    "relay"
+    "relay",
+    ["@babel/transform-runtime", {
+      "regenerator": true
+    }]
   ]
 }

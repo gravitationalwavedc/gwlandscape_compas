@@ -4,12 +4,13 @@ import MyJobs from './Pages/MyJobs';
 import PublicJobs from './Pages/PublicJobs';
 import {graphql} from 'react-relay';
 import {harnessApi} from './index';
-import NewJob from './Pages/NewJob';
 import DuplicateJobForm from './Components/Forms/DuplicateJobForm';
 import ViewJob from './Pages/ViewJob';
 import Loading from './Components/Loading';
 import {RedirectException} from 'found';
 import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
+import Home from './Pages/Home';
+import Publications from './Pages/Publications';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
@@ -26,6 +27,11 @@ function getRoutes() {
     return (
         <Route>
             <Route
+                Component={Home}
+                environment={harnessApi.getEnvironment('compas')}
+                render={handleRender}/>
+            <Route
+                path='public-job-list'
                 Component={PublicJobs}
                 query={graphql`
                 query Routes_HomePage_Query (
@@ -47,10 +53,6 @@ function getRoutes() {
                 environment={harnessApi.getEnvironment('compas')}
                 render={handleRender}/>
             <Route
-                path="job-form"
-                Component={NewJob}
-                render={handleRender}/>
-            <Route
                 path="job-form/duplicate/"
                 query={graphql`
                     query Routes_JobForm_Query ($jobId: ID!){
@@ -64,21 +66,35 @@ function getRoutes() {
                 Component={DuplicateJobForm}
                 render={handleRender}/>
             <Route
-                path="job-list"
+                path="publications"
                 query={graphql`
-                    query Routes_JobList_Query(
-                      $count: Int!,
-                      $cursor: String,
-                      $orderBy: String
-                    ) {
-                      ...MyJobs_data
+                    query Routes_Publications_Query {
+                        ...Publications_data
                     }
                 `}
                 prepareVariables={() => ({
                     count: 100,
+                })}
+                environment={harnessApi.getEnvironment('compas')}
+                Component={Publications}
+                render={handleRender}/>
+            <Route
+                path="job-list"
+                query={graphql`
+                query Routes_JobList_Query(
+                    $count: Int!,
+                    $cursor: String,
+                    $orderBy: String
+                    ) {
+                        ...MyJobs_data
+                    }
+                    `}
+                prepareVariables={() => ({
+                    count: 100,
                     timeRange: 'all',
                 })}
-
+                    
+                environment={harnessApi.getEnvironment('compas')}
                 Component={MyJobs}
                 render={handleRender}/>
             <Route
