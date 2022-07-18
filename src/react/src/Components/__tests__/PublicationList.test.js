@@ -8,7 +8,7 @@ describe('publications Page', () => {
         {
             id: '1',
             author: 'Buffy Summers',
-            title: 'Vampire Slaying: A Restrospective',
+            title: 'Vampire Slaying: A Retrospective',
             year: 2003,
             keywords: {
                 edges: [

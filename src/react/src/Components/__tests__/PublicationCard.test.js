@@ -5,7 +5,7 @@ import PublicationCard from '../PublicationCard';
 describe('publications Page', () => {
     const publication = {
         author: 'Buffy Summers',
-        title: 'Vampire Slaying: A Restrospective',
+        title: 'Vampire Slaying: A Retrospective',
         year: 2003,
         keywords: {
             edges: [
