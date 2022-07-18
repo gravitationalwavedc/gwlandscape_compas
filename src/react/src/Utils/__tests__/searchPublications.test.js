@@ -1,4 +1,3 @@
-import {expect} from '@jest/globals';
 import searchPublications from '../searchPublications';
 
 describe('searchPublications', () => {
