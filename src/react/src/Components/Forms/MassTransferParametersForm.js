@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Col, Form, Row} from 'react-bootstrap';
 import FormCard from './FormCard';
 import Input from './Atoms/Input';
-import SelectInput from "./Atoms/SelectInput";
+import SelectInput from './Atoms/SelectInput';
 
 const massTransferAngularMomentumLossPrescriptionOptions = [
     {'value': 'JEANS', 'label': 'JEANS'},
@@ -32,60 +32,55 @@ const MassTransferParametersForm = ({formik, collapsed, onTitleClick}) => {
 
     return (
         <React.Fragment>
+            <h3>Mass Transfer Parameters</h3>
             <Row>
                 <Col>
-                    <FormCard title="Mass Transfer Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
-                        <Row>
-                            <Col>
-                                <SelectInput
-                                    formik={formik}
-                                    title='Angular Momentum Loss Prescription'
-                                    name='massTransferAngularMomentumLossPrescription'
-                                    type='string'
-                                    help='--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular
+                    <SelectInput
+                        formik={formik}
+                        title='Angular Momentum Loss Prescription'
+                        name='massTransferAngularMomentumLossPrescription'
+                        type='string'
+                        help='--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular
                                     Momentum Loss prescription'
-                                    options={massTransferAngularMomentumLossPrescriptionOptions}
-                                    onChange={handleAngularMomentumLossPrescriptionOnChange}
-                                />
-                            </Col>
-                            <Col>
-                                <Input
-                                    formik={formik}
-                                    show={showMassTransferJloss}
-                                    title="Specific Angular Momentum Lost"
-                                    name="massTransferJloss"
-                                    type="number"
-                                    help="--mass-transfer-jloss: Specific angular momentum with which the non-accreted
+                        options={massTransferAngularMomentumLossPrescriptionOptions}
+                        onChange={handleAngularMomentumLossPrescriptionOnChange}
+                    />
+                </Col>
+                <Col>
+                    <Input
+                        formik={formik}
+                        show={showMassTransferJloss}
+                        title="Specific Angular Momentum Lost"
+                        name="massTransferJloss"
+                        type="number"
+                        help="--mass-transfer-jloss: Specific angular momentum with which the non-accreted
                                     system leaves the system, value > 0"
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <SelectInput
-                                    formik={formik}
-                                    title='Accretion Efficiency Prescription'
-                                    name='massTransferAccretionEfficiencyPrescription'
-                                    type='string'
-                                    help='--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion
+                    />
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <SelectInput
+                        formik={formik}
+                        title='Accretion Efficiency Prescription'
+                        name='massTransferAccretionEfficiencyPrescription'
+                        type='string'
+                        help='--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion
                                     efficiency prescription'
-                                    options={massTransferAccretionEfficiencyPrescriptionOptions}
-                                    onChange={handleAccretionEfficiencyPrescriptionOnChange}
-                                />
-                            </Col>
-                            <Col>
-                                <Input
-                                    formik={formik}
-                                    show={showMassTransferFa}
-                                    title="Fraction Accreted"
-                                    name="massTransferFa"
-                                    type="number"
-                                    help="--mass-transfer-fa: Mass Transfer fraction accreted in FIXED prescription,
+                        options={massTransferAccretionEfficiencyPrescriptionOptions}
+                        onChange={handleAccretionEfficiencyPrescriptionOnChange}
+                    />
+                </Col>
+                <Col>
+                    <Input
+                        formik={formik}
+                        show={showMassTransferFa}
+                        title="Fraction Accreted"
+                        name="massTransferFa"
+                        type="number"
+                        help="--mass-transfer-fa: Mass Transfer fraction accreted in FIXED prescription,
                                     value > 0"
-                                />
-                            </Col>
-                        </Row>
-                    </FormCard>
+                    />
                 </Col>
             </Row>
         </React.Fragment>

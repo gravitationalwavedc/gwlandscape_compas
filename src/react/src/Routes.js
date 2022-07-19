@@ -11,6 +11,7 @@ import {RedirectException} from 'found';
 import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
 import Home from './Pages/Home';
 import Publications from './Pages/Publications';
+import NewBinaryJob from './Pages/NewBinaryJob';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
@@ -51,6 +52,11 @@ function getRoutes() {
                     count: 100
                 })}
                 environment={harnessApi.getEnvironment('compas')}
+                render={handleRender}/>
+            <Route
+                path="job-form"
+                environment={harnessApi.getEnvironment('compas')}
+                Component={NewBinaryJob}
                 render={handleRender}/>
             <Route
                 path="job-form/duplicate/"

@@ -26,7 +26,7 @@ const Home = ({match, router}) => <Container className="pt-5" fluid>
             <Link 
                 as={Button}
                 variant="primary"
-                to='/compas/single-binary-form/' 
+                to='/compas/job-form/' 
                 exact 
                 match={match} 
                 router={router} 

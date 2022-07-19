@@ -22,45 +22,40 @@ const CommonEnvelopeParametersForm = ({formik, collapsed, onTitleClick}) => {
 
     return (
         <React.Fragment>
+            <h3>Common Envelope Parameters</h3>
             <Row>
                 <Col>
-                    <FormCard title="Common Envelope Parameters" collapsed={collapsed} onTitleClick={onTitleClick}>
-                        <Row>
-                            <Col>
-                                <Input
-                                    formik={formik}
-                                    title="Alpha"
-                                    name="commonEnvelopeAlpha"
-                                    type="number"
-                                    help="--common-envelope-alpha: Common Envelope efficiency alpha, Value > 0"
-                                />
-                            </Col>
-                            <Col/>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <SelectInput
-                                    formik={formik}
-                                    title='Lambda Prescription'
-                                    name='commonEnvelopeLambdaPrescription'
-                                    type='string'
-                                    help='--common-envelope-lambda-prescription: CE lambda prescription'
-                                    options={lambdaPrescriptionOptions}
-                                    onChange={handleLambdaPrescriptionOnChange}
-                                />
-                            </Col>
-                            <Col>
-                                <Input
-                                    formik={formik}
-                                    show={showLambda}
-                                    title="Lambda"
-                                    name="commonEnvelopeLambda"
-                                    type="number"
-                                    help="--common-envelope-lambda: Common Envelope lambda, Value > 0"
-                                />
-                            </Col>
-                        </Row>
-                    </FormCard>
+                    <Input
+                        formik={formik}
+                        title="Alpha"
+                        name="commonEnvelopeAlpha"
+                        type="number"
+                        help="--common-envelope-alpha: Common Envelope efficiency alpha, Value > 0"
+                    />
+                </Col>
+                <Col/>
+            </Row>
+            <Row>
+                <Col>
+                    <SelectInput
+                        formik={formik}
+                        title='Lambda Prescription'
+                        name='commonEnvelopeLambdaPrescription'
+                        type='string'
+                        help='--common-envelope-lambda-prescription: CE lambda prescription'
+                        options={lambdaPrescriptionOptions}
+                        onChange={handleLambdaPrescriptionOnChange}
+                    />
+                </Col>
+                <Col>
+                    <Input
+                        formik={formik}
+                        show={showLambda}
+                        title="Lambda"
+                        name="commonEnvelopeLambda"
+                        type="number"
+                        help="--common-envelope-lambda: Common Envelope lambda, Value > 0"
+                    />
                 </Col>
             </Row>
         </React.Fragment>

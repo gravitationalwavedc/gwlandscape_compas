@@ -13,19 +13,19 @@ const ReviewSingleBinaryJob = ({handleSubmit, formik, handleReset}) => {
         }
     };
 
-    return (
-        <React.Fragment>
-            {handleSubmit && <Row className="mb-5">
-                <Col md={3}>
-                    <Button onClick={submitReview}>Submit your job</Button>
-                </Col>
-                <Col>
-                    <Button onClick={handleReset}>Reset Form</Button>
-                    <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
-                </Col>
-            </Row>}
-        </React.Fragment>
-    );
+    return <>
+        <Row className="mb-5">
+            <Col md={4}>
+                <Button onClick={submitReview} variant='form' className='w-100'>Start Simulation</Button>
+            </Col>
+            <Col md={{span: 4, offset: 4}}>
+                <Button onClick={handleReset} variant='form' className='w-100'>Reset Form</Button>
+            </Col>
+        </Row>
+        <Row className="mb-5">
+            <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
+        </Row>
+    </>;
 };
 
 ReviewSingleBinaryJob.defaultProps = {

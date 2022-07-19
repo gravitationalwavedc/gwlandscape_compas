@@ -5,7 +5,7 @@ import NewSingleBinaryJob from '../NewSingleBinaryJob';
 import 'regenerator-runtime/runtime';
 import userEvent from '@testing-library/user-event';
 
-/* global global */
+/* global global, environment, router */
 
 const mockXMLHttpRequest = (status) => {
     const mock = {
@@ -28,9 +28,9 @@ const mockXMLHttpRequest = (status) => {
 };
 
 describe('new single binary job page', () => {
+    const user = userEvent.setup();
     it('should reset parameter values to defauls when use clicks reser form button', async () => {
         expect.hasAssertions();
-
         jest.spyOn(global, 'scrollTo').mockImplementation();
 
         render(<NewSingleBinaryJob router={global.router}/>);
@@ -38,10 +38,10 @@ describe('new single binary job page', () => {
         const separationInput = screen.getByTestId('separation');
         const orbitalInput = screen.getByTestId('orbitalPeriod');
 
-        fireEvent.change(separationInput, {target: {value: ''}});
-        fireEvent.change(orbitalInput, {target: {value: 1.3}});
+        await user.clear(separationInput);
+        await user.type(orbitalInput, '1.3');
 
-        await waitFor(() => userEvent.click(screen.getByText('Reset Form')));
+        await waitFor(() => user.click(screen.getByText('Reset Form')));
         expect(separationInput).toHaveValue(1.02);
         expect(orbitalInput).toHaveValue(null);
     });
@@ -55,23 +55,24 @@ describe('new single binary job page', () => {
         jest.spyOn(global, 'scrollTo').mockImplementation();
 
         const mockRequest = mockXMLHttpRequest(404);
-        render(<NewSingleBinaryJob router={global.router}/>);
-        fireEvent.click(screen.getByText('Submit your job'));
-
-        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
+        render(<NewSingleBinaryJob router={router}/>);
+        await waitFor(() => user.click(screen.getByText('Start Simulation')));
+        
+        await waitFor(() => environment.mock.resolveMostRecentOperation(
+            operation => MockPayloadGenerator.generate(operation)
+        ));
 
         expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
         expect(screen.getAllByText('Loading...')).toHaveLength(3);
 
-        await waitFor(() => {
+        act(() => {
             jest.advanceTimersByTime(2000);
         });
 
         expect(mockRequest.open).toHaveBeenNthCalledWith(1, 'HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">', false);
         expect(mockRequest.open).toHaveBeenNthCalledWith(2, 'HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">', false);
 
-        await waitFor(() => {
+        act(() => {
             jest.advanceTimersByTime(2000);
         });
 
@@ -97,15 +98,12 @@ describe('new single binary job page', () => {
     it('should display error message when error is reported from backend', async () => {
         expect.hasAssertions();
 
-        render(<NewSingleBinaryJob router={global.router}/>);
-        fireEvent.click(screen.getByText('Submit your job'));
+        render(<NewSingleBinaryJob router={router}/>);
+        fireEvent.click(screen.getByText('Start Simulation'));
 
-        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-
-        global.environment.mock.resolve(
-            operation,
-            MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
-        );
+        await waitFor(() => environment.mock.resolveMostRecentOperation(
+            operation => MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
+        ));
 
         expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
     });
@@ -119,15 +117,12 @@ describe('new single binary job page', () => {
 
         const mockRequest = mockXMLHttpRequest(200);
 
-        render(<NewSingleBinaryJob router={global.router}/>);
-        fireEvent.click(screen.getByText('Submit your job'));
+        render(<NewSingleBinaryJob router={router}/>);
+        await waitFor(() => user.click(screen.getByText('Start Simulation')));
 
-        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-
-        global.environment.mock.resolve(
-            operation,
-            MockPayloadGenerator.generate(operation)
-        );
+        await waitFor(() => environment.mock.resolveMostRecentOperation(
+            operation => MockPayloadGenerator.generate(operation)
+        ));
 
         act(() => {
             jest.advanceTimersByTime(6000);
@@ -136,15 +131,15 @@ describe('new single binary job page', () => {
         const req = new XMLHttpRequest();
         req.open('HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">', false);
         req.send();
-        expect(req).toEqual(mockRequest);
+        expect(req).toStrictEqual(mockRequest);
 
         req.open('HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">', false);
         req.send();
-        expect(req).toEqual(mockRequest);
+        expect(req).toStrictEqual(mockRequest);
 
         req.open('HEAD', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">', false);
         req.send();
-        expect(req).toEqual(mockRequest);
+        expect(req).toStrictEqual(mockRequest);
 
         expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
         expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
@@ -153,12 +148,14 @@ describe('new single binary job page', () => {
         //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
         const separationInput = screen.getByLabelText('Separation (AU)');
         const orbitalInput = screen.getByLabelText('Orbital Period (days)');
-        fireEvent.change(separationInput, {target: {value:''}});
-        fireEvent.change(orbitalInput, {target: {value:1.3}});
-        await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
 
-        const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
+        await waitFor(() => user.clear(separationInput));
+        await waitFor(() => user.type(orbitalInput, '1.3'));
+        await waitFor(() => userEvent.click(screen.getByText('Start Simulation')));
+
+        await waitFor(() => environment.mock.resolveMostRecentOperation(
+            operation => MockPayloadGenerator.generate(operation)
+        ));
 
         // check if plots were reset
         expect(screen.getAllByText('Loading...')).toHaveLength(3);
@@ -188,17 +185,18 @@ describe('new single binary job page', () => {
         const separationInput = screen.getByTestId('separation');
         const orbitalInput = screen.getByTestId('orbitalPeriod');
 
-        userEvent.clear(separationInput);
-        userEvent.type(orbitalInput, '1.3');
-        userEvent.clear(screen.getByTestId('theta1'));
-        userEvent.clear(screen.getByTestId('theta2'));
-        userEvent.clear(screen.getByTestId('phi1'));
-        userEvent.clear(screen.getByTestId('phi2'));
+        await waitFor(() => user.clear(separationInput));
+        await waitFor(() => user.type(orbitalInput, '1.3'));
+        await waitFor(() => user.clear(screen.getByTestId('theta1')));
+        await waitFor(() => user.clear(screen.getByTestId('theta2')));
+        await waitFor(() => user.clear(screen.getByTestId('phi1')));
+        await waitFor(() => user.clear(screen.getByTestId('phi2')));
 
-        await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
+        await waitFor(() => user.click(screen.getByText('Start Simulation')));
 
-        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
+        await waitFor(() => environment.mock.resolveMostRecentOperation(
+            operation => MockPayloadGenerator.generate(operation)
+        ));
 
         act(() => {
             jest.advanceTimersByTime(6000);
