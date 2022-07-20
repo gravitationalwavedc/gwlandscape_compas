@@ -33,7 +33,7 @@
       "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}"
     ],
     "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
+      "^.+\\.(js|jsx|cjs|ts|tsx)$": "babel-jest",
       "^.+\\.css$": "<rootDir>/jest/cssTransform.js",
       "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/jest/fileTransform.js"
     },
