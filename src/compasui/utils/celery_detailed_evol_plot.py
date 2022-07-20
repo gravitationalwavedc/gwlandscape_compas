@@ -594,8 +594,7 @@ def printEvolutionaryHistory(evol_text_path, Data=None, events=None):
     if events is not None:
         Data = events[0].Data
     elif Data is not None:
-        # events = getAllEvents(Data)
-        events = getAllEvents()
+        events = allEvents(Data).getAllEvents()
     else:
         raise ValueError("No usable input given")
 
