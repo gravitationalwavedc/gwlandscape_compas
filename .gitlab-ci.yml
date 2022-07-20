@@ -15,7 +15,7 @@ default:
     - cd COMPAS
     - export COMPAS_ROOT_DIR=`pwd`
     - cd src
-    - make -f Makefile
+    - make -f Makefile -j `nproc`
     - cd $WD
 
 django-tests:
