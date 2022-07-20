@@ -16,15 +16,7 @@ compasRootDir = os.path.expandvars(os.environ['COMPAS_ROOT_DIR'])
 
 
 def main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
-    # Read file and create dataframe.
-    # try:
-    #     optional_input = sys.argv[1]
-    #     if optional_input is not None:
-    #         data_path = optional_input
-    # except IndexError:  # default
-    #     data_path = 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
     try:
-
         Data = h5.File(detailed_output_file_path, 'r')
 
         # Collect the important events in the detailed evolution
@@ -120,8 +112,6 @@ def makeDetailedPlots(detailed_plot_path, Data=None, events=None):
 
 
 # Plotting functions
-
-
 def plotMassAttributes(ax=None, Data=None, mask=None, **kwargs):
     # Plot mass attributes
     # Create new column for total mass
@@ -160,17 +150,6 @@ def plotLengthAttributes(ax=None, Data=None, mask=None, **kwargs):
     return ax.get_legend_handles_labels()
 
 
-def plotEccentricity(ax=None, Data=None, mask=None, **kwargs):
-    # Plot eccentricity
-    ax.plot(Data['Time'][()], Data['Eccentricity'][()], linestyle='-', c='k')  # , label= 'Eccentricity')
-    ax.set_ylabel('Eccentricity')
-
-    ax.set_ylim(-0.05, 1.05)
-    ax.grid(linestyle=':', c='gray')
-
-    return None, None
-
-
 def plotStellarTypeAttributes(ax=None, Data=None, mask=None, **kwargs):
     # Plot stellar types
     stellarTypes, useTypes, typeNameMap = getStellarTypes(Data)
@@ -191,48 +170,8 @@ def plotStellarTypeAttributes(ax=None, Data=None, mask=None, **kwargs):
     return ax.get_legend_handles_labels()
 
 
-def plotStellarTypeAttributesAndEccentricity(ax=None, Data=None, mask=None, **kwargs):
-    ax1 = ax
-    ax2 = ax.twinx()
-
-    # Plot stellar types
-    stellarTypes, useTypes, typeNameMap = getStellarTypes(Data)
-
-    handle1 = ax1.plot(Data['Time'][()][mask], typeNameMap(Data['Stellar_Type(1)'][()][mask]), linestyle='-', c='r',
-                       label='Stellar Type 1')
-    handle2 = ax1.plot(Data['Time'][()][mask], typeNameMap(Data['Stellar_Type(2)'][()][mask]), linestyle='-', c='b',
-                       label='Stellar Type 2')
-    ax1.set_ylabel('Stellar Type')
-    ax1.set_yticks(range(useTypes.shape[0]))
-    ax1.set_yticklabels([stellarTypes[typeNum] for typeNum in useTypes])
-
-    # Plot eccentricity
-    handle3 = ax2.plot(Data['Time'][()][mask], Data['Eccentricity'][()][mask] - .01, linestyle='-', c='k',
-                       label='Eccentricity')  # the minor subtraction makes the curve easier to find
-    ax2.set_ylabel('Eccentricity', labelpad=10)
-    ax2.set_yticks([0, .25, .5, .75, 1.0])
-    ax2.set_ylim(-0.05, 1.05)
-    ax2.tick_params(axis='y', left=False, right=True, direction='out', labelleft=False, labelright=True, pad=-25)
-
-    # Legend
-    handles, labels = ax1.get_legend_handles_labels()
-    handles2, labels2 = ax2.get_legend_handles_labels()
-    handles.extend(handles2)
-    labels.extend(labels2)
-    ax.legend(handles=handles, labels=labels)
-
-    # Grid
-    ax2.yaxis.grid(False)
-
-    return handles, labels
-
-
 def plotHertzsprungRussell(ax=None, Data=None, events=None, mask=None, **kwargs):
     # Plot HR diagram: L vs Teff
-
-    # Data['Teff(1)'][()] #K
-    # Data['Luminosity(1)'][()] # Lsol
-
     ax.plot(Data['Teff(1)'][()][mask], Data['Luminosity(1)'][()][mask], linestyle='-', c='r', label='Star 1')
     ax.plot(Data['Teff(2)'][()][mask], Data['Luminosity(2)'][()][mask], linestyle='-', c='b', label='Star 2')
     ax.set_xlabel(r'Temperature [log(T/K)]')
@@ -251,7 +190,7 @@ def plotHertzsprungRussell(ax=None, Data=None, events=None, mask=None, **kwargs)
     for R in np.logspace(-9, 5, 15):
         exp = "{:.1e}".format(R)
         exp = exp[-3] + exp[-1]
-        if ((int(exp) % 2) == 1):  # skip odd ones to remove clutter
+        if (int(exp) % 2) == 1:  # skip odd ones to remove clutter
             continue
         T_K = np.logspace(3, 7, 41)  # in K
         T = T_K / 6e3  # Tsol=6e3K
@@ -402,7 +341,7 @@ class Event(object):
             try:  # Bad form to do a try except, but this works for now
                 self.a = Data['SemiMajorAxis'][ii + 1]
                 self.aprev = Data['SemiMajorAxis'][ii]
-            except:
+            except Exception as e:
                 self.a = Data['SemiMajorAxis'][ii]
                 self.aprev = Data['SemiMajorAxis'][ii - 1]
         self.stype1 = Data['Stellar_Type(1)'][ii]
@@ -611,19 +550,19 @@ class allEvents(object):
 
             # Type of star 1 changed
             if Data['Stellar_Type(1)'][ii] != Data['Stellar_Type(1)'][ii - 1]:
-                if (Data['Stellar_Type(1)'][ii] in [13, 14]):  # SN star 1
+                if Data['Stellar_Type(1)'][ii] in [13, 14]:  # SN star 1
                     self.addEvent(ii, eventClass='SN', whichStar=1)
                 else:
                     self.addEvent(ii, eventClass='Stype', whichStar=1)
 
             # Type of star 2 changed
             if Data['Stellar_Type(2)'][ii] != Data['Stellar_Type(2)'][ii - 1]:
-                if (Data['Stellar_Type(2)'][ii] in [13, 14]):  # SN star 2
+                if Data['Stellar_Type(2)'][ii] in [13, 14]:  # SN star 2
                     self.addEvent(ii, eventClass='SN', whichStar=2)
                 else:
                     self.addEvent(ii, eventClass='Stype', whichStar=2)
 
-        ### Add an event for final state of the binary
+        # Add an event for final state of the binary
         if not isMerger:  # set if a merger was flagged earlier
             isUnbound = (Data['Eccentricity'][-1] > 1 or Data['SemiMajorAxis'][-1] < 0)
             isDCO = (Data['Stellar_Type(1)'][-1] in np.arange(10, 15)) and (
@@ -646,7 +585,6 @@ class allEvents(object):
         return newEvent.endState == 'Merger'
 
 
-
 # Printing events
 def printEvolutionaryHistory(evol_text_path, Data=None, events=None):
     """
@@ -656,7 +594,8 @@ def printEvolutionaryHistory(evol_text_path, Data=None, events=None):
     if events is not None:
         Data = events[0].Data
     elif Data is not None:
-        events = getAllEvents(Data)
+        # events = getAllEvents(Data)
+        events = getAllEvents()
     else:
         raise ValueError("No usable input given")
 
@@ -675,7 +614,7 @@ def printEvolutionaryHistory(evol_text_path, Data=None, events=None):
 
 
 def printFormattedEvolutionLine(time, event, m1, t1, m2, t2, a, e):
-    # All values are floats except event which is a string and t1, t2 which are ints (stellar types)                                                                                   e))
+    # All values are floats except event which is a string and t1, t2 which are ints (stellar types)
     evol_line = "{:10.6f}   {:31}  {:7.3f}    {:2}    {:7.3f}    {:2}   {:8.3f}  {:5.3f}"\
         .format(time, event, m1, t1, m2, t2, a, e)
     return evol_line
