@@ -10,7 +10,7 @@ GW Landscape Compas module for running Compas jobs from the web.
 * Node Version Manager (NVM) installed
 * In some instances `npm run relay` may raise an error that requires the `watchman` package to be installed.
 * COMPAS (refer to the [docs](https://compas.readthedocs.io/en/latest/pages/Getting%20started/getting-started.html) to install it)
-
+* Redis server (refer to the [docs](https://redis.io/docs/getting-started/installation/))
 
 ## Project Structure
 
@@ -131,9 +131,18 @@ Start Node in a new terminal:
 * `npm run relay`
 * `npm run start` (Will start the GW Landscape node server on port 3004 by default)
 
+  (Refer to port mappings used by the react-host for local development in https://github.com/gravitationalwavedc/gwcloud_react_host/blob/master/src/src/modules.js)
 
 
-(Refer to port mappings used by the react-host for local development in https://github.com/gravitationalwavedc/gwcloud_react_host/blob/master/src/src/modules.js)
+Start redis server in a new terminal
+
+* `redis-server`
+
+
+Start celery worker in a new terminal
+
+* `cd gwlandscape/gwlandscape-compas/src/`
+* `celery -A gw_compas.celery worker -l INFO`
 
 
 
