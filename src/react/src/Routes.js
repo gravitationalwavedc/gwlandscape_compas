@@ -11,6 +11,7 @@ import {RedirectException} from 'found';
 import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
 import Home from './Pages/Home';
 import Publications from './Pages/Publications';
+import NewJob from './Pages/NewJob';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
@@ -29,6 +30,10 @@ function getRoutes() {
             <Route
                 Component={Home}
                 environment={harnessApi.getEnvironment('compas')}
+                render={handleRender}/>
+            <Route
+                path="job-form"
+                Component={NewJob}
                 render={handleRender}/>
             <Route
                 path='public-job-list'

@@ -391,16 +391,13 @@ class SingleBinaryJobCreationResult(graphene.ObjectType):
 class CompasJobMutation(relay.ClientIDMutation):
     class Input:
         start = StartInput()
-        data = DataInput()
-        data_parameters = DataParametersInput()
-        search_parameters = SearchParametersInput()
 
     result = graphene.Field(CompasJobCreationResult)
 
     @classmethod
-    def mutate_and_get_payload(cls, root, info, start, data, data_parameters, search_parameters):
+    def mutate_and_get_payload(cls, root, info, start):
         # Create the compas job
-        compas_job = create_compas_job(info.context.user, start, data, data_parameters, search_parameters)
+        compas_job = create_compas_job(info.context.user, start)
 
         # Convert the compas job id to a global id
         job_id = to_global_id("CompasJobNode", compas_job.id)
