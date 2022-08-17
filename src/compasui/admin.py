@@ -1,54 +1,26 @@
 from django.contrib import admin
-from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search, SingleBinaryJob
+from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
 
 
 # Register your models here.
 
-
-class InlineDataAdmin(admin.TabularInline):
-    model = Data
-
-
-class InlineSearchAdmin(admin.TabularInline):
-    model = Search
+@admin.register(CompasJob)
+class CompasJobAdmin(admin.ModelAdmin):
+    pass
 
 
-class InlineDataParameterAdmin(admin.TabularInline):
-    model = DataParameter
+@admin.register(AdvancedParameter)
+class AdvancedParameterAdmin(admin.ModelAdmin):
+    pass
 
 
-class InlineSearchParameterAdmin(admin.TabularInline):
-    model = SearchParameter
-
-
-@admin.register(Data)
-class DataAdmin(admin.ModelAdmin):
-    fields = ['job', 'data_source', 'source_dataset']
-    inlines = (InlineDataParameterAdmin,)
-
-
-@admin.register(Search)
-class SearchAdmin(admin.ModelAdmin):
-    fields = ['job']
-    inlines = (InlineSearchParameterAdmin,)
-
+@admin.register(BasicParameter)
+class BasicParameterAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(Label)
 class LabelAdmin(admin.ModelAdmin):
-    fields = ['name', 'description']
-
-
-@admin.register(CompasJob)
-class CompasJobAdmin(admin.ModelAdmin):
-    fields = ['name', 'description', 'private', 'job_controller_id', 'labels']
-    filter_horizontal = ('labels',)
-    readonly_fields = ('creation_time', 'last_updated')
-    inlines = (
-        InlineDataAdmin,
-        InlineSearchAdmin,
-        InlineDataParameterAdmin,
-        InlineSearchParameterAdmin
-    )
+    pass
 
 
 @admin.register(SingleBinaryJob)

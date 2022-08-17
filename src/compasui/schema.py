@@ -9,9 +9,9 @@ from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
-from .models import CompasJob, Label, Data, Search, SingleBinaryJob
+from .models import CompasJob, Label, SingleBinaryJob
 from .status import JobStatus
-from .types import OutputStartType, JobStatusType, AbstractDataType, AbstractSearchType
+from .types import OutputStartType, JobStatusType
 from .utils.db_search.db_search import perform_db_search
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
@@ -83,7 +83,24 @@ class PublicCompasJobFilter(FilterSet):
         return CompasJob.public_compas_job_filter(super(PublicCompasJobFilter, self).qs, self)
 
 
-class CompasJobNode(DjangoObjectType):
+class AbstractBasicParameterType(graphene.AbstractType):
+    number_of_systems = graphene.String()
+    min_initial_mass = graphene.String()
+    max_initial_mass = graphene.String()
+    initial_mass_function = graphene.String()
+    metallicity = graphene.String()
+    min_metallicity = graphene.String()
+    max_metallicity = graphene.String()
+    metallicity_distribution = graphene.String()
+    min_mass_ratio = graphene.String()
+    max_mass_ratio = graphene.String()
+    mass_ratio_distribution = graphene.String()
+    min_semi_major_axis = graphene.String()
+    max_semi_major_axis = graphene.String()
+    semi_major_axis_distribution = graphene.String()
+
+
+class CompasJobNode(DjangoObjectType, AbstractBasicParameterType):
     class Meta:
         model = CompasJob
         convert_choices_to_enum = False
@@ -134,54 +151,23 @@ class CompasJobNode(DjangoObjectType):
             }
 
 
-class DataType(DjangoObjectType, AbstractDataType):
-    class Meta:
-        model = Data
-        interfaces = (relay.Node,)
-        convert_choices_to_enum = False
-
-
 populate_fields(
-    DataType,
+    CompasJobNode,
     [
-        'start_frequency_band',
-        'min_start_time',
-        'max_start_time',
-        'asini',
-        'freq_band',
-        'alpha',
-        'delta',
-        'orbit_tp',
-        'orbit_period',
-        'drift_time',
-        'd_freq'
-    ],
-    parameter_resolvers
-)
-
-
-class SearchType(DjangoObjectType, AbstractSearchType):
-    class Meta:
-        model = Search
-        interfaces = (relay.Node,)
-        convert_choices_to_enum = False
-
-
-populate_fields(
-    SearchType,
-    [
-        'search_start_time',
-        'search_t_block',
-        'search_central_a0',
-        'search_a0_band',
-        'search_a0_bins',
-        'search_central_p',
-        'search_p_band',
-        'search_p_bins',
-        'search_central_orbit_tp',
-        'search_orbit_tp_band',
-        'search_orbit_tp_bins',
-        'search_l_l_threshold',
+        "number_of_systems",
+        "min_initial_mass",
+        "max_initial_mass",
+        "initial_mass_function",
+        "metallicity",
+        "min_metallicity",
+        "max_metallicity",
+        "metallicity_distribution",
+        "min_mass_ratio",
+        "max_mass_ratio",
+        "mass_ratio_distribution",
+        "min_semi_major_axis",
+        "max_semi_major_axis",
+        "semi_major_axis_distribution"
     ],
     parameter_resolvers
 )
@@ -342,38 +328,21 @@ class StartInput(graphene.InputObjectType):
     private = graphene.Boolean()
 
 
-class DataInput(graphene.InputObjectType):
-    data_choice = graphene.String()
-    source_dataset = graphene.String()
-
-
-class DataParametersInput(graphene.InputObjectType):
-    start_frequency_band = graphene.String()
-    min_start_time = graphene.String()
-    max_start_time = graphene.String()
-    asini = graphene.String()
-    freq_band = graphene.String()
-    alpha = graphene.String()
-    delta = graphene.String()
-    orbit_tp = graphene.String()
-    orbit_period = graphene.String()
-    drift_time = graphene.String()
-    d_freq = graphene.String()
-
-
-class SearchParametersInput(graphene.InputObjectType):
-    search_start_time = graphene.String()
-    search_t_block = graphene.String()
-    search_central_a0 = graphene.String()
-    search_a0_band = graphene.String()
-    search_a0_bins = graphene.String()
-    search_central_p = graphene.String()
-    search_p_band = graphene.String()
-    search_p_bins = graphene.String()
-    search_central_orbit_tp = graphene.String()
-    search_orbit_tp_band = graphene.String()
-    search_orbit_tp_bins = graphene.String()
-    search_l_l_threshold = graphene.String()
+class BasicParametersInput(graphene.InputObjectType):
+    number_of_systems = graphene.String()
+    min_initial_mass = graphene.String()
+    max_initial_mass = graphene.String()
+    initial_mass_function = graphene.String()
+    metallicity = graphene.String()
+    min_metallicity = graphene.String()
+    max_metallicity = graphene.String()
+    metallicity_distribution = graphene.String()
+    min_mass_ratio = graphene.String()
+    max_mass_ratio = graphene.String()
+    mass_ratio_distribution = graphene.String()
+    min_semi_major_axis = graphene.String()
+    max_semi_major_axis = graphene.String()
+    semi_major_axis_distribution = graphene.String()
 
 
 class CompasJobCreationResult(graphene.ObjectType):
@@ -391,13 +360,14 @@ class SingleBinaryJobCreationResult(graphene.ObjectType):
 class CompasJobMutation(relay.ClientIDMutation):
     class Input:
         start = StartInput()
+        basic_parameters = BasicParametersInput()
 
     result = graphene.Field(CompasJobCreationResult)
 
     @classmethod
-    def mutate_and_get_payload(cls, root, info, start):
+    def mutate_and_get_payload(cls, root, info, start, basic_parameters):
         # Create the compas job
-        compas_job = create_compas_job(info.context.user, start)
+        compas_job = create_compas_job(info.context.user, start, basic_parameters)
 
         # Convert the compas job id to a global id
         job_id = to_global_id("CompasJobNode", compas_job.id)

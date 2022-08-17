@@ -8,12 +8,12 @@ from django.conf import settings
 from django.db import transaction
 from celery import chain
 
-from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search, SingleBinaryJob
+from .models import CompasJob, Label, BasicParameter, SingleBinaryJob
 from .tasks import run_compas, run_detailed_evol_plotting
 from .utils.constants import TASK_FAIL, TASK_TIMEOUT
 
 
-def create_compas_job(user, start):
+def create_compas_job(user, start, basic_parameters):
 
     with transaction.atomic():
         compas_job = CompasJob(
@@ -24,6 +24,9 @@ def create_compas_job(user, start):
             is_ligo_job=True
         )
         compas_job.save()
+        for name, value in basic_parameters.items():
+            BasicParameter(job=compas_job, name=name, value=value).save()
+
         # Submit the job to the job controller
 
         # Create the jwt token
@@ -35,7 +38,6 @@ def create_compas_job(user, start):
             settings.JOB_CONTROLLER_JWT_SECRET,
             algorithm='HS256'
         )
-
 
         # Create the parameter json
         params = compas_job.as_json()
