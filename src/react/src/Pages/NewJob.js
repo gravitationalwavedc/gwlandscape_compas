@@ -38,7 +38,10 @@ const NewJob = ({initialValues, router}) => {
                 start: {
                     name: values.name,
                     description: values.description,
-                    private: false, 
+                    private: false
+                },
+                basicParameters: {
+                    metallicity: '0.1'
                 }
             }
         };
@@ -49,7 +52,8 @@ const NewJob = ({initialValues, router}) => {
             variables: variables,
             onCompleted: (response, errors) => {
                 if (!errors) {
-                    router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
+                    // router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
+                    console.log(response.newCompasJob.result.jobId);
                 }
             },
         });

@@ -4,7 +4,6 @@ import MyJobs from './Pages/MyJobs';
 import PublicJobs from './Pages/PublicJobs';
 import {graphql} from 'react-relay';
 import {harnessApi} from './index';
-import DuplicateJobForm from './Components/Forms/DuplicateJobForm';
 import ViewJob from './Pages/ViewJob';
 import Loading from './Components/Loading';
 import {RedirectException} from 'found';
@@ -56,19 +55,6 @@ function getRoutes() {
                     count: 100
                 })}
                 environment={harnessApi.getEnvironment('compas')}
-                render={handleRender}/>
-            <Route
-                path="job-form/duplicate/"
-                query={graphql`
-                    query Routes_JobForm_Query ($jobId: ID!){
-                      ...DuplicateJobForm_data @arguments(jobId: $jobId)
-                    }
-                `}
-                prepareVariables={(params, {location}) => ({
-                    jobId: location.state && location.state.jobId ? location.state.jobId : ''
-                })}
-                environment={harnessApi.getEnvironment('compas')}
-                Component={DuplicateJobForm}
                 render={handleRender}/>
             <Route
                 path="publications"

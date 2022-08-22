@@ -365,12 +365,13 @@ class CompasJobMutation(relay.ClientIDMutation):
     result = graphene.Field(CompasJobCreationResult)
 
     @classmethod
+    @login_required
     def mutate_and_get_payload(cls, root, info, start, basic_parameters):
         # Create the compas job
         compas_job = create_compas_job(info.context.user, start, basic_parameters)
 
         # Convert the compas job id to a global id
-        job_id = to_global_id("CompasJobNode", compas_job.id)
+        job_id = to_global_id("CompasJob", compas_job.id)
 
         # Return the compas job id to the client
         return CompasJobMutation(
