@@ -18,6 +18,7 @@ class AdvancedParameterAdmin(admin.ModelAdmin):
 class BasicParameterAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Label)
 class LabelAdmin(admin.ModelAdmin):
     pass

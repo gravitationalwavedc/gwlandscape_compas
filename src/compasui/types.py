@@ -1,4 +1,4 @@
-from graphene import AbstractType, ObjectType, Int, String, Boolean
+from graphene import ObjectType, Int, String, Boolean
 
 
 class OutputStartType(ObjectType):

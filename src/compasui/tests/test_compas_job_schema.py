@@ -22,19 +22,7 @@ class TestCompasJobSchema(CompasTestCase):
             }
         """
 
-    @patch('compasui.views.requests')
-    def test_create_compas_job_success(self, request_mock):
-
-        mock_response = Mock()
-        mock_response.status_code = 200
-        mock_response.content = b'{"jobId":441}'
-        mock_response.headers = "headers"
-
-        request_mock.request.return_value = mock_response
-
-        self.client.authenticate(self.user)
-
-        compas_job_input = {
+        self.compas_job_input = {
             'input': {
                 'start': {
                     'name': 'first job',
@@ -47,9 +35,23 @@ class TestCompasJobSchema(CompasTestCase):
             }
         }
 
+    @patch('compasui.views.requests')
+    def test_create_compas_job_success(self, request_mock):
+
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.content = b'{"jobId":441}'
+        mock_response.headers = "headers"
+
+        request_mock.request.return_value = mock_response
+
+        self.client.authenticate(self.user)
+
+
+
         response = self.client.execute(
             self.create_compas_job_mutation,
-            compas_job_input
+            self.compas_job_input
         )
 
         expected = {
@@ -76,22 +78,9 @@ class TestCompasJobSchema(CompasTestCase):
 
         self.client.authenticate(self.user)
 
-        compas_job_input = {
-            'input': {
-                'start': {
-                    'name': 'first job',
-                    'description': 'first job description',
-                    'private': 'true'
-                },
-                'basicParameters': {
-                    'metallicity': '0.01'
-                }
-            }
-        }
-
         response = self.client.execute(
             self.create_compas_job_mutation,
-            compas_job_input
+            self.compas_job_input
         )
 
         self.assertIsNotNone(response.errors)
