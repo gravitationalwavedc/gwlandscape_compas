@@ -3,7 +3,6 @@ import { graphql, createFragmentContainer } from 'react-relay';
 import { Row, Nav, Col, Button, Container, Tab, Toast } from 'react-bootstrap';
 import moment from 'moment';
 import Files from '../Components/Results/Files';
-import Parameters from '../Components/Results/Parameters';
 import Link from 'found/Link';
 import LabelDropdown from '../Components/Results/LabelDropdown';
 import PrivacyToggle from '../Components/Results/PrivacyToggle';
@@ -62,11 +61,6 @@ const ViewJob = (props) => {
                     <Col md={2}>
                         <Nav className="flex-column">
                             <Nav.Item>
-                                <Nav.Link eventKey="parameters">
-                                    <h5>Parameters</h5>
-                                </Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
                                 <Nav.Link eventKey="results">
                                     <h5>Results</h5>
                                 </Nav.Link>
@@ -75,9 +69,6 @@ const ViewJob = (props) => {
                     </Col>
                     <Col md={8}>
                         <Tab.Content>
-                            <Tab.Pane eventKey="parameters">
-                                <Parameters jobData={props.data.compasJob} {...props}/>
-                            </Tab.Pane>
                             <Tab.Pane eventKey="results">
                                 <Files {...props}/>
                             </Tab.Pane>
@@ -105,12 +96,6 @@ export default createFragmentContainer(ViewJob,
                         description
                         ...PrivacyToggle_data
                     }
-                    jobStatus {
-                      name
-                      number
-                      date
-                    }
-                    ...Parameters_jobData
                 }
                 ...LabelDropdown_data @arguments(jobId: $jobId)
             }
