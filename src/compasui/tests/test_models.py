@@ -76,4 +76,3 @@ class TestModels(TestCase):
                 "advanced_parameter1": "0.001"
             }
         })
-
