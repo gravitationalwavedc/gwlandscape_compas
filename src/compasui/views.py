@@ -8,18 +8,12 @@ from django.conf import settings
 from django.db import transaction
 from celery import chain
 
-from .models import CompasJob, DataParameter, Label, SearchParameter, Data, Search, SingleBinaryJob
+from .models import CompasJob, Label, SingleBinaryJob, BasicParameter
 from .tasks import run_compas, run_detailed_evol_plotting
 from .utils.constants import TASK_FAIL, TASK_TIMEOUT
 
 
-def create_compas_job(user, start, data, data_parameters, search_parameters):
-    # validate_form = CompasJobForm(data={**start, **data, **signal, **sampler})
-    # should be making use of cleaned_data below
-
-    # Right now, it is not possible to create a non-ligo job
-    if not user.is_ligo:
-        raise Exception("User must be ligo")
+def create_compas_job(user, start, basic_parameters):
 
     with transaction.atomic():
         compas_job = CompasJob(
@@ -30,26 +24,8 @@ def create_compas_job(user, start, data, data_parameters, search_parameters):
             is_ligo_job=True
         )
         compas_job.save()
-
-        job_data = Data(
-            job=compas_job,
-            data_choice=data.data_choice,
-            source_dataset=data.source_dataset
-        )
-
-        job_data.save()
-
-        for key, val in data_parameters.items():
-            DataParameter(job=compas_job, data=job_data, name=key, value=val).save()
-
-        job_search = Search(
-            job=compas_job,
-        )
-
-        job_search.save()
-
-        for key, val in search_parameters.items():
-            SearchParameter(job=compas_job, search=job_search, name=key, value=val).save()
+        for name, value in basic_parameters.items():
+            BasicParameter(job=compas_job, name=name, value=value).save()
 
         # Submit the job to the job controller
 
@@ -69,8 +45,8 @@ def create_compas_job(user, start, data, data_parameters, search_parameters):
         # Construct the request parameters to the job controller, note that parameters must be a string, not an objects
         data = {
             "parameters": json.dumps(params),
-            "cluster": "ozstar",
-            "bundle": "0992ae26454c2a9204718afed9dc7b3d11d9cbf8"
+            "cluster": "gwlandscape",
+            "bundle": "05a07631d8efcd1f979e4c4c09fd9fcc4bc9a3a2"
         }
 
         # Initiate the request to the job controller
