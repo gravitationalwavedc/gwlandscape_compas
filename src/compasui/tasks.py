@@ -2,11 +2,22 @@ from celery import shared_task
 
 import os
 import traceback
+import importlib.util
 
 from .utils.celery_detailed_evol_plot import main as plotting_main
-from .utils.celery_pythonSubmit import run_compas_cmd
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
+
+# get COMPAS directory
+_compas_dir = os.environ['COMPAS_ROOT_DIR']
+
+# load utils/preProcessing/runSubmit.py module
+_run_submit_spec = importlib.util.spec_from_file_location(
+    'runSubmit',
+    os.path.join(_compas_dir, 'utils', 'preProcessing', 'runSubmit.py')
+)
+_run_submit_module = importlib.util.module_from_spec(_run_submit_spec)
+_run_submit_spec.loader.exec_module(_run_submit_module)
 
 
 def check_output_file_generated(outputfilepath):
@@ -28,7 +39,12 @@ def check_output_file_generated(outputfilepath):
 def run_compas(grid_file_path, output_path, detailed_output_file_path):
     result = None
     try:
-        run_compas_cmd(grid_file_path, output_path)
+        # run_compas_cmd(grid_file_path, output_path)
+        _run_submit_module.run_compas_command(
+            configFileName='/home/eman/Downloads/test/compasConfigDefault.yaml',
+            gridFileName=grid_file_path,
+            outputPath=output_path)
+
         result = check_output_file_generated(detailed_output_file_path)
 
     except SoftTimeLimitExceeded:

@@ -183,9 +183,9 @@ COMPAS_IO_PATH = os.path.join(MEDIA_ROOT, 'jobs/')
 
 # COMPAS Python Submit command for Celery task
 # TODO update these settigs to work with COMPAS running in Docker container
-RUN_COMPAS_COMMAND = [
-    'python3',
-    os.path.join(BASE_DIR, 'compasui/utils/celery_pythonSubmit.py'),
-]
+# RUN_COMPAS_COMMAND = [
+#     'python3',
+#     os.path.join(BASE_DIR, 'compasui/utils/celery_pythonSubmit.py'),
+# ]
 
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
