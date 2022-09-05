@@ -4,20 +4,28 @@ import os
 import traceback
 import importlib.util
 
-from .utils.celery_detailed_evol_plot import main as plotting_main
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
 
 # get COMPAS directory
 _compas_dir = os.environ['COMPAS_ROOT_DIR']
 
-# load utils/preProcessing/runSubmit.py module
+# load <_compas_dir>/utils/preProcessing/runSubmit.py module
 _run_submit_spec = importlib.util.spec_from_file_location(
     'runSubmit',
     os.path.join(_compas_dir, 'utils', 'preProcessing', 'runSubmit.py')
 )
 _run_submit_module = importlib.util.module_from_spec(_run_submit_spec)
 _run_submit_spec.loader.exec_module(_run_submit_module)
+
+
+# load <_compas_dir>/utils/plot_detailed_evolution.py module
+_plotting_spec = importlib.util.spec_from_file_location(
+    'plot_detailed_evolution',
+    os.path.join(_compas_dir, 'utils', 'plot_detailed_evolution.py')
+)
+_plotting_module = importlib.util.module_from_spec(_plotting_spec)
+_plotting_spec.loader.exec_module(_plotting_module)
 
 
 def check_output_file_generated(outputfilepath):
@@ -66,7 +74,11 @@ def run_detailed_evol_plotting(jobstate, detailed_output_file_path,
 
         result = None
         try:
-            plotting_main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
+            _plotting_module.main(
+                detailed_output_file_path,
+                detailed_plot_path,
+                vanDenHeuval_plot_path,
+                evol_text_path)
             result = check_output_file_generated(vanDenHeuval_plot_path)
         except SoftTimeLimitExceeded:
             traceback.print_exc()
