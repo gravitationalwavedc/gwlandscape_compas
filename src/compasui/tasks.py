@@ -1,5 +1,7 @@
 from celery import shared_task
 
+from django.conf import settings
+
 import os
 import traceback
 import importlib.util
@@ -49,7 +51,7 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
     try:
         # run_compas_cmd(grid_file_path, output_path)
         _run_submit_module.run_compas_command(
-            configFileName='/home/eman/Downloads/test/compasConfigDefault.yaml',
+            configFileName=settings.COMPAS_CONFIG_PATH,
             gridFileName=grid_file_path,
             outputPath=output_path)
 
