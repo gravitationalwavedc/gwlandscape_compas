@@ -16,6 +16,8 @@ default:
     - export COMPAS_ROOT_DIR=`pwd`
     - cd src
     - make -f Makefile
+    - echo $COMPAS_ROOT_DIR
+    - ls -al "$COMPAS_ROOT_DIR/utils"
     - cd $WD
 
 django-tests:
