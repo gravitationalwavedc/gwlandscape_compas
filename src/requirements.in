@@ -18,3 +18,4 @@ pyhumps
 h5py
 matplotlib
 pyjwt<2
+pyyaml
