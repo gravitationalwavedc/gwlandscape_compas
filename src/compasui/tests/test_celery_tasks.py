@@ -3,6 +3,7 @@ import os.path
 from tempfile import TemporaryDirectory
 from celery.exceptions import SoftTimeLimitExceeded
 from django.test import TestCase
+
 from compasui.tasks import run_compas, run_detailed_evol_plotting
 from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 
@@ -28,15 +29,15 @@ class TestCeleryTasks(TestCase):
         result = run_compas(self.grid_file, self.output_path, self.detailed_output_path)
         self.assertEqual(result, TASK_SUCCESS)
 
-    @patch("compasui.tasks.run_compas_cmd")
-    def test_run_compas_failure(self, run_compas_cmd):
-        run_compas_cmd.side_effect = Exception('something went wrong')
+    @patch("compasui.tasks.run_compas_command")
+    def test_run_compas_failure(self, run_compas_command):
+        run_compas_command.side_effect = Exception('something went wrong')
         result = run_compas(self.grid_file, self.output_path, self.detailed_output_path)
         self.assertEqual(result, TASK_FAIL)
 
-    @patch("compasui.tasks.run_compas_cmd")
-    def test_run_compas_timeout(self, run_compas_cmd):
-        run_compas_cmd.side_effect = SoftTimeLimitExceeded
+    @patch("compasui.tasks.run_compas_command")
+    def test_run_compas_timeout(self, run_compas_command):
+        run_compas_command.side_effect = SoftTimeLimitExceeded
         result = run_compas(self.grid_file, self.output_path, self.detailed_output_path)
         self.assertEqual(result, TASK_TIMEOUT)
 

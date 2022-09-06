@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -184,3 +185,7 @@ COMPAS_IO_PATH = os.path.join(MEDIA_ROOT, 'jobs/')
 COMPAS_CONFIG_PATH = os.path.join(BASE_DIR, 'compasui/utils/compasConfigDefault.yaml')
 
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
+
+# Adding the directory where COMPAS scripts are to python path to be able to load the modules
+COMPAS_SCRIPTS_DIR = os.path.join(os.environ['COMPAS_ROOT_DIR'], 'utils')
+sys.path.insert(1, COMPAS_SCRIPTS_DIR)
