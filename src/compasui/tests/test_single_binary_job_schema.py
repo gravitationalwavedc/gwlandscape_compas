@@ -1,13 +1,20 @@
+import shutil
 from os import path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
+from pathlib import Path
 from django.conf import settings
+from django.test import override_settings
 from compasui.tests.testcases import CompasTestCase
 from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 
 
+temp_output_dir = TemporaryDirectory()
+
+
+@override_settings(COMPAS_IO_PATH=temp_output_dir.name)
 class TestSingleBinaryJobSchema(CompasTestCase):
     def setUp(self):
-
         self.create_single_binary_job_mutation = """
             mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
                 newSingleBinary(input: $input) {
@@ -120,6 +127,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             self.single_binary_job_input
         )
         self.assertEqual(chain()().get.call_count, 2)
+        self.assertFalse(Path(settings.COMPAS_IO_PATH).joinpath("1").exists())
         self.assertEqual(self.expected_failed, response.data)
 
     @patch('compasui.views.chain')
@@ -149,3 +157,12 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         }
         chain()().get.assert_called_once()
         self.assertEqual(expected_success, response.data)
+
+    # @override_settings(COMPAS_IO_PATH="/tmp/test_delete/")
+    # def test_delete_previous_job_output(self):
+    #
+    #     Path("/tmp/test_delete/1/output").mkdir(parents=True)
+    #     delete_previous_job_directory(2)
+    #     self.assertFalse(Path("/tmp/test_delete/1").exists())
+    #     Path("/tmp/test_delete/").rmdir()
+

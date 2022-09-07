@@ -5,11 +5,11 @@ from django.conf import settings
 from compasui.models import SingleBinaryJob
 
 
-@override_settings(MEDIA_ROOT=TemporaryDirectory().name)
+@override_settings(COMPAS_IO_PATH=TemporaryDirectory().name)
 class TestSingleBinaryJobModel(testcases.TestCase):
 
     def grid_file_is_created_successfully(self, job_id, expected_text):
-        grid_file_path = Path(f'{settings.MEDIA_ROOT}/jobs/{job_id}/BSE_grid.txt')
+        grid_file_path = Path(f'{settings.COMPAS_IO_PATH}/{job_id}/BSE_grid.txt')
         self.assertEqual(SingleBinaryJob.objects.count(), 1)
         self.assertTrue(grid_file_path.exists())
         with open(grid_file_path) as f:

@@ -565,7 +565,7 @@ class SingleBinaryJob(models.Model):
                 content += f'{constants.FIELD_COMMANDS[field.name]} {field_value}' + " "
 
         # path where the file is saved: media_root/job_key
-        storage_location = os.path.join(settings.MEDIA_ROOT, 'jobs', str(self.id))
+        storage_location = os.path.join(settings.COMPAS_IO_PATH, str(self.id))
         # create directory
         if not os.path.exists(storage_location):
             os.makedirs(
