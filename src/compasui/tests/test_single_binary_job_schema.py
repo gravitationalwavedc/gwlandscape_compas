@@ -1,4 +1,3 @@
-import shutil
 from os import path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -157,12 +156,3 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         }
         chain()().get.assert_called_once()
         self.assertEqual(expected_success, response.data)
-
-    # @override_settings(COMPAS_IO_PATH="/tmp/test_delete/")
-    # def test_delete_previous_job_output(self):
-    #
-    #     Path("/tmp/test_delete/1/output").mkdir(parents=True)
-    #     delete_previous_job_directory(2)
-    #     self.assertFalse(Path("/tmp/test_delete/1").exists())
-    #     Path("/tmp/test_delete/").rmdir()
-
