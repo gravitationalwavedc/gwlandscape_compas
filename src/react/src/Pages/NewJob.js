@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import { Container, Col, Row, Tab, Nav } from 'react-bootstrap';
+import {Container, Col, Row, Button} from 'react-bootstrap';
 import { useFormik } from 'formik'; 
 import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
-import initialValues from '../Components/Forms/initialValues';
-import validationSchema from '../Components/Forms/validationSchema';
+import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
+// import validationSchema from '../Components/Forms/validationSchema';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -24,7 +24,7 @@ const NewJob = ({initialValues, router}) => {
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: values => handleJobSubmission(values),
-        validationSchema: validationSchema,
+        // validationSchema: validationSchema,
     });
 
     const handleJobSubmission = (values) => {
@@ -39,9 +39,15 @@ const NewJob = ({initialValues, router}) => {
                     name: values.name,
                     description: values.description,
                     private: false
+                },
+                basicParameters: {
+                    metallicity: '0.1'
                 }
+
             }
         };
+
+        console.log(variables);
 
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
@@ -55,20 +61,30 @@ const NewJob = ({initialValues, router}) => {
     };
 
     return (
-        <Container fluid>
+        <Container>
+            <h1 className="pt-5 mb-4">
+                Launch COMPAS Job
+            </h1>
             <Row>
-                <Col md={2}/>
-                <Col md={8} style={{minHeight: '110px'}}>
+                <Col md={6} style={{minHeight: '110px'}}>
                     <JobTitle formik={formik} />
                 </Col>
             </Row>
             <Row>
-                <Col md={8}>
-                    <ReviewJob
-                        formik={formik}
-                        values={formik.values}
-                        handleSubmit={formik.handleSubmit}/>
-                </Col>
+                <Container>
+                    <Row>
+                        <Col md={3}>
+                            <Button>Basic</Button>
+                        </Col>
+                        <Col md={9}>
+                            <ReviewJob
+                                formik={formik}
+                                values={formik.values}
+                                handleSubmit={formik.handleSubmit}/>
+                        </Col>
+                    </Row>
+                </Container>
+
             </Row>
             {/*</Tab.Container>*/}
         </Container>
@@ -77,7 +93,7 @@ const NewJob = ({initialValues, router}) => {
 };
 
 NewJob.defaultProps = {
-    initialValues: initialValues
+    initialValues: compasJobInitialValues
 };
 
 export default NewJob;

@@ -12,7 +12,7 @@ const JobTitle = ({formik}) => (
             type="text" 
             name="name"
             value={formik.values.name}
-            viewProps={{className: 'h1'}}
+            viewProps={{className: 'h2'}}
             onSave={(value) => formik.setFieldValue('name', value)}
             hint="You can use letters, numbers, underscores, and hyphens."
             editButtonContent={<EditButton/>}
