@@ -4,8 +4,10 @@ from pathlib import Path
 from django.conf import settings
 from compasui.models import SingleBinaryJob
 
+temp_output_dir = TemporaryDirectory()
 
-@override_settings(COMPAS_IO_PATH=TemporaryDirectory().name)
+
+@override_settings(COMPAS_IO_PATH=temp_output_dir.name)
 class TestSingleBinaryJobModel(testcases.TestCase):
 
     def grid_file_is_created_successfully(self, job_id, expected_text):
