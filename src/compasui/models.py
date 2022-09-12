@@ -1,5 +1,6 @@
 import math
 import os
+from pathlib import Path
 
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -565,14 +566,15 @@ class SingleBinaryJob(models.Model):
                 content += f'{constants.FIELD_COMMANDS[field.name]} {field_value}' + " "
 
         # path where the file is saved: media_root/job_key
-        storage_location = os.path.join(settings.COMPAS_IO_PATH, str(self.id))
+        storage_location = Path(settings.COMPAS_IO_PATH).joinpath(str(self.id))
+
         # create directory
         if not os.path.exists(storage_location):
             os.makedirs(
                 storage_location,
             )
         # name parameter file
-        grid_file_path = os.path.join(storage_location, 'BSE_grid.txt')
+        grid_file_path = Path(storage_location).joinpath('BSE_grid.txt')
 
         # write parameters string to file
         with open(grid_file_path, 'w') as f:
