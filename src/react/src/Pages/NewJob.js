@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
+import InitialParametersForm from '../Components/Forms/InitialParametersForm';
 // import validationSchema from '../Components/Forms/validationSchema';
 
 const submitMutation = graphql`
@@ -74,9 +75,24 @@ const NewJob = ({initialValues, router}) => {
                 <Container>
                     <Row>
                         <Col md={3}>
-                            <Button>Basic</Button>
+                            <Button
+                                className="mb-1"
+                                variant="primary"
+                                size="md"
+                                block
+                            >
+                                Basic
+                            </Button>
+                            <Button
+                                className="btn-secondary"
+                                size="md"
+                                block
+                            >
+                                Kick
+                            </Button>
                         </Col>
                         <Col md={9}>
+                            <InitialParametersForm formik={formik} ></InitialParametersForm>
                             <ReviewJob
                                 formik={formik}
                                 values={formik.values}
