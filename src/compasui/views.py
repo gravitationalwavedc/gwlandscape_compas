@@ -11,6 +11,7 @@ from celery import chain
 from .models import CompasJob, Label, SingleBinaryJob, BasicParameter
 from .tasks import run_compas, run_detailed_evol_plotting
 from .utils.constants import TASK_FAIL, TASK_TIMEOUT
+from .utils.delete_previous_job_directory import delete_previous_job_directory
 
 
 def create_compas_job(user, start, basic_parameters):
@@ -148,6 +149,7 @@ def create_single_binary_job(
     )
     single_binary_job.save()
     model_id = str(single_binary_job.id)
+    delete_previous_job_directory(single_binary_job.id)
 
     grid_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'BSE_grid.txt')
     output_path = os.path.join(settings.COMPAS_IO_PATH, model_id)
