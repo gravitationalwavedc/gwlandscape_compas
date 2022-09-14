@@ -9,10 +9,9 @@ const InitialParametersForm = ({formik}) => {
                 <Col>
                     <h2>Population</h2>
                 </Col>
-
             </Row>
             <Row>
-                <Col>
+                <Col md={6}>
                     <Input
                         formik={formik}
                         title="Number of Systems"
@@ -40,7 +39,7 @@ const InitialParametersForm = ({formik}) => {
                 </Col>
             </Row>
             <Row>
-                <Col>
+                <Col md={6}>
                     <Input
                         formik={formik}
                         title="Initial Mass Function"
@@ -104,7 +103,7 @@ const InitialParametersForm = ({formik}) => {
                 </Col>
             </Row>
             <Row>
-                <Col>
+                <Col md={6}>
                     <Input
                         formik={formik}
                         title="Mass Ratio Distribution"
@@ -132,7 +131,7 @@ const InitialParametersForm = ({formik}) => {
                 </Col>
             </Row>
             <Row>
-                <Col>
+                <Col md={6}>
                     <Input
                         formik={formik}
                         title="Semi Major Axis Distribution"
