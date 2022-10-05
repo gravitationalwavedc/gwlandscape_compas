@@ -24,21 +24,9 @@ def submit_template(wk_dir, job_name):
 #SBATCH --error={wk_dir}/submit/{job_name}_master_slurm.err
 jid0=($(sbatch {wk_dir}/submit/{job_name}_compas.sh))
 echo "jid0 ${{jid0[-1]}}" >> {wk_dir}/submit/slurm_ids
+jid1=($(sbatch --dependency=afterok:${{jid0[-1]}} {wk_dir}/submit/{job_name}_combineh5.sh))
+echo "jid1 ${{jid1[-1]}}" >> {wk_dir}/submit/slurm_ids
 """
-
-
-# def test_script_template(wk_dir, job_name):
-#     return f"""#!/bin/bash
-#     #SBATCH --job-name={job_name}_test
-#     #SBATCH --account=oz979
-#     #SBATCH --ntasks=1
-#     #SBATCH --time=00:60:00
-#     #SBATCH --output={wk_dir}/test/{job_name}_test.out
-#     #SBATCH --error={wk_dir}/test/{job_name}_test.err
-#
-#     srun hostname
-#     srun echo Hello World!!
-#     srun sleep 60"""
 
 
 def compas_run_template(wk_dir, job_name, no_of_nodes):
@@ -50,15 +38,9 @@ def compas_run_template(wk_dir, job_name, no_of_nodes):
 #SBATCH --output={wk_dir}/compas/run%a/{job_name}_compas_%a.out
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=1
-#if [[ ! -z "$EMAIL" ]]  # If email given
-#then
-#    echo "#SBATCH --mail-type=BEGIN"
-#    echo "#SBATCH --mail-type=FAIL"
-#    echo "#SBATCH --mail-type=END"
-#    echo "#SBATCH --mail-user=$EMAIL"
-#fi
 #SBATCH --time=0-001:00:00
-#SBATCH --mem=16G
+#SBATCH --mem-per-cpu=16G
+#SBATCH --tmp=8G
 
 # Load modules
 module load gcc/6.4.0
@@ -76,8 +58,40 @@ GSL_DIR='/apps/skylake/modulefiles/all/compiler/gcc/6.4.0/gsl/2.4.lua'
 
 # Run python submit
 cd {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}
-python {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}/runSubmit_${{SLURM_ARRAY_TASK_ID}}.py >& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
+srun python {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}/runSubmit_${{SLURM_ARRAY_TASK_ID}}.py >& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
 """
+
+
+def combine_output_template(wk_dir, job_name):
+    return f"""#!/bin/bash
+#SBATCH --account=oz979
+#SBATCH --job-name={job_name}_combineh5
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=0-001:00:00
+#SBATCH --output={wk_dir}/compas/{job_name}_combineh5.out
+#SBATCH --mem-per-cpu=16G
+#SBATCH --tmp=8G
+
+
+# Load modules
+module load gcc/6.4.0
+module load openmpi/3.0.0
+module load boost/1.66.0-python-3.6.4
+module load gsl/2.4
+module load h5py/2.7.1-python-3.6.4-serial
+module load numpy/1.14.1-python-3.6.4
+module load pandas/0.22.0-python-3.6.4
+module load astropy/3.1.2-python-3.6.4
+module load scipy/1.0.0-python-3.6.4
+module load pyyaml/3.12-python-3.6.4
+
+# Run h5copy
+cd {wk_dir}/compas
+srun python /fred/oz979/GWLandscape/COMPAS/utils/h5copy.py input {wk_dir} -r
+"""
+
 
 def upload_grid_file(grid_file_path):
     pass
@@ -118,7 +132,7 @@ def submit(details, input_params):
     shutil.copy(GRIDPATH, compas_dir)
 
     no_of_systems = input_params["basic"]["number_of_systems"]
-    no_of_nodes = 2
+    no_of_nodes = 1
     PYTHONSUBMITPATH = '/fred/oz979/GWLandscape/COMPAS/utils/preProcessing/runSubmit.py'
 
     nsys_per_patch = int(no_of_systems) / int(no_of_nodes)
@@ -146,6 +160,10 @@ def submit(details, input_params):
     with open(compas_script, "w") as f:
         f.write(compas_run_template(wk_dir, job_name, no_of_nodes))
 
+    combine_script = os.path.join(wk_dir, 'submit', f'{job_name}_combineh5.sh')
+    with open(combine_script, "w") as f:
+        f.write(combine_output_template(wk_dir, job_name))
+
     # Actually submit the job
     submit_bash_id = slurm_submit(slurm_script, wk_dir)
 
@@ -159,7 +177,7 @@ def submit(details, input_params):
         'job_id': get_unique_job_id(),
         'submit_id': submit_bash_id,
         'working_directory': wk_dir,
-        'submit_directory': submit_dir
+        'submit_directory': submit_dir_name
     }
 
     # Save the job in the database
