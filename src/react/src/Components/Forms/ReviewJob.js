@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {Button, Col, Row, Table,} from 'react-bootstrap';
+import {Button, Col, Row} from 'react-bootstrap';
 // import FormCard from './FormCard';
 
-const ReviewJob = ({values, handleSubmit, formik}) => {
+const ReviewJob = ({handleSubmit, formik}) => {
     const [errors, setErrors] = useState([]);
 
     const submitReview = async () => {

@@ -58,7 +58,8 @@ GSL_DIR='/apps/skylake/modulefiles/all/compiler/gcc/6.4.0/gsl/2.4.lua'
 
 # Run python submit
 cd {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}
-srun python {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}/runSubmit_${{SLURM_ARRAY_TASK_ID}}.py >& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
+srun python {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}/runSubmit_${{SLURM_ARRAY_TASK_ID}}.py \
+>& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
 """
 
 

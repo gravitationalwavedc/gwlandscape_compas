@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
@@ -8,7 +8,6 @@ import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
 import InitialParametersForm from '../Components/Forms/InitialParametersForm';
-// import validationSchema from '../Components/Forms/validationSchema';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -20,12 +19,11 @@ const submitMutation = graphql`
   }
 `;
 
-const NewJob = ({initialValues, router}) => {
+const NewJob = ({initialValues}) => {
 
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: values => handleJobSubmission(values),
-        // validationSchema: validationSchema,
     });
 
     const handleJobSubmission = (values) => {
@@ -60,8 +58,6 @@ const NewJob = ({initialValues, router}) => {
 
             }
         };
-
-        console.log(variables);
 
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
@@ -105,7 +101,7 @@ const NewJob = ({initialValues, router}) => {
                             </Button>
                         </Col>
                         <Col md={9}>
-                            <InitialParametersForm formik={formik} ></InitialParametersForm>
+                            <InitialParametersForm formik={formik} />
                             <ReviewJob
                                 formik={formik}
                                 values={formik.values}
@@ -115,9 +111,7 @@ const NewJob = ({initialValues, router}) => {
                 </Container>
 
             </Row>
-            {/*</Tab.Container>*/}
         </Container>
-
     );
 };
 
