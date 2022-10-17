@@ -4,19 +4,18 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 import NewJob from '../NewJob';
 import 'regenerator-runtime';
 
-/* global global */
+/* global router,environment */
 
 describe('new compas population job page', () => {
     it('should send a mutation when the form is submitted', async () => {
         expect.hasAssertions();
-        jest.spyOn(console, 'log').mockImplementation();
-        const {getAllByText} = render(<NewJob router={global.router}/>);
+        const {getAllByText} = render(<NewJob router={router}/>);
         fireEvent.click(getAllByText('Submit your job')[0]);
-        const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
-        global.environment.mock.resolve(
+        const operation = await waitFor(() => environment.mock.getMostRecentOperation());
+        environment.mock.resolve(
             operation,
             MockPayloadGenerator.generate(operation)
         );
-        expect(console.log).toHaveBeenCalledWith('<mock-value-for-field-"jobId">');
+        expect(router.replace).toHaveBeenCalledWith('/compas/job-results/<mock-value-for-field-"jobId">/');
     });
 });

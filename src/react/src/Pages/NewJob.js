@@ -19,7 +19,7 @@ const submitMutation = graphql`
   }
 `;
 
-const NewJob = ({initialValues}) => {
+const NewJob = ({initialValues, router}) => {
 
     const formik = useFormik({
         initialValues: initialValues,
@@ -64,7 +64,7 @@ const NewJob = ({initialValues}) => {
             variables: variables,
             onCompleted: (response, errors) => {
                 if (!errors) {
-                    console.log(response.newCompasJob.result.jobId);
+                    router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
                 }
             },
         });
