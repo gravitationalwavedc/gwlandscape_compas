@@ -94,14 +94,6 @@ srun python /fred/oz979/GWLandscape/COMPAS/utils/h5copy.py input {wk_dir} -r
 """
 
 
-def upload_grid_file(grid_file_path):
-    pass
-
-
-def upload_yaml_file(yaml_file_path):
-    pass
-
-
 def submit(details, input_params):
     print("Submitting new job...")
 
@@ -110,7 +102,7 @@ def submit(details, input_params):
 
     # create job working directory
     wk_dir = working_directory(details, input_params)
-    os.makedirs(wk_dir, exist_ok=True)
+    Path(wk_dir).mkdir(parents=True, exist_ok=True)
 
     # change working directory to job directory
     os.chdir(wk_dir)
@@ -119,12 +111,12 @@ def submit(details, input_params):
 
     # create submit directory, where all slurm scripts exist
     submit_dir_name = "submit"
-    submit_dir = os.path.join(wk_dir, submit_dir_name)
-    os.makedirs(submit_dir, exist_ok=True)
+    submit_dir = Path(wk_dir).joinpath(submit_dir_name)
+    Path(submit_dir).mkdir(parents=True, exist_ok=True)
 
     # create the directory where the actual job output exists
-    compas_dir = os.path.join(wk_dir, 'compas')
-    os.makedirs(compas_dir, exist_ok=True)
+    compas_dir = Path(wk_dir).joinpath('compas')
+    Path(compas_dir).mkdir(parents=True, exist_ok=True)
 
     YAMLCONFIGPATH = "/fred/oz979/GWLandscape/COMPAS/utils/preProcessing/compasConfigDefault.yaml"
     GRIDPATH = "/fred/oz979/GWLandscape/COMPAS/utils/preProcessing/BSE_Grid.txt"
@@ -145,23 +137,23 @@ def submit(details, input_params):
         Path(run_dir).mkdir()
         shutil.copyfile(PYTHONSUBMITPATH, Path(run_dir).joinpath(f'runSubmit_{i+1}.py'))
 
-        # nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
+        nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
 
-        start_seed = (i+1) * nsys_per_patch
+        start_seed = (i+1) * nsysi
         seed_file = Path(run_dir).joinpath('randomSeed.txt')
         with open(seed_file, 'w') as f:
             f.write(str(start_seed))
 
     # Write slurm scripts
-    slurm_script = os.path.join(wk_dir, 'submit', f'{job_name}_slurm.sh')
+    slurm_script = Path(wk_dir).joinpath('submit', f'{job_name}_slurm.sh')
     with open(slurm_script, "w") as f:
         f.write(submit_template(wk_dir, job_name))
 
-    compas_script = os.path.join(wk_dir, 'submit', f'{job_name}_compas.sh')
+    compas_script = Path(wk_dir).joinpath('submit', f'{job_name}_compas.sh')
     with open(compas_script, "w") as f:
         f.write(compas_run_template(wk_dir, job_name, no_of_nodes))
 
-    combine_script = os.path.join(wk_dir, 'submit', f'{job_name}_combineh5.sh')
+    combine_script = Path(wk_dir).joinpath('submit', f'{job_name}_combineh5.sh')
     with open(combine_script, "w") as f:
         f.write(combine_output_template(wk_dir, job_name))
 
