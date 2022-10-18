@@ -111,11 +111,11 @@ def submit(details, input_params):
 
     # create submit directory, where all slurm scripts exist
     submit_dir_name = "submit"
-    submit_dir = Path(wk_dir).joinpath(submit_dir_name)
+    submit_dir = Path(wk_dir) / submit_dir_name
     Path(submit_dir).mkdir(parents=True, exist_ok=True)
 
     # create the directory where the actual job output exists
-    compas_dir = Path(wk_dir).joinpath('compas')
+    compas_dir = Path(wk_dir) / 'compas'
     Path(compas_dir).mkdir(parents=True, exist_ok=True)
 
     YAMLCONFIGPATH = "/fred/oz979/GWLandscape/COMPAS/utils/preProcessing/compasConfigDefault.yaml"
@@ -135,25 +135,25 @@ def submit(details, input_params):
     for i in range(no_of_nodes):
         run_dir = f'{wk_dir}/compas/run{i+1}'
         Path(run_dir).mkdir()
-        shutil.copyfile(PYTHONSUBMITPATH, Path(run_dir).joinpath(f'runSubmit_{i+1}.py'))
+        shutil.copyfile(PYTHONSUBMITPATH, Path(run_dir) / f'runSubmit_{i+1}.py')
 
         nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
 
         start_seed = (i+1) * nsysi
-        seed_file = Path(run_dir).joinpath('randomSeed.txt')
+        seed_file = Path(run_dir) / 'randomSeed.txt'
         with open(seed_file, 'w') as f:
             f.write(str(start_seed))
 
     # Write slurm scripts
-    slurm_script = Path(wk_dir).joinpath('submit', f'{job_name}_slurm.sh')
+    slurm_script = Path(wk_dir) / 'submit' / f'{job_name}_slurm.sh'
     with open(slurm_script, "w") as f:
         f.write(submit_template(wk_dir, job_name))
 
-    compas_script = Path(wk_dir).joinpath('submit', f'{job_name}_compas.sh')
+    compas_script = Path(wk_dir) / 'submit' / f'{job_name}_compas.sh'
     with open(compas_script, "w") as f:
         f.write(compas_run_template(wk_dir, job_name, no_of_nodes))
 
-    combine_script = Path(wk_dir).joinpath('submit', f'{job_name}_combineh5.sh')
+    combine_script = Path(wk_dir) / 'submit' / f'{job_name}_combineh5.sh'
     with open(combine_script, "w") as f:
         f.write(combine_output_template(wk_dir, job_name))
 
