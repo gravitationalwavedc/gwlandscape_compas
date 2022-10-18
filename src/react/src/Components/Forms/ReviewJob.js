@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Col, Row} from 'react-bootstrap';
-// import FormCard from './FormCard';
 
-const ReviewJob = ({handleSubmit, formik}) => {
+const ReviewJob = ({handleSubmit, formik, handleReset}) => {
     const [errors, setErrors] = useState([]);
 
     const submitReview = async () => {
@@ -14,8 +13,6 @@ const ReviewJob = ({handleSubmit, formik}) => {
         }
     };
 
-    // const realData = values.dataChoice === 'real';
-
     return (
         <React.Fragment>
             {handleSubmit && <Row className="mb-5">
@@ -23,6 +20,7 @@ const ReviewJob = ({handleSubmit, formik}) => {
                     <Button onClick={submitReview}>Submit your job</Button>
                 </Col>
                 <Col>
+                    <Button onClick={handleReset}>Reset Form</Button>
                     <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
                 </Col>
             </Row>}

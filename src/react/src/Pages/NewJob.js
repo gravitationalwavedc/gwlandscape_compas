@@ -105,7 +105,9 @@ const NewJob = ({initialValues, router}) => {
                             <ReviewJob
                                 formik={formik}
                                 values={formik.values}
-                                handleSubmit={formik.handleSubmit}/>
+                                handleSubmit={formik.handleSubmit}
+                                handleReset={formik.resetForm}
+                            />
                         </Col>
                     </Row>
                 </Container>
