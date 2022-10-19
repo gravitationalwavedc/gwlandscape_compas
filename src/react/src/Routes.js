@@ -10,6 +10,7 @@ import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
 import Home from './Pages/Home';
 import Publications from './Pages/Publications';
 import NewJob from './Pages/NewJob';
+import ViewJob from './Pages/ViewJob';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
@@ -93,6 +94,15 @@ function getRoutes() {
                 environment={harnessApi.getEnvironment('compas')}
                 Component={NewSingleBinaryJob}
                 render={handleRender}/>
+            <Route
+                path="job-results/:jobId/"
+                environment={harnessApi.getEnvironment('compas')}
+                Component={ViewJob}
+                prepareVariables={(params) => ({
+                    jobId: params.jobId
+                })}
+                render={handleRender}
+            />
         </Route>
     );
 }

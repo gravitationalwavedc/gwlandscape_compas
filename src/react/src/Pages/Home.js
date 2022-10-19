@@ -34,6 +34,17 @@ const Home = ({match, router}) => <Container className="pt-5" fluid>
             >
                 Simulate Binary
             </Link>
+            <Link
+                as={Button}
+                variant="primary"
+                to='/compas/job-form/'
+                exact
+                match={match}
+                router={router}
+                className="mr-1"
+            >
+                Simulate Population
+            </Link>
         </Col>
     </Row>
 </Container>;

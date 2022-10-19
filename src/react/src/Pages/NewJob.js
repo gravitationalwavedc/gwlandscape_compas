@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import { Container, Col, Row, Tab, Nav } from 'react-bootstrap';
+import {Container, Col, Row, Button} from 'react-bootstrap';
 import { useFormik } from 'formik'; 
 import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
-import initialValues from '../Components/Forms/initialValues';
-import validationSchema from '../Components/Forms/validationSchema';
+import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
+import InitialParametersForm from '../Components/Forms/InitialParametersForm';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -24,7 +24,6 @@ const NewJob = ({initialValues, router}) => {
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: values => handleJobSubmission(values),
-        validationSchema: validationSchema,
     });
 
     const handleJobSubmission = (values) => {
@@ -39,7 +38,24 @@ const NewJob = ({initialValues, router}) => {
                     name: values.name,
                     description: values.description,
                     private: false
+                },
+                basicParameters: {
+                    numberOfSystems: values.numberOfSystems,
+                    minInitialMass: values.minInitialMass,
+                    maxInitialMass: values.maxInitialMass,
+                    initialMassFunction: values.initialMassFunction,
+                    metallicity: values.metallicity,
+                    metallicityDistribution: values.metallicityDistribution,
+                    minMetallicty: values.minMetallicty,
+                    maxMetallicity: values.maxMetallicity,
+                    minMassRatio: values.minMassRatio,
+                    maxMassRatio: values.maxMassRatio,
+                    massRatioDistribution: values.massRatioDistribution,
+                    minSemiMajorAxis: values.minSemiMajorAxis,
+                    maxSemiMajorAxis: values.maxSemiMajorAxis,
+                    semiMajorAxisDistribution: values.semiMajorAxisDistribution
                 }
+
             }
         };
 
@@ -48,36 +64,61 @@ const NewJob = ({initialValues, router}) => {
             variables: variables,
             onCompleted: (response, errors) => {
                 if (!errors) {
-                    console.log(response.newCompasJob.result.jobId);
+                    router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
                 }
             },
         });
     };
 
     return (
-        <Container fluid>
+        <Container>
+            <h1 className="pt-5 mb-4">
+                Launch COMPAS Job
+            </h1>
             <Row>
-                <Col md={2}/>
-                <Col md={8} style={{minHeight: '110px'}}>
+                <Col md={6} style={{minHeight: '110px'}}>
                     <JobTitle formik={formik} />
                 </Col>
             </Row>
             <Row>
-                <Col md={8}>
-                    <ReviewJob
-                        formik={formik}
-                        values={formik.values}
-                        handleSubmit={formik.handleSubmit}/>
-                </Col>
-            </Row>
-            {/*</Tab.Container>*/}
-        </Container>
+                <Container>
+                    <Row>
+                        <Col md={3}>
+                            <Button
+                                className="mb-1"
+                                variant="primary"
+                                size="md"
+                                block
+                            >
+                                Basic
+                            </Button>
+                            <Button
+                                className="btn-secondary"
+                                size="md"
+                                block
+                            >
+                                Kick
+                            </Button>
+                        </Col>
+                        <Col md={9}>
+                            <InitialParametersForm formik={formik} />
+                            <ReviewJob
+                                formik={formik}
+                                values={formik.values}
+                                handleSubmit={formik.handleSubmit}
+                                handleReset={formik.resetForm}
+                            />
+                        </Col>
+                    </Row>
+                </Container>
 
+            </Row>
+        </Container>
     );
 };
 
 NewJob.defaultProps = {
-    initialValues: initialValues
+    initialValues: compasJobInitialValues
 };
 
 export default NewJob;

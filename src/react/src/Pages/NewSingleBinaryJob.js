@@ -9,7 +9,7 @@ import KickParametersForm from '../Components/Forms/KickParametersForm';
 import CommonEnvelopeParametersForm from '../Components/Forms/CommonEnvelopeParametersForm';
 import SupernovaParametersForm from '../Components/Forms/SupernovaParametersForm';
 import MassTransferParametersForm from '../Components/Forms/MassTransferParametersForm';
-import ReviewSingleBinaryJob from '../Components/Forms/ReviewSingleBinaryJob';
+import ReviewJob from '../Components/Forms/ReviewJob';
 import JobOutput from '../Components/Results/JobOutput';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
@@ -152,7 +152,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                if (!errors && (response.newSingleBinary.result.vanPlotFilePath!='')) {
+                if (!errors && (response.newSingleBinary.result.vanPlotFilePath!=='')) {
 
                     setMyinterval(() => setInterval(() => {
                         if((!vanPlotLoaded) &&
@@ -203,7 +203,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                         onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}
                         collapsed={isMassTransferCollapsed}/>
 
-                    <ReviewSingleBinaryJob
+                    <ReviewJob
                         formik={formik}
                         values={formik.values}
                         handleSubmit={formik.handleSubmit}
