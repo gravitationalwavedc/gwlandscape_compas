@@ -1,7 +1,7 @@
 const compasJobInitialValues = {
     name: 'Untitled',
     description: 'A good description is specific, unique, and memorable.',
-    private: true,
+    private: false,
     numberOfSystems: 10,
     minInitialMass: 5.0,
     maxInitialMass: 150.0,

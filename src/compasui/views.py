@@ -22,14 +22,13 @@ def create_compas_job(user, start, basic_parameters):
             name=start.name,
             description=start.description,
             private=start.private,
-            is_ligo_job=True
+            is_ligo_job=False
         )
         compas_job.save()
         for name, value in basic_parameters.items():
             BasicParameter(job=compas_job, name=name, value=value).save()
 
         # Submit the job to the job controller
-
         # Create the jwt token
         jwt_enc = jwt.encode(
             {
@@ -74,7 +73,6 @@ def create_compas_job(user, start, basic_parameters):
         # Save the job id
         compas_job.job_controller_id = result["jobId"]
         compas_job.save()
-
         return compas_job
 
 
