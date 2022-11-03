@@ -8,6 +8,7 @@ import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
 import InitialParametersForm from '../Components/Forms/InitialParametersForm';
+import validationSchema from '../Components/Forms/compasJobValidationSchema';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -24,6 +25,7 @@ const NewJob = ({initialValues, router}) => {
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: values => handleJobSubmission(values),
+        validationSchema: validationSchema,
     });
 
     const handleJobSubmission = (values) => {
