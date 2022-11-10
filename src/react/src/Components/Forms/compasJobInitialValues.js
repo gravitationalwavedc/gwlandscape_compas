@@ -6,7 +6,7 @@ const compasJobInitialValues = {
     minInitialMass: 5.0,
     maxInitialMass: 150.0,
     initialMassFunction: 'KROUPA',
-    // metallicity: 0.0142,
+    initialMassPower: 0.0,
     metallicityDistribution: 'ZSOLAR',
     minMetallicity: 0.0001,
     maxMetallicity: 0.03,

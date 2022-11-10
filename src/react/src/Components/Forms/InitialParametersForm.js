@@ -221,14 +221,6 @@ const InitialParametersForm = ({formik}) => {
                 </Col>
             </Row>
             <Row>
-                {/*<Col>*/}
-                {/*    <Input*/}
-                {/*        formik={formik}*/}
-                {/*        title="Metallicity Distribution"*/}
-                {/*        name="metallicityDistribution"*/}
-                {/*        type="string"*/}
-                {/*    />*/}
-                {/*</Col>*/}
                 <Col md={6}>
                     <SelectInput
                         formik={formik}
