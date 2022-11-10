@@ -2,14 +2,14 @@ import React from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import {Container, Col, Row, Button, Nav, Tab} from 'react-bootstrap';
+import {Container, Col, Row, Nav, Tab} from 'react-bootstrap';
 import { useFormik } from 'formik'; 
 import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
 import InitialParametersForm from '../Components/Forms/InitialParametersForm';
 import validationSchema from '../Components/Forms/compasJobValidationSchema';
-import KickParametersForm from "../Components/Forms/KickParametersForm";
+import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -104,6 +104,13 @@ const NewJob = ({initialValues, router}) => {
                                         Kick
                                     </Nav.Link>
                                 </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link
+                                        eventKey="massTransferCEParameters"
+                                        className="mb-1">
+                                        test
+                                    </Nav.Link>
+                                </Nav.Item>
                             </Nav>
                         </Col>
                         <Col md={9}>
@@ -114,7 +121,12 @@ const NewJob = ({initialValues, router}) => {
                             </Tab.Content>
                             <Tab.Content>
                                 <Tab.Pane eventKey="kickParameters">
-                                    <KickParametersForm formik={formik} />
+                                    <SupernovaKickParametersForm formik={formik} />
+                                </Tab.Pane>
+                            </Tab.Content>
+                            <Tab.Content>
+                                <Tab.Pane eventKey="massTransferCEParameters">
+                                    <InitialParametersForm formik={formik} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>
@@ -122,7 +134,7 @@ const NewJob = ({initialValues, router}) => {
                 </Tab.Container>
             </Row>
             <Row>
-                <Col md={2}></Col>
+                <Col md={2}>  </Col>
                 <Col md={7}>
                     <ReviewJob
                         formik={formik}

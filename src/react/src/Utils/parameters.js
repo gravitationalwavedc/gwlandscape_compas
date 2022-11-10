@@ -10,4 +10,15 @@ const fryerSupernovaEngineOptions = [
     {'value': 'RAPID', 'label': 'RAPID'},
 ];
 
-export {fryerSupernovaEngineOptions, remnantMassPrescriptionOptions};
+const kickVelocityDistributionOptions = [
+    {'value': 'ZERO', 'label': 'ZERO'},
+    {'value': 'FIXED', 'label': 'FIXED'},
+    {'value': 'FLAT', 'label': 'FLAT'},
+    {'value': 'MAXWELLIAN', 'label': 'MAXWELLIAN'},
+    {'value': 'BRAYELDRIDGE', 'label': 'BRAYELDRIDGE'},
+    {'value': 'MULLER2016', 'label': 'MULLER2016'},
+    {'value': 'MULLER2016MAXWELLIAN', 'label': 'MULLER2016MAXWELLIAN'},
+    {'value': 'MULLERMANDEL', 'label': 'MULLERMANDEL'},
+];
+
+export {fryerSupernovaEngineOptions, remnantMassPrescriptionOptions, kickVelocityDistributionOptions};
