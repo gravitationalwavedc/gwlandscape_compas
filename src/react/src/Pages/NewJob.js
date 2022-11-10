@@ -104,13 +104,6 @@ const NewJob = ({initialValues, router}) => {
                                         Kick
                                     </Nav.Link>
                                 </Nav.Item>
-                                <Nav.Item>
-                                    <Nav.Link
-                                        eventKey="massTransferCEParameters"
-                                        className="mb-1">
-                                        test
-                                    </Nav.Link>
-                                </Nav.Item>
                             </Nav>
                         </Col>
                         <Col md={9}>
@@ -122,11 +115,6 @@ const NewJob = ({initialValues, router}) => {
                             <Tab.Content>
                                 <Tab.Pane eventKey="kickParameters">
                                     <SupernovaKickParametersForm formik={formik} />
-                                </Tab.Pane>
-                            </Tab.Content>
-                            <Tab.Content>
-                                <Tab.Pane eventKey="massTransferCEParameters">
-                                    <InitialParametersForm formik={formik} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>
