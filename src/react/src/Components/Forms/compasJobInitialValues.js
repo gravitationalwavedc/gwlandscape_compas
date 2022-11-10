@@ -17,7 +17,12 @@ const compasJobInitialValues = {
     maxSemiMajorAxis: 1000.0,
     minOrbitalPeriod: 1.1,
     maxOrbitalPeriod: 1000.0,
-    semiMajorAxisDistribution: 'FLATINLOG'
+    semiMajorAxisDistribution: 'FLATINLOG',
+    remnantMassPrescription: 'FRYER2012',
+    fryerSupernovaEngine: 'DELAYED',
+    kickVelocityDistribution: 'MAXWELLIAN',
+    velocity1: 0.0,
+    velocity2: 0.0,
 };
 
 export default compasJobInitialValues;

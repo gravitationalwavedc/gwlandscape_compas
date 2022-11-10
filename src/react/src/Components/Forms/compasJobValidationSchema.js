@@ -79,6 +79,16 @@ let validationSchema = Yup.object().shape({
             'Min Orbital Period should be < Max Orbital Period',
             (value) => value > minOrbitalPeriod.value
         ),
+    velocity1: Yup
+        .number()
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
+    velocity2: Yup
+        .number()
+        .min(0.0)
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
 
 }, [['minInitialMass', 'maxInitialMass'],
     ['minMassRatio', 'maxMassRatio'],
