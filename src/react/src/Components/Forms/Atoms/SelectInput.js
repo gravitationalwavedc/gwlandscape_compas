@@ -13,14 +13,14 @@ const SelectInput = ({ title, formik, name, options, show=true, help, ...rest })
                 isValid={formik.touched[name] && !formik.errors[name]}
                 isInvalid={!!formik.errors[name]}
                 {...formik.getFieldProps(name)} {...rest}>
-                    {options.map(({label, value}) =>
-                        <option
-                            value={value}
-                            id={name + label}
-                            key={name + label}>
-                            {label}
-                        </option>
-                    )}
+                {options.map(({label, value}) =>
+                    <option
+                        value={value}
+                        id={name + label}
+                        key={name + label}>
+                        {label}
+                    </option>
+                )}
             </Form.Control>
             <Form.Text>{help}</Form.Text>
             <Form.Control.Feedback type='invalid'>

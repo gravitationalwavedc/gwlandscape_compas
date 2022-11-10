@@ -23,6 +23,11 @@ const compasJobInitialValues = {
     kickVelocityDistribution: 'MAXWELLIAN',
     velocity1: 0.0,
     velocity2: 0.0,
+    massTransferAngularMomentumLossPrescription: 'ISOTROPIC',
+    massTransferAccretionEfficiencyPrescription: 'THERMAL',
+    massTransferAccretionEfficiency: 0.0,
+    commonEnvelopeAlpha: 1.0,
+    commonEnvelopeLambdaPrescription: 'LAMBDA_NANJING',
 };
 
 export default compasJobInitialValues;

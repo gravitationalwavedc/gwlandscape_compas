@@ -10,6 +10,7 @@ import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
 import InitialParametersForm from '../Components/Forms/InitialParametersForm';
 import validationSchema from '../Components/Forms/compasJobValidationSchema';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
+import MassTransferCEParametersForm from '../Components/Forms/MassTransferCEParameters';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -88,7 +89,7 @@ const NewJob = ({initialValues, router}) => {
             <Row>
                 <Tab.Container defaultActiveKey="initialParameters">
                     <Row>
-                        <Col md={3}>
+                        <Col md={4}>
                             <Nav variant="pills" className="flex-column">
                                 <Nav.Item>
                                     <Nav.Link
@@ -99,22 +100,30 @@ const NewJob = ({initialValues, router}) => {
                                 </Nav.Item>
                                 <Nav.Item>
                                     <Nav.Link
-                                        eventKey="kickParameters"
+                                        eventKey="supernovaKickParameters"
                                         className="mb-1">
-                                        Kick
+                                        Supernova - Kick
+                                    </Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link
+                                        eventKey="massTransferCEParameters"
+                                        className="mb-1">
+                                        Mass Transfer - CE
                                     </Nav.Link>
                                 </Nav.Item>
                             </Nav>
                         </Col>
-                        <Col md={9}>
+                        <Col md={8}>
                             <Tab.Content>
                                 <Tab.Pane eventKey="initialParameters">
                                     <InitialParametersForm formik={formik} />
                                 </Tab.Pane>
-                            </Tab.Content>
-                            <Tab.Content>
-                                <Tab.Pane eventKey="kickParameters">
+                                <Tab.Pane eventKey="supernovaKickParameters">
                                     <SupernovaKickParametersForm formik={formik} />
+                                </Tab.Pane>
+                                <Tab.Pane eventKey="massTransferCEParameters">
+                                    <MassTransferCEParametersForm formik={formik} />
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>

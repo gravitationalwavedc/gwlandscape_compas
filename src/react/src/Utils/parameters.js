@@ -21,4 +21,31 @@ const kickVelocityDistributionOptions = [
     {'value': 'MULLERMANDEL', 'label': 'MULLERMANDEL'},
 ];
 
-export {fryerSupernovaEngineOptions, remnantMassPrescriptionOptions, kickVelocityDistributionOptions};
+const massTransferAngularMomentumLossPrescriptionOptions = [
+    {'value': 'JEANS', 'label': 'JEANS'},
+    {'value': 'ISOTROPIC', 'label': 'ISOTROPIC'},
+    {'value': 'CIRCUMBINARY', 'label': 'CIRCUMBINARY'},
+    {'value': 'ARBITRARY', 'label': 'ARBITRARY'},
+];
+
+const massTransferAccretionEfficiencyPrescriptionOptions = [
+    {'value': 'THERMAL', 'label': 'THERMAL'},
+    {'value': 'FIXED', 'label': 'FIXED'},
+];
+
+const lambdaPrescriptionOptions = [
+    {'value': 'LAMBDA_FIXED', 'label': 'LAMBDA_FIXED'},
+    {'value': 'LAMBDA_LOVERIDGE', 'label': 'LAMBDA_LOVERIDGE'},
+    {'value': 'LAMBDA_NANJING', 'label': 'LAMBDA_NANJING'},
+    {'value': 'LAMBDA_KRUCKOW', 'label': 'LAMBDA_KRUCKOW'},
+    {'value': 'LAMBDA_DEWI', 'label': 'LAMBDA_DEWI'},
+];
+
+export {
+    fryerSupernovaEngineOptions,
+    remnantMassPrescriptionOptions,
+    kickVelocityDistributionOptions,
+    massTransferAngularMomentumLossPrescriptionOptions,
+    massTransferAccretionEfficiencyPrescriptionOptions,
+    lambdaPrescriptionOptions
+};
