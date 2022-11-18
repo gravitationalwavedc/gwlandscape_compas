@@ -24,11 +24,6 @@ const SupernovaKickParametersForm = ({formik}) => {
     return (
         <React.Fragment>
             <Row>
-                <Col md={8}>
-                    <h2>Supernova Remnant and Kick Parameters</h2>
-                </Col>
-            </Row>
-            <Row>
                 <Col md={5}>
                     <SelectInput
                         formik={formik}
@@ -72,6 +67,7 @@ const SupernovaKickParametersForm = ({formik}) => {
                         title="Velocity 1 (km/s)"
                         name="velocity1"
                         type="number"
+                        data-testid="velocity1"
                         show={showVelocity}
                         help=""
                     />
@@ -81,6 +77,7 @@ const SupernovaKickParametersForm = ({formik}) => {
                         formik={formik}
                         title="Velocity 2 (km/s)"
                         name="velocity2"
+                        data-testid="velocity2"
                         type="number"
                         show={showVelocity}
                         help=""

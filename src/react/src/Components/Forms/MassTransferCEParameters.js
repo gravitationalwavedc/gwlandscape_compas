@@ -7,20 +7,15 @@ import {massTransferAccretionEfficiencyPrescriptionOptions,
     lambdaPrescriptionOptions} from '../../Utils/parameters';
 
 const MassTransferCEParametersForm = ({formik}) => {
-    const [showMassTransferAccretionEfficiency, setShowMassTransferAccretionEfficiency] = useState(false);
+    const [showMassTransferFA, setShowMassTransferFA] = useState(false);
 
     const handleAccretionEfficiencyPrescriptionOnChange = (e) => {
         formik.setFieldValue('massTransferAccretionEfficiencyPrescription', e.target.value);
-        setShowMassTransferAccretionEfficiency(e.target.value === 'FIXED');
+        setShowMassTransferFA(e.target.value === 'FIXED');
     };
 
     return (
         <React.Fragment>
-            <Row>
-                <Col>
-                    <h2>Mass Transfer - CE</h2>
-                </Col>
-            </Row>
             <Row>
                 <Col md={6}>
                     <SelectInput
@@ -48,9 +43,9 @@ const MassTransferCEParametersForm = ({formik}) => {
                 <Col>
                     <Input
                         formik={formik}
-                        show={showMassTransferAccretionEfficiency}
-                        title="Accretion Efficiency"
-                        name="massTransferAccretionEfficiency"
+                        show={showMassTransferFA}
+                        title="Fraction Accreted"
+                        name="massTransferFa"
                         type="number"
                         help=""
                     />

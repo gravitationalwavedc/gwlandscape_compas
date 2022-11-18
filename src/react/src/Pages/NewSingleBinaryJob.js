@@ -5,14 +5,14 @@ import {harnessApi} from '../index';
 import { Container, Col, Row} from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
-import KickParametersForm from '../Components/Forms/KickParametersForm';
-import CommonEnvelopeParametersForm from '../Components/Forms/CommonEnvelopeParametersForm';
-import SupernovaParametersForm from '../Components/Forms/SupernovaParametersForm';
-import MassTransferParametersForm from '../Components/Forms/MassTransferParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import JobOutput from '../Components/Results/JobOutput';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
+import FormCard from '../Components/Forms/FormCard';
+import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
+import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
+
 
 const submitMutation = graphql`
   mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
@@ -58,8 +58,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [isBasicCollapsed, setIsBasicCollapsed] = useState(false);
-    const [isKickCollapsed, setIsKickCollapsed] = useState(true);
-    const [isCECollapsed, setIsCECollapsed] = useState(true);
     const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
     const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
     const [myinterval, setMyinterval] = useState(null);
@@ -85,8 +83,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
         setDetailedPlotLoaded(false);
         setOutputError('');
         setIsBasicCollapsed(false);
-        setIsKickCollapsed(true);
-        setIsCECollapsed(true);
         setIsSupernovaCollapsed(true);
         setIsMassTransferCollapsed(true);
         setMyinterval(null);
@@ -111,39 +107,16 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 eccentricity: values.eccentricity,
                 separation: values.separation,
                 orbitalPeriod: values.orbitalPeriod,
-                velocityRandomNumber1: values.velocityRandomNumber1,
-                velocityRandomNumber2: values.velocityRandomNumber2,
                 velocity1: values.velocity1,
                 velocity2: values.velocity2,
-                theta1: values.theta1,
-                theta2: values.theta2,
-                phi1: values.phi1,
-                phi2: values.phi2,
-                meanAnomaly1: values.meanAnomaly1,
-                meanAnomaly2: values.meanAnomaly2,
                 commonEnvelopeAlpha: values.commonEnvelopeAlpha,
                 commonEnvelopeLambdaPrescription: values.commonEnvelopeLambdaPrescription,
-                commonEnvelopeLambda: values.commonEnvelopeLambda,
+                // commonEnvelopeLambda: values.commonEnvelopeLambda,
                 remnantMassPrescription: values.remnantMassPrescription,
                 fryerSupernovaEngine: values.fryerSupernovaEngine,
-                blackHoleKicks: values.blackHoleKicks,
-                kickVelocityDistribution: values.kickVelocityDistribution,
-                kickVelocitySigmaCcsnNs: values.kickVelocitySigmaCcsnNs,
-                kickVelocitySigmaCcsnBh: values.kickVelocitySigmaCcsnBh,
-                kickVelocitySigmaEcsn: values.kickVelocitySigmaEcsn,
-                kickVelocitySigmaUssn: values.kickVelocitySigmaUssn,
-                pairInstabilitySupernovae: Boolean(values.pairInstabilitySupernovae),
-                pisnLowerLimit: values.pisnLowerLimit,
-                pisnUpperLimit: values.pisnUpperLimit,
-                pulsationalPairInstabilitySupernovae: Boolean(values.pulsationalPairInstabilitySupernovae),
-                ppiLowerLimit: values.ppiLowerLimit,
-                ppiUpperLimit: values.ppiUpperLimit,
-                pulsationalPairInstabilityPrescription: values.pulsationalPairInstabilityPrescription,
-                maximumNeutronStarMass: values.maximumNeutronStarMass,
                 massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
                 massTransferAccretionEfficiencyPrescription: values.massTransferAccretionEfficiencyPrescription,
                 massTransferFa: values.massTransferFa,
-                massTransferJloss: values.massTransferJloss,
             }
         };
 
@@ -181,27 +154,28 @@ const NewSingleBinaryJob = ({initialValues}) => {
     return (
         <Container fluid>
             <Row>
+                <Container fluid>
+                    <h1>Evolve a Binary</h1>
+                </Container>
+            </Row>
+            <Row>
                 <Col md={5}>
                     <BasicParametersForm
                         formik={formik}
                         onTitleClick={()=>setIsBasicCollapsed(!isBasicCollapsed)}
                         collapsed={isBasicCollapsed}/>
-                    <KickParametersForm
-                        formik={formik}
-                        onTitleClick={()=>setIsKickCollapsed(!isKickCollapsed)}
-                        collapsed={isKickCollapsed}/>
-                    <CommonEnvelopeParametersForm
-                        formik={formik}
-                        onTitleClick={()=>setIsCECollapsed(!isCECollapsed)}
-                        collapsed={isCECollapsed}/>
-                    <SupernovaParametersForm
-                        formik={formik}
-                        onTitleClick={()=>setIsSupernovaCollapsed(!isSupernovaCollapsed)}
-                        collapsed={isSupernovaCollapsed}/>
-                    <MassTransferParametersForm
-                        formik={formik}
-                        onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}
-                        collapsed={isMassTransferCollapsed}/>
+                    <FormCard
+                        title="Supernova & Kick Parameters"
+                        collapsed={isSupernovaCollapsed}
+                        onTitleClick={()=>setIsSupernovaCollapsed(!isSupernovaCollapsed)}>
+                        <SupernovaKickParametersForm formik={formik}/>
+                    </FormCard>
+                    <FormCard
+                        title="Mass Transfer & CE Parameters"
+                        collapsed={isMassTransferCollapsed}
+                        onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}>
+                        <MassTransferCEParameters formik={formik}/>
+                    </FormCard>
 
                     <ReviewJob
                         formik={formik}
