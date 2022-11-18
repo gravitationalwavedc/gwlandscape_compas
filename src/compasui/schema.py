@@ -274,41 +274,41 @@ class Query(object):
     def resolve_gwclouduser(self, info, **kwargs):
         return info.context.user
 
-    @login_required
-    def resolve_compas_result_files(self, info, **kwargs):
-        # Get the model id of the compas job
-        _, job_id = from_global_id(kwargs.get("job_id"))
-
-        # Try to look up the job with the id provided
-        job = CompasJob.get_by_id(job_id, info.context.user)
-
-        # Fetch the file list from the job controller
-        success, files = job.get_file_list()
-        if not success:
-            raise Exception("Error getting file list. " + str(files))
-
-        # Build the resulting file list and send it back to the client
-        result = []
-        for f in files:
-            download_id = ""
-            if not f["isDir"]:
-                # todo: Optimize how file download ids are generated. An id for every file every time
-                # todo: the page is loaded is not effective at all
-                # Create a file download id for this file
-                success, download_id = job.get_file_download_id(f["path"])
-                if not success:
-                    raise Exception("Error creating file download url. " + str(download_id))
-
-            result.append(
-                CompasResultFile(
-                    path=f["path"],
-                    is_dir=f["isDir"],
-                    file_size=f["fileSize"],
-                    download_id=download_id
-                )
-            )
-
-        return CompasResultFiles(files=result)
+    # @login_required
+    # def resolve_compas_result_files(self, info, **kwargs):
+    #     # Get the model id of the compas job
+    #     _, job_id = from_global_id(kwargs.get("job_id"))
+    #
+    #     # Try to look up the job with the id provided
+    #     job = CompasJob.get_by_id(job_id, info.context.user)
+    #
+    #     # Fetch the file list from the job controller
+    #     success, files = job.get_file_list()
+    #     if not success:
+    #         raise Exception("Error getting file list. " + str(files))
+    #
+    #     # Build the resulting file list and send it back to the client
+    #     result = []
+    #     for f in files:
+    #         download_id = ""
+    #         if not f["isDir"]:
+    #             # todo: Optimize how file download ids are generated. An id for every file every time
+    #             # todo: the page is loaded is not effective at all
+    #             # Create a file download id for this file
+    #             success, download_id = job.get_file_download_id(f["path"])
+    #             if not success:
+    #                 raise Exception("Error creating file download url. " + str(download_id))
+    #
+    #         result.append(
+    #             CompasResultFile(
+    #                 path=f["path"],
+    #                 is_dir=f["isDir"],
+    #                 file_size=f["fileSize"],
+    #                 download_id=download_id
+    #             )
+    #         )
+    #
+    #     return CompasResultFiles(files=result)
 
 
 class StartInput(graphene.InputObjectType):

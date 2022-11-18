@@ -38,43 +38,26 @@ const InitialParametersForm = ({formik}) => {
     const handleInitialMassFnOnChange = (e) => {
         let value = e.target.value;
         formik.setFieldValue('initialMassFunction', value);
-        if(value === 'POWERLAW'){
-            setShowMassPower(true);
-        } else {
-            setShowMassPower(false);
-        }
+        setShowMassPower(value === 'POWERLAW');
     };
 
     const handleMassRatioDistributionOnChange = (e) => {
         let value = e.target.value;
         formik.setFieldValue('massRatioDistribution', value);
-        if(value === 'FLAT'){
-            setShowMassRatios(true);
-        } else {
-            setShowMassRatios(false);
-        }
+        setShowMassRatios(value === 'FLAT');
     };
 
     const handleSemiMajorAxisDistOnChange = (e) => {
         let value = e.target.value;
         formik.setFieldValue('semiMajorAxisDistribution', value);
-        if(['FLATINLOG', 'DUQUENNOYMAYOR1991'].includes(value)){
-            setShowSeparations(true);
-            setShowOrbitalPeriods(false);
-        } else {
-            setShowSeparations(false);
-            setShowOrbitalPeriods(true);
-        }
+        setShowSeparations(['FLATINLOG', 'DUQUENNOYMAYOR1991'].includes(value));
+        setShowOrbitalPeriods(!['FLATINLOG', 'DUQUENNOYMAYOR1991'].includes(value));
     };
 
     const handleMetallicityDistOnChange = (e) => {
         let value = e.target.value;
         formik.setFieldValue('metallicityDistribution', value);
-        if(value === 'ZSOLAR'){
-            setShowMetallicities(false);
-        } else {
-            setShowMetallicities(true);
-        }
+        setShowMetallicities(value !== 'ZSOLAR');
     };
 
     return (
