@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from graphql_relay.node.node import to_global_id
 from compasui.models import CompasJob
 from compasui.tests.testcases import CompasTestCase
-from unittest import mock
 
 User = get_user_model()
 
