@@ -18,4 +18,41 @@ describe('new compas population job page', () => {
         );
         expect(router.replace).toHaveBeenCalledWith('/compas/job-results/<mock-value-for-field-"jobId">/');
     });
+
+    it('should show Accretion Efficiency when Accretion Efficiency Prescription has FIXED selected', () => {
+        expect.hasAssertions();
+        const {getByLabelText} = render(<NewJob router={router}/>);
+
+        expect(getByLabelText('Initial Mass Power').closest('div')).toHaveClass('hidden', false);
+        fireEvent.change(getByLabelText('Initial Mass Function'), {target: {value:'POWERLAW'}});
+        expect(getByLabelText('Initial Mass Power').closest('div')).not.toHaveClass('hidden');
+
+        expect(getByLabelText('Min Mass Ratio').closest('div')).not.toHaveClass('hidden');
+        expect(getByLabelText('Max Mass Ratio').closest('div')).not.toHaveClass('hidden');
+        fireEvent.change(getByLabelText('Mass Ratio Distribution'), {target: {value:'DUQUENNOYMAYOR1991'}});
+        expect(getByLabelText('Min Mass Ratio').closest('div')).toHaveClass('hidden', false);
+        expect(getByLabelText('Max Mass Ratio').closest('div')).toHaveClass('hidden', false);
+
+        expect(getByLabelText('Min Metallicity').closest('div')).toHaveClass('hidden', false);
+        expect(getByLabelText('Max Metallicity').closest('div')).toHaveClass('hidden', false);
+        fireEvent.change(getByLabelText('Metallicity Distribution'), {target: {value:'LOGUNIFORM'}});
+        expect(getByLabelText('Min Metallicity').closest('div')).not.toHaveClass('hidden');
+        expect(getByLabelText('Max Metallicity').closest('div')).not.toHaveClass('hidden');
+
+        expect(getByLabelText('Accretion Efficiency').closest('div')).toHaveClass('hidden', false);
+        fireEvent.change(getByLabelText('Accretion Efficiency Prescription'), {target: {value:'FIXED'}});
+        expect(getByLabelText('Accretion Efficiency').closest('div')).not.toHaveClass('hidden');
+
+        expect(getByLabelText('Fryer Supernova Engine').closest('div')).not.toHaveClass('hidden');
+        fireEvent.change(getByLabelText('Remnant Mass Prescription'), { target: { value: 'HURLEY2000'}});
+        expect(getByLabelText('Fryer Supernova Engine').closest('div')).toHaveClass('hidden', false);
+
+        expect(getByLabelText('Velocity 1 (km/s)').closest('div')).toHaveClass('hidden', false);
+        expect(getByLabelText('Velocity 2 (km/s)').closest('div')).toHaveClass('hidden', false);
+        fireEvent.change(getByLabelText('Kick Velocity Distribution'), {target: {value:'FIXED'}});
+        expect(getByLabelText('Velocity 1 (km/s)').closest('div')).not.toHaveClass('hidden');
+        expect(getByLabelText('Velocity 2 (km/s)').closest('div')).not.toHaveClass('hidden');
+
+    });
+
 });

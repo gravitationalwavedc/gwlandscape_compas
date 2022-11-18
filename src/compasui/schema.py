@@ -10,12 +10,10 @@ from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
 from .models import CompasJob, Label, SingleBinaryJob
-from .status import JobStatus
 from .types import OutputStartType, JobStatusType, AbstractBasicParameterType
-from .utils.db_search.db_search import perform_db_search
+from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
-from .views import create_compas_job, update_compas_job, create_single_binary_job
 from django.conf import settings
 
 
@@ -66,33 +64,16 @@ class UserCompasJobFilter(FilterSet):
         return CompasJob.user_compas_job_filter(super(UserCompasJobFilter, self).qs, self)
 
 
-class PublicCompasJobFilter(FilterSet):
-    class Meta:
-        model = CompasJob
-        fields = '__all__'
-
-    order_by = OrderingFilter(
-        fields=(
-            ('last_updated', 'last_updated'),
-            ('name', 'name'),
-        )
-    )
-
-    @property
-    def qs(self):
-        return CompasJob.public_compas_job_filter(super(PublicCompasJobFilter, self).qs, self)
-
-
 class CompasJobNode(DjangoObjectType, AbstractBasicParameterType):
     class Meta:
         model = CompasJob
         convert_choices_to_enum = False
         interfaces = (relay.Node,)
 
+    # user = graphene.String()
     job_status = graphene.Field(JobStatusType)
     last_updated = graphene.String()
     start = graphene.Field(OutputStartType)
-    labels = graphene.List(LabelType)
 
     @classmethod
     def get_queryset(parent, queryset, info):
@@ -108,12 +89,9 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType):
             "private": parent.private
         }
 
-    def resolve_labels(parent, info):
-        return parent.labels.all()
-
     def resolve_job_status(parent, info):
         try:
-            # Get job details from the job controller
+            # Get job details from the job controller git commit
             _, jc_jobs = request_job_filter(
                 info.context.user.user_id,
                 ids=[parent.job_controller_id]
@@ -156,45 +134,6 @@ populate_fields(
 )
 
 
-class UserDetails(graphene.ObjectType):
-    username = graphene.String()
-
-    def resolve_username(parent, info):
-        return "Todo"
-
-
-class CompasResultFile(graphene.ObjectType):
-    path = graphene.String()
-    is_dir = graphene.Boolean()
-    file_size = graphene.Int()
-    download_id = graphene.String()
-
-
-class CompasResultFiles(graphene.ObjectType):
-    class Meta:
-        interfaces = (relay.Node,)
-
-    class Input:
-        job_id = graphene.ID()
-
-    files = graphene.List(CompasResultFile)
-
-
-class CompasPublicJobNode(graphene.ObjectType):
-    user = graphene.String()
-    name = graphene.String()
-    job_status = graphene.Field(JobStatusType)
-    labels = graphene.List(LabelType)
-    description = graphene.String()
-    timestamp = graphene.String()
-    id = graphene.ID()
-
-
-class CompasPublicJobConnection(relay.Connection):
-    class Meta:
-        node = CompasPublicJobNode
-
-
 class SingleBinaryJobFilter(django_filters.FilterSet):
     class Meta:
         model = SingleBinaryJob
@@ -214,17 +153,7 @@ class SingleBinaryJobNode(DjangoObjectType):
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
-    public_compas_jobs = relay.ConnectionField(
-        CompasPublicJobConnection,
-        search=graphene.String(),
-        time_range=graphene.String()
-    )
-
     all_labels = graphene.List(LabelType)
-
-    compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
-
-    gwclouduser = graphene.Field(UserDetails)
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
@@ -234,75 +163,8 @@ class Query(object):
         return Label.all()
 
     @login_required
-    def resolve_public_compas_jobs(self, info, **kwargs):
-        # Perform the database search
-        success, jobs = perform_db_search(info.context.user, kwargs)
-        if not success:
-            return []
-
-        # Parse the result in to graphql objects
-        result = []
-        for job in jobs:
-            result.append(
-                CompasPublicJobNode(
-                    user=f"{job['user']['firstName']} {job['user']['lastName']}",
-                    name=job['job']['name'],
-                    description=job['job']['description'],
-                    job_status=JobStatusType(
-                        name=JobStatus.display_name(job['history'][0]['state']),
-                        number=job['history'][0]['state'],
-                        date=job['history'][0]['timestamp']
-                    ),
-                    labels=CompasJob.get_by_id(job['job']['id'], info.context.user).labels.all(),
-                    timestamp=job['history'][0]['timestamp'],
-                    id=to_global_id("CompasJobNode", job['job']['id'])
-                )
-            )
-
-        # Nb. The perform_db_search function currently requests one extra record than kwargs['first'].
-        # This triggers the ArrayConnection used by returning the result array to correctly set
-        # hasNextPage correctly, such that infinite scroll works as expected.
-        return result
-
-    @login_required
     def resolve_gwclouduser(self, info, **kwargs):
         return info.context.user
-
-    @login_required
-    def resolve_compas_result_files(self, info, **kwargs):
-        # Get the model id of the compas job
-        _, job_id = from_global_id(kwargs.get("job_id"))
-
-        # Try to look up the job with the id provided
-        job = CompasJob.get_by_id(job_id, info.context.user)
-
-        # Fetch the file list from the job controller
-        success, files = job.get_file_list()
-        if not success:
-            raise Exception("Error getting file list. " + str(files))
-
-        # Build the resulting file list and send it back to the client
-        result = []
-        for f in files:
-            download_id = ""
-            if not f["isDir"]:
-                # todo: Optimize how file download ids are generated. An id for every file every time
-                # todo: the page is loaded is not effective at all
-                # Create a file download id for this file
-                success, download_id = job.get_file_download_id(f["path"])
-                if not success:
-                    raise Exception("Error creating file download url. " + str(download_id))
-
-            result.append(
-                CompasResultFile(
-                    path=f["path"],
-                    is_dir=f["isDir"],
-                    file_size=f["fileSize"],
-                    download_id=download_id
-                )
-            )
-
-        return CompasResultFiles(files=result)
 
 
 class StartInput(graphene.InputObjectType):
@@ -354,7 +216,7 @@ class CompasJobMutation(relay.ClientIDMutation):
         compas_job = create_compas_job(info.context.user, start, basic_parameters)
 
         # Convert the compas job id to a global id
-        job_id = to_global_id("CompasJob", compas_job.id)
+        job_id = to_global_id("CompasJobNode", compas_job.id)
 
         # Return the compas job id to the client
         return CompasJobMutation(

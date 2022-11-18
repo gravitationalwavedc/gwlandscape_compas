@@ -55,7 +55,7 @@ class TestCompasJobSchema(CompasTestCase):
         expected = {
             'newCompasJob': {
                 'result': {
-                    'jobId': to_global_id('CompasJob', CompasJob.objects.last().id)
+                    'jobId': to_global_id('CompasJobNode', CompasJob.objects.last().id)
                 }
             }
         }

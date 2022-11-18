@@ -1,7 +1,5 @@
 import React from 'react';
 import {Route} from 'found';
-import MyJobs from './Pages/MyJobs';
-import PublicJobs from './Pages/PublicJobs';
 import {graphql} from 'react-relay';
 import {harnessApi} from './index';
 import Loading from './Components/Loading';
@@ -34,28 +32,6 @@ function getRoutes() {
                 path="job-form"
                 Component={NewJob}
                 render={handleRender}/>
-            <Route
-                path='public-job-list'
-                Component={PublicJobs}
-                query={graphql`
-                query Routes_HomePage_Query (
-                  $count: Int!,
-                  $cursor: String,
-                  $search: String,
-                  $timeRange: String,
-                ) {
-                    gwclouduser {
-                      username
-                    }
-                    ...PublicJobs_data
-                }
-              `}
-                prepareVariables={() => ({
-                    timeRange: 'all',
-                    count: 100
-                })}
-                environment={harnessApi.getEnvironment('compas')}
-                render={handleRender}/>
 
             <Route
                 path="publications"
@@ -71,25 +47,6 @@ function getRoutes() {
                 Component={Publications}
                 render={handleRender}/>
             <Route
-                path="job-list"
-                query={graphql`
-                query Routes_JobList_Query(
-                    $count: Int!,
-                    $cursor: String,
-                    $orderBy: String
-                    ) {
-                        ...MyJobs_data
-                    }
-                    `}
-                prepareVariables={() => ({
-                    count: 100,
-                    timeRange: 'all',
-                })}
-                    
-                environment={harnessApi.getEnvironment('compas')}
-                Component={MyJobs}
-                render={handleRender}/>
-            <Route
                 path="single-binary-form"
                 environment={harnessApi.getEnvironment('compas')}
                 Component={NewSingleBinaryJob}
@@ -98,6 +55,11 @@ function getRoutes() {
                 path="job-results/:jobId/"
                 environment={harnessApi.getEnvironment('compas')}
                 Component={ViewJob}
+                query={graphql`
+                    query Routes_ViewJob_Query($jobId: ID!){
+                        ...ViewJob_data @arguments(jobId: $jobId)
+                    }
+                `}
                 prepareVariables={(params) => ({
                     jobId: params.jobId
                 })}
