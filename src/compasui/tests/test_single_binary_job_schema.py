@@ -34,16 +34,10 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 'metallicity': 0.02,
                 'eccentricity': 0.1,
                 'separation': 0.1,
-                'meanAnomaly1': 0.1,
                 'commonEnvelopeAlpha': 0.1,
                 'commonEnvelopeLambdaPrescription': 'LAMBDA_FIXED',
-                'commonEnvelopeLambda': 1.1,
-                'ppiLowerLimit': 0.1,
-                'pisnUpperLimit': 0.2,
                 'fryerSupernovaEngine': 'DELAYED',
                 'kickVelocityDistribution': 'ZERO',
-                'pairInstabilitySupernovae': 'false',
-                'pulsationalPairInstabilitySupernovae': 'true',
             }
         }
 
