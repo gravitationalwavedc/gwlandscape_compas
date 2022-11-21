@@ -1,14 +1,14 @@
 import React from 'react';
 import {Route} from 'found';
-import {graphql} from 'react-relay';
+// import {graphql} from 'react-relay';
 import {harnessApi} from './index';
 import Loading from './Components/Loading';
 import {RedirectException} from 'found';
 import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
-import Home from './Pages/Home';
-import Publications from './Pages/Publications';
-import NewJob from './Pages/NewJob';
-import ViewJob from './Pages/ViewJob';
+// import Home from './Pages/Home';
+// import Publications from './Pages/Publications';
+// import NewJob from './Pages/NewJob';
+// import ViewJob from './Pages/ViewJob';
 
 const handleRender = ({Component, props}) => {
     if (!Component || !props)
@@ -25,48 +25,54 @@ function getRoutes() {
     return (
         <Route>
             <Route
-                Component={Home}
-                environment={harnessApi.getEnvironment('compas')}
-                render={handleRender}/>
-            <Route
-                path="job-form"
-                Component={NewJob}
-                render={handleRender}/>
-
-            <Route
-                path="publications"
-                query={graphql`
-                    query Routes_Publications_Query {
-                        ...Publications_data
-                    }
-                `}
-                prepareVariables={() => ({
-                    count: 100,
-                })}
-                environment={harnessApi.getEnvironment('compas')}
-                Component={Publications}
-                render={handleRender}/>
-            <Route
-                path="single-binary-form"
                 environment={harnessApi.getEnvironment('compas')}
                 Component={NewSingleBinaryJob}
                 render={handleRender}/>
-            <Route
-                path="job-results/:jobId/"
-                environment={harnessApi.getEnvironment('compas')}
-                Component={ViewJob}
-                query={graphql`
-                    query Routes_ViewJob_Query($jobId: ID!){
-                        ...ViewJob_data @arguments(jobId: $jobId)
-                    }
-                `}
-                prepareVariables={(params) => ({
-                    jobId: params.jobId
-                })}
-                render={handleRender}
-            />
         </Route>
     );
 }
 
 export default getRoutes;
+
+
+// <Route
+//     Component={Home}
+//     environment={harnessApi.getEnvironment('compas')}
+//     render={handleRender}/>
+// <Route
+//     path="job-form"
+//     Component={NewJob}
+//     render={handleRender}/>
+
+// <Route
+//     path="publications"
+//     query={graphql`
+//         query Routes_Publications_Query {
+//             ...Publications_data
+//         }
+//     `}
+//     prepareVariables={() => ({
+//         count: 100,
+//     })}
+//     environment={harnessApi.getEnvironment('compas')}
+//     Component={Publications}
+//     render={handleRender}/>
+// <Route
+//     path="single-binary-form"
+//     environment={harnessApi.getEnvironment('compas')}
+//     Component={NewSingleBinaryJob}
+//     render={handleRender}/>
+// <Route
+//     path="job-results/:jobId/"
+//     environment={harnessApi.getEnvironment('compas')}
+//     Component={ViewJob}
+//     query={graphql`
+//         query Routes_ViewJob_Query($jobId: ID!){
+//             ...ViewJob_data @arguments(jobId: $jobId)
+//         }
+//     `}
+//     prepareVariables={(params) => ({
+//         jobId: params.jobId
+//     })}
+//     render={handleRender}
+// />
