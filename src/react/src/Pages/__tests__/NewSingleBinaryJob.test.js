@@ -28,7 +28,7 @@ const mockXMLHttpRequest = (status) => {
 };
 
 describe('new single binary job page', () => {
-    it('should reset parameter values to defauls when use clicks reser form button', async () => {
+    it('should reset parameter values to defaults when use clicks reset form button', async () => {
         expect.hasAssertions();
 
         jest.spyOn(global, 'scrollTo').mockImplementation();
@@ -190,10 +190,8 @@ describe('new single binary job page', () => {
 
         userEvent.clear(separationInput);
         userEvent.type(orbitalInput, '1.3');
-        userEvent.clear(screen.getByTestId('theta1'));
-        userEvent.clear(screen.getByTestId('theta2'));
-        userEvent.clear(screen.getByTestId('phi1'));
-        userEvent.clear(screen.getByTestId('phi2'));
+        userEvent.clear(screen.getByTestId('velocity1'));
+        userEvent.clear(screen.getByTestId('velocity2'));
 
         await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
 
@@ -211,12 +209,11 @@ describe('new single binary job page', () => {
 
         // check no errors on separation
         expect(screen.queryByRole('alert', {name: 'Separation (AU)'})).not.toBeInTheDocument();
-        // check no errors on theta 1
-        expect(screen.queryByRole('alert', {name: 'Theta 1'})).not.toBeInTheDocument();
-        // check no errors on phi 1
-        expect(screen.queryByRole('alert', {name: 'Phi 1'})).not.toBeInTheDocument();
-        // check no errors on phi 2
-        expect(screen.queryByRole('alert', {name: 'Phi 2'})).not.toBeInTheDocument();
+
+        // check no errors on velocity 1
+        expect(screen.queryByRole('alert', {name: 'Velocity 1'})).not.toBeInTheDocument();
+        // check no errors on velocity 2
+        expect(screen.queryByRole('alert', {name: 'Velocity 2'})).not.toBeInTheDocument();
 
         jest.useRealTimers();
     });

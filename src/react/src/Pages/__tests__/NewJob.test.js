@@ -39,9 +39,9 @@ describe('new compas population job page', () => {
         expect(getByLabelText('Min Metallicity').closest('div')).not.toHaveClass('hidden');
         expect(getByLabelText('Max Metallicity').closest('div')).not.toHaveClass('hidden');
 
-        expect(getByLabelText('Accretion Efficiency').closest('div')).toHaveClass('hidden', false);
+        expect(getByLabelText('Fraction Accreted').closest('div')).toHaveClass('hidden', false);
         fireEvent.change(getByLabelText('Accretion Efficiency Prescription'), {target: {value:'FIXED'}});
-        expect(getByLabelText('Accretion Efficiency').closest('div')).not.toHaveClass('hidden');
+        expect(getByLabelText('Fraction Accreted').closest('div')).not.toHaveClass('hidden');
 
         expect(getByLabelText('Fryer Supernova Engine').closest('div')).not.toHaveClass('hidden');
         fireEvent.change(getByLabelText('Remnant Mass Prescription'), { target: { value: 'HURLEY2000'}});
