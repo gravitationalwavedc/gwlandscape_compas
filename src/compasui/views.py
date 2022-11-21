@@ -100,8 +100,7 @@ def create_single_binary_job(
             remnant_mass_prescription, fryer_supernova_engine,
             kick_velocity_distribution,
             mass_transfer_angular_momentum_loss_prescription,
-            mass_transfer_accretion_efficiency_prescription, mass_transfer_fa
-    ):
+            mass_transfer_accretion_efficiency_prescription, mass_transfer_fa):
     single_binary_job = SingleBinaryJob(
         mass1=mass1,
         mass2=mass2,
