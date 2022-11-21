@@ -94,18 +94,14 @@ def update_compas_job(job_id, user, private=None, labels=None):
 
 
 def create_single_binary_job(
-        mass1, mass2, metallicity, eccentricity, separation, orbital_period,
-        velocity_random_number_1, velocity_random_number_2,
-        theta_1, theta_2, phi_1, phi_2, mean_anomaly_1, mean_anomaly_2,
-        common_envelope_alpha, common_envelope_lambda_prescription, common_envelope_lambda,
-        remnant_mass_prescription, fryer_supernova_engine, black_hole_kicks,
-        kick_velocity_distribution, kick_velocity_sigma_CCSN_NS, kick_velocity_sigma_CCSN_BH,
-        kick_velocity_sigma_ECSN, kick_velocity_sigma_USSN, pair_instability_supernovae,
-        pisn_lower_limit, pisn_upper_limit, pulsational_pair_instability_supernovae,
-        ppi_lower_limit, ppi_upper_limit, pulsational_pair_instability_prescription,
-        maximum_neutron_star_mass, mass_transfer_angular_momentum_loss_prescription,
-        mass_transfer_accretion_efficiency_prescription, mass_transfer_fa, mass_transfer_jloss
-):
+            mass1, mass2, metallicity, eccentricity, separation, orbital_period,
+            velocity_1, velocity_2,
+            common_envelope_alpha, common_envelope_lambda_prescription,
+            remnant_mass_prescription, fryer_supernova_engine,
+            kick_velocity_distribution,
+            mass_transfer_angular_momentum_loss_prescription,
+            mass_transfer_accretion_efficiency_prescription, mass_transfer_fa
+    ):
     single_binary_job = SingleBinaryJob(
         mass1=mass1,
         mass2=mass2,
@@ -113,37 +109,16 @@ def create_single_binary_job(
         eccentricity=eccentricity,
         separation=separation,
         orbital_period=orbital_period,
-        velocity_random_number_1=velocity_random_number_1,
-        velocity_random_number_2=velocity_random_number_2,
-        theta_1=theta_1,
-        theta_2=theta_2,
-        phi_1=phi_1,
-        phi_2=phi_2,
-        mean_anomaly_1=mean_anomaly_1,
-        mean_anomaly_2=mean_anomaly_2,
+        velocity_1=velocity_1,
+        velocity_2=velocity_2,
         common_envelope_alpha=common_envelope_alpha,
         common_envelope_lambda_prescription=common_envelope_lambda_prescription,
-        common_envelope_lambda=common_envelope_lambda,
         remnant_mass_prescription=remnant_mass_prescription,
         fryer_supernova_engine=fryer_supernova_engine,
-        black_hole_kicks=black_hole_kicks,
         kick_velocity_distribution=kick_velocity_distribution,
-        kick_velocity_sigma_CCSN_NS=kick_velocity_sigma_CCSN_NS,
-        kick_velocity_sigma_CCSN_BH=kick_velocity_sigma_CCSN_BH,
-        kick_velocity_sigma_ECSN=kick_velocity_sigma_ECSN,
-        kick_velocity_sigma_USSN=kick_velocity_sigma_USSN,
-        pair_instability_supernovae=pair_instability_supernovae,
-        pisn_lower_limit=pisn_lower_limit,
-        pisn_upper_limit=pisn_upper_limit,
-        pulsational_pair_instability_supernovae=pulsational_pair_instability_supernovae,
-        ppi_lower_limit=ppi_lower_limit,
-        ppi_upper_limit=ppi_upper_limit,
-        pulsational_pair_instability_prescription=pulsational_pair_instability_prescription,
-        maximum_neutron_star_mass=maximum_neutron_star_mass,
         mass_transfer_angular_momentum_loss_prescription=mass_transfer_angular_momentum_loss_prescription,
         mass_transfer_accretion_efficiency_prescription=mass_transfer_accretion_efficiency_prescription,
         mass_transfer_fa=mass_transfer_fa,
-        mass_transfer_jloss=mass_transfer_jloss,
     )
     single_binary_job.save()
     model_id = str(single_binary_job.id)

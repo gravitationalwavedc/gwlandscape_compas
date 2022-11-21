@@ -207,6 +207,7 @@ class SingleBinaryJob(models.Model):
         validators=[MinValueValidator(0.1), MaxValueValidator(150.0)],
         help_text="Mass of the initially less massive star. 0 < Value < 150",
     )
+
     # --metalicity
     metallicity = models.FloatField(
         blank=False,
@@ -239,24 +240,6 @@ class SingleBinaryJob(models.Model):
         help_text="Value > 0",
     )
 
-    # --kick-magnitude-random-1
-    velocity_random_number_1 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-        help_text="--kick-magnitude-random-1: Value to be used to draw the \
-        kick magnitude for the primary star of a binary system when evolving in BSE mode,\
-        should the star undergo a supernova event, 0 < Value < 1",
-    )
-    # --kick-magnitude-random-2
-    velocity_random_number_2 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-        help_text="--kick-magnitude-random-2: Value to be used to draw the kick \
-        magnitude for the secondary star of a binary system when evolving in BSE mode,\
-         should the star undergo a supernova event, 0 < Value < 1",
-    )
     # --kick-magnitude-1
     velocity_1 = models.FloatField(
         blank=True,
@@ -278,64 +261,6 @@ class SingleBinaryJob(models.Model):
          in BSE mode, should the star undergo a supernova event (km s −1 ), Value > 0",
     )
 
-    # --kick-theta-1
-    theta_1 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0 * math.pi)],
-        help_text="--kick-theta-1: The angle between the orbital plane and the ’z’ \
-        axis of the supernova vector for the for the primary star of a binary system\
-        when evolving in BSE mode, should it undergo a supernova event (radians), \
-        0 < Value < 2pi",
-    )
-    # --kick-theta-2
-    theta_2 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0 * math.pi)],
-        help_text="--kick-theta-2: The angle between the orbital plane and the ’z’ axis\
-         of the supernova vector for the for the secondary star of a binary system when\
-          evolving in BSE mode, should it undergo a supernova event (radians), \
-          0 < Value < 2pi",
-    )
-    # --kick-phi-1
-    phi_1 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0 * math.pi)],
-        help_text="--kick-phi-1: The angle between ’x’ and ’y’, both in the orbital \
-        plane of the supernova vector, for the for the primary star of a binary system \
-        when evolving in BSE mode, should it undergo a supernova event (radians), 0 < Value < 2pi",
-    )
-    # --kick-phi-2
-    phi_2 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0 * math.pi)],
-        help_text="--kick-phi-2: The angle between ’x’ and ’y’, both in the \
-        orbital plane of the supernova vector, for the for the seocndary star \
-        of a binary system when evolving in BSE mode, should it undergo a \
-        supernova event (radians), 0 < Value < 2pi",
-    )
-    # --kick-mean-anomaly-1
-    mean_anomaly_1 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0 * math.pi)],
-        help_text="--kick-mean-anomaly-1: The mean anomaly at the instant of the \
-        supernova for the primary star of a binary system when evolving in BSE mode, \
-        should it undergo a supernova event, 0 < Value < 2pi",
-    )
-    # --kick-mean-anomaly-2
-    mean_anomaly_2 = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0 * math.pi)],
-        help_text="--kick-mean-anomaly-2: The mean anomaly at the instant of the supernova \
-        for the secondary star of a binary system when evolving in BSE mode, should it \
-        undergo a supernova event, 0 < Value < 2pi",
-    )
-
     # common envelope
     # --common-envelope-alpha
     common_envelope_alpha = models.FloatField(
@@ -354,14 +279,6 @@ class SingleBinaryJob(models.Model):
         default=constants.COMMON_ENVELOPE_LAMBDA_PRESCRIPTION_NANJING_VALUE,
         help_text="--common-envelope-lambda-prescription: CE lambda prescription",
     )
-    # --common-envelope-lambda
-    common_envelope_lambda = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=0.1,
-        help_text="--common-envelope-lambda: Common Envelope lambda, Value > 0",
-    )
 
     # supernova
     # --remnant-mass-prescription
@@ -373,6 +290,7 @@ class SingleBinaryJob(models.Model):
         default=constants.REMNANT_MASS_PRESCRIPTION_FRYER2012_VALUE,
         help_text="--remnant-mass-prescription: Remnant mass prescription",
     )
+
     # --fryer-supernova-engine
     fryer_supernova_engine = models.CharField(
         choices=constants.FRYER_SUPERNOVA_ENGINE_CHOICES,
@@ -383,15 +301,7 @@ class SingleBinaryJob(models.Model):
         help_text="--fryer-supernova-engine: Supernova engine type if using \
         the fallback prescription from Fryer et al. (2012)",
     )
-    # --black-hole-kicks
-    black_hole_kicks = models.CharField(
-        choices=constants.BLACK_HOLE_KICKS_CHOICES,
-        max_length=55,
-        blank=True,
-        null=True,
-        default=constants.BLACK_HOLE_KICKS_FALLBACK_VALUE,
-        help_text="--black-hole-kicks: Black hole kicks relative to NS kicks",
-    )
+
     # --kick-magnitude-distribution
     kick_velocity_distribution = models.CharField(
         choices=constants.KICK_VELOCITY_DISTRIBUTION_CHOICES,
@@ -400,110 +310,6 @@ class SingleBinaryJob(models.Model):
         null=True,
         default=constants.KICK_VELOCITY_DISTRIBUTION_MAXWELLIAN,
         help_text="--kick-magnitude-distribution: Natal kick magnitude distribution",
-    )
-    # --kick-magnitude-sigma-CCSN-NS
-    kick_velocity_sigma_CCSN_NS = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=250.0,
-        help_text="--kick-magnitude-sigma-CCSN-NS: Sigma for chosen kick magnitude \
-        distribution for neutron stars (km s − 1 ), Value > 0",
-    )
-    # --kick-magnitude-sigma-CCSN-BH
-    kick_velocity_sigma_CCSN_BH = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=256.0,
-        help_text="--kick-magnitude-sigma-CCSN-BH: Sigma for chosen kick magnitude \
-        distribution for black holes (km s − 1 ), Value > 0",
-    )
-    # --kick-magnitude-sigma-ECSN
-    kick_velocity_sigma_ECSN = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=30.0,
-        help_text="--kick-magnitude-sigma-ECSN: Sigma for chosen kick magnitude \
-        distribution for ECSN (km s − 1 ), Value > 0",
-    )
-    # --kick-magnitude-sigma-USSN
-    kick_velocity_sigma_USSN = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=30.0,
-        help_text="--kick-magnitude-sigma-USSN: Sigma for chosen kick magnitude \
-        distribution for USSN (km s − 1 ), Value > 0",
-    )
-
-    # --pair-instability-supernovae
-    pair_instability_supernovae = models.BooleanField(
-        blank=True,
-        null=True,
-        help_text="--pair-instability-supernovae: Enable pair instability supernovae (PISN)"
-    )
-
-    # --pisn-lower-limit
-    pisn_lower_limit = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=60.0,
-        help_text="--pisn-lower-limit: Minimum core mass for PISN, Value > 0",
-    )
-    # --pisn-upper-limit
-    pisn_upper_limit = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=135.0,
-        help_text="--pisn-upper-limit: Maximum core mass for PISN, \
-        0 < Value >  --pisn-lower-limit",
-    )
-    # --pulsational-pair-instability
-    pulsational_pair_instability_supernovae = models.BooleanField(
-        null=True,
-        blank=True,
-        help_text="--pulsational-pair-instability: Enable mass loss due to \
-        pulsational-pair-instability (PPI)",
-    )
-
-    # --pisn-lower-limit
-    ppi_lower_limit = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=35.0,
-        help_text="--pisn-lower-limit: Minimum core mass for PPI, Value > 0",
-    )
-    # --pisn-upper-limit
-    ppi_upper_limit = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=60.0,
-        help_text="--pisn-upper-limit: Maximum core mass for PPI, \
-        0 < Value > --pisn-lower-limit",
-    )
-    # --pulsational-pair-instability-prescription
-    pulsational_pair_instability_prescription = models.CharField(
-        choices=constants.PULSATIONAL_PAIR_INSTABILITY_PRESCRIPTION_CHOICES,
-        max_length=55,
-        blank=True,
-        null=True,
-        default=constants.PULSATIONAL_PAIR_INSTABILITY_PRESCRIPTION_MARCHANT,
-        help_text="--pulsational-pair-instability-prescription: \
-        Pulsational pair instability prescription",
-    )
-    # --maximum-neutron-star-mass
-    maximum_neutron_star_mass = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=3.0,
-        help_text="--maximum-neutron-star-mass: Maximum mass of a neutron star, Value > 0",
     )
 
     # Mass transfer
@@ -527,6 +333,7 @@ class SingleBinaryJob(models.Model):
         help_text="--mass-transfer-accretion-efficiency-prescription: \
         Mass transfer accretion efficiency prescription",
     )
+
     # Ideally should only appear if using --mass-transfer-accretion-efficiency-prescription FIXED
     # --mass-transfer-fa
     mass_transfer_fa = models.FloatField(
@@ -536,16 +343,6 @@ class SingleBinaryJob(models.Model):
         default=0.5,
         help_text='--mass-transfer-fa: Mass Transfer fraction accreted \
         in FIXED prescription',
-    )
-    # Ideally should only appear if using --mass-transfer-angular-momentum-loss-prescription ARBITRARY
-    # --mass-transfer-jloss
-    mass_transfer_jloss = models.FloatField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0.0)],
-        default=1.0,
-        help_text='--mass-transfer-jloss: Specific angular \
-        momentum with which the non-accreted system leaves the system',
     )
 
     def save(self, *args, **kwargs):
