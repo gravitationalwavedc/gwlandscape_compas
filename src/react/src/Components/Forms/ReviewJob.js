@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Col, Row} from 'react-bootstrap';
 
-const ReviewJob = ({handleSubmit, formik, handleReset}) => {
+const ReviewJob = ({handleSubmit, formik, handleReset, disableButtons}) => {
     const [errors, setErrors] = useState([]);
 
     const submitReview = async () => {
@@ -17,10 +17,10 @@ const ReviewJob = ({handleSubmit, formik, handleReset}) => {
         <React.Fragment>
             {handleSubmit && <Row className="mb-5">
                 <Col md={3}>
-                    <Button onClick={submitReview}>Submit your job</Button>
+                    <Button className={disableButtons?'disabled': ''} onClick={submitReview}>Submit your job</Button>
                 </Col>
                 <Col>
-                    <Button onClick={handleReset}>Reset Form</Button>
+                    <Button className={disableButtons?'disabled': ''} onClick={handleReset}>Reset Form</Button>
                     <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
                 </Col>
             </Row>}

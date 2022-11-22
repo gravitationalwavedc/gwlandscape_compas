@@ -61,6 +61,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
     const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
     const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
     const [myinterval, setMyinterval] = useState(null);
+    const [disableButtons, setDisableButtons] = useState(false);
 
     // This block that checks for plots to be loaded by checking state had to be done in useEffect. That is because
     // changing state using useState hook within setInterval won't be reflected to the component on its own
@@ -70,6 +71,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
             setVanPlotLoaded(false);
             setDetailedPlotLoaded(false);
             setIsLoadingOutput(false);
+            setDisableButtons(false);
         }
     }, [vanPlotLoaded, detailedPlotLoaded, isLoadingOutput]);
 
@@ -86,6 +88,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
         setIsSupernovaCollapsed(true);
         setIsMassTransferCollapsed(true);
         setMyinterval(null);
+        setDisableButtons(false);
     };
     const handleJobSubmission = (values) => {
         Object.entries(values)
@@ -96,6 +99,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
         setDetailedOutputFile('');
         setPlotFile('');
         setIsLoadingOutput(true);
+        setDisableButtons(true);
 
         scrollTo(0, 0);
 
@@ -182,6 +186,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                         values={formik.values}
                         handleSubmit={formik.handleSubmit}
                         handleReset={handleFormReset}
+                        disableButtons={disableButtons}
                     />
                 </Col>
                 <Col md={7}>
