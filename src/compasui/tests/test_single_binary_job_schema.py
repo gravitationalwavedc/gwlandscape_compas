@@ -120,7 +120,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             self.single_binary_job_input
         )
         self.assertEqual(chain()().get.call_count, 2)
-        self.assertFalse(Path(settings.COMPAS_IO_PATH).joinpath("1").exists())
         self.assertEqual(self.expected_failed, response.data)
 
     @patch('compasui.views.chain')

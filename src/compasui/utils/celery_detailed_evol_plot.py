@@ -29,7 +29,7 @@ def main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, 
         makeDetailedPlots(detailed_plot_path, Data, events)
         plotVanDenHeuvel(events=events)
         plt.savefig(vanDenHeuval_plot_path, bbox_inches='tight', pad_inches=0)
-        # plt.show()
+        del Data
     except Exception as e:
         traceback.print_exc()
         raise e
