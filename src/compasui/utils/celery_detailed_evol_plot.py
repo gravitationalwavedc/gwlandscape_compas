@@ -37,7 +37,7 @@ def main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, 
 
 fontparams = {
     "font.serif": "Times New Roman",
-    "text.usetex": "True",
+    "text.usetex": "False",
     "axes.grid": "True",
     "grid.color": "gray",
     "grid.linestyle": ":",
@@ -234,7 +234,7 @@ def plotVanDenHeuvel(events=None):
     if num_events == 1:
         axs = [axs]
     fig.set_figwidth(9)
-    plt.rcParams["text.usetex"] = True  # Use latex
+    plt.rcParams["text.usetex"] = False  # Use latex
 
     for ii in range(num_events):
         img = events[ii].eventImage
