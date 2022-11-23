@@ -14,6 +14,7 @@ ENV VIRTUAL_ENV /src/venv
 
 # Install COMPAS
 RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
+RUN git checkout tags/v02.27.00
 RUN cd /COMPAS/src && make -j`nproc` -f Makefile
 WORKDIR /
 

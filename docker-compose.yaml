@@ -62,7 +62,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/gwlandscape_compas_celery.Dockerfile
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.6
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.7
     restart: always
     environment:
       PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS: "[]"
