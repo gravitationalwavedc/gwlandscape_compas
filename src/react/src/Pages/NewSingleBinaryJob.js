@@ -150,6 +150,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 else{
                     setOutputError('Output could not be generated');
                     setIsLoadingOutput(false);
+                    setDisableButtons(false);
                 }
             },
         });
