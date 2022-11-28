@@ -19,13 +19,14 @@ const ReviewJob = ({handleSubmit, formik, handleReset, disableButtons}) => {
                 <Col md={3}>
                     <Button
                         data-testid="submit-btn"
-                        className={disableButtons?'disabled': ''}
-                        onClick={submitReview}>Submit your job</Button>
+                        onClick={submitReview}
+                        disabled={disableButtons}
+                    >Submit your job</Button>
                 </Col>
                 <Col>
                     <Button
                         data-testid="reset-btn"
-                        className={disableButtons?'disabled': ''}
+                        disabled={disableButtons}
                         onClick={handleReset}>Reset Form</Button>
                     <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
                 </Col>
