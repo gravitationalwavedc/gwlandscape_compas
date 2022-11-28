@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import { Container, Col, Row} from 'react-bootstrap';
+import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
@@ -158,48 +158,83 @@ const NewSingleBinaryJob = ({initialValues}) => {
 
     return (
         <Container fluid>
-            <Row>
-                <Container fluid>
-                    <h1>Evolve a Binary</h1>
-                </Container>
-            </Row>
-            <Row>
-                <Col md={5}>
-                    <BasicParametersForm
-                        formik={formik}
-                        onTitleClick={()=>setIsBasicCollapsed(!isBasicCollapsed)}
-                        collapsed={isBasicCollapsed}/>
-                    <FormCard
-                        title="Supernova & Kick Parameters"
-                        collapsed={isSupernovaCollapsed}
-                        onTitleClick={()=>setIsSupernovaCollapsed(!isSupernovaCollapsed)}>
-                        <SupernovaKickParametersForm formik={formik}/>
-                    </FormCard>
-                    <FormCard
-                        title="Mass Transfer & CE Parameters"
-                        collapsed={isMassTransferCollapsed}
-                        onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}>
-                        <MassTransferCEParameters formik={formik}/>
-                    </FormCard>
-
-                    <ReviewJob
-                        formik={formik}
-                        values={formik.values}
-                        handleSubmit={formik.handleSubmit}
-                        handleReset={handleFormReset}
-                        disableButtons={disableButtons}
-                    />
-                </Col>
-                <Col md={7}>
-                    <JobOutput
-                        detailedplotfilename={plotFile}
-                        vanplotfilename={vanPlotFile}
-                        detailedOutputFileName={detailedOutputFile}
-                        error={outputError}
-                        isLoading={isLoadingOutput}
-                    />
+            <Row className="mt-5">
+                <Col>
+                    <h1>Simulate the evolution of a binary</h1>
+                    <h5>Run a simulation of an evolution of a specific binary. Detailed plots will be automatically generated using COMPAS and available to download.</h5>
                 </Col>
             </Row>
+            <Tab.Container id="single-binary-tabs" defaultActiveKey="binary">
+                <Row>
+                    <Col md={2}>
+                        <Nav fill variant="pills" className="flex-column text-center">
+                            <Nav.Item>
+                                <Nav.Link eventKey="binary">Binary</Nav.Link>
+                            </Nav.Item>
+                            <h5 className="mt-3 mb-0">Advanced settings</h5>
+                            <Nav.Item>
+                                <Nav.Link eventKey="kick">Kick</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="common-envelop">Common Envelop</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="supernova">Supernova</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="mass-transfer">Mass Transfer</Nav.Link>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <Nav.Link eventKey="review">Review</Nav.Link>
+                            </Nav.Item>
+                        </Nav>
+                    </Col>
+                    <Col md={5}>
+                        <Tab.Content>
+                            <Tab.Pane eventKey="binary">
+                                <BasicParametersForm
+                                    formik={formik}
+                                    onTitleClick={()=>setIsBasicCollapsed(!isBasicCollapsed)}
+                                    collapsed={false}/>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="kick">
+                                <FormCard
+                                    title="Supernova & Kick Parameters"
+                                    collapsed={false}
+                                    onTitleClick={()=>setIsSupernovaCollapsed(!isSupernovaCollapsed)}>
+                                    <SupernovaKickParametersForm formik={formik}/>
+                                </FormCard>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="mass-transfer">
+                                <FormCard
+                                    title="Mass Transfer & CE Parameters"
+                                    collapsed={false}
+                                    onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}>
+                                    <MassTransferCEParameters formik={formik}/>
+                                </FormCard>
+                            </Tab.Pane>
+                            <Tab.Pane eventKey="review">
+                                <ReviewJob
+                                    formik={formik}
+                                    values={formik.values}
+                                    handleSubmit={formik.handleSubmit}
+                                    handleReset={handleFormReset}
+                                    disableButtons={disableButtons}
+                                />
+                            </Tab.Pane>
+                        </Tab.Content>
+                    </Col>
+                    <Col md={5}>
+                        <JobOutput
+                            detailedplotfilename={plotFile}
+                            vanplotfilename={vanPlotFile}
+                            detailedOutputFileName={detailedOutputFile}
+                            error={outputError}
+                            isLoading={isLoadingOutput}
+                        />
+                    </Col>
+                </Row>
+            </Tab.Container>
         </Container>
     );
 };
