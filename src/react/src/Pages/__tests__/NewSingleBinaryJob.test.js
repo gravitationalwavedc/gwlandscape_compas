@@ -59,6 +59,7 @@ describe('new single binary job page', () => {
         fireEvent.click(screen.getByText('Submit your job'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+
         global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
 
         expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000);
@@ -102,12 +103,21 @@ describe('new single binary job page', () => {
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
+        // check submit & reset buttons are disable while job is running
+        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).toBeDisabled();
+
         global.environment.mock.resolve(
             operation,
             MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
         );
 
         expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
+
+        // check submit & reset buttons are enabled again after job returns error
+        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).not.toBeDisabled();
+
     });
 
     it('should generate output files when user clicks submit ' +
@@ -123,6 +133,11 @@ describe('new single binary job page', () => {
         fireEvent.click(screen.getByText('Submit your job'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
+
+        // check submit & reset buttons are disabled after submitting the job
+        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).toBeDisabled();
+
 
         global.environment.mock.resolve(
             operation,
@@ -149,6 +164,10 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('van-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"vanPlotFilePath">');
         expect(screen.getByTestId('detailed-plot')).toHaveProperty('src', 'https://gwlandscape.org.au<mock-value-for-field-"plotFilePath">');
         expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
+
+        // check submit & reset buttons are enabled again after job succeeds and plots are generated
+        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).not.toBeDisabled();
 
         //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
         const separationInput = screen.getByLabelText('Separation (AU)');

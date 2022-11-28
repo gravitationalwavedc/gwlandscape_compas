@@ -17,10 +17,17 @@ const ReviewJob = ({handleSubmit, formik, handleReset, disableButtons}) => {
         <React.Fragment>
             {handleSubmit && <Row className="mb-5">
                 <Col md={3}>
-                    <Button className={disableButtons?'disabled': ''} onClick={submitReview}>Submit your job</Button>
+                    <Button
+                        data-testid="submit-btn"
+                        onClick={submitReview}
+                        disabled={disableButtons}
+                    >Submit your job</Button>
                 </Col>
                 <Col>
-                    <Button className={disableButtons?'disabled': ''} onClick={handleReset}>Reset Form</Button>
+                    <Button
+                        data-testid="reset-btn"
+                        disabled={disableButtons}
+                        onClick={handleReset}>Reset Form</Button>
                     <ul>{errors.map(value => <li className="text-danger" key={value}>{value}</li>)}</ul>
                 </Col>
             </Row>}
