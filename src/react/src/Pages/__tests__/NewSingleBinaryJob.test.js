@@ -104,8 +104,8 @@ describe('new single binary job page', () => {
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
         // check submit & reset buttons are disable while job is running
-        expect(screen.getByTestId('submit-btn')).toHaveClass('disabled', false);
-        expect(screen.getByTestId('reset-btn')).toHaveClass('disabled', false);
+        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).toBeDisabled();
 
         global.environment.mock.resolve(
             operation,
@@ -115,8 +115,8 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
 
         // check submit & reset buttons are enabled again after job returns error
-        expect(screen.getByTestId('submit-btn')).not.toHaveClass('disabled');
-        expect(screen.getByTestId('reset-btn')).not.toHaveClass('disabled');
+        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).not.toBeDisabled();
 
     });
 
@@ -135,8 +135,8 @@ describe('new single binary job page', () => {
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
         // check submit & reset buttons are disabled after submitting the job
-        expect(screen.getByTestId('submit-btn')).toHaveClass('disabled', false);
-        expect(screen.getByTestId('reset-btn')).toHaveClass('disabled', false);
+        expect(screen.getByTestId('submit-btn')).toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).toBeDisabled();
 
 
         global.environment.mock.resolve(
@@ -166,8 +166,8 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('download-link')).toHaveProperty('href', 'https://gwlandscape.org.au<mock-value-for-field-"detailedOutputFilePath">');
 
         // check submit & reset buttons are enabled again after job succeeds and plots are generated
-        expect(screen.getByTestId('submit-btn')).not.toHaveClass('disabled');
-        expect(screen.getByTestId('reset-btn')).not.toHaveClass('disabled');
+        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
+        expect(screen.getByTestId('reset-btn')).not.toBeDisabled();
 
         //Clear Separation and add value for OrbitalPeriod to make sure form submits if an input was cleared
         const separationInput = screen.getByLabelText('Separation (AU)');
