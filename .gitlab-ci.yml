@@ -58,7 +58,7 @@ code-quality:
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
-    SP_VERSION: latest
+    SP_VERSION: 0.87.3
   allow_failure: true
   services:
     - docker:stable-dind
