@@ -1,11 +1,12 @@
 import os
 
-from db import get_job_by_id, update_job, delete_job
+from _bundledb import get_job_by_id, create_or_update_job, delete_job
 from scheduler.slurm import slurm_status, SLURM_STATUS
 from scheduler.status import JobStatus
 
 
 def get_submit_status(job):
+
     if 'submit_id' in job:
         _status, info = slurm_status(job['submit_id'])
 
@@ -35,7 +36,7 @@ def get_submit_status(job):
 
         # The batch submission was successful, remove the submit id from the job
         del job['submit_id']
-        update_job(job)
+        create_or_update_job(job)
 
     result = {
         'what': 'submit',
@@ -47,6 +48,7 @@ def get_submit_status(job):
 
 
 def status(details, job_data):
+
     # Get the job
     job = get_job_by_id(details['scheduler_id'])
     if not job:
@@ -57,10 +59,10 @@ def status(details, job_data):
             'info': "Job does not exist. Perhaps it failed to start?"
         }]
 
-        return {
+        return dict({
             'status': result,
             'complete': True
-        }
+        })
 
     # First check if we're waiting for the bash submit script to run
     status = [get_submit_status(job)]
@@ -70,10 +72,10 @@ def status(details, job_data):
 
     # Check if the slurm_ids file exists
     if not os.path.exists(sid_file):
-        return {
+        return dict({
             'status': status,
             'complete': False
-        }
+        })
 
     with open(sid_file, 'r') as f:
         slurm_ids = [line.strip() for line in f.readlines()]
@@ -96,7 +98,7 @@ def status(details, job_data):
             if _status > JobStatus.RUNNING and _status != JobStatus.COMPLETED:
                 delete_job(job)
 
-    return {
+    return dict({
         'status': status,
         'complete': True
-    }
+    })

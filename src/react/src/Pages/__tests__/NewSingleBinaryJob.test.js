@@ -138,7 +138,6 @@ describe('new single binary job page', () => {
         expect(screen.getByTestId('submit-btn')).toBeDisabled();
         expect(screen.getByTestId('reset-btn')).toBeDisabled();
 
-
         global.environment.mock.resolve(
             operation,
             MockPayloadGenerator.generate(operation)
