@@ -31,9 +31,9 @@ SLURM_STATUS = {
 
 def slurm_submit(script, working_directory):
     """
-    Used to submit a job on the cluster
+    Used to utils a job on the cluster
 
-    :param script: The slurm script to submit
+    :param script: The slurm script to utils
     :return: An integer identifier for the submitted job
     """
 

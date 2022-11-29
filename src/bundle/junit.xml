@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite name="tests.test_submit_single.TestSubmitSingle-20221130084010" tests="1" file="tests/test_submit_single.py" time="0.008" timestamp="2022-11-30T08:40:10" failures="1" errors="0" skipped="0">
+		<testcase classname="tests.test_submit_single.TestSubmitSingle" name="test_submit_single" time="0.008" timestamp="2022-11-30T08:40:10" file="tests/test_submit_single.py" line="5">
+			<failure type="AssertionError" message="1 is not false"><![CDATA[Traceback (most recent call last):
+  File "/home/lewis/Projects/gwdc/gwlandscape-compas/src/bundle/tests/test_submit_single.py", line 6, in test_submit_single
+    self.assertFalse(1)
+AssertionError: 1 is not false
+]]></failure>
+		</testcase>
+	</testsuite>
+</testsuites>

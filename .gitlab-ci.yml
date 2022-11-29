@@ -8,7 +8,7 @@ default:
     - apt -y update
     - apt -y upgrade
     - apt -y install texlive-latex-extra cm-super dvipng
-    - apt -y install apt-utils net-tools python3.8 python3-pip git curl g++ libboost-all-dev libgsl-dev libhdf5-serial-dev
+    - apt -y install apt-utils net-tools python3.8 python3-venv python3-pip git curl g++ libboost-all-dev libgsl-dev libhdf5-serial-dev
     - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
     - export WD=`pwd`
     - git clone https://github.com/TeamCOMPAS/COMPAS.git
@@ -58,7 +58,7 @@ code-quality:
   image: docker:stable
   variables:
     DOCKER_DRIVER: overlay2
-    SP_VERSION: 0.85.26
+    SP_VERSION: latest
   allow_failure: true
   services:
     - docker:stable-dind
@@ -81,3 +81,20 @@ flake8:
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
+
+bundle-tests:
+  stage: test
+  script:
+    - cd src/bundle/
+    - python3 -m venv venv
+    - . venv/bin/activate; pip install -r requirements.txt
+    - . venv/bin/activate; coverage run -m xmlrunner discover --output-file ./junit.xml
+    - . venv/bin/activate; coverage xml
+
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: src/bundle/coverage.xml
+      junit: src/bundle/junit.xml
+

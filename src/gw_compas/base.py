@@ -171,21 +171,4 @@ GRAPHQL_JWT = {
 GWCLOUD_JOB_CONTROLLER_API_URL = "https://gwcloud.org.au/job/apiv1"
 GWCLOUD_AUTH_API_URL = "http://localhost:8000/graphql"
 
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_TASK_SOFT_TIME_LIMIT = 60
-CELERY_TASK_TIME_LIMIT = 70
-
-COMPAS_IO_PATH = os.path.join(MEDIA_ROOT, 'jobs/')
-
-# COMPAS Python Submit command for Celery task
-# TODO update these settigs to work with COMPAS running in Docker container
-RUN_COMPAS_COMMAND = [
-    'python3',
-    os.path.join(BASE_DIR, 'compasui/utils/celery_pythonSubmit.py'),
-]
-
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []

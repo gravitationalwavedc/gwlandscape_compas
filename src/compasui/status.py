@@ -1,7 +1,7 @@
 class JobStatus:
     # A job that is currently in draft state - it is not yet submitted
     DRAFT = 0
-    # A job is pending if it is currently waiting for a cluster to submit the job to
+    # A job is pending if it is currently waiting for a cluster to utils the job to
     # (ie, all available clusters are offline)
     PENDING = 10
     # A job is submitting if the job has been submitted but is waiting for the client to acknowledge it has received

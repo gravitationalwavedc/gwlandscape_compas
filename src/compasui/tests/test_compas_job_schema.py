@@ -35,7 +35,7 @@ class TestCompasJobSchema(CompasTestCase):
             }
         }
 
-    @patch('compasui.views.requests')
+    @patch('requests.request')
     def test_create_compas_job_success(self, request_mock):
 
         mock_response = Mock()
@@ -43,7 +43,7 @@ class TestCompasJobSchema(CompasTestCase):
         mock_response.content = b'{"jobId":441}'
         mock_response.headers = "headers"
 
-        request_mock.request.return_value = mock_response
+        request_mock.return_value = mock_response
 
         self.client.authenticate(self.user)
 
@@ -64,7 +64,7 @@ class TestCompasJobSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
         self.assertEqual(CompasJob.objects.all().count(), 1)
 
-    @patch('compasui.views.requests')
+    @patch('requests.request')
     def test_create_compas_job_job_controller_fail(self, request_mock):
 
         mock_response = Mock()
@@ -72,7 +72,7 @@ class TestCompasJobSchema(CompasTestCase):
         mock_response.content = "Bad request"
         mock_response.headers = "headers"
 
-        request_mock.request.side_effect = mock_response
+        request_mock.side_effect = mock_response
 
         self.client.authenticate(self.user)
 

@@ -13,7 +13,7 @@ def get_submit_status(job):
         # If the job is a state less than or equal to running, return it's state
         if _status <= JobStatus.RUNNING:
             result = {
-                'what': 'submit',
+                'what': 'utils',
                 'status': _status,
                 'info': info
             }
@@ -27,19 +27,19 @@ def get_submit_status(job):
 
             # Report the error
             result = {
-                'what': 'submit',
+                'what': 'utils',
                 'status': _status,
                 'info': info
             }
 
             return result
 
-        # The batch submission was successful, remove the submit id from the job
+        # The batch submission was successful, remove the utils id from the job
         del job['submit_id']
         create_or_update_job(job)
 
     result = {
-        'what': 'submit',
+        'what': 'utils',
         'status': JobStatus.COMPLETED,
         'info': "Completed"
     }
@@ -64,7 +64,7 @@ def status(details, job_data):
             'complete': True
         })
 
-    # First check if we're waiting for the bash submit script to run
+    # First check if we're waiting for the bash utils script to run
     status = [get_submit_status(job)]
 
     # Get the path to the slurm id's file

@@ -1,7 +1,3 @@
-import os
-from pathlib import Path
-
-from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
@@ -9,7 +5,6 @@ from .utils import constants
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.jobs.request_file_list import request_file_list
 from .utils.jobs.request_job_status import request_job_status
-# from .variables import compas_parameters
 
 
 class Label(models.Model):
@@ -90,6 +85,7 @@ class CompasJob(models.Model):
             advanced[p.name] = p.value
 
         return dict(
+            type="multi",
             name=self.name,
             description=self.description,
             basic=basic,
@@ -344,16 +340,25 @@ class SingleBinaryJob(models.Model):
         in FIXED prescription',
     )
 
+    # When the single binary job was created - so we can clean up old jobs
+    created = models.DateTimeField(auto_now_add=True)
+
+    # The content of the BSE_grid.txt file to save some client side work
+    bse_grid_content = models.TextField()
+
+    # The job controller id
+    job_controller_id = models.BigIntegerField(null=True, default=None)
+
     def save(self, *args, **kwargs):
         """
         overwrites default save model behavior
         """
+        self._save_bse_grid_file()
         super().save(*args, **kwargs)
-        self.save_BSE_Grid_file()
 
-    def save_BSE_Grid_file(self):
+    def _save_bse_grid_file(self):
         """
-        saves initial parameters and advanced settings in BSE_grid.txt file to filesystem
+        Generate initial parameters and advanced settings for the BSE_grid.txt file
         """
         content = ""
 
@@ -363,17 +368,10 @@ class SingleBinaryJob(models.Model):
             if (field_value is not None) and (field.name in constants.FIELD_COMMANDS):
                 content += f'{constants.FIELD_COMMANDS[field.name]} {field_value}' + " "
 
-        # path where the file is saved: media_root/job_key
-        storage_location = Path(settings.COMPAS_IO_PATH).joinpath(str(self.id))
+        self.bse_grid_content = content
 
-        # create directory
-        if not os.path.exists(storage_location):
-            os.makedirs(
-                storage_location,
-            )
-        # name parameter file
-        grid_file_path = Path(storage_location).joinpath('BSE_grid.txt')
-
-        # write parameters string to file
-        with open(grid_file_path, 'w') as f:
-            f.write(content)
+    def as_json(self):
+        return dict(
+            type="single",
+            bse_grid_file=self.bse_grid_content
+        )

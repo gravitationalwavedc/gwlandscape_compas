@@ -285,6 +285,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **input):
         try:
             job = create_single_binary_job(
+                user=info.context.user,
                 mass1=input.get("mass1"),
                 mass2=input.get("mass2"),
                 metallicity=input.get("metallicity"),

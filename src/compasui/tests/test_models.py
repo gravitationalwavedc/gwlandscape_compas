@@ -34,6 +34,7 @@ class TestModels(TestCase):
         advanced.save()
 
         self.assertDictEqual(job.as_json(), {
+            "type": "multi",
             "name": "first job",
             "description": "first job description",
             "basic": {

@@ -9,15 +9,6 @@ temp_output_dir = TemporaryDirectory()
 
 @override_settings(COMPAS_IO_PATH=temp_output_dir.name)
 class TestSingleBinaryJobModel(testcases.TestCase):
-
-    def grid_file_is_created_successfully(self, job_id, expected_text):
-        grid_file_path = Path(f'{settings.COMPAS_IO_PATH}/{job_id}/BSE_grid.txt')
-        self.assertEqual(SingleBinaryJob.objects.count(), 1)
-        self.assertTrue(grid_file_path.exists())
-        with open(grid_file_path) as f:
-            content = f.read()
-            self.assertEqual(content, expected_text)
-
     def test_create_with_defaults(self):
         job = SingleBinaryJob(
             mass1=1.5,
@@ -34,7 +25,7 @@ class TestSingleBinaryJobModel(testcases.TestCase):
                                 "--mass-transfer-accretion-efficiency-prescription THERMAL --mass-transfer-fa 0.5 "
 
         job.save()
-        self.grid_file_is_created_successfully(job.id, expected_gridfiletext)
+        self.assertEqual(job.bse_grid_content, expected_gridfiletext)
 
     def test_create_with_null_values(self):
         job = SingleBinaryJob(
@@ -55,7 +46,7 @@ class TestSingleBinaryJobModel(testcases.TestCase):
                                 "--mass-transfer-accretion-efficiency-prescription THERMAL --mass-transfer-fa 0.5 "
 
         job.save()
-        self.grid_file_is_created_successfully(job.id, expected_gridfiletext)
+        self.assertEqual(job.bse_grid_content, expected_gridfiletext)
 
     def test_create_with_orbital_value_provided(self):
         job = SingleBinaryJob(
@@ -76,4 +67,4 @@ class TestSingleBinaryJobModel(testcases.TestCase):
                                 "--mass-transfer-accretion-efficiency-prescription THERMAL --mass-transfer-fa 0.5 "
 
         job.save()
-        self.grid_file_is_created_successfully(job.id, expected_gridfiletext)
+        self.assertEqual(job.bse_grid_content, expected_gridfiletext)
