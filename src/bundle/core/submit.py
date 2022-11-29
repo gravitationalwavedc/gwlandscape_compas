@@ -4,7 +4,7 @@ import shutil
 from pathlib import Path
 
 from core.misc import working_directory
-from db import get_unique_job_id, update_job
+from _bundledb import create_or_update_job
 from scheduler.slurm import slurm_submit
 
 
@@ -137,10 +137,10 @@ def submit(details, input_params):
         Path(run_dir).mkdir()
         shutil.copyfile(PYTHONSUBMITPATH, Path(run_dir) / f'runSubmit_{i+1}.py')
 
-        nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
+        # nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
 
-        start_seed = (i+1) * nsysi
-        seed_file = Path(run_dir) / 'randomSeed.txt'
+        start_seed = (i+1) * nsys_per_patch
+        seed_file = Path(run_dir).joinpath('randomSeed.txt')
         with open(seed_file, 'w') as f:
             f.write(str(start_seed))
 
@@ -167,14 +167,14 @@ def submit(details, input_params):
 
     # Create a new job to store details
     job = {
-        'job_id': get_unique_job_id(),
+        'job_id': 0,
         'submit_id': submit_bash_id,
         'working_directory': wk_dir,
         'submit_directory': submit_dir_name
     }
 
     # Save the job in the database
-    update_job(job)
+    create_or_update_job(job)
 
     # return the job id
     return job['job_id']
