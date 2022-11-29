@@ -7,6 +7,7 @@ import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import JobOutput from '../Components/Results/JobOutput';
+import SingleBinaryTab from '../Components/SingleBinaryTab';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
 import FormCard from '../Components/Forms/FormCard';
@@ -90,6 +91,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
         setMyinterval(null);
         setDisableButtons(false);
     };
+
     const handleJobSubmission = (values) => {
         Object.entries(values)
             .filter(([key, value]) => value === '')
@@ -165,7 +167,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 </Col>
             </Row>
             <Tab.Container id="single-binary-tabs" defaultActiveKey="binary">
-                <Row>
+                <Row className="mt-4">
                     <Col md={2}>
                         <Nav fill variant="pills" className="flex-column text-center">
                             <Nav.Item>
@@ -173,56 +175,32 @@ const NewSingleBinaryJob = ({initialValues}) => {
                             </Nav.Item>
                             <h5 className="mt-3 mb-0">Advanced settings</h5>
                             <Nav.Item>
-                                <Nav.Link eventKey="kick">Kick</Nav.Link>
+                                <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="common-envelop">Common Envelop</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="supernova">Supernova</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="mass-transfer">Mass Transfer</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="review">Review</Nav.Link>
+                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br/>Common Envelop</Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
                     <Col md={5}>
-                        <Tab.Content>
-                            <Tab.Pane eventKey="binary">
-                                <BasicParametersForm
-                                    formik={formik}
-                                    onTitleClick={()=>setIsBasicCollapsed(!isBasicCollapsed)}
-                                    collapsed={false}/>
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="kick">
-                                <FormCard
-                                    title="Supernova & Kick Parameters"
-                                    collapsed={false}
-                                    onTitleClick={()=>setIsSupernovaCollapsed(!isSupernovaCollapsed)}>
-                                    <SupernovaKickParametersForm formik={formik}/>
-                                </FormCard>
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="mass-transfer">
-                                <FormCard
-                                    title="Mass Transfer & CE Parameters"
-                                    collapsed={false}
-                                    onTitleClick={()=>setIsMassTransferCollapsed(!isMassTransferCollapsed)}>
-                                    <MassTransferCEParameters formik={formik}/>
-                                </FormCard>
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="review">
-                                <ReviewJob
-                                    formik={formik}
-                                    values={formik.values}
-                                    handleSubmit={formik.handleSubmit}
-                                    handleReset={handleFormReset}
-                                    disableButtons={disableButtons}
-                                />
-                            </Tab.Pane>
+                        <Tab.Content className="mt-2">
+                            <SingleBinaryTab title="Binary" eventKey="binary">
+                                <BasicParametersForm formik={formik} />
+                            </SingleBinaryTab>
+                            <SingleBinaryTab title="Supernova & Kick" eventKey="kick">
+                                <SupernovaKickParametersForm formik={formik} />
+                            </SingleBinaryTab>
+                            <SingleBinaryTab title="Mass Transfer & Common Envelop" eventKey="mass-transfer">
+                                <MassTransferCEParameters formik={formik}/>
+                            </SingleBinaryTab>
                         </Tab.Content>
+                        <ReviewJob
+                            formik={formik}
+                            values={formik.values}
+                            handleSubmit={formik.handleSubmit}
+                            handleReset={handleFormReset}
+                            disableButtons={disableButtons}
+                        />
                     </Col>
                     <Col md={5}>
                         <JobOutput

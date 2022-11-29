@@ -15,15 +15,14 @@ const ReviewJob = ({handleSubmit, formik, handleReset, disableButtons}) => {
 
     return (
         <React.Fragment>
-            {handleSubmit && <Row className="mb-5">
-                <Col md={3}>
+            {handleSubmit && <Row>
+                <Col>
                     <Button
                         data-testid="submit-btn"
                         onClick={submitReview}
                         disabled={disableButtons}
-                    >Submit your job</Button>
-                </Col>
-                <Col>
+                        className="mr-3"
+                    >Start Simulation</Button>
                     <Button
                         data-testid="reset-btn"
                         disabled={disableButtons}
