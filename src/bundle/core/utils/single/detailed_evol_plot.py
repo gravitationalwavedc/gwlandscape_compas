@@ -15,7 +15,7 @@ from matplotlib import rcParams
 compasRootDir = os.path.expandvars(os.environ['COMPAS_ROOT_DIR'])
 
 
-def main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
+def plotting_main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
     try:
         Data = h5.File(detailed_output_file_path, 'r')
 
@@ -617,7 +617,3 @@ def printFormattedEvolutionLine(time, event, m1, t1, m2, t2, a, e):
     evol_line = "{:10.6f}   {:31}  {:7.3f}    {:2}    {:7.3f}    {:2}   {:8.3f}  {:5.3f}"\
         .format(time, event, m1, t1, m2, t2, a, e)
     return evol_line
-
-
-if __name__ == "__main__":
-    main()

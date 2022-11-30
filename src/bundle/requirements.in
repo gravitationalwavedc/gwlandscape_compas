@@ -1,0 +1,11 @@
+# CI/Testing
+coverage
+unittest-xml-reporting
+
+# Misc
+pip-tools
+
+# Required by single binary plotting
+numpy
+h5py
+matplotlib
