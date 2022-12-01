@@ -1,6 +1,6 @@
 import React from 'react';
 import { MockPayloadGenerator } from 'relay-test-utils';
-import {screen, render, fireEvent, waitFor, act} from '@testing-library/react';
+import { screen, render, fireEvent, waitFor, act } from '@testing-library/react';
 import NewSingleBinaryJob from '../NewSingleBinaryJob';
 import 'regenerator-runtime/runtime';
 import userEvent from '@testing-library/user-event';
@@ -56,7 +56,7 @@ describe('new single binary job page', () => {
 
         const mockRequest = mockXMLHttpRequest(404);
         render(<NewSingleBinaryJob router={global.router}/>);
-        fireEvent.click(screen.getByText('Submit your job'));
+        fireEvent.click(screen.getByTestId('submit-btn'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
@@ -99,7 +99,7 @@ describe('new single binary job page', () => {
         expect.hasAssertions();
 
         render(<NewSingleBinaryJob router={global.router}/>);
-        fireEvent.click(screen.getByText('Submit your job'));
+        fireEvent.click(screen.getByTestId('submit-btn'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
@@ -130,7 +130,7 @@ describe('new single binary job page', () => {
         const mockRequest = mockXMLHttpRequest(200);
 
         render(<NewSingleBinaryJob router={global.router}/>);
-        fireEvent.click(screen.getByText('Submit your job'));
+        fireEvent.click(screen.getByTestId('submit-btn'));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
@@ -173,7 +173,7 @@ describe('new single binary job page', () => {
         const orbitalInput = screen.getByLabelText('Orbital Period (days)');
         fireEvent.change(separationInput, {target: {value:''}});
         fireEvent.change(orbitalInput, {target: {value:1.3}});
-        await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
+        await waitFor(() => userEvent.click(screen.getByTestId('submit-btn')));
 
         const operation1 = await waitFor(() => global.environment.mock.getMostRecentOperation());
         global.environment.mock.resolve(operation1, MockPayloadGenerator.generate(operation1));
@@ -193,8 +193,7 @@ describe('new single binary job page', () => {
         jest.useRealTimers();
     });
 
-    it('should run the job successfully when orbitalPeriod is used instead of separation ' +
-        'then there should be no validation errors for any empty number parameters', async () => {
+    it('should run the job when orbitalPeriod is used with no validation errors', async () => {
         expect.hasAssertions();
 
         jest.useFakeTimers();
@@ -211,7 +210,7 @@ describe('new single binary job page', () => {
         userEvent.clear(screen.getByTestId('velocity1'));
         userEvent.clear(screen.getByTestId('velocity2'));
 
-        await waitFor(() => userEvent.click(screen.getByText('Submit your job')));
+        await waitFor(() => userEvent.click(screen.getByTestId('submit-btn')));
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
         global.environment.mock.resolve(operation, MockPayloadGenerator.generate(operation));
@@ -236,4 +235,3 @@ describe('new single binary job page', () => {
         jest.useRealTimers();
     });
 });
-
