@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import {commitMutation} from 'relay-runtime';
-import {graphql} from 'react-relay';
-import {harnessApi} from '../index';
+import { commitMutation } from 'relay-runtime';
+import { graphql } from 'react-relay';
+import { harnessApi } from '../index';
 import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
@@ -31,7 +31,7 @@ const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
 const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
-const NewSingleBinaryJob = ({initialValues}) => {
+const NewSingleBinaryJob = ({ initialValues }) => {
 
     const formik = useFormik({
         initialValues: initialValues,
