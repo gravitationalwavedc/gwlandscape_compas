@@ -60,8 +60,19 @@ const NewJob = ({initialValues, router}) => {
                     semiMajorAxisDistribution: values.semiMajorAxisDistribution,
                     minOrbitalPeriod: values.minOrbitalPeriod,
                     maxOrbitalPeriod: values.maxOrbitalPeriod,
+                },
+                advancedParameters: {
+                    massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
+                    massTransferAccretionEfficiencyPrescription: values.massTransferAccretionEfficiencyPrescription,
+                    massTransferFa: values.massTransferFa,
+                    commonEnvelopeAlpha: values.commonEnvelopeAlpha,
+                    commonEnvelopeLambdaPrescription: values.commonEnvelopeLambdaPrescription,
+                    remnantMassPrescription: values.remnantMassPrescription,
+                    fryerSupernovaEngine: values.fryerSupernovaEngine,
+                    kickVelocityDistribution: values.kickVelocityDistribution,
+                    velocity1: values.velocity1,
+                    velocity2: values.velocity2,
                 }
-
             }
         };
 

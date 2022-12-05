@@ -7,12 +7,12 @@ import requests
 from django.conf import settings
 from django.db import transaction
 
-from .models import CompasJob, Label, SingleBinaryJob, BasicParameter
+from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
 from .tasks import run_compas
 from .utils.constants import TASK_FAIL, TASK_TIMEOUT
 
 
-def create_compas_job(user, start, basic_parameters):
+def create_compas_job(user, start, basic_parameters, advanced_parameters):
 
     with transaction.atomic():
         compas_job = CompasJob(
@@ -25,6 +25,9 @@ def create_compas_job(user, start, basic_parameters):
         compas_job.save()
         for name, value in basic_parameters.items():
             BasicParameter(job=compas_job, name=name, value=value).save()
+
+        for name, value in advanced_parameters.items():
+            AdvancedParameter(job=compas_job, name=name, value=value).save()
 
         # Submit the job to the job controller
         # Create the jwt token
@@ -39,6 +42,7 @@ def create_compas_job(user, start, basic_parameters):
 
         # Create the parameter json
         params = compas_job.as_json()
+        print(params)
 
         # Construct the request parameters to the job controller, note that parameters must be a string, not an objects
         data = {
