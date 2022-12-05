@@ -30,7 +30,7 @@ class TestCompasJobSchema(CompasTestCase):
                     'private': 'true'
                 },
                 'basicParameters': {
-                    'metallicity': '0.01'
+                    'numberOfSystems': '100'
                 }
             }
         }

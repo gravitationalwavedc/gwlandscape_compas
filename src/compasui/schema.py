@@ -121,7 +121,7 @@ populate_fields(
         "min_initial_mass",
         "max_initial_mass",
         "initial_mass_function",
-        "metallicity",
+        "initial_mass_power",
         "min_metallicity",
         "max_metallicity",
         "metallicity_distribution",
@@ -130,7 +130,9 @@ populate_fields(
         "mass_ratio_distribution",
         "min_semi_major_axis",
         "max_semi_major_axis",
-        "semi_major_axis_distribution"
+        "semi_major_axis_distribution",
+        "min_orbital_period",
+        "max_orbital_period",
     ],
     parameter_resolvers
 )
@@ -180,7 +182,7 @@ class BasicParametersInput(graphene.InputObjectType):
     min_initial_mass = graphene.String()
     max_initial_mass = graphene.String()
     initial_mass_function = graphene.String()
-    metallicity = graphene.String()
+    initial_mass_power = graphene.String()
     min_metallicity = graphene.String()
     max_metallicity = graphene.String()
     metallicity_distribution = graphene.String()
@@ -190,6 +192,12 @@ class BasicParametersInput(graphene.InputObjectType):
     min_semi_major_axis = graphene.String()
     max_semi_major_axis = graphene.String()
     semi_major_axis_distribution = graphene.String()
+    min_orbital_period = graphene.String()
+    max_orbital_period = graphene.String()
+
+# class AdvancedParametersInput(graphene.InputObjectType):
+#     mass_transfer_angular_momentum_loss_prescription = graphene.String()
+#     massTransferAccretionEfficiencyPrescription = graphene.String
 
 
 class CompasJobCreationResult(graphene.ObjectType):

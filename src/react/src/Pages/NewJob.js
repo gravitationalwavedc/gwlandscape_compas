@@ -48,7 +48,7 @@ const NewJob = ({initialValues, router}) => {
                     minInitialMass: values.minInitialMass,
                     maxInitialMass: values.maxInitialMass,
                     initialMassFunction: values.initialMassFunction,
-                    metallicity: values.metallicity,
+                    intialMassPower: values.intialMassPower,
                     metallicityDistribution: values.metallicityDistribution,
                     minMetallicty: values.minMetallicty,
                     maxMetallicity: values.maxMetallicity,
@@ -57,7 +57,9 @@ const NewJob = ({initialValues, router}) => {
                     massRatioDistribution: values.massRatioDistribution,
                     minSemiMajorAxis: values.minSemiMajorAxis,
                     maxSemiMajorAxis: values.maxSemiMajorAxis,
-                    semiMajorAxisDistribution: values.semiMajorAxisDistribution
+                    semiMajorAxisDistribution: values.semiMajorAxisDistribution,
+                    minOrbitalPeriod: values.minOrbitalPeriod,
+                    maxOrbitalPeriod: values.maxOrbitalPeriod,
                 }
 
             }
