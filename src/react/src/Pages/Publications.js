@@ -5,6 +5,7 @@ import { HiOutlineSearch } from 'react-icons/hi';
 import PublicationList from '../Components/PublicationList';
 import searchPublications from '../Utils/searchPublications';
 
+
 const Publications = ({data, match, router}) => {
     const [search, setSearch] = useState('');
     const [publications, setPublications] = useState();
@@ -36,7 +37,8 @@ const Publications = ({data, match, router}) => {
                                         <HiOutlineSearch />
                                     </InputGroup.Text>
                                 </InputGroup.Prepend>
-                                <Form.Control 
+                                <Form.Control
+                                    className="text-left"
                                     placeholder="Search by Author, Title, Keyword or Publication Date" 
                                     value={search} 
                                     onChange={({target}) => setSearch(target.value)} />
