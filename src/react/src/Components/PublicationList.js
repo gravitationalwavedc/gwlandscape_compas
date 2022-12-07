@@ -1,7 +1,6 @@
 import React from 'react';
 import PublicationCard from './PublicationCard';
 
-
 const PublicationList = ({publications, match, router}) => 
     <>
         {
