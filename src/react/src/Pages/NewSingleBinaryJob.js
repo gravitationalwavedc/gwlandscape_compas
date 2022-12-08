@@ -16,7 +16,6 @@ import RenderLengthContainer from '../Components/Plots/RenderLengthContainer';
 import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContainer';
 import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
 
-
 const submitMutation = graphql`
   mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
     newSingleBinary(input: $input) {
