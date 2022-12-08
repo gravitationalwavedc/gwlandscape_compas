@@ -116,7 +116,7 @@ class CompasModel(models.Model):
 
 
 class CompasDatasetModel(models.Model):
-    compas_publication = models.ForeignKey(CompasPublication, models.CASCADE)
+    compas_publication = models.ForeignKey(CompasPublication, models.CASCADE, related_name='dataset_models')
     compas_model = models.ForeignKey(CompasModel, models.CASCADE)
     file = models.FileField(upload_to=job_directory_path, blank=True, null=True)
 

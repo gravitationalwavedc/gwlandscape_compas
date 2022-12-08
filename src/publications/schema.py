@@ -41,6 +41,7 @@ class CompasPublicationNode(DjangoObjectType):
             'journal',
             'journal_doi',
             'dataset_doi',
+            'dataset_models',
             'creation_time',
             'description',
             'public',
