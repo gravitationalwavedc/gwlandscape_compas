@@ -6,13 +6,15 @@ import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
-import JobOutput from '../Components/Results/JobOutput';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
-import FormCard from '../Components/Forms/FormCard';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
+import RenderMassContainer from "../Components/Plots/RenderMassContainer";
+import RenderLengthContainer from "../Components/Plots/RenderLengthContainer";
+import RenderHRDiagramContainer from "../Components/Plots/RenderHRDiagramContainer";
+import VanDenHeuvel from "../Components/Plots/VanDenHeuvel";
 
 
 const submitMutation = graphql`
@@ -58,11 +60,9 @@ const NewSingleBinaryJob = ({ initialValues }) => {
     const [detailedPlotLoaded, setDetailedPlotLoaded] = useState(false);
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    const [isBasicCollapsed, setIsBasicCollapsed] = useState(false);
-    const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
-    const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
     const [myinterval, setMyinterval] = useState(null);
     const [disableButtons, setDisableButtons] = useState(false);
+    let syncId = null; 
 
     // This block that checks for plots to be loaded by checking state had to be done in useEffect. That is because
     // changing state using useState hook within setInterval won't be reflected to the component on its own
@@ -163,7 +163,10 @@ const NewSingleBinaryJob = ({ initialValues }) => {
             <Row className="mt-5">
                 <Col>
                     <h1>Simulate the evolution of a binary</h1>
-                    <h5>Run a simulation of an evolution of a specific binary. Detailed plots will be automatically generated using COMPAS and available to download.</h5>
+                    <h5>
+                        Run a simulation of an evolution of a specific binary. 
+                        Detailed plots will be automatically generated using COMPAS and available to download.
+                    </h5>
                 </Col>
             </Row>
             <Tab.Container id="single-binary-tabs" defaultActiveKey="binary">
@@ -182,7 +185,7 @@ const NewSingleBinaryJob = ({ initialValues }) => {
                             </Nav.Item>
                         </Nav>
                     </Col>
-                    <Col md={5}>
+                    <Col md={4}>
                         <Tab.Content className="mt-2">
                             <SingleBinaryTab title="Binary" eventKey="binary">
                                 <BasicParametersForm formik={formik} />
@@ -202,14 +205,17 @@ const NewSingleBinaryJob = ({ initialValues }) => {
                             disableButtons={disableButtons}
                         />
                     </Col>
-                    <Col md={5}>
-                        <JobOutput
-                            detailedplotfilename={plotFile}
-                            vanplotfilename={vanPlotFile}
-                            detailedOutputFileName={detailedOutputFile}
-                            error={outputError}
-                            isLoading={isLoadingOutput}
-                        />
+                    <Col md={6}>
+                      <VanDenHeuvel /> 
+                      <br />
+                      <div className="plotContainer">
+                        <RenderMassContainer className="container" syncId={syncId} />
+                        <br />
+                        <RenderLengthContainer className="container" syncId={syncId} />
+                        <br />
+                        <br />
+                        <RenderHRDiagramContainer className="container" syncId={syncId} />
+                      </div>
                     </Col>
                 </Row>
             </Tab.Container>
