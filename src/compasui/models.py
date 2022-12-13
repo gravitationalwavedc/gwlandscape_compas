@@ -360,8 +360,8 @@ class SingleBinaryJob(models.Model):
         for field in self._meta.get_fields():
 
             field_value = getattr(self, field.name)
-            if (field_value is not None) and (field.name in constants.FIELD_COMMANDS):
-                content += f'{constants.FIELD_COMMANDS[field.name]} {field_value}' + " "
+            if (field_value is not None) and (field.name in constants.SINGLE_BINARY_FIELD_COMMANDS):
+                content += f'{constants.SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value}' + " "
 
         # path where the file is saved: media_root/job_key
         storage_location = Path(settings.COMPAS_IO_PATH).joinpath(str(self.id))

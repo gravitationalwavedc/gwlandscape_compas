@@ -2,7 +2,7 @@
 #### Django Server side
 - Add field to Django model `SingleBinaryJob` in `src/compasui/models.py`
 - To add the parameter to the Grid file that is passed to COMPAS
-  * In `src/compasui/utils/constants.py`, map field name to a COMPAS parameter in `FIELD_COMMANDS` dictionary
+  * In `src/compasui/utils/constants.py`, map field name to a COMPAS parameter in `SINGLE_BINARY_FIELD_COMMANDS` dictionary
 - `makemigrations` and `migrate`
 - Modify the view that maps inputs to model fields and saves the model `create_single_binary_job` in 
 `src/compasui/views`
