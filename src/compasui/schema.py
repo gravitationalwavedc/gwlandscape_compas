@@ -200,9 +200,6 @@ class CompasJobCreationResult(graphene.ObjectType):
 class SingleBinaryJobCreationResult(graphene.ObjectType):
     job_id = graphene.String()
     json_data = graphene.String()
-    grid_file_path = graphene.String()
-    plot_file_path = graphene.String()
-    van_plot_file_path = graphene.String()
     detailed_output_file_path = graphene.String()
 
 
@@ -316,11 +313,6 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 result=SingleBinaryJobCreationResult(
                     job_id=job.id,
                     json_data=json_data,
-                    plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
-                                   f'/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
-                    grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
-                    van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
-                                       f'/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
                     detailed_output_file_path=detailed_output_file_path
                 )
             )
@@ -329,8 +321,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             print("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
-                    job_id='', json_data=None, plot_file_path='', grid_file_path='',
-                    van_plot_file_path='', detailed_output_file_path=''))
+                    job_id='', json_data=None, detailed_output_file_path=''))
 
 
 class Mutation(graphene.ObjectType):
