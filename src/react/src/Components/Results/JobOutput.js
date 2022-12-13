@@ -4,7 +4,6 @@ import FormCard from '../Forms/FormCard';
 
 
 const JobOutput = (props) => {
-    // const filename = props.gridfileName;
     const detailedplot = props.detailedplotfilename;
     const vanplot = props.vanplotfilename;
     const detailedoutput = props.detailedOutputFileName;

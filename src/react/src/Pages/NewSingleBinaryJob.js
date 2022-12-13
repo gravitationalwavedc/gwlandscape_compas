@@ -10,7 +10,7 @@ import JobOutput from '../Components/Results/JobOutput';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
-import FormCard from '../Components/Forms/FormCard';
+// import FormCard from '../Components/Forms/FormCard';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
 
@@ -20,6 +20,7 @@ const submitMutation = graphql`
     newSingleBinary(input: $input) {
       result {
         jobId
+        jsonData
         gridFilePath
         plotFilePath
         vanPlotFilePath
@@ -54,13 +55,14 @@ const NewSingleBinaryJob = ({initialValues}) => {
     const [plotFile, setPlotFile] = useState('');
     const [vanPlotFile, setVanPlotFile] = useState('');
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
+    const [jsonData, setJsonData] = useState('');
     const [vanPlotLoaded, setVanPlotLoaded] = useState(false);
     const [detailedPlotLoaded, setDetailedPlotLoaded] = useState(false);
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    const [isBasicCollapsed, setIsBasicCollapsed] = useState(false);
-    const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
-    const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
+    // const [isBasicCollapsed, setIsBasicCollapsed] = useState(false);
+    // const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
+    // const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
     const [myinterval, setMyinterval] = useState(null);
     const [disableButtons, setDisableButtons] = useState(false);
 
@@ -85,9 +87,9 @@ const NewSingleBinaryJob = ({initialValues}) => {
         setVanPlotLoaded(false);
         setDetailedPlotLoaded(false);
         setOutputError('');
-        setIsBasicCollapsed(false);
-        setIsSupernovaCollapsed(true);
-        setIsMassTransferCollapsed(true);
+        // setIsBasicCollapsed(false);
+        // setIsSupernovaCollapsed(true);
+        // setIsMassTransferCollapsed(true);
         setMyinterval(null);
         setDisableButtons(false);
     };
@@ -145,7 +147,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                             setPlotFile(server_url + response.newSingleBinary.result.plotFilePath);
                             setDetailedPlotLoaded(true);
                         }
-
+                        setJsonData(response.newSingleBinary.result.jsonData);
                         setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                     }, 2000));
                 }
@@ -163,7 +165,8 @@ const NewSingleBinaryJob = ({initialValues}) => {
             <Row className="mt-5">
                 <Col>
                     <h1>Simulate the evolution of a binary</h1>
-                    <h5>Run a simulation of an evolution of a specific binary. Detailed plots will be automatically generated using COMPAS and available to download.</h5>
+                    <h5>Run a simulation of an evolution of a specific binary. Detailed plots will be automatically
+                        generated using COMPAS and available to download.</h5>
                 </Col>
             </Row>
             <Tab.Container id="single-binary-tabs" defaultActiveKey="binary">
@@ -209,6 +212,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                             detailedOutputFileName={detailedOutputFile}
                             error={outputError}
                             isLoading={isLoadingOutput}
+                            jsonData={jsonData}
                         />
                     </Col>
                 </Row>
