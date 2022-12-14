@@ -3,7 +3,7 @@ import os.path
 from tempfile import TemporaryDirectory
 from celery.exceptions import SoftTimeLimitExceeded
 from django.test import TestCase
-from compasui.tasks import run_compas, run_detailed_evol_plotting
+from compasui.tasks import run_compas
 from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 
 
@@ -40,30 +40,3 @@ class TestCeleryTasks(TestCase):
         result = run_compas(self.grid_file, self.output_path, self.detailed_output_path)
         self.assertEqual(result, TASK_TIMEOUT)
 
-    def test_run_detailed_evol_plotting_success(self):
-        result = run_detailed_evol_plotting(TASK_SUCCESS, self.plotting_file_path, self.detailed_plot_path,
-                                            self.vanDenHeuval_plot_path, self.evol_text_path)
-        self.assertEqual(result, TASK_SUCCESS)
-
-    @patch("compasui.tasks.plotting_main")
-    def test_run_detailed_evol_plotting_failure(self, plotting_main):
-        plotting_main.side_effect = Exception
-        result = run_detailed_evol_plotting(TASK_SUCCESS, self.detailed_output_path, self.detailed_plot_path,
-                                            self.vanDenHeuval_plot_path, self.evol_text_path)
-        self.assertEqual(result, TASK_FAIL)
-
-    @patch("compasui.tasks.plotting_main")
-    def test_run_detailed_evol_plotting_timeout(self, plotting_main):
-        plotting_main.side_effect = SoftTimeLimitExceeded
-        result = run_detailed_evol_plotting(TASK_SUCCESS, self.detailed_output_path, self.detailed_plot_path,
-                                            self.vanDenHeuval_plot_path, self.evol_text_path)
-        self.assertEqual(result, TASK_TIMEOUT)
-
-    def test_run_detailed_evol_plotting_failure_when_run_compas_fails(self):
-        result = run_detailed_evol_plotting(TASK_FAIL, self.detailed_output_path, self.detailed_plot_path,
-                                            self.vanDenHeuval_plot_path, self.evol_text_path)
-        self.assertEqual(result, TASK_FAIL)
-
-        result = run_detailed_evol_plotting(TASK_TIMEOUT, self.detailed_output_path, self.detailed_plot_path,
-                                            self.vanDenHeuval_plot_path, self.evol_text_path)
-        self.assertEqual(result, TASK_FAIL)
