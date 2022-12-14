@@ -21,23 +21,11 @@ const submitMutation = graphql`
       result {
         jobId
         jsonData
-        gridFilePath
-        plotFilePath
-        vanPlotFilePath
         detailedOutputFilePath
       }
     }
   }
 `;
-
-const checkFileExist = (urlToFile) => {
-    let xhr = new XMLHttpRequest();
-
-    xhr.open('HEAD', urlToFile, false);
-    xhr.send();
-
-    return (xhr.status != '404')? true : false;
-};
 
 const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
@@ -52,45 +40,19 @@ const NewSingleBinaryJob = ({initialValues}) => {
         validationSchema: validationSchema,
     });
 
-    const [plotFile, setPlotFile] = useState('');
-    const [vanPlotFile, setVanPlotFile] = useState('');
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
     const [jsonData, setJsonData] = useState('');
-    const [vanPlotLoaded, setVanPlotLoaded] = useState(false);
-    const [detailedPlotLoaded, setDetailedPlotLoaded] = useState(false);
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    // const [isBasicCollapsed, setIsBasicCollapsed] = useState(false);
-    // const [isSupernovaCollapsed, setIsSupernovaCollapsed] = useState(true);
-    // const [isMassTransferCollapsed, setIsMassTransferCollapsed] = useState(true);
-    const [myinterval, setMyinterval] = useState(null);
     const [disableButtons, setDisableButtons] = useState(false);
 
-    // This block that checks for plots to be loaded by checking state had to be done in useEffect. That is because
-    // changing state using useState hook within setInterval won't be reflected to the component on its own
-    useEffect(() => {
-        if(vanPlotLoaded && detailedPlotLoaded){
-            clearInterval(myinterval);
-            setVanPlotLoaded(false);
-            setDetailedPlotLoaded(false);
-            setIsLoadingOutput(false);
-            setDisableButtons(false);
-        }
-    }, [vanPlotLoaded, detailedPlotLoaded, isLoadingOutput]);
 
     const handleFormReset = () => {
         formik.resetForm();
-        setVanPlotFile('');
         setDetailedOutputFile('');
-        setPlotFile('');
+        setJsonData('');
         setIsLoadingOutput(false);
-        setVanPlotLoaded(false);
-        setDetailedPlotLoaded(false);
         setOutputError('');
-        // setIsBasicCollapsed(false);
-        // setIsSupernovaCollapsed(true);
-        // setIsMassTransferCollapsed(true);
-        setMyinterval(null);
         setDisableButtons(false);
     };
 
@@ -99,9 +61,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
             .filter(([key, value]) => value === '')
             .map(([key, value]) => values[key] = null);
 
-        setVanPlotFile('');
         setDetailedOutputFile('');
-        setPlotFile('');
         setIsLoadingOutput(true);
         setDisableButtons(true);
 
@@ -119,7 +79,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
                 velocity2: values.velocity2,
                 commonEnvelopeAlpha: values.commonEnvelopeAlpha,
                 commonEnvelopeLambdaPrescription: values.commonEnvelopeLambdaPrescription,
-                // commonEnvelopeLambda: values.commonEnvelopeLambda,
                 remnantMassPrescription: values.remnantMassPrescription,
                 fryerSupernovaEngine: values.fryerSupernovaEngine,
                 massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
@@ -133,29 +92,15 @@ const NewSingleBinaryJob = ({initialValues}) => {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                if (!errors && (response.newSingleBinary.result.vanPlotFilePath!=='')) {
-
-                    setMyinterval(() => setInterval(() => {
-                        if((!vanPlotLoaded) &&
-                            checkFileExist(server_url + response.newSingleBinary.result.vanPlotFilePath)){
-                            setVanPlotFile(server_url + response.newSingleBinary.result.vanPlotFilePath);
-                            setVanPlotLoaded(true);
-                        }
-
-                        if((!detailedPlotLoaded) &&
-                            checkFileExist(server_url + response.newSingleBinary.result.plotFilePath)){
-                            setPlotFile(server_url + response.newSingleBinary.result.plotFilePath);
-                            setDetailedPlotLoaded(true);
-                        }
-                        setJsonData(response.newSingleBinary.result.jsonData);
-                        setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
-                    }, 2000));
+                if(!errors) {
+                    setJsonData(response.newSingleBinary.result.jsonData);
+                    setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                 }
                 else{
                     setOutputError('Output could not be generated');
-                    setIsLoadingOutput(false);
-                    setDisableButtons(false);
                 }
+                setIsLoadingOutput(false);
+                setDisableButtons(false);
             },
         });
     };
@@ -207,8 +152,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
                     </Col>
                     <Col md={5}>
                         <JobOutput
-                            detailedplotfilename={plotFile}
-                            vanplotfilename={vanPlotFile}
                             detailedOutputFileName={detailedOutputFile}
                             error={outputError}
                             isLoading={isLoadingOutput}
