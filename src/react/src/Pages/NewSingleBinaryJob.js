@@ -92,7 +92,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                if(!errors) {
+                if(!errors && (response.newSingleBinary.result.detailedOutputFilePath !== '')) {
                     setJsonData(response.newSingleBinary.result.jsonData);
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                 }
