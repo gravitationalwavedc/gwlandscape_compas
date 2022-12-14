@@ -307,13 +307,16 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             )
 
             detailed_output_file_path = Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+
             json_data = read_h5_data_as_json(detailed_output_file_path)
 
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
                     job_id=job.id,
                     json_data=json_data,
-                    detailed_output_file_path=detailed_output_file_path
+                    detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
+                                              f'/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+
                 )
             )
         except Exception:
@@ -321,7 +324,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             print("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
-                    job_id='', json_data=None, detailed_output_file_path=''))
+                    job_id='', json_data='', detailed_output_file_path=''))
 
 
 class Mutation(graphene.ObjectType):
