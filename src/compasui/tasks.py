@@ -40,27 +40,3 @@ def run_compas(grid_file_path, output_path, detailed_output_file_path):
         result = TASK_FAIL
     finally:
         return result
-
-
-@shared_task
-def run_detailed_evol_plotting(jobstate, detailed_output_file_path,
-                               detailed_plot_path, vanDenHeuval_plot_path, evol_text_path):
-
-    if jobstate == TASK_SUCCESS:
-
-        result = None
-        try:
-            plotting_main(detailed_output_file_path, detailed_plot_path, vanDenHeuval_plot_path, evol_text_path)
-            result = check_output_file_generated(vanDenHeuval_plot_path)
-        except SoftTimeLimitExceeded:
-            traceback.print_exc()
-            result = TASK_TIMEOUT
-        except Exception:
-            traceback.print_exc()
-            result = TASK_FAIL
-        finally:
-            return result
-
-    elif jobstate == TASK_FAIL or jobstate == TASK_TIMEOUT:
-        print("COMPAS Model didn't run successfully! Couldn't generate plot")
-        return TASK_FAIL
