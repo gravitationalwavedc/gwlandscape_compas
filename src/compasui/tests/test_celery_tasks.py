@@ -39,4 +39,3 @@ class TestCeleryTasks(TestCase):
         run_compas_cmd.side_effect = SoftTimeLimitExceeded
         result = run_compas(self.grid_file, self.output_path, self.detailed_output_path)
         self.assertEqual(result, TASK_TIMEOUT)
-

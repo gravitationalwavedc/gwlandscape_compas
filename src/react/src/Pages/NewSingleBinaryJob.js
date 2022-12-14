@@ -10,7 +10,6 @@ import JobOutput from '../Components/Results/JobOutput';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
-// import FormCard from '../Components/Forms/FormCard';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
 

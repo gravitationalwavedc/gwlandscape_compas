@@ -68,7 +68,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         }
         self.assertEqual(expected, response.data)
 
-
     @patch('compasui.views.run_compas')
     def test_celery_tasks_called(self, run_compas):
         run_compas.delay().get.return_value = TASK_SUCCESS
@@ -82,7 +81,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         output_path = path.join(settings.COMPAS_IO_PATH, '1')
         detailed_output_file_path = path.join(settings.COMPAS_IO_PATH, '1', 'COMPAS_Output',
                                               'Detailed_Output', 'BSE_Detailed_Output_0.h5')
-
 
         run_compas.delay.assert_called_with(grid_file_path, output_path, detailed_output_file_path)
 

@@ -2,6 +2,7 @@ import traceback
 import json
 import h5py as h5
 
+
 def read_h5_data_as_json(h5filepath):
     json_data = None
     try:

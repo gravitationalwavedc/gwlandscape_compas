@@ -1,4 +1,3 @@
-import json
 import traceback
 from pathlib import Path
 
@@ -306,7 +305,8 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 mass_transfer_fa=input.get('mass_transfer_fa')
             )
 
-            detailed_output_file_path = Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+            detailed_output_file_path = \
+                Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
 
             json_data = read_h5_data_as_json(detailed_output_file_path)
 

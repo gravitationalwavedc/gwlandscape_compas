@@ -3,7 +3,6 @@ from celery import shared_task
 import os
 import traceback
 
-from .utils.celery_detailed_evol_plot import main as plotting_main
 from .utils.celery_pythonSubmit import run_compas_cmd
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
