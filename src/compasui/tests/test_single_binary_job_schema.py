@@ -1,7 +1,6 @@
 from os import path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
-from pathlib import Path
 from django.conf import settings
 from django.test import override_settings
 from compasui.tests.testcases import CompasTestCase
@@ -49,6 +48,18 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 }
             }
         }
+
+        self.details_output_file_path = "../compasui/tests/test_data/BSE_Detailed_Output_0.h5"
+
+    def test_h5_file_to_json(self):
+        json_data = read_h5_data_as_json("./compasui/tests/test_data/BSE_Detailed_Output_0.h5")
+        self.assertIsNotNone(json_data)
+
+        # Test it return None if the file doesn't exist
+        json_data = read_h5_data_as_json(f'../{self.details_output_file_path}')
+        self.assertIsNone(json_data)
+
+
 
     def test_new_single_binary_job_exception_no_redis_raised(self):
         # Not mocking tasks or redis. Tasks fail as celery cannot connect to redis
