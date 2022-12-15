@@ -1,4 +1,5 @@
 import traceback
+from pathlib import Path
 
 import django_filters
 import graphene
@@ -14,6 +15,7 @@ from .types import OutputStartType, JobStatusType, AbstractBasicParameterType
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
+from .utils.h5ToJson import read_h5_data_as_json
 from django.conf import settings
 
 
@@ -196,9 +198,7 @@ class CompasJobCreationResult(graphene.ObjectType):
 
 class SingleBinaryJobCreationResult(graphene.ObjectType):
     job_id = graphene.String()
-    grid_file_path = graphene.String()
-    plot_file_path = graphene.String()
-    van_plot_file_path = graphene.String()
+    json_data = graphene.String()
     detailed_output_file_path = graphene.String()
 
 
@@ -304,17 +304,19 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                     'mass_transfer_accretion_efficiency_prescription'),
                 mass_transfer_fa=input.get('mass_transfer_fa')
             )
+
+            detailed_output_file_path = \
+                Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+
+            json_data = read_h5_data_as_json(detailed_output_file_path)
+
             return SingleBinaryJobMutation(
-                # single_binary_job=job
                 result=SingleBinaryJobCreationResult(
                     job_id=job.id,
-                    plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
-                                   f'/COMPAS_Output/Detailed_Output/detailedEvolutionPlot.png',
-                    grid_file_path=f'{settings.MEDIA_URL}jobs/{job.id}/BSE_grid.txt',
-                    van_plot_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
-                                       f'/COMPAS_Output/Detailed_Output/vanDenHeuvalPlot.png',
+                    json_data=json_data,
                     detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
                                               f'/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+
                 )
             )
         except Exception:
@@ -322,8 +324,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             print("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
-                    job_id='', plot_file_path='', grid_file_path='',
-                    van_plot_file_path='', detailed_output_file_path=''))
+                    job_id='', json_data='', detailed_output_file_path=''))
 
 
 class Mutation(graphene.ObjectType):
