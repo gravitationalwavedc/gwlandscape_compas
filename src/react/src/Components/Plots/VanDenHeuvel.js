@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { vdhattr } from "./DataUtil";
+import React, { useState, useEffect } from 'react';
+import { vdhattr } from './DataUtil';
 import './VanDenHeuvel.css';
 
 export default function VanDenHeuvel(props) {
@@ -15,7 +15,7 @@ export default function VanDenHeuvel(props) {
         'Common envelope initiated by 2',
         'Star 2 undergoes supernova and forms a BH',
         'Double compact object BH+BH merging in 7.5 Myr' //Tdlay
-    ]
+    ];
     //const eventIndex = [2, 26, 13, 49, 15, 51]; //should generate these
     const eventAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     const stellarTypes = [
@@ -53,38 +53,39 @@ export default function VanDenHeuvel(props) {
                 isMerger = true;
 
                 switch (mtValue) {
-                    case 1:
-                        eventstring = `Stable mass transfer from 1 to 2`;
-                        if (stype2 < 13) {
-                            image_num = 26;
-                        } else {
-                            image_num = 44;
-                            setRotateImage((prev) => ({ ...prev, image_num: true }));
-                        }
-                    case 2:
-                        eventstring = `Stable mass transfer from 2 to 1`;
-                        if (stype2 < 13) {
-                            image_num = 26;
-                            setRotateImage((prev) => ({ ...prev, image_num: true }));
-                        } else {
-                            image_num = 44;
-                        }
-                        break;
-                    case 3:
-                    case 4:
-                        eventstring = `Common envelope initiated by ${Math.floor(mtValue / 2)}`;
-                        image_num = (stype1 < 13 && stype2 < 13) ? 28 : 49;
-                        break;
-                    case 5:
-                        eventstring = `Double-core common envelope`;
-                        image_num = 28;
-                        break;
-                    case 6:
-                        image_num = 37;
-                        eventstring = `Stellar Merger: ${stellarTypes[stype1]}+${stellarTypes[stype2]}`;
-                        break;
-                    default:
-                        throw new Error('Unknow MT_history');
+                case 1:
+                    eventstring = 'Stable mass transfer from 1 to 2';
+                    if (stype2 < 13) {
+                        image_num = 26;
+                    } else {
+                        image_num = 44;
+                        setRotateImage((prev) => ({ ...prev, image_num: true }));
+                    }
+                    break;
+                case 2:
+                    eventstring = 'Stable mass transfer from 2 to 1';
+                    if (stype2 < 13) {
+                        image_num = 26;
+                        setRotateImage((prev) => ({ ...prev, image_num: true }));
+                    } else {
+                        image_num = 44;
+                    }
+                    break;
+                case 3:
+                case 4:
+                    eventstring = `Common envelope initiated by ${Math.floor(mtValue / 2)}`;
+                    image_num = (stype1 < 13 && stype2 < 13) ? 28 : 49;
+                    break;
+                case 5:
+                    eventstring = 'Double-core common envelope';
+                    image_num = 28;
+                    break;
+                case 6:
+                    image_num = 37;
+                    eventstring = `Stellar Merger: ${stellarTypes[stype1]}+${stellarTypes[stype2]}`;
+                    break;
+                default:
+                    throw new Error('Unknow MT_history');
                 }
                 sequenceIndices.push(i);
                 imageIndices.push(image_num);
@@ -168,7 +169,7 @@ export default function VanDenHeuvel(props) {
         setImageIndex(imageIndices);
         setEventSequenceIndex(sequenceIndices);
         setEventString(eventStrings);
-    }
+    };
 
     useEffect(() => {
         getEvents();
@@ -176,22 +177,22 @@ export default function VanDenHeuvel(props) {
 
     const imageDiv = (imageIndex, rotate_image = false) => { //index: eventIndex value, i: sequence number
         //rotate image here
-        if (!imageIndex) return (<div className="cartoon"></div>);
-        const filepath = `/assets/images/vanDenHeuvel_figures/${imageIndex}.png`;
+        if (!imageIndex) return (<div className="cartoon" />);
+        const filepath = `/assets/${imageIndex}.png`;
         return (<div className="cartoon"><img src={filepath} /></div>);
-    }
+    };
 
     const bebold = input => <b className="bold">{input}</b>;
 
-    const descDiv = (index, i) => { //index: eventIndex value, i: sequence number 
+    const descDiv = (index, i) =>  //index: eventIndex value, i: sequence number 
         //let index = eventIndex[i];
-        return (<div className="desc"> Time = {bebold(vdhattr.time[index])} Myr, a = {bebold(vdhattr.semimajor[index])} R<sub>⊙</sub>
+        (<div className="desc"> Time = {bebold(vdhattr.time[index])} Myr, a = {bebold(vdhattr.semimajor[index])} R<sub>⊙</sub>
             <br /> M<sub>1</sub> = {bebold(vdhattr.mass1[index])} M<sub>⊙</sub>, M<sub>2</sub> = {bebold(vdhattr.mass2[index])} M<sub>⊙</sub>
             <br /> {eventString[i]}
         </div>);
-    }
+    
 
-    const eventSequenceDiv = (i) => { return <div className="alphabet">{eventAlphabet[i]}</div> }
+    const eventSequenceDiv = (i) => <div className="alphabet">{eventAlphabet[i]}</div>;
 
     return (<div>
         {eventSequenceIndex && eventSequenceIndex.map((index, i) => <><div className="container">
