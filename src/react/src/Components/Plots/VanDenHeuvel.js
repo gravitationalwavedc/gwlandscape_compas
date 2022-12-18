@@ -16,6 +16,7 @@ export default function VanDenHeuvel(props) {
         'Star 2 undergoes supernova and forms a BH',
         'Double compact object BH+BH merging in 7.5 Myr' //Tdlay
     ];
+    //
     //const eventIndex = [2, 26, 13, 49, 15, 51]; //should generate these
     const eventAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     const stellarTypes = [
@@ -61,7 +62,6 @@ export default function VanDenHeuvel(props) {
                         image_num = 44;
                         setRotateImage((prev) => ({ ...prev, image_num: true }));
                     }
-                    break;
                 case 2:
                     eventstring = 'Stable mass transfer from 2 to 1';
                     if (stype2 < 13) {
