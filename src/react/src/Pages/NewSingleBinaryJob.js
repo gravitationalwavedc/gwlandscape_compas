@@ -46,7 +46,6 @@ const NewSingleBinaryJob = ({ initialValues }) => {
     const [jsonData, setJsonData] = useState('');
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    const [myinterval, setMyinterval] = useState(null);
     const [disableButtons, setDisableButtons] = useState(false);
     let syncId = null; 
 

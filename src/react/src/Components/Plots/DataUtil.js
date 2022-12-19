@@ -1,5 +1,5 @@
 import React from 'react';
-import data from "./DataMock/data.json";
+import data from './DataMock/data.json';
 
 const units = {
     time: 'Myr',
@@ -7,7 +7,7 @@ const units = {
     Luminosity: <>L<sub>&#8857;</sub></>,
     mass: <>M<sub>&#8857;</sub></>,
     length: <>R<sub>&#8857;</sub></>
-}
+};
 
 const mass = {
     totalMass1: data.totalMass1,
@@ -45,7 +45,7 @@ const hrattr = {
     luminosity_1: data.luminosity_1,
     luminosity_2: data.luminosity_2,
     time: data.time
-}
+};
 
 const vdhattr = {
     time: data.time,
@@ -57,18 +57,18 @@ const vdhattr = {
     Stellar_Type1: data.Stellar_Type1,
     Stellar_Type2: data.Stellar_Type2,
     Z1: data.Z1
-}
+};
 
 const mapLineData = (dataset, keys = null) => {
     let data = [];
     dataset.time.forEach((_, i) => {
         let obj = {};
         let objkeys = keys ? Object.keys(keys) : Object.keys(dataset);
-        objkeys.forEach(key => { keys ? obj[keys[key]] = dataset[key][i] : obj[key] = dataset[key][i] });
+        objkeys.forEach(key => { keys ? obj[keys[key]] = dataset[key][i] : obj[key] = dataset[key][i]; });
         data.push(obj);
     });
     return data;
-}
+};
 
 const mapScatterData = (dataset, aliases) => { //has two separate datasets
     let data1=[];
@@ -76,7 +76,7 @@ const mapScatterData = (dataset, aliases) => { //has two separate datasets
     let objkeys = Object.keys(aliases);
     dataset.time.forEach((t,i) => {
         let obj1 = {time: t};
-        let obj2 = {time: t}
+        let obj2 = {time: t};
         objkeys.forEach(key=> {
             let datakey = aliases[key];
             key.includes('1') ? obj1[datakey] = dataset[key][i] : obj2[datakey] = dataset[key][i];
@@ -85,7 +85,7 @@ const mapScatterData = (dataset, aliases) => { //has two separate datasets
         data2.push(obj2);
     });
     return [data1, data2];
-}
+};
 
 const mapLineDataforScatterChart = (dataset, ykey, aliases=null) => {
     let data_total = {};
@@ -103,6 +103,6 @@ const mapLineDataforScatterChart = (dataset, ykey, aliases=null) => {
         data_total[datakey] = data;
     });
     return data_total;
-}
+};
 
 export { units, mass, length, hrattr, vdhattr, mapLineData, mapScatterData, mapLineDataforScatterChart};
