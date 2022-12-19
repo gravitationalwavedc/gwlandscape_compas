@@ -2,21 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { vdhattr } from './DataUtil';
 import './VanDenHeuvel.css';
 
+const DOMAIN = process.env.NODE_ENV !== 'development' ? '' : 'http://localhost:3004';
+
 export default function VanDenHeuvel(props) {
     const [imageIndex, setImageIndex] = useState(null);
     const [eventSequenceIndex, setEventSequenceIndex] = useState(null);
     const [eventString, setEventString] = useState(null);
-    const [rotateimage, setRotateImage] = useState(null);
-
-    const dummystr = [
-        'Zero-age main-sequence, metallicity Z=0.0010',
-        'Stable mass transfer from 1 to 2',
-        'Star 1 undergoes supernova and forms a BH',
-        'Common envelope initiated by 2',
-        'Star 2 undergoes supernova and forms a BH',
-        'Double compact object BH+BH merging in 7.5 Myr' //Tdlay
-    ];
-    
     //const eventIndex = [2, 26, 13, 49, 15, 51]; //should generate these
     const eventAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
     const stellarTypes = [
@@ -54,38 +45,36 @@ export default function VanDenHeuvel(props) {
                 isMerger = true;
 
                 switch (mtValue) {
-                    case 1:
-                        eventstring = `Stable mass transfer from 1 to 2`;
-                        if (stype2 < 13) {
-                            image_num = 26;
-                        } else {
-                            image_num = 44;
-                            setRotateImage((prev) => ({ ...prev, image_num: true }));
-                        }
-                    case 2:
-                        eventstring = `Stable mass transfer from 2 to 1`;
-                        if (stype2 < 13) {
-                            image_num = 26;
-                            setRotateImage((prev) => ({ ...prev, image_num: true }));
-                        } else {
-                            image_num = 44;
-                        }
-                        break;
-                    case 3:
-                    case 4:
-                        eventstring = `Common envelope initiated by ${Math.floor(mtValue / 2)}`;
-                        image_num = (stype1 < 13 && stype2 < 13) ? 28 : 49;
-                        break;
-                    case 5:
-                        eventstring = `Double-core common envelope`;
-                        image_num = 28;
-                        break;
-                    case 6:
-                        image_num = 37;
-                        eventstring = `Stellar Merger: ${stellarTypes[stype1]}+${stellarTypes[stype2]}`;
-                        break;
-                    default:
-                        throw new Error('Unknow MT_history');
+                case 1:
+                    eventstring = 'Stable mass transfer from 1 to 2';
+                    if (stype2 < 13) {
+                        image_num = 26;
+                    } else {
+                        image_num = 44;
+                    }
+                case 2:
+                    eventstring = 'Stable mass transfer from 2 to 1';
+                    if (stype2 < 13) {
+                        image_num = 26;
+                    } else {
+                        image_num = 44;
+                    }
+                    break;
+                case 3:
+                case 4:
+                    eventstring = `Common envelope initiated by ${Math.floor(mtValue / 2)}`;
+                    image_num = (stype1 < 13 && stype2 < 13) ? 28 : 49;
+                    break;
+                case 5:
+                    eventstring = 'Double-core common envelope';
+                    image_num = 28;
+                    break;
+                case 6:
+                    image_num = 37;
+                    eventstring = `Stellar Merger: ${stellarTypes[stype1]}+${stellarTypes[stype2]}`;
+                    break;
+                default:
+                    throw new Error('Unknow MT_history');
                 }
                 sequenceIndices.push(i);
                 imageIndices.push(image_num);
@@ -94,14 +83,17 @@ export default function VanDenHeuvel(props) {
 
             //eventClass = 'supernova' or 'stellar type change'
             let type_changed_star, isSupernova; //which star 
+
             if (stype1 !== vdhattr.Stellar_Type1[i - 1]) {
                 type_changed_star = 1;
                 isSupernova = stype1 === 13 || stype1 === 14;
             }
+
             if (stype2 !== vdhattr.Stellar_Type2[i - 1]) {
                 type_changed_star = 2;
                 isSupernova = stype2 === 13 || stype2 === 14;
             }
+
             if (type_changed_star) {
                 let image_num, eventstring;
                 //if supernova
@@ -132,6 +124,7 @@ export default function VanDenHeuvel(props) {
                 imageIndices.push(image_num);
                 eventStrings.push(eventstring);
             }
+
             if (i === vdhattr.time.length - 1 && !isMerger) {
                 let eventstring, image_num;
                 let isUnbound = vdhattr.eccentricity[i] > 1 || vdhattr.semimajor[i] < 0;
@@ -175,23 +168,28 @@ export default function VanDenHeuvel(props) {
         getEvents();
     }, []);
 
-    const imageDiv = (imageIndex, rotate_image = false) => { //index: eventIndex value, i: sequence number
-        //rotate image here
-        if (!imageIndex) return (<div className="cartoon"></div>);
-        const filepath = `/assets/images/vanDenHeuvel_figures/${imageIndex}.png`;
+    const imageDiv = (imageIndex = false) => { 
+        if (!imageIndex) return (<div className="cartoon" />);
+        const filepath = `${DOMAIN}/assets/${imageIndex}.png`;
         return (<div className="cartoon"><img src={filepath} /></div>);
     }
 
     const bebold = input => <b className="bold">{input}</b>;
 
-    const descDiv = (index, i) => { //index: eventIndex value, i: sequence number 
+    //index: eventIndex value, i: sequence number 
+    const descDiv = (index, i) =>  
         //let index = eventIndex[i];
-        return (<div className="desc"> Time = {bebold(vdhattr.time[index])} Myr, a = {bebold(vdhattr.semimajor[index])} R<sub>⊙</sub>
-            <br /> M<sub>1</sub> = {bebold(vdhattr.mass1[index])} M<sub>⊙</sub>, M<sub>2</sub> = {bebold(vdhattr.mass2[index])} M<sub>⊙</sub>
-            <br /> {eventString[i]}
-        </div>);
-    }
-
+        (
+            <div className="desc"> 
+              Time = {  bebold(vdhattr.time[index])} Myr, a = {bebold(vdhattr.semimajor[index]) } R<sub>⊙</sub>
+                <br /> 
+              M<sub>1</sub> = {bebold(vdhattr.mass1[index])} M<sub>⊙</sub>, 
+              M<sub>2</sub> = {bebold(vdhattr.mass2[index])} M<sub>⊙</sub>
+                <br /> 
+                {eventString[i]}
+            </div>
+        );
+    
     const eventSequenceDiv = (i) => { return <div className="alphabet">{eventAlphabet[i]}</div> };
 
     return (<div>
