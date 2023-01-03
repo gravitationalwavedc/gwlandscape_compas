@@ -46,8 +46,8 @@ const NewSingleBinaryJob = ({ initialValues }) => {
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
-    let syncId = null; 
 
+    let syncId = null; 
 
     const handleFormReset = () => {
         formik.resetForm();
