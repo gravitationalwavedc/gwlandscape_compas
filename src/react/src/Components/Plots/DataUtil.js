@@ -9,22 +9,22 @@ const units = {
 };
 
 const mass = (data) => ({
-    totalMass1: data.totalMass1,
-    totalMass2: data.totalMass2,
-    mass_ZAMS1: data.mass_ZAMS1,
-    mass_ZAMS2: data.mass_ZAMS2,
-    mass_0_1: data.mass_0_1,
-    mass_0_2: data.mass_0_2,
-    mass_CO_core1: data.mass_CO_core1,
-    mass_CO_core2: data.mass_CO_core2,
-    mass_core_1: data.mass_core1,
-    mass_core_2: data.mass_core2,
-    mass_HE_core1: data.mass_HE_core1,
-    mass_HE_core2: data.mass_HE_core2,
-    mass_env1: data.mass_env1,
-    mass_env2: data.mass_env2,
-    time: data.time,
-    systemMass: data.totalMass1.map((m, i) => m + data.totalMass2[i]),
+    totalMass1: data["Mass(1)"],
+    totalMass2: data["Mass(2)"],
+    mass_ZAMS1: data["Mass@ZAMS(1)"],
+    mass_ZAMS2: data["Mass@ZAMS(2)"],
+    mass_0_1: data["Mass_0(1)"],
+    mass_0_2: data["Mass_0(2)"],
+    mass_CO_core1: data["Mass_CO_Core(1)"],
+    mass_CO_core2: data["Mass_CO_Core(2)"],
+    mass_core_1: data["Mass_Core(1)"],
+    mass_core_2: data["Mass_Core(2)"],
+    mass_HE_core1: data["Mass_He_Core(1)"],
+    mass_HE_core2: data["Mass_He_Core(2)"],
+    mass_env1: data["Mass_Env(1)"],
+    mass_env2: data["Mass_Env(2)"],
+    time: data["Time"],
+    systemMass: data["Mass(1)"].map((m, i) => m + data["Mass(2)"][i]),
 });
 
 const length = (data) => ({
