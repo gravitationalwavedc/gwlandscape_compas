@@ -13,7 +13,7 @@ import MassTransferCEParameters from '../Components/Forms/MassTransferCEParamete
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
 import RenderMassContainer from '../Components/Plots/RenderMassContainer';
 import RenderLengthContainer from '../Components/Plots/RenderLengthContainer';
-import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContainer';
+// import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContainer';
 import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
 
 
@@ -96,7 +96,7 @@ const NewSingleBinaryJob = ({ initialValues }) => {
             variables: variables,
             onCompleted: async (response, errors) => {
                 if(!errors && (response.newSingleBinary.result.detailedOutputFilePath !== '')) {
-                    setJsonData(response.newSingleBinary.result.jsonData);
+                    setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                 }
                 else{
@@ -144,7 +144,7 @@ const NewSingleBinaryJob = ({ initialValues }) => {
                                 <SupernovaKickParametersForm formik={formik} />
                             </SingleBinaryTab>
                             <SingleBinaryTab title="Mass Transfer & Common Envelop" eventKey="mass-transfer">
-                                <MassTransferCEParameters formik={formik}/>
+                               <MassTransferCEParameters formik={formik}/>
                             </SingleBinaryTab>
                         </Tab.Content>
                         <ReviewJob
@@ -156,16 +156,7 @@ const NewSingleBinaryJob = ({ initialValues }) => {
                         />
                     </Col>
                     <Col md={6}>
-                        <VanDenHeuvel /> 
-                        <br />
-                        <div className="plotContainer">
-                            <RenderMassContainer className="container" syncId={syncId} />
-                            <br />
-                            <RenderLengthContainer className="container" syncId={syncId} />
-                            <br />
-                            <br />
-                            <RenderHRDiagramContainer className="container" syncId={syncId} />
-                        </div>
+                        {jsonData && <VanDenHeuvel data={jsonData} />}
                     </Col>
                 </Row>
             </Tab.Container>
@@ -178,3 +169,15 @@ NewSingleBinaryJob.defaultProps = {
 };
 
 export default NewSingleBinaryJob;
+
+
+//                        <br />
+//                        <div className="plotContainer">
+//                            <RenderMassContainer className="container" syncId={syncId} />
+//                            <br />
+//                            <RenderLengthContainer className="container" syncId={syncId} />
+//                            <br />
+//                            <br />
+//                            <RenderHRDiagramContainer className="container" syncId={syncId} />
+//                        </div>
+//                    
