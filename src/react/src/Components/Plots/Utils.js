@@ -11,7 +11,6 @@ const tickExpFormatter = num => {
     ).join('');
     const [base, exponent] = num.toExponential().split('e').map(n => parseFloat(n));
     return base === 0 ? 0 : `${base === 1 ? '' : base + '×'}${10 + toSuper(exponent)}`;
-    //return (<>{{base}}<sup>{{exponent}}</sup></>);
 }
 
 
@@ -24,7 +23,6 @@ const LineChartTooltip = (props) => {
                 {payload.map(p => <p>{`${p.value.toFixed(4)}`} {yunit}</p>)}
             </div>
         );
-        //
     }
 }
 
