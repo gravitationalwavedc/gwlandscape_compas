@@ -4,6 +4,10 @@
     "es2021": true,
     "jest/globals": true
   },
+  "plugins": [
+    "react",
+    "jest"
+  ],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -16,12 +20,13 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": [
-    "react",
-    "jest"
-  ],
   "globals": {
     "process": "readonly"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   },
   "rules": {
     "indent": [

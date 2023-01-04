@@ -48,7 +48,7 @@ const NewSingleBinaryJob = ({ initialValues }) => {
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
 
-    let syncId = null; 
+    let syncId = 1; 
 
     const handleFormReset = () => {
         formik.resetForm();
@@ -156,7 +156,15 @@ const NewSingleBinaryJob = ({ initialValues }) => {
                         />
                     </Col>
                     <Col md={6}>
-                        {jsonData && <VanDenHeuvel data={jsonData} />}
+                    { jsonData && 
+                        <> 
+                            <VanDenHeuvel data={jsonData} />
+                            <div className="plotContainer">
+                                <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
+                                <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
+                            </div>
+                        </> 
+                    }
                     </Col>
                 </Row>
             </Tab.Container>
@@ -172,10 +180,7 @@ export default NewSingleBinaryJob;
 
 
 //                        <br />
-//                        <div className="plotContainer">
-//                            <RenderMassContainer className="container" syncId={syncId} />
 //                            <br />
-//                            <RenderLengthContainer className="container" syncId={syncId} />
 //                            <br />
 //                            <br />
 //                            <RenderHRDiagramContainer className="container" syncId={syncId} />
