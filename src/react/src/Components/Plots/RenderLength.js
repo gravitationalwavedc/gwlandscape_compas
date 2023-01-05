@@ -14,10 +14,6 @@ import {
 import propTypes from 'prop-types';
 import { tickExpFormatter } from './Utils';
 
-// const scale = num => {
-//   return num.toExponential();
-// }
-
 const strokeStyle = {
     semimajor: { stroke: 'black', strokeWidth: '2' },
     periapsis: { stroke: 'black', strokeWidth: '2', strokeDasharray: '5 5' },
@@ -30,14 +26,12 @@ const strokeStyle = {
 const xDomain = ['auto', dataMax => (dataMax * 1.1)];
 const yDomain = ['auto', 'dataMax+1000'];
 
-//zoom-in
 const getAxisYDomainOneDataset = (refData, ref, offset) => {
     let [bottom, top] = [refData[0][ref], refData[0][ref]];
     refData.forEach((d) => {
         if (d[ref] > top) top = d[ref];
         if (d[ref] < bottom) bottom = d[ref];
     });
-    //return [(bottom | 0) - offset, (top | 0) + offset];
     return [bottom - offset, top + offset];
 };
 
@@ -158,8 +152,6 @@ export default class RenderLength extends React.Component {
                     }}
                     onMouseDown={(e) => {
                         this.setState({ refAreaLeft: e.activeLabel });
-                        console.log('chartX:', e.chartX);
-                        console.log('chartY:', e.chartY);
                     }}
                     onMouseMove={(e) => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })}
                     // eslint-disable-next-line react/jsx-no-bind
@@ -182,9 +174,14 @@ export default class RenderLength extends React.Component {
                         tickFormatter={tickExpFormatter}
                         domain={[bottom, top]}
                         padding={{ bottom: 5 }}
-                        label={{ value: 'Radius/R_\u{2299}', angle: -90, position: 'insideLeft', textAnchor: 'middle', offset: -5 }} />
+                        label={{
+                            value: 'Radius/R_\u{2299}',
+                            angle: -90,
+                            position: 'insideLeft',
+                            textAnchor: 'middle',
+                            offset: -5
+                        }} />
                     <Tooltip formatter={(value, name) => {
-                        //console.log(value,name);
                         if (name === 'time') { return [`${value} Myr`, name]; }
                         return [value, name];
                     }}

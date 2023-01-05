@@ -11,7 +11,6 @@ import {
 } from 'recharts';
 
 const RenderLengthContainer = ({ data, divStyle, syncId }) => {
-    console.log(data);
     const [domain, setDomain] = useState({
         x1: 'auto',
         x2: dataMax => (dataMax * 1.1),
