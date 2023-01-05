@@ -39,11 +39,11 @@ const length = (data) => ({
 });
 
 const hrattr = (data) => ({
-    teff_1: data.teff_1,
-    teff_2: data.teff_2,
-    luminosity_1: data.luminosity_1,
-    luminosity_2: data.luminosity_2,
-    time: data.time
+    teff_1: data['Teff(1)'],
+    teff_2: data['Teff(2)'],
+    luminosity_1: data['Luminosity(1)'],
+    luminosity_2: data['Luminosity(2)'],
+    time: data['Time']
 });
 
 const vdhattr = (data) => ({
@@ -60,7 +60,6 @@ const vdhattr = (data) => ({
 
 const mapLineData = (dataset, keys = null) => {
     let data = [];
-    console.log(dataset);
     dataset.time.forEach((_, i) => {
         let obj = {};
         let objkeys = keys ? Object.keys(keys) : Object.keys(dataset);
@@ -70,10 +69,12 @@ const mapLineData = (dataset, keys = null) => {
     return data;
 };
 
-const mapScatterData = (dataset, aliases) => { //has two separate datasets
+const mapScatterData = (dataset, aliases) => { 
+    // has two separate datasets
     let data1 = [];
     let data2 = [];
     let objkeys = Object.keys(aliases);
+
     dataset.time.forEach((t, i) => {
         let obj1 = { time: t };
         let obj2 = { time: t };
@@ -84,6 +85,7 @@ const mapScatterData = (dataset, aliases) => { //has two separate datasets
         data1.push(obj1);
         data2.push(obj2);
     });
+
     return [data1, data2];
 };
 

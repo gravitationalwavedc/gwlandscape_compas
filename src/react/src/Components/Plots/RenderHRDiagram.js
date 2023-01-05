@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
     XAxis,
     YAxis,
@@ -12,9 +12,8 @@ import {
     Scatter,
     ZAxis,
     ReferenceArea,
-} from "recharts";
-import propTypes from 'prop-types';
-import { filterData, tickExpFormatter, getReferenceLineSegment, getReferenceRangeType } from "./Utils";
+} from 'recharts';
+import { filterData, tickExpFormatter, getReferenceLineSegment, getReferenceRangeType } from './Utils';
 import { units } from './DataUtil';
 
 
@@ -33,12 +32,6 @@ const initialState = {
     animation: false,
 };
 
-RenderHRDiagram.propTypes = {
-    data1: propTypes.array.isRequired,
-    data2: propTypes.array.isRequired,
-    syncId: propTypes.string,
-}
-
 const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
     const [filteredData1, setFilteredData1] = useState([...data1]);
     const [filteredData2, setFilteredData2] = useState([...data2]);
@@ -51,15 +44,14 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
 
     const isZoomed = filteredData1?.length !== data1?.length || filteredData2?.length !== data2?.length;
 
-    const drawReferenceLine = (R, xDomain, yDomain) => {
-        return <ReferenceLine
-            label={`${R} R_sun`}
-            stroke="gray"
-            strokeDasharray="3 3"
-            position="start"
-            segment={getReferenceLineSegment(R, xDomain, yDomain)}
-        />;
-    }
+    const drawReferenceLine = (R, xDomain, yDomain) => <ReferenceLine
+        key={`${R}-${xDomain}-${yDomain}`}
+        label={`${R} R_sun`}
+        stroke="gray"
+        strokeDasharray="3 3"
+        position="start"
+        segment={getReferenceLineSegment(R, xDomain, yDomain)}
+    />;
 
     const handleZoomOUt = () => {
         setFilteredData1([...data1]);
@@ -86,7 +78,6 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
 
     const handleMouseUp = () => {
         if (isZooming) {
-            console.log("handleMouseUp called");
             let { x1, y1, x2, y2 } = zoomArea;
             setIsZooming(false);
             setZoomArea(DEFAULT_ZOOM);
@@ -98,23 +89,20 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
             const dataPointsInRange2 = filterData(filteredData2, 'Temperature', 'Luminosity', x1, x2, y1, y2);
 
             if (dataPointsInRange1.length || dataPointsInRange2.length) {
-                console.log(dataPointsInRange1.length, dataPointsInRange2.length);
                 setLeft(x1);
                 setRight(x2);
                 setTop(y2);
                 setBottom(y1);
                 setFilteredData1(dataPointsInRange1);
                 setFilteredData2(dataPointsInRange2);
-            } else {
-                console.log("zoom cancel");
             }
         }
     };
 
     return (<div style={divStyle || {
-        width: "973px",
-        height: "400px",
-        backgroundColor: "white"
+        width: '973px',
+        height: '400px',
+        backgroundColor: 'white'
     }}>
         {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
 
@@ -158,7 +146,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     tickFormatter={tickExpFormatter}
                     domain={[bottom, top]}
                     label={{
-                        value: `Luminosity/L\u{2299}`,
+                        value: 'Luminosity/L\u{2299}',
                         angle: -90,
                         position: 'insideLeft',
                         textAnchor: 'middle',
@@ -174,9 +162,12 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     cursor={{ strokeDasharray: '3 3' }}
                     formatter={(value, name) => <>{value} {units[name]}</>}
                 />
-                <Legend wrapperStyle={{ paddingLeft: "40px" }} layout="vertical" align="right" verticalAlign="top" />
-
-                {radii.filter(r => getReferenceRangeType(r, xDomain, yDomain)).map(r => { return drawReferenceLine(r, xDomain, yDomain) })}
+                <Legend wrapperStyle={{ paddingLeft: '40px' }} layout="vertical" align="right" verticalAlign="top" />
+                {
+                    radii
+                        .filter(r => getReferenceRangeType(r, xDomain, yDomain))
+                        .map(r => drawReferenceLine(r, xDomain, yDomain))
+                }
                 <Scatter
                     name='Star1'
                     data={filteredData1}
@@ -198,11 +189,9 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     y1={zoomArea?.y1}
                     y2={zoomArea?.y2}
                 />
-
-
             </ScatterChart>
         </ResponsiveContainer>
     </div>);
-}
+};
 
 export default RenderHRDiagram;
