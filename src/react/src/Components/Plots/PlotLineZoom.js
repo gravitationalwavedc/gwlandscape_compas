@@ -52,8 +52,6 @@ const PlotLineZoom = ({
     children,
     yunit }) => {
 
-    console.log(ykeys);
-
     const [zoomArea, setZoomArea] = useState(DEFAULT_ZOOM);
     const [isZooming, setIsZooming] = useState(false);
     const [isZoomed, setIsZoomed] = useState(false);
