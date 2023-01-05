@@ -1,18 +1,16 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from 'react';
 import {
     ResponsiveContainer,
     LineChart,
     Line,
     ReferenceArea,
     Tooltip
-} from "recharts";
+} from 'recharts';
 
 const getTwoPoints = (array) => {
     let point1 = { y: array[0].y, value: array[0].value };
-    let p = array.find(point => {
-        return point1.value === 0 ? point.value !== point1.value :
-            Math.abs((point.value - point1.value) / point1.value) > 1.1
-    });
+    let p = array.find(point => point1.value === 0 ? point.value !== point1.value :
+        Math.abs((point.value - point1.value) / point1.value) > 1.1);
     let point2 = p ? { y: p.y, value: p.value } : null;
     return point2 ? [point1, point2] : null;
 };
@@ -27,7 +25,7 @@ const getYconstsLog = (point1, point2) => {
     let a = (point1.y - point2.y) / Math.log10(point1.value / point2.value);
     let b = point1.y - a * Math.log10(point1.value);
     return [a, b];
-}
+};
 
 const translateChartYtoCoordY = (chartY, yconst, scaleType) => {
     if (yconst && scaleType === 'Linear') {
@@ -40,20 +38,21 @@ const translateChartYtoCoordY = (chartY, yconst, scaleType) => {
 
 const DEFAULT_ZOOM = { x1: null, y1: null, x2: null, y2: null };
 
-export default function PlotLineZoom(props) { //should be passed x & y domain properties
-    //adjustDomain: since x and y axes are called from the parent components
-    const { divStyle,
-        syncId,
-        data,
-        xkey,
-        ykeys,
-        initialState,
-        adjustDomain,
-        strokeStyle,
-        aliases,
-        scaleType,
-        children,
-        yunit } = props;
+const PlotLineZoom = ({
+    divStyle,
+    syncId,
+    data,
+    xkey,
+    ykeys,
+    initialState,
+    adjustDomain,
+    strokeStyle,
+    aliases,
+    scaleType,
+    children,
+    yunit }) => {
+
+    console.log(ykeys);
 
     const [zoomArea, setZoomArea] = useState(DEFAULT_ZOOM);
     const [isZooming, setIsZooming] = useState(false);
@@ -69,11 +68,6 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
         }
     }, [isZoomed]);
 
-    useEffect(() => {
-        if (ToolTip.current) {
-        }
-    });
-
     const Line1 = useRef();
     const ToolTip = useRef();
 
@@ -81,7 +75,7 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
         if (dataKey === 'time') return;
         return (<Line
             id={dataKey}
-            type={type || "monotone"}
+            type={type || 'monotone'}
             dataKey={dataKey}
             key={dataKey}
             name={alias}
@@ -89,7 +83,7 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
             dot={dot}
             ref={Line1 ? Line1 : null} //There should be new logic to get two datapoints from the plot
         />);
-    }
+    };
 
     const handleZoomOUt = () => {
         setZoomArea(DEFAULT_ZOOM);
@@ -116,12 +110,10 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
         }
     };
 
-    const hasYDataInXRange = (xrangeData, minRange, maxRange) => {
-        return xrangeData.some(point => {
-            let datapoints = Object.values(point);
-            return datapoints.some(p => p >= minRange && p <= maxRange);
-        });
-    }
+    const hasYDataInXRange = (xrangeData, minRange, maxRange) => xrangeData.some(point => {
+        let datapoints = Object.values(point);
+        return datapoints.some(p => p >= minRange && p <= maxRange);
+    });
 
     const handleMouseUp = () => {
         if (isZooming) {
@@ -136,10 +128,10 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
             setIsZooming(false);
             setZoomArea(DEFAULT_ZOOM);
         }
-    }
+    };
 
     return (
-        <div style={divStyle || { width: "973px", height: "400px", backgroundColor: "white"}}>
+        <div style={divStyle || { width: '973px', height: '400px', backgroundColor: 'white' }}>
             {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
             <ResponsiveContainer width="80%"
                 height="100%">
@@ -160,7 +152,7 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
                     ref={Linechartload}
                 >
                     {children}
-                    {ykeys.map(key => { return drawLine(key, aliases[key], strokeStyle[key]); })}
+                    {ykeys.map(key => drawLine(key, aliases[key], strokeStyle[key]))}
                     <ReferenceArea
                         x1={zoomArea?.x1}
                         x2={zoomArea?.x2}
@@ -182,4 +174,6 @@ export default function PlotLineZoom(props) { //should be passed x & y domain pr
             </ResponsiveContainer>
         </div>
     );
-}
+};
+
+export default PlotLineZoom;
