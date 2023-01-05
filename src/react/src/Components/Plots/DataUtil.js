@@ -9,33 +9,33 @@ const units = {
 };
 
 const mass = (data) => ({
-    totalMass1: data["Mass(1)"],
-    totalMass2: data["Mass(2)"],
-    mass_ZAMS1: data["Mass@ZAMS(1)"],
-    mass_ZAMS2: data["Mass@ZAMS(2)"],
-    mass_0_1: data["Mass_0(1)"],
-    mass_0_2: data["Mass_0(2)"],
-    mass_CO_core1: data["Mass_CO_Core(1)"],
-    mass_CO_core2: data["Mass_CO_Core(2)"],
-    mass_core_1: data["Mass_Core(1)"],
-    mass_core_2: data["Mass_Core(2)"],
-    mass_HE_core1: data["Mass_He_Core(1)"],
-    mass_HE_core2: data["Mass_He_Core(2)"],
-    mass_env1: data["Mass_Env(1)"],
-    mass_env2: data["Mass_Env(2)"],
-    time: data["Time"],
-    systemMass: data["Mass(1)"].map((m, i) => m + data["Mass(2)"][i]),
+    totalMass1: data['Mass(1)'],
+    totalMass2: data['Mass(2)'],
+    mass_ZAMS1: data['Mass@ZAMS(1)'],
+    mass_ZAMS2: data['Mass@ZAMS(2)'],
+    mass_0_1: data['Mass_0(1)'],
+    mass_0_2: data['Mass_0(2)'],
+    mass_CO_core1: data['Mass_CO_Core(1)'],
+    mass_CO_core2: data['Mass_CO_Core(2)'],
+    mass_core_1: data['Mass_Core(1)'],
+    mass_core_2: data['Mass_Core(2)'],
+    mass_HE_core1: data['Mass_He_Core(1)'],
+    mass_HE_core2: data['Mass_He_Core(2)'],
+    mass_env1: data['Mass_Env(1)'],
+    mass_env2: data['Mass_Env(2)'],
+    time: data['Time'],
+    systemMass: data['Mass(1)'].map((m, i) => m + data['Mass(2)'][i]),
 });
 
 const length = (data) => ({
-    semimajor: data.semimajor,
-    eccentricity: data.eccentricity,
-    radius_1: data.radius_1,
-    radius_2: data.radius_2,
-    roche_radius_1: data.roche_radius_1,
-    roche_radius_2: data.roche_radius_2,
-    time: data.time,
-    periapsis: data.semimajor.map((sma, i) => sma * (1 - data.eccentricity[i]))
+    semimajor: data['SemiMajorAxis'],
+    eccentricity: data['Eccentricity'],
+    radius_1: data['Radius(1)'],
+    radius_2: data['Radius(2)'],
+    roche_radius_1: data['Radius(1)|RL'],
+    roche_radius_2: data['Radius(2)|RL'],
+    time: data['Time'],
+    periapsis: data['SemiMajorAxis'].map((sma, i) => sma * (1 - data['Eccentricity'][i]))
 });
 
 const hrattr = (data) => ({
@@ -47,19 +47,20 @@ const hrattr = (data) => ({
 });
 
 const vdhattr = (data) => ({
-    time: data["Time"],
-    semimajor: data["SemiMajorAxis"],
-    mass1: data["Mass(1)"],
-    mass2: data["Mass(2)"],
-    eccentricity: data["Eccentricity"],
-    MT_history: data["MT_History"],
-    Stellar_Type1: data["Stellar_Type(1)"],
-    Stellar_Type2: data["Stellar_Type(2)"],
-    Z1: data["Mass@ZAMS(1)"]
+    time: data['Time'],
+    semimajor: data['SemiMajorAxis'],
+    mass1: data['Mass(1)'],
+    mass2: data['Mass(2)'],
+    eccentricity: data['Eccentricity'],
+    MT_history: data['MT_History'],
+    Stellar_Type1: data['Stellar_Type(1)'],
+    Stellar_Type2: data['Stellar_Type(2)'],
+    Z1: data['Mass@ZAMS(1)']
 });
 
 const mapLineData = (dataset, keys = null) => {
     let data = [];
+    console.log(dataset);
     dataset.time.forEach((_, i) => {
         let obj = {};
         let objkeys = keys ? Object.keys(keys) : Object.keys(dataset);
