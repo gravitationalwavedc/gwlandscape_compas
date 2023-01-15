@@ -9,6 +9,7 @@ import ReviewJob from '../Components/Forms/ReviewJob';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
+import JobOutput from '../Components/Results/JobOutput';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
 import RenderMassContainer from '../Components/Plots/RenderMassContainer';
@@ -154,6 +155,11 @@ const NewSingleBinaryJob = () => {
                         />
                     </Col>
                     <Col md={6}>
+                        <JobOutput
+                            detailedOutputFileName={detailedOutputFile}
+                            error={outputError}
+                            isLoading={isLoadingOutput}
+                        />
                         {jsonData &&
                             <>
                                 <VanDenHeuvel data={jsonData} />
