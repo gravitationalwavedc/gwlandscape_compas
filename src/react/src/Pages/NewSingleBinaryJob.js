@@ -97,8 +97,7 @@ const NewSingleBinaryJob = () => {
                 if (!errors && (response.newSingleBinary.result.detailedOutputFilePath !== '')) {
                     setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
-                }
-                else {
+                } else {
                     setOutputError('Output could not be generated');
                 }
                 setIsLoadingOutput(false);
