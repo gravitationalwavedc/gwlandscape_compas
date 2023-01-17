@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import {commitMutation} from 'relay-runtime';
-import {graphql} from 'react-relay';
-import {harnessApi} from '../index';
+import { commitMutation } from 'relay-runtime';
+import { graphql } from 'react-relay';
+import { harnessApi } from '../index';
 import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
-import JobOutput from '../Components/Results/JobOutput';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
 import initialValues from '../Components/Forms/initialValues';
 import validationSchema from '../Components/Forms/validationSchema';
+import JobOutput from '../Components/Results/JobOutput';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
-
+import RenderMassContainer from '../Components/Plots/RenderMassContainer';
+import RenderLengthContainer from '../Components/Plots/RenderLengthContainer';
+import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContainer';
+import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
 
 const submitMutation = graphql`
   mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
@@ -28,10 +31,9 @@ const submitMutation = graphql`
 
 const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
-
 const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
-const NewSingleBinaryJob = ({initialValues}) => {
+const NewSingleBinaryJob = () => {
 
     const formik = useFormik({
         initialValues: initialValues,
@@ -45,6 +47,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
 
+    let syncId = 1;
 
     const handleFormReset = () => {
         formik.resetForm();
@@ -63,8 +66,6 @@ const NewSingleBinaryJob = ({initialValues}) => {
         setDetailedOutputFile('');
         setIsLoadingOutput(true);
         setDisableButtons(true);
-
-        scrollTo(0, 0);
 
         const variables = {
             input: {
@@ -91,11 +92,10 @@ const NewSingleBinaryJob = ({initialValues}) => {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                if(!errors && (response.newSingleBinary.result.detailedOutputFilePath !== '')) {
-                    setJsonData(response.newSingleBinary.result.jsonData);
+                if (!errors && (response.newSingleBinary.result.detailedOutputFilePath !== '')) {
+                    setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
-                }
-                else{
+                } else {
                     setOutputError('Output could not be generated');
                 }
                 setIsLoadingOutput(false);
@@ -109,8 +109,10 @@ const NewSingleBinaryJob = ({initialValues}) => {
             <Row className="mt-5">
                 <Col>
                     <h1>Simulate the evolution of a binary</h1>
-                    <h5>Run a simulation of an evolution of a specific binary. Detailed plots will be automatically
-                        generated using COMPAS and available to download.</h5>
+                    <h5>
+                        Run a simulation of an evolution of a specific binary.
+                        Detailed plots will be automatically generated using COMPAS and available to download.
+                    </h5>
                 </Col>
             </Row>
             <Tab.Container id="single-binary-tabs" defaultActiveKey="binary">
@@ -125,11 +127,11 @@ const NewSingleBinaryJob = ({initialValues}) => {
                                 <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br/>Common Envelop</Nav.Link>
+                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br />Common Envelop</Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
-                    <Col md={5}>
+                    <Col md={4}>
                         <Tab.Content className="mt-2">
                             <SingleBinaryTab title="Binary" eventKey="binary">
                                 <BasicParametersForm formik={formik} />
@@ -138,7 +140,7 @@ const NewSingleBinaryJob = ({initialValues}) => {
                                 <SupernovaKickParametersForm formik={formik} />
                             </SingleBinaryTab>
                             <SingleBinaryTab title="Mass Transfer & Common Envelop" eventKey="mass-transfer">
-                                <MassTransferCEParameters formik={formik}/>
+                                <MassTransferCEParameters formik={formik} />
                             </SingleBinaryTab>
                         </Tab.Content>
                         <ReviewJob
@@ -149,22 +151,27 @@ const NewSingleBinaryJob = ({initialValues}) => {
                             disableButtons={disableButtons}
                         />
                     </Col>
-                    <Col md={5}>
+                    <Col md={6}>
                         <JobOutput
                             detailedOutputFileName={detailedOutputFile}
                             error={outputError}
                             isLoading={isLoadingOutput}
-                            jsonData={jsonData}
                         />
+                        {jsonData &&
+                            <>
+                                <VanDenHeuvel data={jsonData} />
+                                <div className="plotContainer">
+                                    <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
+                                    <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
+                                    <RenderHRDiagramContainer className="container" syncId={syncId} data={jsonData} />
+                                </div>
+                            </>
+                        }
                     </Col>
                 </Row>
             </Tab.Container>
         </Container>
     );
-};
-
-NewSingleBinaryJob.defaultProps = {
-    initialValues: initialValues
 };
 
 export default NewSingleBinaryJob;
