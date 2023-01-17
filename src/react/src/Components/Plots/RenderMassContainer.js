@@ -12,7 +12,6 @@ import PlotLineZoom from './PlotLineZoom';
 const initialDomain = { x1: 'auto', x2: dataMax => (dataMax * 1.1), y1: 'auto', y2: 'dataMax' };
 
 const RenderMassContainer = ({ data, divStyle, syncId }) => {
-    console.log(data);
     const [domain, setDomain] = useState(initialDomain);
 
     const aliases = {

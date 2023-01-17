@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
 import { graphql } from 'react-relay';
 import { harnessApi } from '../index';
@@ -66,8 +66,6 @@ const NewSingleBinaryJob = () => {
         setDetailedOutputFile('');
         setIsLoadingOutput(true);
         setDisableButtons(true);
-
-        scrollTo(0, 0);
 
         const variables = {
             input: {
