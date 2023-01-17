@@ -8,6 +8,7 @@ export default function VanDenHeuvel({ data }) {
     const [imageIndex, setImageIndex] = useState(null);
     const [eventSequenceIndex, setEventSequenceIndex] = useState(null);
     const [eventString, setEventString] = useState(null);
+
     //const eventIndex = [2, 26, 13, 49, 15, 51]; //should generate these
     const eventAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
@@ -46,36 +47,36 @@ export default function VanDenHeuvel({ data }) {
                 isMerger = true;
 
                 switch (mtValue) {
-                    case 1:
-                        eventstring = 'Stable mass transfer from 1 to 2';
-                        if (stype2 < 13) {
-                            image_num = 26;
-                        } else {
-                            image_num = 44;
-                        }
-                    case 2:
-                        eventstring = 'Stable mass transfer from 2 to 1';
-                        if (stype2 < 13) {
-                            image_num = 26;
-                        } else {
-                            image_num = 44;
-                        }
-                        break;
-                    case 3:
-                    case 4:
-                        eventstring = `Common envelope initiated by ${Math.floor(mtValue / 2)}`;
-                        image_num = (stype1 < 13 && stype2 < 13) ? 28 : 49;
-                        break;
-                    case 5:
-                        eventstring = 'Double-core common envelope';
-                        image_num = 28;
-                        break;
-                    case 6:
-                        image_num = 37;
-                        eventstring = `Stellar Merger: ${stellarTypes[stype1]}+${stellarTypes[stype2]}`;
-                        break;
-                    default:
-                        throw new Error('Unknow MT_history');
+                case 1:
+                    eventstring = 'Stable mass transfer from 1 to 2';
+                    if (stype2 < 13) {
+                        image_num = 26;
+                    } else {
+                        image_num = 44;
+                    }
+                case 2:
+                    eventstring = 'Stable mass transfer from 2 to 1';
+                    if (stype2 < 13) {
+                        image_num = 26;
+                    } else {
+                        image_num = 44;
+                    }
+                    break;
+                case 3:
+                case 4:
+                    eventstring = `Common envelope initiated by ${Math.floor(mtValue / 2)}`;
+                    image_num = (stype1 < 13 && stype2 < 13) ? 28 : 49;
+                    break;
+                case 5:
+                    eventstring = 'Double-core common envelope';
+                    image_num = 28;
+                    break;
+                case 6:
+                    image_num = 37;
+                    eventstring = `Stellar Merger: ${stellarTypes[stype1]}+${stellarTypes[stype2]}`;
+                    break;
+                default:
+                    throw new Error('Unknow MT_history');
                 }
                 sequenceIndices.push(i);
                 imageIndices.push(image_num);
@@ -173,23 +174,23 @@ export default function VanDenHeuvel({ data }) {
         if (!imageIndex) return (<div className="cartoon" />);
         const filepath = `${DOMAIN}/assets/${imageIndex}.png`;
         return (<div className="cartoon"><img src={filepath} /></div>);
-    }
+    };
 
     const bebold = input => <b className="bold">{input}</b>;
 
     //index: eventIndex value, i: sequence number 
     const descDiv = (index, i) =>
     //let index = eventIndex[i];
-    (
-        <div className="desc">
+        (
+            <div className="desc">
             Time = {bebold(vdhattrData.time[index])} Myr, a = {bebold(vdhattrData.semimajor[index])} R<sub>⊙</sub>
-            <br />
+                <br />
             M<sub>1</sub> = {bebold(vdhattrData.mass1[index])} M<sub>⊙</sub>,
             M<sub>2</sub> = {bebold(vdhattrData.mass2[index])} M<sub>⊙</sub>
-            <br />
-            {eventString[i]}
-        </div>
-    );
+                <br />
+                {eventString[i]}
+            </div>
+        );
 
 
     const eventSequenceDiv = (i) => <div className="alphabet">{eventAlphabet[i]}</div>;

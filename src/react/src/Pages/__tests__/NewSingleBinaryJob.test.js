@@ -8,7 +8,6 @@ import userEvent from '@testing-library/user-event';
 /* global global */
 
 describe('new single binary job page', () => {
-
     const mockNewSingleBinaryResult = {
         SingleBinaryJobCreationResult() {
             return {
