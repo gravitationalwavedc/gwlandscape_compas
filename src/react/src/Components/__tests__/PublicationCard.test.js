@@ -23,7 +23,7 @@ describe('publications Page', () => {
         expect.hasAssertions();
         render(<PublicationCard publication={publication} />);
         expect(screen.getByText(publication.title)).toBeInTheDocument();
-        expect(screen.getByText(`${publication.author} - ${publication.year}`)).toBeInTheDocument();
+        expect(screen.getByText(`${publication.author} · ${publication.year}`)).toBeInTheDocument();
         expect(screen.getByText(
             `${publication.keywords.edges[0].node.tag}, ${publication.keywords.edges[1].node.tag}`
         )).toBeInTheDocument();
