@@ -172,7 +172,7 @@ export default function VanDenHeuvel({ data }) {
 
     const imageDiv = (imageIndex = false) => {
         if (!imageIndex) return (<div className="cartoon" />);
-        const filepath = `${DOMAIN}/compas/assets/${imageIndex}.png`;
+        const filepath = `${DOMAIN}/compas/static/assets/${imageIndex}.png`;
         return (<div className="cartoon"><img src={filepath} /></div>);
     };
 

@@ -37,7 +37,7 @@ RUN . ~/.nvm/nvm.sh && cd /src/react/ && nvm install && nvm use && npm install n
 RUN rsync -arv /src/static/ /static/
 
 # Copy the images in to the static output as well
-RUN rsync -arv /src/react/compas/assets /static/
+RUN rsync -arv /src/react/compas/static/assets /static/
 
 # Don't need any of the javascipt code now
 RUN rm -Rf /src
