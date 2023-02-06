@@ -1,3 +1,4 @@
+import pathlib
 from tempfile import TemporaryDirectory
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -48,10 +49,16 @@ class TestCompasDatasetModel(testcases.TestCase):
             self.test_job_archive
         )
 
+        file = model.objects.last().upload_set.first().file.path
+        self.assertTrue(pathlib.Path(file).exists())
+
         CompasDatasetModel.delete_dataset_model(model.id)
 
         self.assertEqual(CompasDatasetModel.objects.all().count(), 0)
         self.assertEqual(Upload.objects.all().count(), 0)
+
+        # The Uploaded files should be deleted
+        self.assertFalse(pathlib.Path(file).exists())
 
     @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
     def test_str(self):
