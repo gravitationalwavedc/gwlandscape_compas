@@ -1,3 +1,4 @@
+import pathlib
 import uuid
 from tempfile import TemporaryDirectory
 
@@ -249,6 +250,9 @@ class TestCompasDatasetModelSchema(CompasTestCase):
             }
         }
 
+        file = model.upload_set.first().file.path
+        self.assertTrue(pathlib.Path(file).exists())
+
         response = self.client.execute(
             self.delete_compas_dataset_model_mutation,
             dataset_model_input
@@ -265,6 +269,9 @@ class TestCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(CompasDatasetModel.objects.all().count(), 0)
         self.assertEqual(Upload.objects.all().count(), 0)
+
+        # The Uploaded files should be deleted
+        self.assertFalse(pathlib.Path(file).exists())
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_compas_dataset_model_authenticated_not_publication_manager(self):

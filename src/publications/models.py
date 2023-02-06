@@ -134,6 +134,13 @@ class CompasDatasetModel(models.Model):
 
     @classmethod
     def delete_dataset_model(cls, _id):
+        # Clean up any related Upload files
+        obj = cls.objects.get(id=_id)
+        for file in obj.upload_set.all():
+            file.file.delete()
+
+        # Clean up the original uploaded file
+        cls.objects.get(id=_id).file.delete()
         cls.objects.get(id=_id).delete()
 
     def __str__(self):
@@ -168,7 +175,7 @@ class CompasDatasetModel(models.Model):
 
         dataset_tar.close()
         # remove the tar file after decompression
-        os.remove(self.file.path)
+        self.file.delete()
 
 
 class Upload(models.Model):
