@@ -180,8 +180,6 @@ CELERY_TASK_SOFT_TIME_LIMIT = 60
 CELERY_TASK_TIME_LIMIT = 70
 
 COMPAS_IO_PATH = os.path.join(MEDIA_ROOT, 'jobs/')
-if 'COMPAS_ROOT_DIR' not in os.environ:
-    os.environ['COMPAS_ROOT_DIR'] = ''
 
 # COMPAS Python Submit command for Celery task
 # TODO update these settigs to work with COMPAS running in Docker container
