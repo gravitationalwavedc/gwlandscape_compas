@@ -1,7 +1,11 @@
+import datetime
 import os
 import tarfile
+import uuid
 
+from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from graphql_relay import from_global_id
 
 from publications.utils import check_publication_management_user
@@ -184,3 +188,51 @@ class Upload(models.Model):
 
     def __str__(self):
         return os.path.basename(self.file.name)
+
+
+class CompasDatasetModelUploadToken(models.Model):
+    """
+    This model tracks file upload tokens that can be used to upload compas dataset model files rather than using
+    traditional JWT authentication
+    """
+    # The job upload token
+    token = models.UUIDField(unique=True, default=uuid.uuid4, db_index=True)
+    # The ID of the user the upload token was created for (Used to provide the user of the uploaded job)
+    user_id = models.IntegerField()
+    # When the token was created
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    @classmethod
+    def get_by_token(cls, token):
+        """
+        Returns the instance matching the specified token, or None if expired or not found
+        """
+        # First prune any old tokens which may have expired
+        cls.prune()
+
+        # Next try to find the instance matching the specified token
+        inst = cls.objects.filter(token=token)
+        if not inst.exists():
+            return None
+
+        return inst.first()
+
+    @classmethod
+    def create(cls, user):
+        """
+        Creates a CompasDatasetModelUploadToken object
+        """
+        # First prune any old tokens which may have expired
+        cls.prune()
+
+        # Next create and return a new token instance
+        return cls.objects.create(user_id=user.user_id)
+
+    @classmethod
+    def prune(cls):
+        """
+        Removes any expired tokens from the database
+        """
+        cls.objects.filter(
+            created__lt=timezone.now() - datetime.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY)
+        ).delete()

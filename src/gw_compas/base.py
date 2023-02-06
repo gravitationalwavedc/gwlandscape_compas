@@ -133,7 +133,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static/"),
 ]
 
-EMAIL_FROM = 'no-reply@gw-cloud.org'
+EMAIL_FROM = 'no-reply@gwlandscape.org.au'
 EMAIL_HOST = 'mail.swin.edu.au'
 EMAIL_PORT = 25
 
@@ -180,6 +180,8 @@ CELERY_TASK_SOFT_TIME_LIMIT = 60
 CELERY_TASK_TIME_LIMIT = 70
 
 COMPAS_IO_PATH = os.path.join(MEDIA_ROOT, 'jobs/')
+if 'COMPAS_ROOT_DIR' not in os.environ:
+    os.environ['COMPAS_ROOT_DIR'] = ''
 
 # COMPAS Python Submit command for Celery task
 # TODO update these settigs to work with COMPAS running in Docker container
@@ -189,3 +191,5 @@ RUN_COMPAS_COMMAND = [
 ]
 
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
+
+COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY = 60*60*24     # User has one day to upload the file for the job
