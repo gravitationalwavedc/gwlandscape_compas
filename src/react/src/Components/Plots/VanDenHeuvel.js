@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { vdhattr } from './DataUtil';
 import './VanDenHeuvel.css';
 
 const DOMAIN = process.env.NODE_ENV !== 'development' ? '' : 'http://localhost:3004';
 
-export default function VanDenHeuvel({ data }) {
+export default memo(function VanDenHeuvel({ data }) {
     const [imageIndex, setImageIndex] = useState(null);
     const [eventSequenceIndex, setEventSequenceIndex] = useState(null);
     const [eventString, setEventString] = useState(null);
@@ -204,4 +204,4 @@ export default function VanDenHeuvel({ data }) {
             </div>
         )}
     </div>);
-}
+});

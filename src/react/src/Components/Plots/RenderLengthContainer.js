@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { length, mapLineData } from './DataUtil';
 import { tickExpFormatter } from './Utils';
 import PlotLineZoom from './PlotLineZoom';
@@ -10,13 +10,15 @@ import {
     Label
 } from 'recharts';
 
-const RenderLengthContainer = ({ data, divStyle, syncId }) => {
+const RenderLengthContainer = memo(function RenderLengthContainer({ data, divStyle, syncId }) {
     const [domain, setDomain] = useState({
         x1: 'auto',
         x2: dataMax => (dataMax * 1.1),
         y1: 'auto',
         y2: 'dataMax+1000'
     });
+
+    const chartData = mapLineData(length(data));
 
     const aliases = {
         semimajor: 'semi-major axis',
@@ -47,7 +49,7 @@ const RenderLengthContainer = ({ data, divStyle, syncId }) => {
     return (<PlotLineZoom
         divStyle={divStyle}
         syncId={syncId}
-        data={mapLineData(length(data))}
+        data={chartData}
         xkey={xkey}
         ykeys={Object.keys(ykeys)}
         initialState={domain}
@@ -83,6 +85,6 @@ const RenderLengthContainer = ({ data, divStyle, syncId }) => {
             }} />
         <Legend layout="vertical" align="right" verticalAlign="top" />
     </PlotLineZoom>);
-};
+});
 
 export default RenderLengthContainer;

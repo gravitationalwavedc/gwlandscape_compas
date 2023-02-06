@@ -34,18 +34,17 @@ const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
 const NewSingleBinaryJob = () => {
+    const [detailedOutputFile, setDetailedOutputFile] = useState('');
+    const [jsonData, setJsonData] = useState('');
+    const [outputError, setOutputError] = useState('');
+    const [isLoadingOutput, setIsLoadingOutput] = useState(false);
+    const [disableButtons, setDisableButtons] = useState(false);
 
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: values => handleJobSubmission(values),
         validationSchema: validationSchema,
     });
-
-    const [detailedOutputFile, setDetailedOutputFile] = useState('');
-    const [jsonData, setJsonData] = useState('');
-    const [outputError, setOutputError] = useState('');
-    const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    const [disableButtons, setDisableButtons] = useState(false);
 
     let syncId = 1;
 
@@ -59,6 +58,9 @@ const NewSingleBinaryJob = () => {
     };
 
     const handleJobSubmission = (values) => {
+        // Reset the json data so they know something is happening.
+        setJsonData('');
+
         Object.entries(values)
             .filter(([key, value]) => value === '')
             .map(([key, value]) => values[key] = null);
@@ -86,7 +88,6 @@ const NewSingleBinaryJob = () => {
                 massTransferFa: values.massTransferFa,
             }
         };
-
 
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
@@ -163,7 +164,8 @@ const NewSingleBinaryJob = () => {
                                 <div className="plotContainer">
                                     <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
                                     <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
-                                    <RenderHRDiagramContainer className="container" syncId={syncId} data={jsonData} />
+                                    <RenderHRDiagramContainer 
+                                        className="container" syncId={syncId} data={jsonData} />
                                 </div>
                             </>
                         }
