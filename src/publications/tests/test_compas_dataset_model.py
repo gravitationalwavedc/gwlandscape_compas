@@ -49,7 +49,7 @@ class TestCompasDatasetModel(testcases.TestCase):
             self.test_job_archive
         )
 
-        file = model.objects.last().upload_set.first().file.path
+        file = model.upload_set.first().file.path
         self.assertTrue(pathlib.Path(file).exists())
 
         CompasDatasetModel.delete_dataset_model(model.id)
