@@ -1,3 +1,4 @@
+import uuid
 from tempfile import TemporaryDirectory
 
 from django.contrib.auth import get_user_model
@@ -32,9 +33,17 @@ class TestCompasDatasetModelSchema(CompasTestCase):
 
         self.publication.keywords.set(self.keywords)
 
-        self.add_compas_dataset_model_mutation = """
-            mutation AddCompasDatasetModelMutation($input: AddCompasDatasetModelMutationInput!) {
-                addCompasDatasetModel(input: $input) {
+        self.generate_compas_dataset_model_upload_token_query = """
+            query {
+                generateCompasDatasetModelUploadToken {
+                    token
+                }
+            }
+        """
+
+        self.upload_compas_dataset_model_mutation = """
+            mutation UploadCompasDatasetModelMutation($input: UploadCompasDatasetModelMutationInput!) {
+                uploadCompasDatasetModel(input: $input) {
                     id
                 }
             }
@@ -64,7 +73,7 @@ class TestCompasDatasetModelSchema(CompasTestCase):
             'input': {
                 'compasPublication': to_global_id('CompasPublication', self.publication.id),
                 'compasModel': to_global_id('CompasModel', self.model.id),
-                'file': self.test_job_archive
+                'jobFile': self.test_job_archive
             }
         }
 
@@ -72,7 +81,7 @@ class TestCompasDatasetModelSchema(CompasTestCase):
             'input': {
                 'compasPublication': to_global_id('CompasPublication', self.publication.id),
                 'compasModel': to_global_id('CompasModel', self.model.id),
-                'file': self.test_job_single
+                'jobFile': self.test_job_single
             }
         }
 
@@ -109,16 +118,22 @@ class TestCompasDatasetModelSchema(CompasTestCase):
         """
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
-    def test_add_compas_dataset_model_authenticated_archive(self):
+    def test_upload_compas_dataset_model_authenticated_archive(self):
         self.client.authenticate(self.user)
 
         response = self.client.execute(
-            self.add_compas_dataset_model_mutation,
+            self.generate_compas_dataset_model_upload_token_query
+        )
+
+        self.archive_input['input']['uploadToken'] = response.data['generateCompasDatasetModelUploadToken']['token']
+
+        response = self.client.execute(
+            self.upload_compas_dataset_model_mutation,
             self.archive_input
         )
 
         expected = {
-            'addCompasDatasetModel': {
+            'uploadCompasDatasetModel': {
                 'id': to_global_id('CompasDatasetModel', CompasDatasetModel.objects.last().id),
             }
         }
@@ -146,16 +161,24 @@ class TestCompasDatasetModelSchema(CompasTestCase):
             )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
-    def test_add_compas_dataset_model_authenticated_single(self):
+    def test_upload_compas_dataset_model_authenticated_single(self):
+        # Test that a user who is in PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS can create a dataset model for a single
+        # file
         self.client.authenticate(self.user)
 
         response = self.client.execute(
-            self.add_compas_dataset_model_mutation,
+            self.generate_compas_dataset_model_upload_token_query
+        )
+
+        self.single_input['input']['uploadToken'] = response.data['generateCompasDatasetModelUploadToken']['token']
+
+        response = self.client.execute(
+            self.upload_compas_dataset_model_mutation,
             self.single_input
         )
 
         expected = {
-            'addCompasDatasetModel': {
+            'uploadCompasDatasetModel': {
                 'id': to_global_id('CompasDatasetModel', CompasDatasetModel.objects.last().id),
             }
         }
@@ -172,16 +195,17 @@ class TestCompasDatasetModelSchema(CompasTestCase):
         self.assertEqual(Upload.objects.last().file.name, 'publications/1/1/COMPAS_Output.h5')
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
-    def test_add_compas_dataset_model_authenticated_not_publication_manager(self):
+    def test_upload_compas_dataset_model_authenticated_not_publication_manager(self):
+        # Shouldn't be able to create a dataset model upload token if a user isn't in
+        # PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS
         self.client.authenticate(self.user)
 
         response = self.client.execute(
-            self.add_compas_dataset_model_mutation,
-            self.archive_input
+            self.generate_compas_dataset_model_upload_token_query
         )
 
         expected = {
-            'addCompasDatasetModel': None
+            'generateCompasDatasetModelUploadToken': None
         }
 
         self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
@@ -192,14 +216,13 @@ class TestCompasDatasetModelSchema(CompasTestCase):
             0
         )
 
-    def test_add_publication_unauthenticated(self):
+    def test_generate_compas_dataset_model_upload_token_unauthenticated(self):
         response = self.client.execute(
-            self.add_compas_dataset_model_mutation,
-            self.archive_input
+            self.generate_compas_dataset_model_upload_token_query,
         )
 
         expected = {
-            'addCompasDatasetModel': None
+            'generateCompasDatasetModelUploadToken': None
         }
 
         self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
@@ -460,4 +483,20 @@ class TestCompasDatasetModelSchema(CompasTestCase):
         }
 
         self.assertEqual(None, response.errors)
+        self.assertDictEqual(expected, response.data)
+
+    def test_upload_compas_dataset_model_upload_token(self):
+        # Verify that illegal tokens are not accepted
+        self.single_input['input']['uploadToken'] = str(uuid.uuid4())
+
+        response = self.client.execute(
+            self.upload_compas_dataset_model_mutation,
+            self.single_input
+        )
+
+        expected = {
+            'uploadCompasDatasetModel': None
+        }
+
+        self.assertEqual("Compas Dataset Model upload token is invalid or expired.", response.errors[0].message)
         self.assertDictEqual(expected, response.data)

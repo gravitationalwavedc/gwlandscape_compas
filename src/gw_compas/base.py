@@ -133,7 +133,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static/"),
 ]
 
-EMAIL_FROM = 'no-reply@gw-cloud.org'
+EMAIL_FROM = 'no-reply@gwlandscape.org.au'
 EMAIL_HOST = 'mail.swin.edu.au'
 EMAIL_PORT = 25
 
@@ -189,3 +189,5 @@ RUN_COMPAS_COMMAND = [
 ]
 
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
+
+COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY = 60*60*24     # User has one day to upload the file for the job

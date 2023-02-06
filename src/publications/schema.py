@@ -5,10 +5,12 @@ from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_file_upload.scalars import Upload
+from graphql import GraphQLError
 from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
 
-from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel
+from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel, \
+    CompasDatasetModelUploadToken
 from publications.utils import check_publication_management_user
 
 
@@ -105,11 +107,28 @@ class CompasDatasetModelNode(DjangoObjectType):
         return [Path(f.file.url).absolute() for f in root.upload_set.all()]
 
 
+class GenerateCompasDatasetModelUploadToken(graphene.ObjectType):
+    token = graphene.String()
+
+
 class Query(object):
     keywords = DjangoFilterConnectionField(KeywordNode)
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
     compas_models = DjangoFilterConnectionField(CompasModelNode)
     compas_dataset_models = DjangoFilterConnectionField(CompasDatasetModelNode)
+
+    generate_compas_dataset_model_upload_token = graphene.Field(GenerateCompasDatasetModelUploadToken)
+
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def resolve_generate_compas_dataset_model_upload_token(self, info, **kwargs):
+        user = info.context.user
+
+        # Create a compas dataset model upload token
+        token = CompasDatasetModelUploadToken.create(user)
+
+        # Return the generated token
+        return GenerateCompasDatasetModelUploadToken(token=str(token.token))
 
 
 class AddKeywordMutation(relay.ClientIDMutation):
@@ -211,26 +230,6 @@ class DeleteCompasModelMutation(relay.ClientIDMutation):
         return DeleteCompasModelMutation(result=True)
 
 
-class AddCompasDatasetModelMutation(relay.ClientIDMutation):
-    class Input:
-        compas_publication = graphene.String(required=True)
-        compas_model = graphene.String(required=True)
-        file = Upload(required=True)
-
-    id = graphene.ID()
-
-    @classmethod
-    @login_required
-    @user_passes_test(check_publication_management_user)
-    def mutate_and_get_payload(cls, root, info, compas_publication, compas_model, file):
-        dataset_model = CompasDatasetModel.create_dataset_model(
-            CompasPublication.objects.get(id=from_global_id(compas_publication)[1]),
-            CompasModel.objects.get(id=from_global_id(compas_model)[1]),
-            file
-        )
-        return AddCompasDatasetModelMutation(id=to_global_id('CompasDatasetModel', dataset_model.id))
-
-
 class DeleteCompasDatasetModelMutation(relay.ClientIDMutation):
     class Input:
         id = graphene.ID()
@@ -245,6 +244,32 @@ class DeleteCompasDatasetModelMutation(relay.ClientIDMutation):
         return DeleteCompasDatasetModelMutation(result=True)
 
 
+class UploadCompasDatasetModelMutation(relay.ClientIDMutation):
+    class Input:
+        upload_token = graphene.String()
+        compas_publication = graphene.String(required=True)
+        compas_model = graphene.String(required=True)
+        job_file = Upload(required=True)
+
+    id = graphene.ID()
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, upload_token, compas_publication, compas_model, job_file):
+        # Get the token being used to perform the upload - this will return None if the token doesn't exist or
+        # is expired
+        token = CompasDatasetModelUploadToken.get_by_token(upload_token)
+        if not token:
+            raise GraphQLError("Compas Dataset Model upload token is invalid or expired.")
+
+        dataset_model = CompasDatasetModel.create_dataset_model(
+            CompasPublication.objects.get(id=from_global_id(compas_publication)[1]),
+            CompasModel.objects.get(id=from_global_id(compas_model)[1]),
+            job_file
+        )
+
+        return UploadCompasDatasetModelMutation(id=to_global_id('CompasDatasetModel', dataset_model.id))
+
+
 class Mutation(graphene.ObjectType):
     add_keyword = AddKeywordMutation.Field()
     delete_keyword = DeleteKeywordMutation.Field()
@@ -252,5 +277,5 @@ class Mutation(graphene.ObjectType):
     delete_publication = DeletePublicationMutation.Field()
     add_compas_model = AddCompasModelMutation.Field()
     delete_compas_model = DeleteCompasModelMutation.Field()
-    add_compas_dataset_model = AddCompasDatasetModelMutation.Field()
     delete_compas_dataset_model = DeleteCompasDatasetModelMutation.Field()
+    upload_compas_dataset_model = UploadCompasDatasetModelMutation.Field()
