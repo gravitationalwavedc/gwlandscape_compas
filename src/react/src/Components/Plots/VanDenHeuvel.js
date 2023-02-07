@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import { vdhattr } from './DataUtil';
-import './VanDenHeuvel.css';
+import { eventAlphabet, stellarTypes } from './VanDenHeuvelUtils';
 
 const DOMAIN = process.env.NODE_ENV !== 'development' ? '' : 'http://localhost:3004';
 
@@ -9,38 +9,20 @@ export default memo(function VanDenHeuvel({ data }) {
     const [eventSequenceIndex, setEventSequenceIndex] = useState(null);
     const [eventString, setEventString] = useState(null);
 
-    //const eventIndex = [2, 26, 13, 49, 15, 51]; //should generate these
-    const eventAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
-
-    const stellarTypes = [
-        'MS',
-        'MS',
-        'HG', 'FGB', 'CHeB', 'EAGB', 'TPAGB', 'HeMS', 'HeHG',
-        'HeGB', 'HeWD', 'COWD', 'ONeWD', 'NS', 'BH', 'MR'
-    ];
-
     const vdhattrData = vdhattr(data);
 
     const getEvents = () => {
-        let imageIndices = [];
-        let sequenceIndices = [];
-        let eventStrings = [];
+        let imageIndices = [2];
+        let sequenceIndices = [0];
+        let eventStrings = [`Zero-age main-sequence, metallicity Z=${vdhattrData.Z1[0]}`];
         let isMerger = false;
 
-        //Beginning of event
-        sequenceIndices.push(0);
-        imageIndices.push(2);
-        eventStrings.push(`Zero-age main-sequence, metallicity Z=${vdhattrData.Z1[0]}`);
-
-        //iterate through time sequence
         for (let i = 0; i < vdhattrData.time.length; i++) {
-            if (i == 0) continue;
-            //if (isMerger) break;
+            if (i === 0) continue;
 
-            let stype1 = vdhattrData.Stellar_Type1[i];
-            let stype2 = vdhattrData.Stellar_Type2[i];
+            const stype1 = vdhattrData.Stellar_Type1[i];
+            const stype2 = vdhattrData.Stellar_Type2[i];
 
-            //eventClass=='Mass Transfer'
             if (vdhattrData.MT_history[i] > 0 && vdhattrData.MT_history[i - 1] !== vdhattrData.MT_history[i]) {
                 let image_num, eventstring;
                 let mtValue = vdhattrData.MT_history[i];
@@ -54,6 +36,7 @@ export default memo(function VanDenHeuvel({ data }) {
                     } else {
                         image_num = 44;
                     }
+                    break;
                 case 2:
                     eventstring = 'Stable mass transfer from 2 to 1';
                     if (stype2 < 13) {
@@ -83,7 +66,6 @@ export default memo(function VanDenHeuvel({ data }) {
                 eventStrings.push(eventstring);
             }
 
-            //eventClass = 'supernova' or 'stellar type change'
             let type_changed_star, isSupernova; //which star 
 
             if (stype1 !== vdhattrData.Stellar_Type1[i - 1]) {
@@ -178,9 +160,7 @@ export default memo(function VanDenHeuvel({ data }) {
 
     const bebold = input => <b className="bold">{input}</b>;
 
-    //index: eventIndex value, i: sequence number 
     const descDiv = (index, i) =>
-    //let index = eventIndex[i];
         (
             <div className="desc">
             Time = {bebold(vdhattrData.time[index])} Myr, a = {bebold(vdhattrData.semimajor[index])} R<sub>⊙</sub>
@@ -195,13 +175,14 @@ export default memo(function VanDenHeuvel({ data }) {
 
     const eventSequenceDiv = (i) => <div className="alphabet">{eventAlphabet[i]}</div>;
 
-    return (<div>
-        {eventSequenceIndex && eventSequenceIndex.map((index, i) =>
-            <div className="container" key={i}>
-                {imageIndex[i] && eventSequenceDiv(i)}
-                {imageIndex[i] && imageDiv(imageIndex[i])}
-                {imageIndex[i] && descDiv(index, i)}
-            </div>
-        )}
-    </div>);
+    return (
+        <div>
+            {eventSequenceIndex && eventSequenceIndex.map((index, i) =>
+                <div key={i}>
+                    {imageIndex[i] && eventSequenceDiv(i)}
+                    {imageIndex[i] && imageDiv(imageIndex[i])}
+                    {imageIndex[i] && descDiv(index, i)}
+                </div>
+            )}
+        </div>);
 });
