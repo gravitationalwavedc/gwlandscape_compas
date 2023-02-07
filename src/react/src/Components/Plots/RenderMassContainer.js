@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { mapLineData, units, mass } from './DataUtil';
 import {
     XAxis,
@@ -11,8 +11,10 @@ import PlotLineZoom from './PlotLineZoom';
 
 const initialDomain = { x1: 'auto', x2: dataMax => (dataMax * 1.1), y1: 'auto', y2: 'dataMax' };
 
-const RenderMassContainer = ({ data, divStyle, syncId }) => {
+const RenderMassContainer = memo(function RenderMassContainer({ data, divStyle, syncId }) {
     const [domain, setDomain] = useState(initialDomain);
+    
+    const mapData = mapLineData(mass(data));
 
     const aliases = {
         totalMass1: 'Mass1',
@@ -46,7 +48,7 @@ const RenderMassContainer = ({ data, divStyle, syncId }) => {
         <PlotLineZoom
             divStyle={divStyle}
             syncId={syncId}
-            data={mapLineData(mass(data))}
+            data={mapData}
             xkey={xkey}
             ykeys={ykeys}
             initialState={initialDomain}
@@ -80,6 +82,6 @@ const RenderMassContainer = ({ data, divStyle, syncId }) => {
             <Legend layout="vertical" align="right" verticalAlign="top" />
         </PlotLineZoom>
     );
-};
+});
 
 export default RenderMassContainer;

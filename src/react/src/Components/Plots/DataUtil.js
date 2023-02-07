@@ -38,13 +38,19 @@ const length = (data) => ({
     periapsis: data['SemiMajorAxis'].map((sma, i) => sma * (1 - data['Eccentricity'][i]))
 });
 
-const hrattr = (data) => ({
-    teff_1: data['Teff(1)'],
-    teff_2: data['Teff(2)'],
-    luminosity_1: data['Luminosity(1)'],
-    luminosity_2: data['Luminosity(2)'],
-    time: data['Time']
-});
+const hrattr = (data) => {
+    if (!data) {
+        return ({});
+    }
+
+    return ({
+        teff_1: data['Teff(1)'],
+        teff_2: data['Teff(2)'],
+        luminosity_1: data['Luminosity(1)'],
+        luminosity_2: data['Luminosity(2)'],
+        time: data['Time']
+    });
+};
 
 const vdhattr = (data) => ({
     time: data['Time'],
@@ -73,6 +79,11 @@ const mapScatterData = (dataset, aliases) => {
     // has two separate datasets
     let data1 = [];
     let data2 = [];
+
+    if (Object.keys(dataset).length === 0) {
+        return [data1, data2];
+    }
+
     let objkeys = Object.keys(aliases);
 
     dataset.time.forEach((t, i) => {
