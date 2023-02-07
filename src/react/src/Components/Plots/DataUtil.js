@@ -80,10 +80,7 @@ const mapScatterData = (dataset, aliases) => {
     let data1 = [];
     let data2 = [];
 
-    console.log("Am I here?", dataset);
-
     if (Object.keys(dataset).length === 0) {
-        console.log("but not here right");
         return [data1, data2];
     }
 
