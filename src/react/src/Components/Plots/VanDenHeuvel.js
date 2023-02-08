@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Col, Image, Row } from 'react-bootstrap';
+import { Col, Image, Row, Table } from 'react-bootstrap';
 import { vdhattr } from './DataUtil';
 import { eventAlphabet, getEvents } from './VanDenHeuvelUtils';
 
@@ -12,17 +12,53 @@ export default memo(function VanDenHeuvel({ data }) {
     return (
         <Col>
             {sequenceIndices && sequenceIndices.map((index, i) =>
-                imageIndices[i] ? <Row md={3} sm={3} key={i} className="mb-4">
+                imageIndices[i] ? <Row key={i} className="mb-4 mt-4">
                     <Col sm={1} md={1} className="text-right">{eventAlphabet[i]}</Col>
                     <Col>
                         <Image fluid src={`${DOMAIN}/compas/static/assets/${imageIndices[i]}.png`} />
                     </Col>
                     <Col>
-                        Time = {vdhattrData.time[index].toFixed(2)} Myr, 
-                        a = {vdhattrData.semimajor[index].toFixed(2)} R<sub>⊙</sub>
-                        M<sub>1</sub> = {vdhattrData.mass1[index].toFixed(2)} M<sub>⊙</sub>, 
-                        M<sub>2</sub> = {vdhattrData.mass2[index].toFixed(2)} M<sub>⊙</sub>, 
-                        {eventStrings[i]}
+                        <Table borderless responsive size="sm">
+                            <tbody>
+                                <tr>
+                                    <th>
+                                        Time
+                                    </th>
+                                    <td>
+                                        {vdhattrData.time[index].toFixed(2)} Myr
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        a
+                                    </th>
+                                    <td>
+                                        {vdhattrData.semimajor[index].toFixed(2)} R<sub>⊙</sub>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        M<sub>1</sub>
+                                    </th>
+                                    <td>
+                                        {vdhattrData.mass1[index].toFixed(2)} M<sub>⊙</sub>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        M<sub>2</sub>
+                                    </th>
+                                    <td>
+                                        {vdhattrData.mass2[index].toFixed(2)} M<sub>⊙</sub>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colSpan={2}>
+                                        <h6>{eventStrings[i]}</h6>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </Table>
                     </Col>
                 </Row> : null)
             }

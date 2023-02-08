@@ -66,7 +66,6 @@ export default class RenderLength extends React.Component {
         this.state.data = this.props.data;
     }
 
-
     drawLine(dataKey, alias = null, style, type = null, dot = false) {
         if (dataKey === 'time') return;
         return (<Line type={type || 'monotone'}
@@ -75,7 +74,6 @@ export default class RenderLength extends React.Component {
             {...style}
             dot={dot}
         />);
-    //{...(stroke?{stroke:stroke}:{})}
     }
 
     zoom() {
@@ -119,21 +117,19 @@ export default class RenderLength extends React.Component {
             bottom: yDomain[0],
             top: yDomain[1],
         }));
-
     }
 
-
     render() {
-        const { datakeys, type, stroke, dot, divStyle, syncId } = this.props;
+        const { datakeys, divStyle, syncId } = this.props;
         const { data, left, right, refAreaLeft, refAreaRight, top, bottom } = this.state;
 
         return (<div style={divStyle || {
-            width: '823px',
+            width: '100%',
             height: '400px',
             backgroundColor: 'white'
         }}>
             <button type="button" className="btn update" onClick={this.zoomOut.bind(this)}>
-        Zoom Out
+                Zoom Out
             </button>
 
             <ResponsiveContainer width="100%"

@@ -5,7 +5,6 @@ export const eventAlphabet = [
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
 ];
 
-
 export const stellarTypes = [
     'MS',
     'MS',
