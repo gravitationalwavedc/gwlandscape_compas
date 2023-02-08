@@ -11,7 +11,7 @@ import PlotLineZoom from './PlotLineZoom';
 
 const initialDomain = { x1: 'auto', x2: dataMax => (dataMax * 1.1), y1: 'auto', y2: 'dataMax' };
 
-const RenderMassContainer = memo(function RenderMassContainer({ data, divStyle, syncId }) {
+const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) {
     const [domain, setDomain] = useState(initialDomain);
     
     const mapData = mapLineData(mass(data));
@@ -46,7 +46,6 @@ const RenderMassContainer = memo(function RenderMassContainer({ data, divStyle, 
 
     return (
         <PlotLineZoom
-            divStyle={divStyle}
             syncId={syncId}
             data={mapData}
             xkey={xkey}

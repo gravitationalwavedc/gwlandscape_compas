@@ -120,76 +120,73 @@ export default class RenderLength extends React.Component {
     }
 
     render() {
-        const { datakeys, divStyle, syncId } = this.props;
+        const { datakeys, syncId } = this.props;
         const { data, left, right, refAreaLeft, refAreaRight, top, bottom } = this.state;
 
-        return (<div style={divStyle || {
-            width: '100%',
-            height: '400px',
-            backgroundColor: 'white'
-        }}>
-            <button type="button" className="btn update" onClick={this.zoomOut.bind(this)}>
-                Zoom Out
-            </button>
+        return (
+            <div style={{ width: '100%', height: '400px'}} className="mt-3">
+                <button type="button" className="btn update" onClick={this.zoomOut.bind(this)}>
+                    Zoom Out
+                </button>
 
-            <ResponsiveContainer width="100%"
-                height="100%">
-                <LineChart
-                    width={500}
-                    height={300}
-                    data={data}
-                    syncId={syncId}
+                <ResponsiveContainer width="100%"
+                    height="100%">
+                    <LineChart
+                        width={500}
+                        height={300}
+                        data={data}
+                        syncId={syncId}
 
-                    margin={{
-                        top: 5,
-                        right: 20,
-                        left: 20,
-                        bottom: 25,
-                    }}
-                    onMouseDown={(e) => {
-                        this.setState({ refAreaLeft: e.activeLabel });
-                    }}
-                    onMouseMove={(e) => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })}
-                    // eslint-disable-next-line react/jsx-no-bind
-                    onMouseUp={this.zoom.bind(this)}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                        allowDataOverflow
-                        name="time"
-                        type="number"
-                        scale='time'
-                        domain={[left, right]}
-                        padding={{ left: 20 }}
-                        dataKey="time" unit="" tickFormatter={f => f.toFixed(2)}>
-                        <Label value="Time(Myr)" position="bottom" offset={0} />
-                    </XAxis>
-                    <YAxis
-                        allowDataOverflow
-                        scale='log'
-                        tickFormatter={tickExpFormatter}
-                        domain={[bottom, top]}
-                        padding={{ bottom: 5 }}
-                        label={{
-                            value: 'Radius/R_\u{2299}',
-                            angle: -90,
-                            position: 'insideLeft',
-                            textAnchor: 'middle',
-                            offset: -5
-                        }} />
-                    <Tooltip formatter={(value, name) => {
-                        if (name === 'time') { return [`${value} Myr`, name]; }
-                        return [value, name];
-                    }}
-                    position={{}} />
-                    <Legend layout="vertical" align="right" verticalAlign="top" />
-                    {Object.keys(datakeys).map((key) => this.drawLine(key, datakeys[key], strokeStyle[key]))}
-                    {refAreaLeft && refAreaRight ? (
-                        <ReferenceArea x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} />
-                    ) : null}
-                </LineChart>
-            </ResponsiveContainer>
-        </div>);
+                        margin={{
+                            top: 5,
+                            right: 20,
+                            left: 20,
+                            bottom: 25,
+                        }}
+                        onMouseDown={(e) => {
+                            this.setState({ refAreaLeft: e.activeLabel });
+                        }}
+                        onMouseMove={(e) => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })}
+                        // eslint-disable-next-line react/jsx-no-bind
+                        onMouseUp={this.zoom.bind(this)}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                            allowDataOverflow
+                            name="time"
+                            type="number"
+                            scale='time'
+                            domain={[left, right]}
+                            padding={{ left: 20 }}
+                            dataKey="time" unit="" tickFormatter={f => f.toFixed(2)}>
+                            <Label value="Time(Myr)" position="bottom" offset={0} />
+                        </XAxis>
+                        <YAxis
+                            allowDataOverflow
+                            scale='log'
+                            tickFormatter={tickExpFormatter}
+                            domain={[bottom, top]}
+                            padding={{ bottom: 5 }}
+                            label={{
+                                value: 'Radius/R_\u{2299}',
+                                angle: -90,
+                                position: 'insideLeft',
+                                textAnchor: 'middle',
+                                offset: -5
+                            }} />
+                        <Tooltip formatter={(value, name) => {
+                            if (name === 'time') { return [`${value} Myr`, name]; }
+                            return [value, name];
+                        }}
+                        position={{}} />
+                        <Legend layout="vertical" align="right" verticalAlign="top" />
+                        {Object.keys(datakeys).map((key) => this.drawLine(key, datakeys[key], strokeStyle[key]))}
+                        {refAreaLeft && refAreaRight ? (
+                            <ReferenceArea x1={refAreaLeft} x2={refAreaRight} strokeOpacity={0.3} />
+                        ) : null}
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>);
     }
 }
 //<Legend wrapperStyle={{ paddingBottom: "20px" }} layout="vertical" align="right" verticalAlign="top" />
