@@ -129,7 +129,7 @@ const PlotLineZoom = ({
     };
 
     return (
-        <div style={divStyle || { width: '100%', height: '400px', backgroundColor: 'white' }}>
+        <div style={divStyle || { width: '100%', height: '400px'}}>
             {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
             <ResponsiveContainer width="80%"
                 height="100%">
