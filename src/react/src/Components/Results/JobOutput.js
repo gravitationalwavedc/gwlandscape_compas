@@ -10,7 +10,10 @@ const JobOutput = ({ detailedOutputFileName, error, isLoading }) => (
             </Col>
             <Col>
                 {detailedOutputFileName
-                    ? <a data-testid="download-link" href={detailedOutputFileName}>Download Output File</a>
+                    ? <a 
+                        data-testid="download-link"
+                        className='float-right mr-4'
+                        href={detailedOutputFileName}>Download Output File</a>
                     : (isLoading && <div>Loading...</div>)
                 }
             </Col>

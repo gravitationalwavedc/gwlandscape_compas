@@ -100,9 +100,8 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
     };
 
     return (<div style={divStyle || {
-        width: '973px',
+        width: '100%',
         height: '400px',
-        backgroundColor: 'white'
     }}>
         {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
 
