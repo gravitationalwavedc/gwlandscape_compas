@@ -10,7 +10,7 @@ import {
     Label
 } from 'recharts';
 
-const RenderLengthContainer = memo(function RenderLengthContainer({ data, divStyle, syncId }) {
+const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId }) {
     const [domain, setDomain] = useState({
         x1: 'auto',
         x2: dataMax => (dataMax * 1.1),
@@ -47,7 +47,6 @@ const RenderLengthContainer = memo(function RenderLengthContainer({ data, divSty
     const { time: xkey, ...ykeys } = aliases;
 
     return (<PlotLineZoom
-        divStyle={divStyle}
         syncId={syncId}
         data={chartData}
         xkey={xkey}
