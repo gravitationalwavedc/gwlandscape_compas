@@ -32,8 +32,8 @@ const length = (data) => ({
     eccentricity: data['Eccentricity'],
     radius_1: data['Radius(1)'],
     radius_2: data['Radius(2)'],
-    roche_radius_1: data['Radius(1)|RL'],
-    roche_radius_2: data['Radius(2)|RL'],
+    roche_radius_1: data['RocheLobe(1)|a'],
+    roche_radius_2: data['RocheLobe(2)|a'],
     time: data['Time'],
     periapsis: data['SemiMajorAxis'].map((sma, i) => sma * (1 - data['Eccentricity'][i]))
 });

@@ -8,10 +8,11 @@ import {
 } from 'recharts';
 
 const getTwoPoints = (array) => {
-    let point1 = { y: array[0].y, value: array[0].value };
-    let p = array.find(point => point1.value === 0 ? point.value !== point1.value :
+    const point1 = { y: array[0].y, value: array[0].value };
+
+    const p = array.find(point => point1.value === 0 ? point.value !== point1.value :
         Math.abs((point.value - point1.value) / point1.value) > 1.1);
-    let point2 = p ? { y: p.y, value: p.value } : null;
+    const point2 = p ? { y: p.y, value: p.value } : null;
     return point2 ? [point1, point2] : null;
 };
 
@@ -39,7 +40,6 @@ const translateChartYtoCoordY = (chartY, yconst, scaleType) => {
 const DEFAULT_ZOOM = { x1: null, y1: null, x2: null, y2: null };
 
 const PlotLineZoom = ({
-    divStyle,
     syncId,
     data,
     xkey,
@@ -59,10 +59,12 @@ const PlotLineZoom = ({
 
     const Linechartload = useCallback(line => {
         if (line && Line1) {
-            let points = Line1.current.props.points;
-            let twopoints = getTwoPoints(points);
-            if (scaleType === 'Linear') setYconst(getYconstsLinear(...twopoints));
-            if (scaleType === 'Log') setYconst(getYconstsLog(...twopoints));
+            const points = Line1.current.props.points;
+            const twopoints = getTwoPoints(points);
+            if(twopoints !== null) {
+                if (scaleType === 'Linear') setYconst(getYconstsLinear(...twopoints));
+                if (scaleType === 'Log') setYconst(getYconstsLog(...twopoints));
+            }
         }
     }, [isZoomed]);
 
@@ -129,7 +131,7 @@ const PlotLineZoom = ({
     };
 
     return (
-        <div style={divStyle || { width: '100%', height: '400px'}}>
+        <div style={{ width: '100%', height: '400px'}}>
             {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
             <ResponsiveContainer width="80%"
                 height="100%">
@@ -159,13 +161,9 @@ const PlotLineZoom = ({
                     />
                     <Tooltip
                         allowEscapeViewBox={{ x: false, y: false }}
-                        //content={<CustomTooltip xunit='Myr' yunit={yunit}/>}
-                        //position={{ x: 760, y: 10 }}
                         ref={ToolTip}
                         formatter={value => <>{value.toFixed(4)} {yunit}</>}
-                        //formatter={value => value.toFixed(4) + yunit } 
                         labelFormatter={label => `Time : ${label} Myr`}
-                        //animationDuration={1500}
                         filterNull={false}
                     />
                 </LineChart>

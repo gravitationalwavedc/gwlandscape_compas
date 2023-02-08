@@ -61,9 +61,18 @@ const NewSingleBinaryJob = () => {
         // Reset the json data so they know something is happening.
         setJsonData('');
 
-        Object.entries(values)
-            .filter(([key, value]) => value === '')
-            .map(([key, value]) => values[key] = null);
+        // We don't want to update the Formik values to null because
+        // it causes errors with uncontrolled components.
+        const valuesCopy = {...values};
+
+        // But graphql expects null instead of ''. 
+        Object.keys(valuesCopy).forEach(
+            (key) => {
+                if (valuesCopy[key] === '') {
+                    valuesCopy[key] = null;
+                }
+            }
+        );
 
         setDetailedOutputFile('');
         setIsLoadingOutput(true);
@@ -71,21 +80,21 @@ const NewSingleBinaryJob = () => {
 
         const variables = {
             input: {
-                mass1: values.mass1,
-                mass2: values.mass2,
-                metallicity: values.metallicity,
-                eccentricity: values.eccentricity,
-                separation: values.separation,
-                orbitalPeriod: values.orbitalPeriod,
-                velocity1: values.velocity1,
-                velocity2: values.velocity2,
-                commonEnvelopeAlpha: values.commonEnvelopeAlpha,
-                commonEnvelopeLambdaPrescription: values.commonEnvelopeLambdaPrescription,
-                remnantMassPrescription: values.remnantMassPrescription,
-                fryerSupernovaEngine: values.fryerSupernovaEngine,
-                massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,
-                massTransferAccretionEfficiencyPrescription: values.massTransferAccretionEfficiencyPrescription,
-                massTransferFa: values.massTransferFa,
+                mass1: valuesCopy.mass1,
+                mass2: valuesCopy.mass2,
+                metallicity: valuesCopy.metallicity,
+                eccentricity: valuesCopy.eccentricity,
+                separation: valuesCopy.separation,
+                orbitalPeriod: valuesCopy.orbitalPeriod,
+                velocity1: valuesCopy.velocity1,
+                velocity2: valuesCopy.velocity2,
+                commonEnvelopeAlpha: valuesCopy.commonEnvelopeAlpha,
+                commonEnvelopeLambdaPrescription: valuesCopy.commonEnvelopeLambdaPrescription,
+                remnantMassPrescription: valuesCopy.remnantMassPrescription,
+                fryerSupernovaEngine: valuesCopy.fryerSupernovaEngine,
+                massTransferAngularMomentumLossPrescription: valuesCopy.massTransferAngularMomentumLossPrescription,
+                massTransferAccretionEfficiencyPrescription: valuesCopy.massTransferAccretionEfficiencyPrescription,
+                massTransferFa: valuesCopy.massTransferFa,
             }
         };
 
