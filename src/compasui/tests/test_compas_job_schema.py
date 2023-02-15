@@ -31,6 +31,10 @@ class TestCompasJobSchema(CompasTestCase):
                 },
                 'basicParameters': {
                     'numberOfSystems': '100'
+                },
+                'advancedParameters': {
+                    'massTransferFa': '0.5',
+                    'massTransferAccretionEfficiencyPrescription': 'FIXED',
                 }
             }
         }
