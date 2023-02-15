@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import traceback
 
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -9,6 +10,7 @@ from .utils import constants
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.jobs.request_file_list import request_file_list
 from .utils.jobs.request_job_status import request_job_status
+from .utils.constants import COMPAS_RUN_FIELD_COMMANDS
 # from .variables import compas_parameters
 
 
@@ -95,6 +97,21 @@ class CompasJob(models.Model):
             basic=basic,
             advanced=advanced
         )
+
+    def as_compas_options(self):
+        options = dict()
+        try:
+            for p in self.basic_parameter.all():
+                options[COMPAS_RUN_FIELD_COMMANDS[p.name]] = p.value
+
+            for p in self.advanced_parameter.all():
+                options[COMPAS_RUN_FIELD_COMMANDS[p.name]] = p.value
+
+            return options
+        except KeyError:
+            traceback.print_exc()
+            return None
+
 
     @classmethod
     def get_by_id(cls, bid, user):
