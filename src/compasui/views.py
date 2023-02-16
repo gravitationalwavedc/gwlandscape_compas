@@ -42,7 +42,6 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
 
         # Create the parameter json
         params = compas_job.as_json()
-        print(params)
 
         # Construct the request parameters to the job controller, note that parameters must be a string, not an objects
         data = {
