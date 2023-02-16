@@ -59,7 +59,8 @@ class TestModels(TestCase):
         metallicity_distribution = BasicParameter(job=job, name="metallicity_distribution", value="ZSOLAR")
         metallicity_distribution.save()
 
-        mass_transfer_accretion_efficiency_prescription = AdvancedParameter(job=job, name="mass_transfer_accretion_efficiency_prescription", value="FIXED")
+        mass_transfer_accretion_efficiency_prescription = \
+            AdvancedParameter(job=job, name="mass_transfer_accretion_efficiency_prescription", value="FIXED")
         mass_transfer_accretion_efficiency_prescription.save()
 
         self.assertDictEqual(job.as_compas_options(), {
@@ -78,9 +79,8 @@ class TestModels(TestCase):
         no_of_systems = BasicParameter(job=job, name="no_of_systems", value="100")
         no_of_systems.save()
 
-        mass_transfer_accretion_efficiency_prescription = AdvancedParameter(job=job,
-                                                                            name="mass_transfer_accretion_efficiency_prescription",
-                                                                            value="FIXED")
+        mass_transfer_accretion_efficiency_prescription = \
+            AdvancedParameter(job=job, name="mass_transfer_accretion_efficiency_prescription", value="FIXED")
         mass_transfer_accretion_efficiency_prescription.save()
 
         self.assertIsNone(job.as_compas_options())

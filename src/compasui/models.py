@@ -112,7 +112,6 @@ class CompasJob(models.Model):
             traceback.print_exc()
             return None
 
-
     @classmethod
     def get_by_id(cls, bid, user):
         """

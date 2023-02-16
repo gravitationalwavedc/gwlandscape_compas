@@ -205,6 +205,7 @@ class BasicParametersInput(graphene.InputObjectType):
     min_orbital_period = graphene.String()
     max_orbital_period = graphene.String()
 
+
 class AdvancedParametersInput(graphene.InputObjectType):
     mass_transfer_angular_momentum_loss_prescription = graphene.String()
     mass_transfer_accretion_efficiency_prescription = graphene.String()

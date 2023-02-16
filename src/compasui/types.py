@@ -31,6 +31,7 @@ class AbstractBasicParameterType(AbstractType):
     min_orbital_period = String()
     max_orbital_period = String()
 
+
 class AbstractAdvancedParametersType(AbstractType):
     mass_transfer_angular_momentum_loss_prescription = String()
     mass_transfer_accretion_efficiency_prescription = String()
