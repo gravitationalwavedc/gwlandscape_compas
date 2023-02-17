@@ -99,6 +99,13 @@ class CompasJob(models.Model):
         )
 
     def as_compas_options(self):
+        """
+        Reads basic and advanced parameter names, looks up corresponding COMPAS commands
+        then matches the command with parameter value
+        :return:
+        options: dictionary of COMPAS commands and values
+        example: { '--number_of_systems': '100', '--metallicity-distribution': 'ZSOLAR', ...}
+        """
         options = dict()
         try:
             for p in self.basic_parameter.all():
@@ -110,7 +117,6 @@ class CompasJob(models.Model):
             return options
         except KeyError:
             traceback.print_exc()
-            return None
 
     @classmethod
     def get_by_id(cls, bid, user):
@@ -377,7 +383,7 @@ class SingleBinaryJob(models.Model):
 
             field_value = getattr(self, field.name)
             if (field_value is not None) and (field.name in constants.SINGLE_BINARY_FIELD_COMMANDS):
-                content += f'{constants.SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value}' + " "
+                content += f'{constants.SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value} '
 
         # path where the file is saved: media_root/job_key
         storage_location = Path(settings.COMPAS_IO_PATH).joinpath(str(self.id))

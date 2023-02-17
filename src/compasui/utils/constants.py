@@ -408,7 +408,7 @@ TASK_RUNNING = 'RUNNING'
 # example of added task failure
 TASK_FAIL_OTHER = 'REMOVED'
 
-COMPAS_RUN_FIELD_COMMANDS = dict({
+COMPAS_RUN_FIELD_COMMANDS = {
     'number_of_systems': '--number-of-systems',
     'min_initial_mass': '--initial-mass-min',
     'max_initial_mass': '--initial-mass-max',
@@ -435,4 +435,4 @@ COMPAS_RUN_FIELD_COMMANDS = dict({
     'kick_velocity_distribution': '--kick-magnitude-distribution',
     'velocity_1': '--kick-magnitude-1',
     'velocity_2': '--kick-magnitude-2'
-})
+}
