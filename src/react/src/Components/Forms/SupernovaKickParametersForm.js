@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Col, Row} from 'react-bootstrap';
 import Input from './Atoms/Input';
 import {fryerSupernovaEngineOptions, remnantMassPrescriptionOptions, kickVelocityDistributionOptions}
@@ -7,19 +7,8 @@ import SelectInput from './Atoms/SelectInput';
 
 
 const SupernovaKickParametersForm = ({formik}) => {
-    const [showFryerSupernovaEngine, setShowFryerSupernovaEngine] = useState(true);
-    const [showVelocity, setShowVelocity] = useState(false);
-
-
-    const handleRemnantMassPrescriptionOnChange = (e) => {
-        formik.setFieldValue('remnantMassPrescription', e.target.value);
-        setShowFryerSupernovaEngine(e.target.value === 'FRYER2012');
-    };
-
-    const handleKickVelocityDistChange = (e) => {
-        formik.setFieldValue('kickVelocityDistribution', e.target.value);
-        setShowVelocity(e.target.value === 'FIXED');
-    };
+    const showFryerSupernovaEngine = formik.values['remnantMassPrescription'] === 'FRYER2012';
+    const showVelocity = formik.values['kickVelocityDistribution'] === 'FIXED';
 
     return (
         <React.Fragment>
@@ -32,7 +21,6 @@ const SupernovaKickParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={remnantMassPrescriptionOptions}
-                        onChange={handleRemnantMassPrescriptionOnChange}
                     />
                 </Col>
                 <Col md={5}>
@@ -56,7 +44,6 @@ const SupernovaKickParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={kickVelocityDistributionOptions}
-                        onChange={handleKickVelocityDistChange}
                     />
                 </Col>
             </Row>
