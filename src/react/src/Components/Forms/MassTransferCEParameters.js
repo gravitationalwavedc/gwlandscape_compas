@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Col, Row} from 'react-bootstrap';
 import Input from './Atoms/Input';
 import SelectInput from './Atoms/SelectInput';
@@ -7,12 +7,7 @@ import {massTransferAccretionEfficiencyPrescriptionOptions,
     lambdaPrescriptionOptions} from '../../Utils/parameters';
 
 const MassTransferCEParametersForm = ({formik}) => {
-    const [showMassTransferFA, setShowMassTransferFA] = useState(false);
-
-    const handleAccretionEfficiencyPrescriptionOnChange = (e) => {
-        formik.setFieldValue('massTransferAccretionEfficiencyPrescription', e.target.value);
-        setShowMassTransferFA(e.target.value === 'FIXED');
-    };
+    const showMassTransferFA = formik.values['massTransferAccretionEfficiencyPrescription'] === 'FIXED';
 
     return (
         <React.Fragment>
@@ -37,7 +32,6 @@ const MassTransferCEParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={massTransferAccretionEfficiencyPrescriptionOptions}
-                        onChange={handleAccretionEfficiencyPrescriptionOnChange}
                     />
                 </Col>
                 <Col>

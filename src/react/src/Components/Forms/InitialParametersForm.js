@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Col, Row} from 'react-bootstrap';
 import Input from './Atoms/Input';
 import SelectInput from './Atoms/SelectInput';
@@ -29,36 +29,10 @@ const metallicityDist = [
 
 const InitialParametersForm = ({formik}) => {
 
-    const [showMassPower, setShowMassPower] = useState(false);
-    const [showMassRatios, setShowMassRatios] = useState(true);
-    const [showSeparations, setShowSeparations] = useState(true);
-    const [showOrbitalPeriods, setShowOrbitalPeriods] = useState(false);
-    const [showMetallicities, setShowMetallicities] = useState(false);
-
-    const handleInitialMassFnOnChange = (e) => {
-        let value = e.target.value;
-        formik.setFieldValue('initialMassFunction', value);
-        setShowMassPower(value === 'POWERLAW');
-    };
-
-    const handleMassRatioDistributionOnChange = (e) => {
-        let value = e.target.value;
-        formik.setFieldValue('massRatioDistribution', value);
-        setShowMassRatios(value === 'FLAT');
-    };
-
-    const handleSemiMajorAxisDistOnChange = (e) => {
-        let value = e.target.value;
-        formik.setFieldValue('semiMajorAxisDistribution', value);
-        setShowSeparations(['FLATINLOG', 'DUQUENNOYMAYOR1991'].includes(value));
-        setShowOrbitalPeriods(!['FLATINLOG', 'DUQUENNOYMAYOR1991'].includes(value));
-    };
-
-    const handleMetallicityDistOnChange = (e) => {
-        let value = e.target.value;
-        formik.setFieldValue('metallicityDistribution', value);
-        setShowMetallicities(value !== 'ZSOLAR');
-    };
+    const showMassPower = formik.values['initialMassFunction'] === 'POWERLAW';
+    const showMassRatios = formik.values['massRatioDistribution'] === 'FLAT';
+    const showSeparations = ['FLATINLOG', 'DUQUENNOYMAYOR1991'].includes(formik.values['semiMajorAxisDistribution']);
+    const showMetallicities = formik.values['metallicityDistribution'] !== 'ZSOLAR';
 
     return (
         <React.Fragment>
@@ -86,7 +60,6 @@ const InitialParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={initialMassFn}
-                        onChange={handleInitialMassFnOnChange}
                     />
                 </Col>
                 <Col>
@@ -126,7 +99,6 @@ const InitialParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={massRatioDist}
-                        onChange={handleMassRatioDistributionOnChange}
                     />
                 </Col>
             </Row>
@@ -159,7 +131,6 @@ const InitialParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={semiMajorAxisDist}
-                        onChange={handleSemiMajorAxisDistOnChange}
                     />
                 </Col>
             </Row>
@@ -190,7 +161,7 @@ const InitialParametersForm = ({formik}) => {
                         title="Min Orbital Period (Hours)"
                         name="minOrbitalPeriod"
                         type="number"
-                        show={showOrbitalPeriods}
+                        show={!showSeparations}
                     />
                 </Col>
                 <Col>
@@ -199,7 +170,7 @@ const InitialParametersForm = ({formik}) => {
                         title="Max Orbital Period (Hours)"
                         name="maxOrbitalPeriod"
                         type="number"
-                        show={showOrbitalPeriods}
+                        show={!showSeparations}
                     />
                 </Col>
             </Row>
@@ -212,7 +183,6 @@ const InitialParametersForm = ({formik}) => {
                         type='string'
                         help=''
                         options={metallicityDist}
-                        onChange={handleMetallicityDistOnChange}
                     />
                 </Col>
             </Row>

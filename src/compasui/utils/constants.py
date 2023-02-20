@@ -260,7 +260,7 @@ NAME_VALUES.update(
 )
 
 # Mapping fields names to corresponding COMPAS commands
-FIELD_COMMANDS = dict(
+SINGLE_BINARY_FIELD_COMMANDS = dict(
     {
         'mass1': '--initial-mass-1',
         'mass2': '--initial-mass-2',
@@ -407,3 +407,32 @@ TASK_TIMEOUT = 'TIMEOUT'
 TASK_RUNNING = 'RUNNING'
 # example of added task failure
 TASK_FAIL_OTHER = 'REMOVED'
+
+COMPAS_RUN_FIELD_COMMANDS = {
+    'number_of_systems': '--number-of-systems',
+    'min_initial_mass': '--initial-mass-min',
+    'max_initial_mass': '--initial-mass-max',
+    'initial_mass_function': '--initial-mass-function',
+    'initial_mass_power': '--initial-mass-power',
+    'min_metallicity': '--metallicity-min',
+    'max_metallicity': '--metallicity-max',
+    'metallicity_distribution': '--metallicity-distribution',
+    'min_mass_ratio': '--mass-ratio-min',
+    'max_mass_ratio': '--mass-ratio-max',
+    'mass_ratio_distribution': '--mass-ratio-distribution',
+    'min_semi_major_axis': '--semi-major-axis-min',
+    'max_semi_major_axis': '--semi-major-axis-max',
+    'semi_major_axis_distribution': '--semi-major-axis-distribution',
+    'min_orbital_period': '--orbital-period-min',
+    'max_orbital_period': '--orbital-period-max',
+    'mass_transfer_angular_momentum_loss_prescription': '--mass-transfer-angular-momentum-loss-prescription',
+    'mass_transfer_accretion_efficiency_prescription': '--mass-transfer-accretion-efficiency-prescription',
+    'mass_transfer_fa': '--mass-transfer-fa',
+    'common_envelope_alpha': '--common-envelope-alpha',
+    'common_envelope_lambda_prescription': '--common-envelope-lambda-prescription',
+    'remnant_mass_prescription': '--remnant-mass-prescription',
+    'fryer_supernova_engine': '--fryer-supernova-engine',
+    'kick_velocity_distribution': '--kick-magnitude-distribution',
+    'velocity_1': '--kick-magnitude-1',
+    'velocity_2': '--kick-magnitude-2'
+}

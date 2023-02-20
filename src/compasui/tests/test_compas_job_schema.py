@@ -30,7 +30,11 @@ class TestCompasJobSchema(CompasTestCase):
                     'private': 'true'
                 },
                 'basicParameters': {
-                    'metallicity': '0.01'
+                    'numberOfSystems': '100'
+                },
+                'advancedParameters': {
+                    'massTransferFa': '0.5',
+                    'massTransferAccretionEfficiencyPrescription': 'FIXED',
                 }
             }
         }

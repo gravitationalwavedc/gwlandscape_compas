@@ -11,7 +11,7 @@ from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
 from .models import CompasJob, Label, SingleBinaryJob
-from .types import OutputStartType, JobStatusType, AbstractBasicParameterType
+from .types import OutputStartType, JobStatusType, AbstractBasicParameterType, AbstractAdvancedParametersType
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
@@ -66,7 +66,7 @@ class UserCompasJobFilter(FilterSet):
         return CompasJob.user_compas_job_filter(super(UserCompasJobFilter, self).qs, self)
 
 
-class CompasJobNode(DjangoObjectType, AbstractBasicParameterType):
+class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvancedParametersType):
     class Meta:
         model = CompasJob
         convert_choices_to_enum = False
@@ -121,7 +121,7 @@ populate_fields(
         "min_initial_mass",
         "max_initial_mass",
         "initial_mass_function",
-        "metallicity",
+        "initial_mass_power",
         "min_metallicity",
         "max_metallicity",
         "metallicity_distribution",
@@ -130,7 +130,19 @@ populate_fields(
         "mass_ratio_distribution",
         "min_semi_major_axis",
         "max_semi_major_axis",
-        "semi_major_axis_distribution"
+        "semi_major_axis_distribution",
+        "min_orbital_period",
+        "max_orbital_period",
+        "mass_transfer_angular_momentum_loss_prescription",
+        "mass_transfer_accretion_efficiency_prescription",
+        "mass_transfer_fa",
+        "common_envelope_alpha",
+        "common_envelope_lambda_prescription",
+        "remnant_mass_prescription",
+        "fryer_supernova_engine",
+        "kick_velocity_distribution",
+        "velocity_1",
+        "velocity_2",
     ],
     parameter_resolvers
 )
@@ -180,7 +192,7 @@ class BasicParametersInput(graphene.InputObjectType):
     min_initial_mass = graphene.String()
     max_initial_mass = graphene.String()
     initial_mass_function = graphene.String()
-    metallicity = graphene.String()
+    initial_mass_power = graphene.String()
     min_metallicity = graphene.String()
     max_metallicity = graphene.String()
     metallicity_distribution = graphene.String()
@@ -190,6 +202,21 @@ class BasicParametersInput(graphene.InputObjectType):
     min_semi_major_axis = graphene.String()
     max_semi_major_axis = graphene.String()
     semi_major_axis_distribution = graphene.String()
+    min_orbital_period = graphene.String()
+    max_orbital_period = graphene.String()
+
+
+class AdvancedParametersInput(graphene.InputObjectType):
+    mass_transfer_angular_momentum_loss_prescription = graphene.String()
+    mass_transfer_accretion_efficiency_prescription = graphene.String()
+    mass_transfer_fa = graphene.String()
+    common_envelope_alpha = graphene.String()
+    common_envelope_lambda_prescription = graphene.String()
+    remnant_mass_prescription = graphene.String()
+    fryer_supernova_engine = graphene.String()
+    kick_velocity_distribution = graphene.String()
+    velocity_1 = graphene.String()
+    velocity_2 = graphene.String()
 
 
 class CompasJobCreationResult(graphene.ObjectType):
@@ -206,14 +233,15 @@ class CompasJobMutation(relay.ClientIDMutation):
     class Input:
         start = StartInput()
         basic_parameters = BasicParametersInput()
+        advanced_parameters = AdvancedParametersInput()
 
     result = graphene.Field(CompasJobCreationResult)
 
     @classmethod
     @login_required
-    def mutate_and_get_payload(cls, root, info, start, basic_parameters):
+    def mutate_and_get_payload(cls, root, info, start, basic_parameters, advanced_parameters):
         # Create the compas job
-        compas_job = create_compas_job(info.context.user, start, basic_parameters)
+        compas_job = create_compas_job(info.context.user, start, basic_parameters, advanced_parameters)
 
         # Convert the compas job id to a global id
         job_id = to_global_id("CompasJobNode", compas_job.id)
