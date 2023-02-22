@@ -37,6 +37,7 @@ params_to_compas_commands = {
     'velocity_1': '--kick-magnitude-1',
     'velocity_2': '--kick-magnitude-2'
 }
+
 def submit_template(wk_dir, job_name):
     """
     This function returns the slurm script that submits all related scripts as jobs
@@ -122,20 +123,23 @@ cd {wk_dir}/compas
 srun python /fred/oz979/GWLandscape/COMPAS/utils/h5copy.py input {wk_dir} -r
 """
 
+
 def get_string_value(value):
     return value if value != '' else None
 
+
 def get_numerical_value(value):
     return float(value) if value != '' else None
+
 
 def read_default_yaml_config(yaml_file_path):
     with open(yaml_file_path) as f:
         config = yaml.load(f, yaml.Loader)
         return config
 
+
 def update_yaml_config(default_config, input_params):
     params = {**input_params['basic'], **input_params['advanced']}
-
 
     for name, value in params.items():
         try:
@@ -200,11 +204,11 @@ def submit(details, input_params):
         nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
         updated_yaml_config['numericalChoices']['--number-of-systems'] = int(nsysi)
 
-        with open(Path(run_dir) / 'compasConfigDefault.yaml','w') as yaml_file:
+        with open(Path(run_dir) / 'compasConfigDefault.yaml', 'w') as yaml_file:
             yaml.dump(updated_yaml_config, yaml_file)
 
         start_seed = (i+1) * nsys_per_patch
-        seed_file = Path(run_dir) /'randomSeed.txt'
+        seed_file = Path(run_dir) / 'randomSeed.txt'
         with open(seed_file, 'w') as f:
             f.write(str(start_seed))
 
