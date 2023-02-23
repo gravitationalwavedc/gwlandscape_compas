@@ -147,7 +147,7 @@ def update_yaml_config(default_config, input_params):
             if command in default_config['stringChoices'].keys():
                 default_config['stringChoices'][command] = get_string_value(value)
             elif command in default_config['booleanChoices'].keys():
-                default_config['stringChoices'][command] = bool(value)
+                default_config['booleanChoices'][command] = bool(value)
             elif command in default_config['numericalChoices'].keys():
                 default_config['numericalChoices'][command] = get_numerical_value(value)
             else:
