@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import traceback
 
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator

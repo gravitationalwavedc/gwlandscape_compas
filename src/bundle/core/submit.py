@@ -38,6 +38,7 @@ params_to_compas_commands = {
     'velocity_2': '--kick-magnitude-2'
 }
 
+
 def submit_template(wk_dir, job_name):
     """
     This function returns the slurm script that submits all related scripts as jobs
