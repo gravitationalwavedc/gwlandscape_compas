@@ -32,8 +32,8 @@ const length = (data) => ({
     eccentricity: data['Eccentricity'],
     radius_1: data['Radius(1)'],
     radius_2: data['Radius(2)'],
-    roche_radius_1: data['RocheLobe(1)|a'],
-    roche_radius_2: data['RocheLobe(2)|a'],
+    roche_radius_1: data['RocheLobe(1)'],
+    roche_radius_2: data['RocheLobe(2)'],
     time: data['Time'],
     periapsis: data['SemiMajorAxis'].map((sma, i) => sma * (1 - data['Eccentricity'][i]))
 });
@@ -100,7 +100,7 @@ const mapScatterData = (dataset, aliases) => {
     return [data1, data2];
 };
 
-const mapLineDataforScatterChart = (dataset, ykey, aliases = null) => {
+const mapLineDataForScatterChart = (dataset, ykey, aliases = null) => {
     let data_total = {};
     let objkeys = aliases ? Object.keys(aliases) : Object.keys(dataset);
     objkeys.forEach(key => {
@@ -118,4 +118,4 @@ const mapLineDataforScatterChart = (dataset, ykey, aliases = null) => {
     return data_total;
 };
 
-export { units, mass, length, hrattr, vdhattr, mapLineData, mapScatterData, mapLineDataforScatterChart };
+export { units, mass, length, hrattr, vdhattr, mapLineData, mapScatterData, mapLineDataForScatterChart };
