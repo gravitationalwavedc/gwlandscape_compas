@@ -10,7 +10,6 @@ const RenderHRDiagramContainer = memo(function RenderHRDiagramContainer({data, s
         luminosity_2: 'Luminosity',
     };
 
-    console.log(data);
     const [data1, data2] = mapScatterData(hrattr(data), aliases);
 
     return (
