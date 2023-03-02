@@ -162,7 +162,7 @@ const PlotLineZoom = ({
                     <Tooltip
                         allowEscapeViewBox={{ x: false, y: false }}
                         ref={ToolTip}
-                        formatter={value => <>{value.toFixed(4)} {yunit}</>}
+                        formatter={value => <>{value.toFixed(2)} {yunit}</>}
                         labelFormatter={label => `Time : ${label} Myr`}
                         filterNull={false}
                     />

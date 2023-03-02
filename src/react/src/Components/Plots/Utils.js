@@ -19,7 +19,7 @@ const LineChartTooltip = (props) => {
         return (
             <div>
                 <p>{`${label} ${xunit}`}</p>
-                {payload.map(p => <p key={p.value}>{`${p.value.toFixed(4)}`} {yunit}</p>)}
+                {payload.map(p => <p key={p.value}>{`${p.value.toFixed(2)}`} {yunit}</p>)}
             </div>
         );
     }
