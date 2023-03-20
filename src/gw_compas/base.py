@@ -191,3 +191,6 @@ RUN_COMPAS_COMMAND = [
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
 
 COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY = 60*60*24     # User has one day to upload the file for the job
+
+# The expiry of FileDownloadTokens (in seconds)
+FILE_DOWNLOAD_TOKEN_EXPIRY = 60*60*24

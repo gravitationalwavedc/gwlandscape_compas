@@ -1,4 +1,5 @@
 import traceback
+from _decimal import Decimal
 from pathlib import Path
 
 import django_filters
@@ -10,7 +11,7 @@ from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
-from .models import CompasJob, Label, SingleBinaryJob
+from .models import CompasJob, Label, SingleBinaryJob, FileDownloadToken
 from .types import OutputStartType, JobStatusType, AbstractBasicParameterType, AbstractAdvancedParametersType
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
@@ -164,10 +165,28 @@ class SingleBinaryJobNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
+class CompasResultFile(graphene.ObjectType):
+    path = graphene.String()
+    is_dir = graphene.Boolean()
+    file_size = graphene.Decimal()
+    download_token = graphene.String()
+
+
+class CompasResultFiles(graphene.ObjectType):
+    class Meta:
+        interfaces = (relay.Node,)
+
+    class Input:
+        job_id = graphene.ID()
+
+    files = graphene.List(CompasResultFile)
+
+
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
     all_labels = graphene.List(LabelType)
+    compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
@@ -180,6 +199,30 @@ class Query(object):
     def resolve_gwclouduser(self, info, **kwargs):
         return info.context.user
 
+    @login_required
+    def resolve_compas_result_files(self, info, **kwargs):
+        _, job_id = from_global_id(kwargs.get("job_id"))
+
+        job = CompasJob.get_by_id(job_id, info.context.user)
+        success, files = job.get_file_list()
+
+        if not success:
+            raise Exception("Error getting file list. " + str(files))
+
+        paths = [f['path'] for f in filter(lambda x: not x['isDir'], files)]
+        tokens = FileDownloadToken.create(job, paths)
+
+        token_dict = {tok.path: tok.token for tok in tokens}
+        result = [
+            CompasResultFile(
+                path=f['path'],
+                is_dir=f['isDir'],
+                file_size=Decimal(f['filesSize']),
+                download_token=token_dict.get(f['path'], None)
+            )
+            for f in files
+        ]
+        return CompasResultFiles(files=result)
 
 class StartInput(graphene.InputObjectType):
     name = graphene.String()

@@ -1,16 +1,17 @@
+import datetime
 import os
+import uuid
 from pathlib import Path
 
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone
 
 from .utils import constants
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.jobs.request_file_list import request_file_list
 from .utils.jobs.request_job_status import request_job_status
-# from .utils.constants import COMPAS_RUN_FIELD_COMMANDS
-# from .variables import compas_parameters
 
 
 class Label(models.Model):
@@ -187,6 +188,43 @@ class AdvancedParameter(models.Model):
     def __str__(self):
         return '{} - {} ({})'.format(self.name, self.value, self.job)
 
+
+class FileDownloadToken(models.Model):
+    """
+    This model tracks files from job file lists which can be used to generate file download tokens from the job
+    controller
+    """
+    job = models.ForeignKey(CompasJob, on_delete=models.CASCADE, db_index=True)
+    token = models.UUIDField(unique=True, default=uuid.uuid4,db_index=True)
+    path = models.TextField()
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    @classmethod
+    def prune(cls):
+        """
+        Removes expired tokens from the database
+        :return:
+        """
+        cls.objects.filter(
+            created__lt=timezone.now() - datetime.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY)
+        ).delete()
+
+    @classmethod
+    def get_by_token(cls, token):
+        cls.prune()
+        tok = cls.objects.filter(token=token)
+        if not tok.exists():
+            return None
+        return tok.first()
+
+    @classmethod
+    def create(cls, job, paths):
+        """
+        Creates a bulk number of FileDownloadToken objects for a specific job and list of paths, and returns the
+        created objects
+        """
+        data = [cls(job=job, path=p) for p in paths]
+        return cls.objects.bulk_create(data)
 
 class SingleBinaryJob(models.Model):
 
