@@ -217,7 +217,7 @@ class Query(object):
             CompasResultFile(
                 path=f['path'],
                 is_dir=f['isDir'],
-                file_size=Decimal(f['filesSize']),
+                file_size=Decimal(f['fileSize']),
                 download_token=token_dict.get(f['path'], None)
             )
             for f in files
