@@ -5,7 +5,9 @@ from pathlib import Path
 import django_filters
 import graphene
 from django_filters import FilterSet, OrderingFilter
+from django.conf import settings
 from graphene import relay
+from graphql import GraphQLError
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
@@ -17,7 +19,7 @@ from .views import create_compas_job, update_compas_job, create_single_binary_jo
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
 from .utils.h5ToJson import read_h5_data_as_json
-from django.conf import settings
+from .utils.jobs.request_file_download_id import request_file_download_id
 
 
 def parameter_resolvers(name):
@@ -316,6 +318,35 @@ class UpdateCompasJobMutation(relay.ClientIDMutation):
         )
 
 
+class GenerateFileDownloadIds(relay.ClientIDMutation):
+    class Input:
+        job_id = graphene.ID(required=True)
+        download_tokens = graphene.List(graphene.String, required=True)
+
+    result = graphene.List(graphene.String)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, job_id, download_tokens):
+        user = info.context.user
+        job = CompasJob.get_by_id(from_global_id(job_id)[1], user)
+
+        # Verify the download tokens and get the paths
+        paths = FileDownloadToken.get_paths(job, download_tokens)
+
+        # Check all tokens were found
+        if None in paths:
+            raise GraphQLError("At least one token was invalid or expired")
+
+        # Request file download ids list
+        success, result = request_file_download_id(job, paths)
+
+        if not success:
+            raise GraphQLError(result)
+
+        # Return list of file download ids
+        return GenerateFileDownloadIds(result=result)
+
+
 class UniqueNameMutation(relay.ClientIDMutation):
     class Input:
         name = graphene.String()
@@ -401,5 +432,6 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
 class Mutation(graphene.ObjectType):
     new_compas_job = CompasJobMutation.Field()
     update_compas_job = UpdateCompasJobMutation.Field()
+    generate_file_download_ids = GenerateFileDownloadIds.Field()
     is_name_unique = UniqueNameMutation.Field()
     new_single_binary = SingleBinaryJobMutation.Field()

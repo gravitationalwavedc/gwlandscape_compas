@@ -226,6 +226,21 @@ class FileDownloadToken(models.Model):
         data = [cls(job=job, path=p) for p in paths]
         return cls.objects.bulk_create(data)
 
+    @classmethod
+    def get_paths(cls, job, tokens):
+        """
+        Returns a list of paths from a list of tokens, any token that isn't found will have a path of None
+        The resulting list, will have identical size and ordering to the provided list of tokens
+        """
+        cls.prune()
+        objects = {
+            f.token: f.path for f in cls.objects.filter(job=job, token__in=tokens)
+        }
+
+        return [
+            objects[str(tok)] if str(tok) in objects else None for tok in tokens
+        ]
+
 class SingleBinaryJob(models.Model):
 
     # required input parameters
