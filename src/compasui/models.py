@@ -234,9 +234,8 @@ class FileDownloadToken(models.Model):
         """
         cls.prune()
         objects = {
-            f.token: f.path for f in cls.objects.filter(job=job, token__in=tokens)
+            str(f.token): f.path for f in cls.objects.filter(job=job, token__in=tokens)
         }
-
         return [
             objects[str(tok)] if str(tok) in objects else None for tok in tokens
         ]

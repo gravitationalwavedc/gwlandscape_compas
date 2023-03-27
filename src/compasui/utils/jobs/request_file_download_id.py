@@ -32,7 +32,7 @@ def request_file_download_id(job, path, user_id=None):
     # Generate the post payload
     data = {
         'jobId': job.job_controller_id,
-        'path': path
+        'paths': path
     }
 
     try:
@@ -56,6 +56,6 @@ def request_file_download_id(job, path, user_id=None):
         # Parse the response from the job controller
         result = json.loads(result.content)
 
-        return True, result["fileId"]
+        return True, result["fileIds"]
     except Exception:
         return False, "Error getting job file download url"

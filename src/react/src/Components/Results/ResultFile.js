@@ -1,6 +1,7 @@
 import React from 'react';
 import {commitMutation, graphql} from 'react-relay';
-import {harnessApi} from "../../index";
+import {harnessApi} from '../../index';
+
 const downloadUrl = 'https://gwcloud.org.au/job/apiv1/file/?fileId=';
 
 const generateFileDownloadIdMutation = graphql`
@@ -12,6 +13,7 @@ const generateFileDownloadIdMutation = graphql`
 `;
 
 const handleOnFileClick = (e, jobId, token) => {
+    e.preventDefault();
     commitMutation(harnessApi.getEnvironment('compas'), {
         mutation: generateFileDownloadIdMutation,
         variables: {
@@ -22,15 +24,18 @@ const handleOnFileClick = (e, jobId, token) => {
         },
         onCompleted: (response, errors) => {
             if(errors) {
-                alert('Unable to download file');
+                alert('Error downloading file');
             } else {
-                const link = e.target;
+                const link = document.createElement('a');
                 link.href = downloadUrl + response.generateFileDownloadIds.result[0];
+                link.target = '_blank';
+                document.body.appendChild(link);
                 link.click();
+                document.body.removeChild(link);
             }
         }
     });
-    e.preventDefault();
+
 };
 const ResultFile = ({jobId, file}) =>
     <tr>
@@ -47,5 +52,7 @@ const ResultFile = ({jobId, file}) =>
 
             }
         </td>
+        <td>{file.isDir ? 'Directory' : 'File'}</td>
+        <td>{file.fileSize}</td>
     </tr>;
 export default ResultFile;

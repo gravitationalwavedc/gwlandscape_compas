@@ -2,6 +2,7 @@ import React from 'react';
 import {QueryRenderer, graphql} from 'react-relay';
 import {harnessApi} from '../../index';
 import {Table} from 'react-bootstrap';
+import ResultFile from './ResultFile';
 
 const Files = ({jobId}) => {
 
@@ -38,18 +39,14 @@ const Files = ({jobId}) => {
                                 {
                                     props.compasResultFiles.files.map(
                                         (f, i) =>
-                                            <tr key={i}>
-                                                <td>{f.path}</td>
-                                                <td>{f.isDir? 'Directory': 'File'}</td>
-                                                <td>{f.fileSize}</td>
-                                            </tr>
+                                            <ResultFile jobId={jobId} file={f} key={i}/>
                                     )
                                 }
                             </React.Fragment>;
                         }
                     }
                     }
-                />
+                ></QueryRenderer>
             </tbody>
         </Table>
     </React.Fragment>;
