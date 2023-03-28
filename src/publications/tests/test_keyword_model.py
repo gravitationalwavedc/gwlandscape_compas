@@ -20,8 +20,18 @@ class TestKeywordModel(testcases.TestCase):
         o = Keyword.create_keyword('test')
         Keyword.delete_keyword(o.id)
 
-        try:
+        with self.assertRaises(
+            Keyword.DoesNotExist,
+            msg="Keyword was deleted successfully when it should have failed"
+        ):
             Keyword.delete_keyword(o.id)
-            self.fail("Keyword was deleted successfully when it should have failed")
-        except Keyword.DoesNotExist:
-            pass
+
+    def test_update(self):
+        o = Keyword.create_keyword('test')
+
+        self.assertEqual(o.tag, 'test')
+
+        Keyword.update_keyword(o.id, 'new')
+        o.refresh_from_db()
+
+        self.assertEqual(o.tag, 'new')

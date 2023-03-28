@@ -182,7 +182,8 @@ class AddPublicationMutation(relay.ClientIDMutation):
     @login_required
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, **kwargs):
-        publication = CompasPublication.create_publication(**kwargs)
+        keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop('keywords', [])]
+        publication = CompasPublication.create_publication(**kwargs, keywords=keyword_ids)
         return AddPublicationMutation(id=to_global_id('CompasPublication', publication.id))
 
 

@@ -30,6 +30,17 @@ class Keyword(models.Model):
     def delete_keyword(cls, _id):
         cls.objects.get(id=_id).delete()
 
+    @classmethod
+    def update_keyword(cls, _id, tag=None):
+        keyword = cls.objects.get(id=_id)
+        if tag is not None:
+            keyword.tag = tag
+        keyword.save()
+
+    @classmethod
+    def filter_by_ids(cls, ids):
+        return cls.objects.filter(id__in=ids)
+
 
 def job_directory_path(instance, filename):
     """
@@ -74,18 +85,28 @@ class CompasPublication(models.Model):
 
     @classmethod
     def create_publication(cls, **kwargs):
-        if keyword_ids := kwargs.get('keywords', []):
-            del kwargs['keywords']
+        keywords = Keyword.filter_by_ids(kwargs.pop('keywords', []))
 
         result = cls.objects.create(**kwargs)
-
-        [result.keywords.add(Keyword.objects.get(id=from_global_id(_id)[1])) for _id in keyword_ids]
+        result.keywords.set(keywords)
 
         return result
 
     @classmethod
     def delete_publication(cls, _id):
         cls.objects.get(id=_id).delete()
+
+    @classmethod
+    def update_publication(cls, _id, **kwargs):
+        publication = cls.objects.get(id=_id)
+        keyword_ids = kwargs.pop('keywords', None)
+        if keyword_ids is not None:
+            keywords = Keyword.filter_by_ids(keyword_ids)
+            publication.keywords.set(keywords)
+
+        for key, val in kwargs.items():
+            setattr(publication, key, val)
+        publication.save()
 
     @classmethod
     def public_filter(cls, queryset, info):
