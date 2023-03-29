@@ -1,6 +1,9 @@
+from datetime import datetime
+import uuid
+
 from django.contrib.auth import get_user_model
 from graphql_relay import to_global_id
-from compasui.models import CompasJob
+from compasui.models import CompasJob, FileDownloadToken
 from compasui.tests.testcases import CompasTestCase
 from unittest.mock import patch, Mock
 
@@ -87,3 +90,44 @@ class TestCompasJobSchema(CompasTestCase):
 
         self.assertIsNotNone(response.errors)
         self.assertRaises(Exception, "Error submitting job, got error code: 400\n\nheaders\n\nBad request")
+
+    @patch('compasui.models.request_file_list')
+    @patch('compasui.schema.FileDownloadToken.create')
+    def test_get_job_result_files(self, create_token, request_file_list):
+
+        self.client.authenticate(self.user)
+
+        job = CompasJob.objects.create(
+            user_id=self.user.id,
+            name="Test1",
+            description="first job",
+            job_controller_id=2,
+            private=False
+        )
+
+        request_file_list.return_value = True, [{'path': '/job/file.txt', 'isDir': False, 'fileSize': 33, 'downloadToken': 1}]
+        new_token = FileDownloadToken(
+            job=job, token=uuid.uuid4(), path='/job/file.txt', created=datetime.now())
+        create_token.return_value = [new_token]
+        response = self.client.execute(
+            f"""
+            query{{
+                compasResultFiles(jobId: "{to_global_id('CompasJobNode', job.id)}") {{
+                    files {{
+                        path
+                        isDir
+                        fileSize
+                        downloadToken                    
+                    }}
+                }}
+            }}
+            """
+        )
+        expected = {
+            'compasResultFiles': {
+                'files': [
+                    {'path': '/job/file.txt', 'isDir': False, 'fileSize': '33', 'downloadToken': str(new_token.token)}
+                ]
+            }
+        }
+        self.assertDictEqual(response.data, expected)
