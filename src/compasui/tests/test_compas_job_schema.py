@@ -2,6 +2,9 @@ from datetime import datetime
 import uuid
 
 from django.contrib.auth import get_user_model
+from django.conf import settings
+from django.utils import timezone
+
 from graphql_relay import to_global_id
 from compasui.models import CompasJob, FileDownloadToken
 from compasui.tests.testcases import CompasTestCase
@@ -106,9 +109,12 @@ class TestCompasJobSchema(CompasTestCase):
         )
 
         request_file_list.return_value = True, [{'path': '/job/file.txt', 'isDir': False, 'fileSize': 33, 'downloadToken': 1}]
+
         new_token = FileDownloadToken(
             job=job, token=uuid.uuid4(), path='/job/file.txt', created=datetime.now())
+
         create_token.return_value = [new_token]
+
         response = self.client.execute(
             f"""
             query{{
@@ -131,3 +137,78 @@ class TestCompasJobSchema(CompasTestCase):
             }
         }
         self.assertDictEqual(response.data, expected)
+
+
+    @patch('compasui.schema.request_file_download_id')
+    def test_generate_file_download_id(self, request_file_download_id):
+
+        self.client.authenticate(self.user)
+
+        job = CompasJob.objects.create(
+            user_id=self.user.id,
+            name="Test1",
+            description="first job",
+            job_controller_id=2,
+            private=False
+        )
+
+        new_token = FileDownloadToken.objects.create(
+            job=job,
+            path='/job/file.txt',
+        )
+
+        # Test successful request when token is valid
+        request_file_download_id.return_value = True, ['123456']
+
+        generate_file_download_id_mutation = """
+            mutation ResultFileMutation($input: GenerateFileDownloadIdsInput!) {
+                generateFileDownloadIds(input: $input) {
+                    result
+                }
+            }
+            """
+
+        mutation_input = {
+            'input' : {
+                'jobId': to_global_id('CompasJobNode', job.id),
+                'downloadTokens': [str(new_token.token)]
+            }
+        }
+        response = self.client.execute(
+            generate_file_download_id_mutation,
+            mutation_input
+        )
+
+        expected = {
+            'generateFileDownloadIds': {
+                'result': ['123456']
+            }
+        }
+        self.assertDictEqual(response.data, expected)
+
+        # Test failure to get file download url
+        request_file_download_id.return_value = False, "Error getting job file download url"
+
+        response = self.client.execute(
+            generate_file_download_id_mutation,
+            mutation_input
+        )
+        expected = {
+            'generateFileDownloadIds': None
+        }
+        self.assertDictEqual(response.data, expected)
+
+        # Test failure when token is expired
+        new_token.created = datetime.now() - timezone.timedelta(settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1)
+        new_token.save()
+
+        response = self.client.execute(
+            generate_file_download_id_mutation,
+            mutation_input
+        )
+        expected = {
+            'generateFileDownloadIds': None
+        }
+        self.assertDictEqual(response.data, expected)
+
+        request_file_download_id.return_value = False, "Error getting job file download url"
