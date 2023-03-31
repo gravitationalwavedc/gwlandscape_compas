@@ -46,6 +46,7 @@ class TestModels(TestCase):
             }
         })
 
+
 class TestFileDownloadToken(TestCase):
     """
     Copied from GWLab

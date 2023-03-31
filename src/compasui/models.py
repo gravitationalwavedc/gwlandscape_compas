@@ -195,7 +195,7 @@ class FileDownloadToken(models.Model):
     from the job controller
     """
     job = models.ForeignKey(CompasJob, on_delete=models.CASCADE, db_index=True)
-    token = models.UUIDField(unique=True, default=uuid.uuid4,db_index=True)
+    token = models.UUIDField(unique=True, default=uuid.uuid4, db_index=True)
     path = models.TextField()
     created = models.DateTimeField(auto_now_add=True, db_index=True)
 
@@ -239,6 +239,7 @@ class FileDownloadToken(models.Model):
         return [
             objects[str(tok)] if str(tok) in objects else None for tok in tokens
         ]
+
 
 class SingleBinaryJob(models.Model):
 

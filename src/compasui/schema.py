@@ -226,6 +226,7 @@ class Query(object):
         ]
         return CompasResultFiles(files=result)
 
+
 class StartInput(graphene.InputObjectType):
     name = graphene.String()
     description = graphene.String()

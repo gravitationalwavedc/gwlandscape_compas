@@ -108,7 +108,10 @@ class TestCompasJobSchema(CompasTestCase):
             private=False
         )
 
-        request_file_list.return_value = True, [{'path': '/job/file.txt', 'isDir': False, 'fileSize': 33, 'downloadToken': 1}]
+        request_file_list.return_value = True, [{'path': '/job/file.txt',
+                                                 'isDir': False,
+                                                 'fileSize': 33,
+                                                 'downloadToken': 1}]
 
         new_token = FileDownloadToken(
             job=job, token=uuid.uuid4(), path='/job/file.txt', created=datetime.now())
@@ -123,7 +126,7 @@ class TestCompasJobSchema(CompasTestCase):
                         path
                         isDir
                         fileSize
-                        downloadToken                    
+                        downloadToken
                     }}
                 }}
             }}
@@ -137,7 +140,6 @@ class TestCompasJobSchema(CompasTestCase):
             }
         }
         self.assertDictEqual(response.data, expected)
-
 
     @patch('compasui.schema.request_file_download_id')
     def test_generate_file_download_id(self, request_file_download_id):
@@ -169,7 +171,7 @@ class TestCompasJobSchema(CompasTestCase):
             """
 
         mutation_input = {
-            'input' : {
+            'input': {
                 'jobId': to_global_id('CompasJobNode', job.id),
                 'downloadTokens': [str(new_token.token)]
             }
