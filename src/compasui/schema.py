@@ -319,6 +319,9 @@ class UpdateCompasJobMutation(relay.ClientIDMutation):
 
 
 class GenerateFileDownloadIds(relay.ClientIDMutation):
+    """
+    Copied from GWLab
+    """
     class Input:
         job_id = graphene.ID(required=True)
         download_tokens = graphene.List(graphene.String, required=True)

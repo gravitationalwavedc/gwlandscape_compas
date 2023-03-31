@@ -191,8 +191,8 @@ class AdvancedParameter(models.Model):
 
 class FileDownloadToken(models.Model):
     """
-    This model tracks files from job file lists which can be used to generate file download tokens from the job
-    controller
+    Copied from GWLab - This model tracks files from job file lists which can be used to generate file download tokens
+    from the job controller
     """
     job = models.ForeignKey(CompasJob, on_delete=models.CASCADE, db_index=True)
     token = models.UUIDField(unique=True, default=uuid.uuid4,db_index=True)

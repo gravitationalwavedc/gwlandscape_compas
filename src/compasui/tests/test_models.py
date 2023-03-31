@@ -47,6 +47,9 @@ class TestModels(TestCase):
         })
 
 class TestFileDownloadToken(TestCase):
+    """
+    Copied from GWLab
+    """
     @classmethod
     def setUpTestData(cls):
         cls.job = CompasJob.objects.create(
