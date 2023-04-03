@@ -5,6 +5,7 @@ from graphql_relay import to_global_id
 
 from compasui.tests.testcases import CompasTestCase
 from publications.models import CompasPublication, Keyword
+from publications.tests.test_utils import silence_errors
 
 User = get_user_model()
 
@@ -13,11 +14,13 @@ class TestPublicationSchema(CompasTestCase):
     def setUp(self):
         self.user = User.objects.create(username="buffy", first_name="buffy", last_name="summers")
 
-        self.keywords_ids = [
-            to_global_id('KeywordNode', Keyword.create_keyword('keyword1').id),
-            to_global_id('KeywordNode', Keyword.create_keyword('keyword2').id),
-            to_global_id('KeywordNode', Keyword.create_keyword('keyword3').id),
+        self.keyword_ids = [
+            Keyword.create_keyword('keyword1').id,
+            Keyword.create_keyword('keyword2').id,
+            Keyword.create_keyword('keyword3').id,
         ]
+
+        self.keyword_global_ids = [to_global_id('KeywordNode', _id) for _id in self.keyword_ids]
 
         self.add_publication_mutation = """
             mutation AddPublicationMutation($input: AddPublicationMutationInput!) {
@@ -43,20 +46,20 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.publication_input_optional = {
-            'published': True,
-            'year': 1983,
-            'journal': 'test journal',
-            'journalDoi': 'test journal doi',
-            'datasetDoi': 'test dataset doi',
-            'description': 'test description',
-            'public': True,
-            'downloadLink': 'test download link',
-            'keywords': []
+        self.publication_input_full = {
+            'input': {
+                **self.publication_input_required['input'],
+                'published': True,
+                'year': 1983,
+                'journal': 'test journal',
+                'journalDoi': 'test journal doi',
+                'datasetDoi': 'test dataset doi',
+                'description': 'test description',
+                'public': True,
+                'downloadLink': 'test download link',
+                'keywords': self.keyword_global_ids
+            }
         }
-
-        for keyword_id in self.keywords_ids:
-            self.publication_input_optional['keywords'].append(keyword_id)
 
         self.publication_query = """
             query {
@@ -89,6 +92,14 @@ class TestPublicationSchema(CompasTestCase):
             }
         """
 
+    def create_publication(self, **kwargs):
+        inputs = {
+            **humps.decamelize(self.publication_input_full['input']),
+            'keywords': self.keyword_ids,
+            **kwargs
+        }
+        return CompasPublication.create_publication(**inputs)
+
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_publication_authenticated(self):
         self.client.authenticate(self.user)
@@ -104,7 +115,7 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
         self.assertEqual(
@@ -112,11 +123,9 @@ class TestPublicationSchema(CompasTestCase):
             1
         )
 
-        self.publication_input_required['input'].update(self.publication_input_optional)
-
         response = self.client.execute(
             self.add_publication_mutation,
-            self.publication_input_required
+            self.publication_input_full
         )
 
         expected = {
@@ -125,20 +134,21 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
-        del self.publication_input_required['input']['keywords']
+        del self.publication_input_full['input']['keywords']
 
         for kw in Keyword.objects.all():
             self.assertEqual(
                 CompasPublication.objects.filter(
-                    **humps.decamelize(self.publication_input_required['input']),
+                    **humps.decamelize(self.publication_input_full['input']),
                     keywords=kw
                 ).count(),
                 1
             )
 
+    @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_add_publication_authenticated_not_publication_manager(self):
         self.client.authenticate(self.user)
@@ -160,6 +170,7 @@ class TestPublicationSchema(CompasTestCase):
             0
         )
 
+    @silence_errors
     def test_add_publication_unauthenticated(self):
         response = self.client.execute(
             self.add_publication_mutation,
@@ -181,8 +192,7 @@ class TestPublicationSchema(CompasTestCase):
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_publication_authenticated(self):
         self.client.authenticate(self.user)
-
-        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         publication_input = {
             'input': {
@@ -201,16 +211,16 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
         self.assertEqual(CompasPublication.objects.all().count(), 0)
 
+    @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_publication_authenticated_not_publication_manager(self):
         self.client.authenticate(self.user)
-
-        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         publication_input = {
             'input': {
@@ -232,8 +242,9 @@ class TestPublicationSchema(CompasTestCase):
 
         self.assertEqual(CompasPublication.objects.all().count(), 1)
 
+    @silence_errors
     def test_delete_publication_unauthenticated(self):
-        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         publication_input = {
             'input': {
@@ -255,11 +266,11 @@ class TestPublicationSchema(CompasTestCase):
 
         self.assertEqual(CompasPublication.objects.all().count(), 1)
 
+    @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_publication_not_exists(self):
         self.client.authenticate(self.user)
-
-        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         publication_input = {
             'input': {
@@ -282,8 +293,9 @@ class TestPublicationSchema(CompasTestCase):
         self.assertEqual(CompasPublication.objects.all().count(), 1)
 
     def test_publication_query_unauthenticated(self):
-        self.publication_input_required['input'].update(self.publication_input_optional)
-        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
+
+        # publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_full['input']))
 
         response = self.client.execute(
             self.publication_query
@@ -332,14 +344,12 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
     def test_publication_query_authenticated(self):
         self.client.authenticate(self.user)
-
-        self.publication_input_required['input'].update(self.publication_input_optional)
-        publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         response = self.client.execute(
             self.publication_query
@@ -388,19 +398,15 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
     def test_publication_query_filter_public_unauthenticated(self):
-        self.publication_input_required['input'].update(self.publication_input_optional)
-        publication = CompasPublication.create_publication(
-            **humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         # Add another publication with public=False - this should not show up in the output of the query for an
         # anonymous query
-        self.publication_input_required['input']['public'] = False
-        CompasPublication.create_publication(
-            **humps.decamelize(self.publication_input_required['input']))
+        self.create_publication(public=False)
 
         response = self.client.execute(
             self.publication_query
@@ -449,21 +455,16 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
     def test_publication_query_filter_public_authenticated(self):
         self.client.authenticate(self.user)
-
-        self.publication_input_required['input'].update(self.publication_input_optional)
-        publication = CompasPublication.create_publication(
-            **humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         # Add another publication with public=False - this should not show up in the output of the query for an
         # authenticated user who is not a publication manager
-        self.publication_input_required['input']['public'] = False
-        CompasPublication.create_publication(
-            **humps.decamelize(self.publication_input_required['input']))
+        self.create_publication(public=False)
 
         response = self.client.execute(
             self.publication_query
@@ -512,22 +513,17 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_publication_query_filter_public_authenticated_publication_manager(self):
         self.client.authenticate(self.user)
-
-        self.publication_input_required['input'].update(self.publication_input_optional)
-        publication = CompasPublication.create_publication(
-            **humps.decamelize(self.publication_input_required['input']))
+        publication = self.create_publication()
 
         # Add another publication with public=False - this should show up in the output of the query for a publication
         # manager
-        self.publication_input_required['input']['public'] = False
-        publication2 = CompasPublication.create_publication(
-            **humps.decamelize(self.publication_input_required['input']))
+        publication2 = self.create_publication(public=False)
 
         response = self.client.execute(
             self.publication_query
@@ -612,5 +608,5 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
-        self.assertEqual(None, response.errors)
+        self.assertIsNone(response.errors)
         self.assertDictEqual(expected, response.data)
