@@ -1,22 +1,25 @@
 import traceback
+from _decimal import Decimal
 from pathlib import Path
 
 import django_filters
 import graphene
 from django_filters import FilterSet, OrderingFilter
+from django.conf import settings
 from graphene import relay
+from graphql import GraphQLError
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
-from .models import CompasJob, Label, SingleBinaryJob
+from .models import CompasJob, Label, SingleBinaryJob, FileDownloadToken
 from .types import OutputStartType, JobStatusType, AbstractBasicParameterType, AbstractAdvancedParametersType
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
 from .utils.h5ToJson import read_h5_data_as_json
-from django.conf import settings
+from .utils.jobs.request_file_download_id import request_file_download_id
 
 
 def parameter_resolvers(name):
@@ -164,10 +167,28 @@ class SingleBinaryJobNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
+class CompasResultFile(graphene.ObjectType):
+    path = graphene.String()
+    is_dir = graphene.Boolean()
+    file_size = graphene.Decimal()
+    download_token = graphene.String()
+
+
+class CompasResultFiles(graphene.ObjectType):
+    class Meta:
+        interfaces = (relay.Node,)
+
+    class Input:
+        job_id = graphene.ID()
+
+    files = graphene.List(CompasResultFile)
+
+
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
     all_labels = graphene.List(LabelType)
+    compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
@@ -179,6 +200,31 @@ class Query(object):
     @login_required
     def resolve_gwclouduser(self, info, **kwargs):
         return info.context.user
+
+    @login_required
+    def resolve_compas_result_files(self, info, **kwargs):
+        _, job_id = from_global_id(kwargs.get("job_id"))
+
+        job = CompasJob.get_by_id(job_id, info.context.user)
+        success, files = job.get_file_list()
+
+        if not success:
+            raise Exception("Error getting file list. " + str(files))
+
+        paths = [f['path'] for f in filter(lambda x: not x['isDir'], files)]
+        tokens = FileDownloadToken.create(job, paths)
+
+        token_dict = {tok.path: tok.token for tok in tokens}
+        result = [
+            CompasResultFile(
+                path=f['path'],
+                is_dir=f['isDir'],
+                file_size=Decimal(f['fileSize']),
+                download_token=token_dict.get(f['path'], None)
+            )
+            for f in files
+        ]
+        return CompasResultFiles(files=result)
 
 
 class StartInput(graphene.InputObjectType):
@@ -273,6 +319,38 @@ class UpdateCompasJobMutation(relay.ClientIDMutation):
         )
 
 
+class GenerateFileDownloadIds(relay.ClientIDMutation):
+    """
+    Copied from GWLab
+    """
+    class Input:
+        job_id = graphene.ID(required=True)
+        download_tokens = graphene.List(graphene.String, required=True)
+
+    result = graphene.List(graphene.String)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, job_id, download_tokens):
+        user = info.context.user
+        job = CompasJob.get_by_id(from_global_id(job_id)[1], user)
+
+        # Verify the download tokens and get the paths
+        paths = FileDownloadToken.get_paths(job, download_tokens)
+
+        # Check all tokens were found
+        if None in paths:
+            raise GraphQLError("At least one token was invalid or expired")
+
+        # Request file download ids list
+        success, result = request_file_download_id(job, paths)
+
+        if not success:
+            raise GraphQLError(result)
+
+        # Return list of file download ids
+        return GenerateFileDownloadIds(result=result)
+
+
 class UniqueNameMutation(relay.ClientIDMutation):
     class Input:
         name = graphene.String()
@@ -358,5 +436,6 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
 class Mutation(graphene.ObjectType):
     new_compas_job = CompasJobMutation.Field()
     update_compas_job = UpdateCompasJobMutation.Field()
+    generate_file_download_ids = GenerateFileDownloadIds.Field()
     is_name_unique = UniqueNameMutation.Field()
     new_single_binary = SingleBinaryJobMutation.Field()
