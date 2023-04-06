@@ -1,6 +1,7 @@
 import logging
 import functools
 
+
 def silence_errors(func):
     @functools.wraps(func)
     def wrapper_silence_errors(*args, **kwargs):

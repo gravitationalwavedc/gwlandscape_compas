@@ -159,6 +159,21 @@ class DeleteKeywordMutation(relay.ClientIDMutation):
         return DeleteKeywordMutation(result=True)
 
 
+class UpdateKeywordMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID()
+        tag = graphene.String()
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id, tag):
+        Keyword.update_keyword(from_global_id(id)[1], tag)
+        return UpdateKeywordMutation(result=True)
+
+
 class AddPublicationMutation(relay.ClientIDMutation):
     class Input:
         author = graphene.String(required=True)
@@ -184,7 +199,7 @@ class AddPublicationMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, **kwargs):
         keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop('keywords', [])]
         publication = CompasPublication.create_publication(**kwargs, keywords=keyword_ids)
-        return AddPublicationMutation(id=to_global_id('CompasPublication', publication.id))
+        return AddPublicationMutation(id=to_global_id('CompasPublicationNode', publication.id))
 
 
 class DeletePublicationMutation(relay.ClientIDMutation):
@@ -201,6 +216,35 @@ class DeletePublicationMutation(relay.ClientIDMutation):
         return DeletePublicationMutation(result=True)
 
 
+class UpdatePublicationMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID(required=True)
+        author = graphene.String(required=True)
+        # published defines if the job was published in a journal/arxiv
+        published = graphene.Boolean()
+        title = graphene.String(required=True)
+        year = graphene.Int()
+        journal = graphene.String()
+        journal_doi = graphene.String()
+        dataset_doi = graphene.String()
+        description = graphene.String()
+        # public defines if the job is publicly accessible
+        public = graphene.Boolean()
+        download_link = graphene.String()
+        arxiv_id = graphene.String(required=True)
+        keywords = graphene.List(graphene.String)
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id, **kwargs):
+        keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop('keywords', [])]
+        CompasPublication.update_publication(_id=from_global_id(id)[1], **kwargs, keywords=keyword_ids)
+        return UpdatePublicationMutation(result=True)
+
+
 class AddCompasModelMutation(relay.ClientIDMutation):
     class Input:
         name = graphene.String()
@@ -214,7 +258,7 @@ class AddCompasModelMutation(relay.ClientIDMutation):
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, name, summary, description):
         model = CompasModel.create_model(name, summary, description)
-        return AddCompasModelMutation(id=to_global_id('CompasModel', model.id))
+        return AddCompasModelMutation(id=to_global_id('CompasModelNode', model.id))
 
 
 class DeleteCompasModelMutation(relay.ClientIDMutation):
@@ -229,6 +273,23 @@ class DeleteCompasModelMutation(relay.ClientIDMutation):
     def mutate_and_get_payload(cls, root, info, id):
         CompasModel.delete_model(from_global_id(id)[1])
         return DeleteCompasModelMutation(result=True)
+
+
+class UpdateCompasModelMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID()
+        name = graphene.String()
+        summary = graphene.String()
+        description = graphene.String()
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id, **kwargs):
+        CompasModel.update_model(from_global_id(id)[1], **kwargs)
+        return UpdateCompasModelMutation(result=True)
 
 
 class DeleteCompasDatasetModelMutation(relay.ClientIDMutation):
@@ -274,9 +335,12 @@ class UploadCompasDatasetModelMutation(relay.ClientIDMutation):
 class Mutation(graphene.ObjectType):
     add_keyword = AddKeywordMutation.Field()
     delete_keyword = DeleteKeywordMutation.Field()
+    update_keyword = UpdateKeywordMutation.Field()
     add_publication = AddPublicationMutation.Field()
     delete_publication = DeletePublicationMutation.Field()
+    update_publication = UpdatePublicationMutation.Field()
     add_compas_model = AddCompasModelMutation.Field()
     delete_compas_model = DeleteCompasModelMutation.Field()
+    update_compas_model = UpdateCompasModelMutation.Field()
     delete_compas_dataset_model = DeleteCompasDatasetModelMutation.Field()
     upload_compas_dataset_model = UploadCompasDatasetModelMutation.Field()
