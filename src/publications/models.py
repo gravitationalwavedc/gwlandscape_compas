@@ -6,7 +6,6 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from graphql_relay import from_global_id
 
 from publications.utils import check_publication_management_user
 
@@ -138,6 +137,13 @@ class CompasModel(models.Model):
     @classmethod
     def delete_model(cls, _id):
         cls.objects.get(id=_id).delete()
+
+    @classmethod
+    def update_model(cls, _id, **kwargs):
+        model = cls.objects.get(id=_id)
+        for key, val in kwargs.items():
+            setattr(model, key, val)
+        model.save()
 
 
 class CompasDatasetModel(models.Model):

@@ -10,30 +10,44 @@ from publications.tests.test_utils import silence_errors
 User = get_user_model()
 
 
-class TestPublicationSchema(CompasTestCase):
+def create_keywords():
+    Keyword.create_keyword('keyword1')
+    Keyword.create_keyword('keyword2')
+    Keyword.create_keyword('keyword3')
+
+
+def create_publication(**kwargs):
+    inputs = {
+        'author': 'test author',
+        'title': 'test title',
+        'arxiv_id': 'test arxiv_id',
+        'published': True,
+        'year': 1983,
+        'journal': 'test journal',
+        'journal_doi': 'test journal doi',
+        'dataset_doi': 'test dataset doi',
+        'description': 'test description',
+        'public': True,
+        'download_link': 'test download link',
+        'keywords': list(Keyword.objects.all().values_list('id', flat=True)),
+        **kwargs
+    }
+    return CompasPublication.create_publication(**inputs)
+
+
+class TestAddPublicationSchema(CompasTestCase):
     def setUp(self):
         self.user = User.objects.create(username="buffy", first_name="buffy", last_name="summers")
 
-        self.keyword_ids = [
-            Keyword.create_keyword('keyword1').id,
-            Keyword.create_keyword('keyword2').id,
-            Keyword.create_keyword('keyword3').id,
+        create_keywords()
+        self.keyword_global_ids = [
+            to_global_id('KeywordNode', _id) for _id in list(Keyword.objects.all().values_list('id', flat=True))
         ]
-
-        self.keyword_global_ids = [to_global_id('KeywordNode', _id) for _id in self.keyword_ids]
 
         self.add_publication_mutation = """
             mutation AddPublicationMutation($input: AddPublicationMutationInput!) {
                 addPublication(input: $input) {
                     id
-                }
-            }
-        """
-
-        self.delete_publication_mutation = """
-            mutation DeletePublicationMutation($input: DeletePublicationMutationInput!) {
-                deletePublication(input: $input) {
-                    result
                 }
             }
         """
@@ -60,6 +74,313 @@ class TestPublicationSchema(CompasTestCase):
                 'keywords': self.keyword_global_ids
             }
         }
+
+        self.expected_output = {
+            'addPublication': {
+                'id': to_global_id('CompasPublicationNode', 1)
+            }
+        }
+
+        self.null_output = {
+            'addPublication': None
+        }
+
+    def execute_query(self):
+        return self.client.execute(
+            self.add_publication_mutation,
+            self.publication_input_required
+        )
+
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_add_publication_authenticated(self):
+        self.client.authenticate(self.user)
+
+        response = self.execute_query()
+
+        self.assertIsNone(response.errors)
+        self.assertDictEqual(self.expected_output, response.data)
+
+        self.assertEqual(
+            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
+            1
+        )
+
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_add_full_publication_authenticated(self):
+        self.client.authenticate(self.user)
+
+        response = self.client.execute(
+            self.add_publication_mutation,
+            self.publication_input_full
+        )
+
+        self.assertIsNone(response.errors)
+        self.assertDictEqual(self.expected_output, response.data)
+
+        self.assertEqual(
+            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
+            1
+        )
+
+        del self.publication_input_full['input']['keywords']
+
+        for kw in Keyword.objects.all():
+            self.assertEqual(
+                CompasPublication.objects.filter(
+                    **humps.decamelize(self.publication_input_full['input']),
+                    keywords=kw
+                ).count(),
+                1
+            )
+
+    @silence_errors
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
+    def test_add_publication_authenticated_not_publication_manager(self):
+        self.client.authenticate(self.user)
+
+        response = self.execute_query()
+
+        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertEqual(
+            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
+            0
+        )
+
+    @silence_errors
+    def test_add_publication_unauthenticated(self):
+        response = self.execute_query()
+
+        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertEqual(
+            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
+            0
+        )
+
+
+class TestDeletePublicationSchema(CompasTestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="buffy", first_name="buffy", last_name="summers")
+
+        self.delete_publication_mutation = """
+            mutation DeletePublicationMutation($input: DeletePublicationMutationInput!) {
+                deletePublication(input: $input) {
+                    result
+                }
+            }
+        """
+
+        create_keywords()
+        self.publication = create_publication()
+        self.publication_input = {
+            'input': {
+                'id': to_global_id('CompasPublicationNode', self.publication.id),
+            }
+        }
+
+        self.expected_output = {
+            'deletePublication': {
+                'result': True
+            }
+        }
+
+        self.null_output = {
+            'deletePublication': None
+        }
+
+    def execute_query(self):
+        return self.client.execute(
+            self.delete_publication_mutation,
+            self.publication_input
+        )
+
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_delete_publication_authenticated(self):
+        self.client.authenticate(self.user)
+
+        response = self.execute_query()
+
+        self.assertIsNone(response.errors)
+        self.assertDictEqual(self.expected_output, response.data)
+
+        self.assertEqual(CompasPublication.objects.all().count(), 0)
+
+    @silence_errors
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
+    def test_delete_publication_authenticated_not_publication_manager(self):
+        self.client.authenticate(self.user)
+
+        response = self.execute_query()
+
+        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertEqual(CompasPublication.objects.all().count(), 1)
+
+    @silence_errors
+    def test_delete_publication_unauthenticated(self):
+        response = self.execute_query()
+
+        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertEqual(CompasPublication.objects.all().count(), 1)
+
+    @silence_errors
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_delete_publication_not_exists(self):
+        self.client.authenticate(self.user)
+
+        self.publication_input['input']['id'] = to_global_id('CompasPublicationNode', self.publication.id+1)
+        response = self.execute_query()
+
+        self.assertEqual("CompasPublication matching query does not exist.", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertEqual(CompasPublication.objects.all().count(), 1)
+
+
+class TestUpdatePublicationSchema(CompasTestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="buffy", first_name="buffy", last_name="summers")
+
+        self.update_publication_mutation = """
+            mutation UpdatePublicationMutation($input: UpdatePublicationMutationInput!) {
+                updatePublication(input: $input) {
+                    result
+                }
+            }
+        """
+
+        create_keywords()
+        self.publication = create_publication()
+
+        self.initial_publication_fields = self.get_publication_fields(self.publication)
+        self.updated_publication_fields = {
+            'author': 'new test author',
+            'title': 'new test title',
+            'description': 'new test description',
+            'arxiv_id': 'new test arxiv_id',
+            'published': False,
+            'year': 1984,
+            'journal': 'new test journal',
+            'journal_doi': 'new test journal doi',
+            'dataset_doi': 'new test dataset doi',
+            'public': False,
+            'download_link': 'new test download link',
+            'keywords': [Keyword.objects.first().id]
+        }
+        self.publication_input = {
+            'input': {
+                'id': to_global_id('CompasPublicationNode', self.publication.id),
+                **humps.camelize(self.updated_publication_fields)
+            }
+        }
+        self.publication_input['input']['keywords'] = [to_global_id('KeywordNode', Keyword.objects.first().id)]
+
+        self.expected_output = {
+            'updatePublication': {
+                'result': True
+            }
+        }
+
+        self.null_output = {
+            'updatePublication': None
+        }
+
+    def get_publication_fields(self, publication):
+        vals = {
+            field: getattr(self.publication, field) for field in [
+                'author',
+                'title',
+                'description',
+                'arxiv_id',
+                'published',
+                'year',
+                'journal',
+                'journal_doi',
+                'dataset_doi',
+                'public',
+                'download_link',
+            ]
+        }
+        vals['keywords'] = list(self.publication.keywords.values_list('id', flat=True))
+        return vals
+
+    def execute_query(self):
+        return self.client.execute(
+            self.update_publication_mutation,
+            self.publication_input
+        )
+
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_update_publication_authenticated(self):
+        self.client.authenticate(self.user)
+
+        response = self.execute_query()
+        self.publication.refresh_from_db()
+
+        self.assertIsNone(response.errors)
+        self.assertDictEqual(self.expected_output, response.data)
+
+        self.assertDictEqual(
+            self.get_publication_fields(self.publication),
+            self.updated_publication_fields
+        )
+
+    @silence_errors
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
+    def test_update_publication_authenticated_not_publication_manager(self):
+        self.client.authenticate(self.user)
+
+        response = self.execute_query()
+        self.publication.refresh_from_db()
+
+        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertDictEqual(
+            self.get_publication_fields(self.publication),
+            self.initial_publication_fields
+        )
+
+    @silence_errors
+    def test_update_publication_unauthenticated(self):
+        response = self.execute_query()
+        self.publication.refresh_from_db()
+
+        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertDictEqual(
+            self.get_publication_fields(self.publication),
+            self.initial_publication_fields
+        )
+
+    @silence_errors
+    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
+    def test_update_publication_not_exists(self):
+        self.client.authenticate(self.user)
+
+        self.publication_input['input']['id'] = to_global_id('CompasPublicationNode', self.publication.id+1)
+        response = self.execute_query()
+        self.publication.refresh_from_db()
+
+        self.assertEqual("CompasPublication matching query does not exist.", response.errors[0].message)
+        self.assertDictEqual(self.null_output, response.data)
+
+        self.assertDictEqual(
+            self.get_publication_fields(self.publication),
+            self.initial_publication_fields
+        )
+
+
+class TestQueryPublicationSchema(CompasTestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="buffy", first_name="buffy", last_name="summers")
 
         self.publication_query = """
             query {
@@ -92,221 +413,18 @@ class TestPublicationSchema(CompasTestCase):
             }
         """
 
-    def create_publication(self, **kwargs):
-        inputs = {
-            **humps.decamelize(self.publication_input_full['input']),
-            'keywords': self.keyword_ids,
-            **kwargs
-        }
-        return CompasPublication.create_publication(**inputs)
+        create_keywords()
+        self.publication = create_publication()
+        # Add another publication with public=False - this should not show up in the output of the query for an
+        # anonymous query, or for anyone who is not a publication manager
+        self.private_publication = create_publication(public=False)
 
-    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
-    def test_add_publication_authenticated(self):
-        self.client.authenticate(self.user)
-
-        response = self.client.execute(
-            self.add_publication_mutation,
-            self.publication_input_required
-        )
-
-        expected = {
-            'addPublication': {
-                'id': to_global_id('CompasPublication', 1)
-            }
-        }
-
-        self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(
-            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
-            1
-        )
-
-        response = self.client.execute(
-            self.add_publication_mutation,
-            self.publication_input_full
-        )
-
-        expected = {
-            'addPublication': {
-                'id': to_global_id('CompasPublication', 2)
-            }
-        }
-
-        self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
-
-        del self.publication_input_full['input']['keywords']
-
-        for kw in Keyword.objects.all():
-            self.assertEqual(
-                CompasPublication.objects.filter(
-                    **humps.decamelize(self.publication_input_full['input']),
-                    keywords=kw
-                ).count(),
-                1
-            )
-
-    @silence_errors
-    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
-    def test_add_publication_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
-
-        response = self.client.execute(
-            self.add_publication_mutation,
-            self.publication_input_required
-        )
-
-        expected = {
-            'addPublication': None
-        }
-
-        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(
-            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
-            0
-        )
-
-    @silence_errors
-    def test_add_publication_unauthenticated(self):
-        response = self.client.execute(
-            self.add_publication_mutation,
-            self.publication_input_required
-        )
-
-        expected = {
-            'addPublication': None
-        }
-
-        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(
-            CompasPublication.objects.filter(**humps.decamelize(self.publication_input_required['input'])).count(),
-            0
-        )
-
-    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
-    def test_delete_publication_authenticated(self):
-        self.client.authenticate(self.user)
-        publication = self.create_publication()
-
-        publication_input = {
-            'input': {
-                'id': to_global_id('Publication', publication.id),
-            }
-        }
-
-        response = self.client.execute(
-            self.delete_publication_mutation,
-            publication_input
-        )
-
-        expected = {
-            'deletePublication': {
-                'result': True
-            }
-        }
-
-        self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(CompasPublication.objects.all().count(), 0)
-
-    @silence_errors
-    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
-    def test_delete_publication_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
-        publication = self.create_publication()
-
-        publication_input = {
-            'input': {
-                'id': to_global_id('Publication', publication.id),
-            }
-        }
-
-        response = self.client.execute(
-            self.delete_publication_mutation,
-            publication_input
-        )
-
-        expected = {
-            'deletePublication': None
-        }
-
-        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(CompasPublication.objects.all().count(), 1)
-
-    @silence_errors
-    def test_delete_publication_unauthenticated(self):
-        publication = self.create_publication()
-
-        publication_input = {
-            'input': {
-                'id': to_global_id('Publication', publication.id),
-            }
-        }
-
-        response = self.client.execute(
-            self.delete_publication_mutation,
-            publication_input
-        )
-
-        expected = {
-            'deletePublication': None
-        }
-
-        self.assertEqual("You do not have permission to perform this action", response.errors[0].message)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(CompasPublication.objects.all().count(), 1)
-
-    @silence_errors
-    @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
-    def test_delete_publication_not_exists(self):
-        self.client.authenticate(self.user)
-        publication = self.create_publication()
-
-        publication_input = {
-            'input': {
-                'id': to_global_id('Publication', publication.id + 1),
-            }
-        }
-
-        response = self.client.execute(
-            self.delete_publication_mutation,
-            publication_input
-        )
-
-        expected = {
-            'deletePublication': None
-        }
-
-        self.assertEqual("CompasPublication matching query does not exist.", response.errors[0].message)
-        self.assertDictEqual(expected, response.data)
-
-        self.assertEqual(CompasPublication.objects.all().count(), 1)
-
-    def test_publication_query_unauthenticated(self):
-        publication = self.create_publication()
-
-        # publication = CompasPublication.create_publication(**humps.decamelize(self.publication_input_full['input']))
-
-        response = self.client.execute(
-            self.publication_query
-        )
-
-        expected = {
+        self.expected_output = {
             'compasPublications': {
                 'edges': [
                     {
                         'node': {
-                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
+                            'id': to_global_id('CompasPublicationNode', self.publication.id),
                             'author': 'test author',
                             'published': True,
                             'title': 'test title',
@@ -314,7 +432,7 @@ class TestPublicationSchema(CompasTestCase):
                             'journal': 'test journal',
                             'journalDoi': 'test journal doi',
                             'datasetDoi': 'test dataset doi',
-                            'creationTime': publication.creation_time.isoformat(),
+                            'creationTime': self.publication.creation_time.isoformat(),
                             'description': 'test description',
                             'public': True,
                             'downloadLink': 'test download link',
@@ -344,269 +462,83 @@ class TestPublicationSchema(CompasTestCase):
             }
         }
 
+    def execute_query(self):
+        return self.client.execute(
+            self.publication_query
+        )
+
+    def test_publication_query_unauthenticated(self):
+        response = self.execute_query()
+
         self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
+        self.assertDictEqual(self.expected_output, response.data)
 
     def test_publication_query_authenticated(self):
         self.client.authenticate(self.user)
-        publication = self.create_publication()
 
-        response = self.client.execute(
-            self.publication_query
-        )
-
-        expected = {
-            'compasPublications': {
-                'edges': [
-                    {
-                        'node': {
-                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
-                            'author': 'test author',
-                            'published': True,
-                            'title': 'test title',
-                            'year': 1983,
-                            'journal': 'test journal',
-                            'journalDoi': 'test journal doi',
-                            'datasetDoi': 'test dataset doi',
-                            'creationTime': publication.creation_time.isoformat(),
-                            'description': 'test description',
-                            'public': True,
-                            'downloadLink': 'test download link',
-                            'arxivId': 'test arxiv_id',
-                            'keywords': {
-                                'edges': [
-                                    {
-                                        'node': {
-                                            'tag': 'keyword1'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword2'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword3'
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
-            }
-        }
+        response = self.execute_query()
 
         self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
+        self.assertDictEqual(self.expected_output, response.data)
 
     def test_publication_query_filter_public_unauthenticated(self):
-        publication = self.create_publication()
-
-        # Add another publication with public=False - this should not show up in the output of the query for an
-        # anonymous query
-        self.create_publication(public=False)
-
-        response = self.client.execute(
-            self.publication_query
-        )
-
-        expected = {
-            'compasPublications': {
-                'edges': [
-                    {
-                        'node': {
-                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
-                            'author': 'test author',
-                            'published': True,
-                            'title': 'test title',
-                            'year': 1983,
-                            'journal': 'test journal',
-                            'journalDoi': 'test journal doi',
-                            'datasetDoi': 'test dataset doi',
-                            'creationTime': publication.creation_time.isoformat(),
-                            'description': 'test description',
-                            'public': True,
-                            'downloadLink': 'test download link',
-                            'arxivId': 'test arxiv_id',
-                            'keywords': {
-                                'edges': [
-                                    {
-                                        'node': {
-                                            'tag': 'keyword1'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword2'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword3'
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
-            }
-        }
+        response = self.execute_query()
 
         self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
+        self.assertDictEqual(self.expected_output, response.data)
 
     def test_publication_query_filter_public_authenticated(self):
         self.client.authenticate(self.user)
-        publication = self.create_publication()
 
-        # Add another publication with public=False - this should not show up in the output of the query for an
-        # authenticated user who is not a publication manager
-        self.create_publication(public=False)
-
-        response = self.client.execute(
-            self.publication_query
-        )
-
-        expected = {
-            'compasPublications': {
-                'edges': [
-                    {
-                        'node': {
-                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
-                            'author': 'test author',
-                            'published': True,
-                            'title': 'test title',
-                            'year': 1983,
-                            'journal': 'test journal',
-                            'journalDoi': 'test journal doi',
-                            'datasetDoi': 'test dataset doi',
-                            'creationTime': publication.creation_time.isoformat(),
-                            'description': 'test description',
-                            'public': True,
-                            'downloadLink': 'test download link',
-                            'arxivId': 'test arxiv_id',
-                            'keywords': {
-                                'edges': [
-                                    {
-                                        'node': {
-                                            'tag': 'keyword1'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword2'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword3'
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                ]
-            }
-        }
+        response = self.execute_query()
 
         self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
+        self.assertDictEqual(self.expected_output, response.data)
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_publication_query_filter_public_authenticated_publication_manager(self):
         self.client.authenticate(self.user)
-        publication = self.create_publication()
 
-        # Add another publication with public=False - this should show up in the output of the query for a publication
-        # manager
-        publication2 = self.create_publication(public=False)
+        response = self.execute_query()
 
-        response = self.client.execute(
-            self.publication_query
+        self.expected_output['compasPublications']['edges'].append(
+            {
+                'node': {
+                    'id': to_global_id('CompasPublicationNode', self.private_publication.id),
+                    'arxivId': 'test arxiv_id',
+                    'author': 'test author',
+                    'creationTime': self.private_publication.creation_time.isoformat(),
+                    'datasetDoi': 'test dataset doi',
+                    'description': 'test description',
+                    'public': False,
+                    'downloadLink': 'test download link',
+                    'journal': 'test journal',
+                    'journalDoi': 'test journal doi',
+                    'keywords': {
+                        'edges': [
+                            {
+                                'node': {
+                                    'tag': 'keyword1'
+                                }
+                            },
+                            {
+                                'node': {
+                                    'tag': 'keyword2'
+                                }
+                            },
+                            {
+                                'node': {
+                                    'tag': 'keyword3'
+                                }
+                            }
+                        ]
+                    },
+                    'published': True,
+                    'title': 'test title',
+                    'year': 1983
+                }
+            }
         )
 
-        expected = {
-            'compasPublications': {
-                'edges': [
-                    {
-                        'node': {
-                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjE=',
-                            'author': 'test author',
-                            'published': True,
-                            'title': 'test title',
-                            'year': 1983,
-                            'journal': 'test journal',
-                            'journalDoi': 'test journal doi',
-                            'datasetDoi': 'test dataset doi',
-                            'creationTime': publication.creation_time.isoformat(),
-                            'description': 'test description',
-                            'public': True,
-                            'downloadLink': 'test download link',
-                            'arxivId': 'test arxiv_id',
-                            'keywords': {
-                                'edges': [
-                                    {
-                                        'node': {
-                                            'tag': 'keyword1'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword2'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword3'
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    {
-                        'node': {
-                            'arxivId': 'test arxiv_id',
-                            'author': 'test author',
-                            'creationTime': publication2.creation_time.isoformat(),
-                            'datasetDoi': 'test dataset doi',
-                            'description': 'test description',
-                            'public': False,
-                            'downloadLink': 'test download link',
-                            'id': 'Q29tcGFzUHVibGljYXRpb25Ob2RlOjI=',
-                            'journal': 'test journal',
-                            'journalDoi': 'test journal doi',
-                            'keywords': {
-                                'edges': [
-                                    {
-                                        'node': {
-                                            'tag': 'keyword1'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword2'
-                                        }
-                                    },
-                                    {
-                                        'node': {
-                                            'tag': 'keyword3'
-                                        }
-                                    }
-                                ]
-                            },
-                            'published': True,
-                            'title': 'test title',
-                            'year': 1983
-                        }
-                    }
-                ]
-            }
-        }
-
         self.assertIsNone(response.errors)
-        self.assertDictEqual(expected, response.data)
+        self.assertDictEqual(self.expected_output, response.data)
