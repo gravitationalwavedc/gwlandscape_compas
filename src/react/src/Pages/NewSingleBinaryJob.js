@@ -137,7 +137,7 @@ const NewSingleBinaryJob = () => {
                                 <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br />Common Envelop</Nav.Link>
+                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br />Common Envelope</Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
@@ -149,7 +149,7 @@ const NewSingleBinaryJob = () => {
                             <SingleBinaryTab title="Supernova & Kick" eventKey="kick">
                                 <SupernovaKickParametersForm formik={formik} />
                             </SingleBinaryTab>
-                            <SingleBinaryTab title="Mass Transfer & Common Envelop" eventKey="mass-transfer">
+                            <SingleBinaryTab title="Mass Transfer & Common Envelope" eventKey="mass-transfer">
                                 <MassTransferCEParameters formik={formik} />
                             </SingleBinaryTab>
                         </Tab.Content>
