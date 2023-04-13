@@ -58,6 +58,9 @@ const NewSingleBinaryJob = () => {
     };
 
     const handleJobSubmission = (values) => {
+        // Reset errors if any
+        setOutputError('');
+
         // Reset the json data so they know something is happening.
         setJsonData('');
 
@@ -107,6 +110,8 @@ const NewSingleBinaryJob = () => {
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                 } else {
                     setOutputError('Output could not be generated');
+                    setDetailedOutputFile('');
+                    setJsonData('');
                 }
                 setIsLoadingOutput(false);
                 setDisableButtons(false);
