@@ -170,6 +170,15 @@ class CompasDatasetModel(models.Model):
         cls.objects.get(id=_id).file.delete()
         cls.objects.get(id=_id).delete()
 
+    @classmethod
+    def update_dataset_model(cls, _id, compas_publication=None, compas_model=None):
+        dataset_model = cls.objects.get(id=_id)
+        if compas_publication:
+            dataset_model.compas_publication = compas_publication
+        if compas_model:
+            dataset_model.compas_model = compas_model
+        dataset_model.save()
+
     def __str__(self):
         return f"{self.compas_publication.title} - {self.compas_model.name}"
 

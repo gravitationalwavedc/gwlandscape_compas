@@ -306,6 +306,30 @@ class DeleteCompasDatasetModelMutation(relay.ClientIDMutation):
         return DeleteCompasDatasetModelMutation(result=True)
 
 
+class UpdateCompasDatasetModelMutation(relay.ClientIDMutation):
+    class Input:
+        id = graphene.ID(required=True)
+        compas_publication = graphene.String()
+        compas_model = graphene.String()
+
+    result = graphene.Boolean()
+
+    @classmethod
+    @login_required
+    @user_passes_test(check_publication_management_user)
+    def mutate_and_get_payload(cls, root, info, id, **kwargs):
+        if 'compas_publication' in kwargs:
+            kwargs['compas_publication'] = CompasPublication.objects.get(
+                id=from_global_id(kwargs['compas_publication'])[1]
+            )
+        if 'compas_model' in kwargs:
+            kwargs['compas_model'] = CompasModel.objects.get(
+                id=from_global_id(kwargs['compas_model'])[1]
+            )
+        CompasDatasetModel.update_dataset_model(from_global_id(id)[1], **kwargs)
+        return UpdateCompasDatasetModelMutation(result=True)
+
+
 class UploadCompasDatasetModelMutation(relay.ClientIDMutation):
     class Input:
         upload_token = graphene.String()
@@ -329,7 +353,7 @@ class UploadCompasDatasetModelMutation(relay.ClientIDMutation):
             job_file
         )
 
-        return UploadCompasDatasetModelMutation(id=to_global_id('CompasDatasetModel', dataset_model.id))
+        return UploadCompasDatasetModelMutation(id=to_global_id('CompasDatasetModelNode', dataset_model.id))
 
 
 class Mutation(graphene.ObjectType):
@@ -343,4 +367,5 @@ class Mutation(graphene.ObjectType):
     delete_compas_model = DeleteCompasModelMutation.Field()
     update_compas_model = UpdateCompasModelMutation.Field()
     delete_compas_dataset_model = DeleteCompasDatasetModelMutation.Field()
+    update_compas_dataset_model = UpdateCompasDatasetModelMutation.Field()
     upload_compas_dataset_model = UploadCompasDatasetModelMutation.Field()

@@ -61,6 +61,31 @@ class TestCompasDatasetModel(testcases.TestCase):
         self.assertFalse(pathlib.Path(file).exists())
 
     @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
+    def test_update(self):
+        model = CompasDatasetModel.create_dataset_model(
+            self.publication,
+            self.model,
+            self.test_job_archive
+        )
+
+        new_model = CompasModel.create_model('new test', 'new summary', 'new description')
+
+        new_publication = CompasPublication.create_publication(
+            author='new test author',
+            title='new test title',
+            arxiv_id='new test arxiv_id'
+        )
+
+        self.assertEqual(model.compas_model.id, self.model.id)
+        self.assertEqual(model.compas_publication.id, self.publication.id)
+
+        CompasDatasetModel.update_dataset_model(model.id, new_publication, new_model)
+        model.refresh_from_db()
+
+        self.assertEqual(model.compas_model.id, new_model.id)
+        self.assertEqual(model.compas_publication.id, new_publication.id)
+
+    @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
     def test_str(self):
         model = CompasDatasetModel.create_dataset_model(
             self.publication,
