@@ -58,6 +58,9 @@ const NewSingleBinaryJob = () => {
     };
 
     const handleJobSubmission = (values) => {
+        // Reset errors if any
+        setOutputError('');
+
         // Reset the json data so they know something is happening.
         setJsonData('');
 
@@ -107,6 +110,8 @@ const NewSingleBinaryJob = () => {
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                 } else {
                     setOutputError('Output could not be generated');
+                    setDetailedOutputFile('');
+                    setJsonData('');
                 }
                 setIsLoadingOutput(false);
                 setDisableButtons(false);
@@ -137,7 +142,7 @@ const NewSingleBinaryJob = () => {
                                 <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br />Common Envelop</Nav.Link>
+                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br />Common Envelope</Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
@@ -149,7 +154,7 @@ const NewSingleBinaryJob = () => {
                             <SingleBinaryTab title="Supernova & Kick" eventKey="kick">
                                 <SupernovaKickParametersForm formik={formik} />
                             </SingleBinaryTab>
-                            <SingleBinaryTab title="Mass Transfer & Common Envelop" eventKey="mass-transfer">
+                            <SingleBinaryTab title="Mass Transfer & Common Envelope" eventKey="mass-transfer">
                                 <MassTransferCEParameters formik={formik} />
                             </SingleBinaryTab>
                         </Tab.Content>

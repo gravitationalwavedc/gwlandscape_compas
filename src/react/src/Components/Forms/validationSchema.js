@@ -30,7 +30,7 @@ let validationSchema = Yup.object().shape({
         .number()
         .required()
         .min(0.0)
-        .max(1.0),
+        .lessThan(1.0),
     separation: Yup
         .number()
         .min(0.0)
