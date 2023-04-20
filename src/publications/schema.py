@@ -161,7 +161,7 @@ class DeleteKeywordMutation(relay.ClientIDMutation):
 
 class UpdateKeywordMutation(relay.ClientIDMutation):
     class Input:
-        id = graphene.ID()
+        id = graphene.ID(required=True)
         tag = graphene.String()
 
     result = graphene.Boolean()
@@ -219,10 +219,10 @@ class DeletePublicationMutation(relay.ClientIDMutation):
 class UpdatePublicationMutation(relay.ClientIDMutation):
     class Input:
         id = graphene.ID(required=True)
-        author = graphene.String(required=True)
+        author = graphene.String()
         # published defines if the job was published in a journal/arxiv
         published = graphene.Boolean()
-        title = graphene.String(required=True)
+        title = graphene.String()
         year = graphene.Int()
         journal = graphene.String()
         journal_doi = graphene.String()
@@ -231,7 +231,7 @@ class UpdatePublicationMutation(relay.ClientIDMutation):
         # public defines if the job is publicly accessible
         public = graphene.Boolean()
         download_link = graphene.String()
-        arxiv_id = graphene.String(required=True)
+        arxiv_id = graphene.String()
         keywords = graphene.List(graphene.String)
 
     result = graphene.Boolean()
@@ -277,7 +277,7 @@ class DeleteCompasModelMutation(relay.ClientIDMutation):
 
 class UpdateCompasModelMutation(relay.ClientIDMutation):
     class Input:
-        id = graphene.ID()
+        id = graphene.ID(required=True)
         name = graphene.String()
         summary = graphene.String()
         description = graphene.String()
