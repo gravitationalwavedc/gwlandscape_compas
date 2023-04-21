@@ -119,7 +119,7 @@ class CompasModel(models.Model):
     class Meta:
         ordering = ['name']
 
-    name = models.CharField(max_length=50, null=True, blank=True)
+    name = models.CharField(max_length=50, null=False, blank=False)
     summary = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
@@ -127,7 +127,7 @@ class CompasModel(models.Model):
         return self.name
 
     @classmethod
-    def create_model(cls, name, summary, description):
+    def create_model(cls, name, summary=None, description=None):
         return cls.objects.create(
             name=name,
             summary=summary,
