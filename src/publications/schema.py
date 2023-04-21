@@ -133,7 +133,7 @@ class Query(object):
 
 class AddKeywordMutation(relay.ClientIDMutation):
     class Input:
-        tag = graphene.String()
+        tag = graphene.String(required=True)
 
     id = graphene.String()
 
@@ -147,7 +147,7 @@ class AddKeywordMutation(relay.ClientIDMutation):
 
 class DeleteKeywordMutation(relay.ClientIDMutation):
     class Input:
-        id = graphene.ID()
+        id = graphene.ID(required=True)
 
     result = graphene.Boolean()
 
@@ -204,7 +204,7 @@ class AddPublicationMutation(relay.ClientIDMutation):
 
 class DeletePublicationMutation(relay.ClientIDMutation):
     class Input:
-        id = graphene.ID()
+        id = graphene.ID(required=True)
 
     result = graphene.Boolean()
 
@@ -247,7 +247,7 @@ class UpdatePublicationMutation(relay.ClientIDMutation):
 
 class AddCompasModelMutation(relay.ClientIDMutation):
     class Input:
-        name = graphene.String()
+        name = graphene.String(required=True)
         summary = graphene.String()
         description = graphene.String()
 
@@ -256,8 +256,8 @@ class AddCompasModelMutation(relay.ClientIDMutation):
     @classmethod
     @login_required
     @user_passes_test(check_publication_management_user)
-    def mutate_and_get_payload(cls, root, info, name, summary, description):
-        model = CompasModel.create_model(name, summary, description)
+    def mutate_and_get_payload(cls, root, info, **kwargs):
+        model = CompasModel.create_model(**kwargs)
         return AddCompasModelMutation(id=to_global_id('CompasModelNode', model.id))
 
 
