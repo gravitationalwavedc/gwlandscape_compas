@@ -5,17 +5,16 @@ import Files from '../Components/Results/Files';
 
 const ViewJob = ({data, ...rest}) => (
     <>
-        {data.compasJob ? <><Container fluid>
-            <Row className="mb-3">
-                <Col md={2} />
-                <Col md={8}>
-                    <h1>Job Details</h1>
+        {data.compasJob ? <><Container>
+            <Row className="mt-5">
+                <Col>
                     {data.compasJob && <>
-                        <div> Name: {data.compasJob.start.name}</div>
-                        <div>Description: {data.compasJob.start.description}</div>
-                        <div>Created: {data.compasJob.lastUpdated}</div>
-                        <div>Private: {data.compasJob.start.private}</div>
-                        <div>Status: {data.compasJob.jobStatus.name}</div>
+                        <h1>{data.compasJob.start.name}</h1>
+                        <h6>
+                            {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
+                            {data.compasJob.user} . {data.compasJob.start.private}
+                        </h6>
+                        <h5>{data.compasJob.start.description}</h5>
                         <div>
                             <Files jobId={data.compasJob.id} {...rest}/>
                         </div>
