@@ -36,6 +36,7 @@ export default createFragmentContainer(ViewJob,
                     id
                     userId
                     lastUpdated
+                    user
                     start {
                         name
                         description
