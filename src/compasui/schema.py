@@ -20,6 +20,7 @@ from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
 from .utils.h5ToJson import read_h5_data_as_json
 from .utils.jobs.request_file_download_id import request_file_download_id
+from .utils.auth.lookup_users import request_lookup_users
 
 
 def parameter_resolvers(name):
@@ -75,7 +76,7 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
         convert_choices_to_enum = False
         interfaces = (relay.Node,)
 
-    # user = graphene.String()
+    user = graphene.String()
     job_status = graphene.Field(JobStatusType)
     last_updated = graphene.String()
     start = graphene.Field(OutputStartType)
@@ -115,7 +116,11 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
                 "number": 0,
                 "data": "Unknown"
             }
-
+    def resolve_user(parent, info):
+        success, users = request_lookup_users([parent.user_id], info.context.user.user_id)
+        if success and users:
+            return f"{users[0]['firstName']} {users[0]['lastName']}"
+        return "Unknown User"
 
 populate_fields(
     CompasJobNode,
