@@ -1,26 +1,47 @@
 import React from 'react';
 import {graphql, createFragmentContainer} from 'react-relay';
-import { Row, Col, Container } from 'react-bootstrap';
+import {Row, Col, Container, Nav, Tab} from 'react-bootstrap';
 import Files from '../Components/Results/Files';
 
 const ViewJob = ({data, ...rest}) => (
     <>
         {data.compasJob ? <><Container>
-            <Row className="mt-5">
-                <Col>
-                    {data.compasJob && <>
+            {data.compasJob && <>
+                <Row className="mt-5">
+                    <Col>
                         <h1>{data.compasJob.start.name}</h1>
                         <h6>
                             {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
                             {data.compasJob.user} . {data.compasJob.start.private}
                         </h6>
                         <h5>{data.compasJob.start.description}</h5>
-                        <div>
-                            <Files jobId={data.compasJob.id} {...rest}/>
-                        </div>
-                    </>}
-                </Col>
-            </Row>
+                    </Col>
+                </Row>
+                <Tab.Container id="job_info_tabs" defaultActiveKey="results">
+                    <Row>
+                        <Col md={2}>
+                            <Nav fill variant="pills" className="flex-column text-center">
+                                <Nav.Item>
+                                    <Nav.Link eventKey="explore">Explore</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="parameters">Parameters</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="results">Results</Nav.Link>
+                                </Nav.Item>
+                            </Nav>
+                        </Col>
+                        <Col md={10}>
+                            <Tab.Content className="mt-2">
+                                <Tab.Pane eventKey="results">
+                                    <Files jobId={data.compasJob.id} {...rest}/>
+                                </Tab.Pane>
+                            </Tab.Content>
+                        </Col>
+                    </Row>
+                </Tab.Container>
+            </>}
         </Container></> : <Container><Row><Col>Job not found</Col></Row></Container>}
     </>
 );
