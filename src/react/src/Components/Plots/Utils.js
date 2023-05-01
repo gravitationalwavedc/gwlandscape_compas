@@ -1,6 +1,6 @@
 import React from 'react';
 
-const filterScatterData = (data, xlabel, ylabel, x1, x2, y1, y2) => 
+const filterScatterData = (data, xlabel, ylabel, x1, x2, y1, y2) =>
     data.filter(d => d[xlabel] >= x1 && d[xlabel] <= x2 && d[ylabel] >= y1 && d[ylabel] <= y2);
 
 const tickExpFormatter = num => {
@@ -36,16 +36,27 @@ const getTemperature = (radius, luminosity, Tsol = NaN) => {
     return (luminosity / radius ** 2) ** (1 / 4) * Tsol;
 };
 
-const getReferenceRangeType = (R, xDomain, yDomain) => { 
+const getReferenceRangeType = (R, xDomain, yDomain) => {
     // returns 0 if out of bounds, 1 if left edge, 2 if right edge, 3 if both
-    let Lmin = getLuminosity(R, xDomain[0]);
-    let Lmax = getLuminosity(R, xDomain[1]);
-    let left = yDomain[0] < Lmin && yDomain[1] > Lmin;
-    let right = yDomain[0] < Lmax && yDomain[1] > Lmax;
-    if (left && right) return 3;
-    if (left) return 1;
-    if (right) return 2;
-    return 0;
+    const Lmin = getLuminosity(R, xDomain[0]);
+    const Lmax = getLuminosity(R, xDomain[1]);
+
+    const edgeCheck = (checkNumber) => yDomain[0] < checkNumber && yDomain[1] > checkNumber;
+
+    const left = edgeCheck(Lmin);
+    const right = edgeCheck(Lmax);
+
+    let rangeType = 0;
+
+    if (left && right) {
+        rangeType = 3;
+    } else if (right) {
+        rangeType = 2;
+    } else if (left) {
+        rangeType = 1;
+    }
+
+    return rangeType;
 };
 
 const getReferenceLineSegment = (R, xDomain, yDomain) => {
