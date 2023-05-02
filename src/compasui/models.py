@@ -118,7 +118,7 @@ class CompasJob(models.Model):
         #     raise Exception("Permission Denied")
 
         # Users can only access the job if it is public or the user owns the job
-        if job.private and user.user_id != job.user_id:
+        if job.private and user.id != job.user_id:
             raise Exception("Permission Denied")
 
         return job
@@ -132,7 +132,7 @@ class CompasJob(models.Model):
         :param user_job_filter: The UserCompasJobFilter instance
         :return: The queryset filtered by the requesting user
         """
-        return qs.filter(user_id=user_job_filter.request.user.user_id)
+        return qs.filter(user_id=user_job_filter.request.user.id)
 
     @classmethod
     def public_compas_job_filter(cls, qs, public_job_filter):
