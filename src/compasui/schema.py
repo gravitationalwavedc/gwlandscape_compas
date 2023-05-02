@@ -23,10 +23,11 @@ from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.auth.lookup_users import request_lookup_users
 
 
-def parameter_resolvers(name):
+def basic_parameter_resolvers(name):
     def func(parent, info):
         try:
-            param = parent.parameter.get(name=name)
+            param = parent.basic_parameter.get(name=name)
+            print(param)
             if param.value in ['true', 'True']:
                 return True
             elif param.value in ['false', 'False']:
@@ -34,9 +35,23 @@ def parameter_resolvers(name):
             else:
                 return param.value
 
-        except parent.parameter.model.DoesNotExist:
+        except parent.basic_parameter.model.DoesNotExist:
             return None
+    return func
 
+def advanced_parameter_resolvers(name):
+    def func(parent, info):
+        try:
+            param = parent.advanced_parameter.get(name=name)
+            if param.value in ['true', 'True']:
+                return True
+            elif param.value in ['false', 'False']:
+                return False
+            else:
+                return param.value
+
+        except parent.advanced_parameter.model.DoesNotExist:
+            return None
     return func
 
 
@@ -117,7 +132,7 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
                 "data": "Unknown"
             }
     def resolve_user(parent, info):
-        success, users = request_lookup_users([parent.user_id], info.context.user.user_id)
+        success, users = request_lookup_users([parent.user_id], info.context.user.id)
         if success and users:
             return f"{users[0]['firstName']} {users[0]['lastName']}"
         return "Unknown User"
@@ -141,6 +156,12 @@ populate_fields(
         "semi_major_axis_distribution",
         "min_orbital_period",
         "max_orbital_period",
+    ],
+    basic_parameter_resolvers
+)
+
+populate_fields(
+    CompasJobNode, [
         "mass_transfer_angular_momentum_loss_prescription",
         "mass_transfer_accretion_efficiency_prescription",
         "mass_transfer_fa",
@@ -150,9 +171,9 @@ populate_fields(
         "fryer_supernova_engine",
         "kick_velocity_distribution",
         "velocity_1",
-        "velocity_2",
+        "velocity_2"
     ],
-    parameter_resolvers
+    advanced_parameter_resolvers
 )
 
 
