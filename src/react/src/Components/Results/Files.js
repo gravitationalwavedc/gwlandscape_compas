@@ -4,9 +4,9 @@ import {harnessApi} from '../../index';
 import {Table} from 'react-bootstrap';
 import ResultFile from './ResultFile';
 
-const Files = ({jobId}) => {
+const Files = ({jobId}) =>
 
-    return <React.Fragment>
+    <React.Fragment>
         <Table>
             <thead>
                 <tr>
@@ -46,10 +46,10 @@ const Files = ({jobId}) => {
                         }
                     }
                     }
-                ></QueryRenderer>
+                />
             </tbody>
         </Table>
     </React.Fragment>;
-};
+
 
 export default Files;

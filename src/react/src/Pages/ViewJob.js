@@ -19,7 +19,7 @@ const ViewJob = ({data, ...rest}) => (
                 </Row>
                 <Tab.Container id="job_info_tabs" defaultActiveKey="results">
                     <Row>
-                        <Col md={2}>
+                        <Col md={3}>
                             <Nav fill variant="pills" className="flex-column text-center">
                                 <Nav.Item>
                                     <Nav.Link eventKey="explore">Explore</Nav.Link>
@@ -32,7 +32,7 @@ const ViewJob = ({data, ...rest}) => (
                                 </Nav.Item>
                             </Nav>
                         </Col>
-                        <Col md={10}>
+                        <Col md={9}>
                             <Tab.Content className="mt-2">
                                 <Tab.Pane eventKey="results">
                                     <Files jobId={data.compasJob.id} {...rest}/>
@@ -57,7 +57,6 @@ export default createFragmentContainer(ViewJob,
                     id
                     userId
                     lastUpdated
-                    user
                     start {
                         name
                         description
