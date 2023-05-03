@@ -5,7 +5,7 @@ let validationSchema = Yup.object().shape({
         .number()
         .required()
         .min(1),
-    intialMassPower: Yup
+    initialMassPower: Yup
         .number()
         .nullable(),
     minInitialMass: Yup
