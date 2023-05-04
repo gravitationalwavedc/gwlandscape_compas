@@ -10,55 +10,55 @@ const Parameters = (props) =>
             </Col>
         </Row>
         <Row>
-            <Col md={4}>Number of Systems</Col>
+            <Col md={4} className="paramater-name">Number of Systems</Col>
             <Col md={2}>{props.jobData.numberOfSystems}</Col>
         </Row>
         <Row>
-            <Col md={4}>Initial Mass Function</Col>
+            <Col md={4} className="paramater-name">Initial Mass Function</Col>
             <Col md={2}>{props.jobData.initialMassFunction}</Col>
-            <Col md={4}>Initial Mass Power</Col>
+            <Col md={4} className="paramater-name">Initial Mass Power</Col>
             <Col md={2}>{props.jobData.initialMassPower}</Col>
         </Row>
         <Row>
-            <Col md={4}>Min Initial Mass</Col>
+            <Col md={4} className="paramater-name">Min Initial Mass</Col>
             <Col md={2}>{props.jobData.minInitialMass}</Col>
-            <Col md={4}>Max Initial Mass</Col>
+            <Col md={4} className="paramater-name">Max Initial Mass</Col>
             <Col md={2}>{props.jobData.maxInitialMass}</Col>
         </Row>
         <Row>
-            <Col md={4}>Mass Ratio Distribution</Col>
+            <Col md={4} className="paramater-name" className="paramater-name">Mass Ratio Distribution</Col>
             <Col md={2}>{props.jobData.massRatioDistribution}</Col>
         </Row>
         <Row>
-            <Col md={4}>Min Mass Ratio</Col>
+            <Col md={4} className="paramater-name">Min Mass Ratio</Col>
             <Col md={2}>{props.jobData.minMassRatio}</Col>
-            <Col md={4}>Max Mass Ratio</Col>
+            <Col md={4} className="paramater-name">Max Mass Ratio</Col>
             <Col md={2}>{props.jobData.maxMassRatio}</Col>
         </Row>
         <Row>
-            <Col md={4}>Semi Major Axis Distribution</Col>
+            <Col md={4} className="paramater-name">Semi Major Axis Distribution</Col>
             <Col md={2}>{props.jobData.semiMajorAxisDistribution}</Col>
         </Row>
         <Row>
-            <Col md={4}>Min Semi Major Axis (AU)</Col>
+            <Col md={4} className="paramater-name">Min Semi Major Axis (AU)</Col>
             <Col md={2}>{props.jobData.minSemiMajorAxis}</Col>
-            <Col md={4}>Max Semi Major Axis (AU)</Col>
+            <Col md={4} className="paramater-name">Max Semi Major Axis (AU)</Col>
             <Col md={2}>{props.jobData.maxSemiMajorAxis}</Col>
         </Row>
         <Row>
-            <Col md={4}>Min Orbital Period (Hours)</Col>
+            <Col md={4} className="paramater-name">Min Orbital Period (Hours)</Col>
             <Col md={2}>{props.jobData.minOrbitalPeriod}</Col>
-            <Col md={4}>Max Orbital Period (Hours)</Col>
+            <Col md={4} className="paramater-name">Max Orbital Period (Hours)</Col>
             <Col md={2}>{props.jobData.maxOrbitalPeriod}</Col>
         </Row>
         <Row>
-            <Col md={4}>Metallicity Distribution</Col>
+            <Col md={4} className="paramater-name">Metallicity Distribution</Col>
             <Col md={2}>{props.jobData.metallicityDistribution}</Col>
         </Row>
         <Row>
-            <Col md={4}>Min Metallicity</Col>
+            <Col md={4} className="paramater-name">Min Metallicity</Col>
             <Col md={2}>{props.jobData.minMetallicity}</Col>
-            <Col md={4}>Max Metallicity</Col>
+            <Col md={4} className="paramater-name">Max Metallicity</Col>
             <Col md={2}>{props.jobData.maxMetallicity}</Col>
         </Row>
     </React.Fragment>;
