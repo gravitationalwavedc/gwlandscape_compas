@@ -2,6 +2,7 @@ import React from 'react';
 import {graphql, createFragmentContainer} from 'react-relay';
 import {Row, Col, Container, Nav, Tab} from 'react-bootstrap';
 import Files from '../Components/Results/Files';
+import Parameters from '../Components/Results/Parameters';
 
 const ViewJob = ({data, ...rest}) => (
     <>
@@ -12,7 +13,7 @@ const ViewJob = ({data, ...rest}) => (
                         <h1>{data.compasJob.start.name}</h1>
                         <h6>
                             {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
-                            {data.compasJob.user} . {data.compasJob.start.private}
+                            {data.compasJob.user} . {data.compasJob.userId} . {data.compasJob.start.private}
                         </h6>
                         <h5>{data.compasJob.start.description}</h5>
                     </Col>
@@ -36,6 +37,9 @@ const ViewJob = ({data, ...rest}) => (
                             <Tab.Content className="mt-2">
                                 <Tab.Pane eventKey="results">
                                     <Files jobId={data.compasJob.id} {...rest}/>
+                                </Tab.Pane>
+                                <Tab.Pane eventKey="parameters">
+                                    <Parameters jobData={data.compasJob} {...rest}/>
                                 </Tab.Pane>
                             </Tab.Content>
                         </Col>
@@ -66,6 +70,7 @@ export default createFragmentContainer(ViewJob,
                         name
                         number
                     }
+                    ...Parameters_jobData
                 }
             }
         `,
