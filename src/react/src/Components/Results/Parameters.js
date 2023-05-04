@@ -61,6 +61,50 @@ const Parameters = (props) =>
             <Col md={4} className="paramater-name">Max Metallicity</Col>
             <Col md={2}>{props.jobData.maxMetallicity}</Col>
         </Row>
+
+        <Row>
+            <Col>
+                <h2>Supernova - Kick Options</h2>
+            </Col>
+        </Row>
+        <Row>
+            <Col md={4} className="paramater-name">Remnant Mass Prescription</Col>
+            <Col md={2}>{props.jobData.remnantMassPrescription}</Col>
+            <Col md={4} className="paramater-name">Fryer Supernova Engine</Col>
+            <Col md={2}>{props.jobData.fryerSupernovaEngine}</Col>
+        </Row>
+        <Row>
+            <Col md={4} className="paramater-name">Kick Velocity Distribution</Col>
+            <Col md={2}>{props.jobData.kickVelocityDistribution}</Col>
+        </Row>
+        <Row>
+            <Col md={4} className="paramater-name">Velocity 1 (km/s)</Col>
+            <Col md={2}>{props.jobData.velocity1}</Col>
+            <Col md={4} className="paramater-name">Velocity 2 (km/s)</Col>
+            <Col md={2}>{props.jobData.velocity2}</Col>
+        </Row>
+
+        <Row>
+            <Col>
+                <h2>Mass Transfer - CE Options</h2>
+            </Col>
+        </Row>
+        <Row>
+            <Col md={4} className="paramater-name">Angular Momentum Loss Prescription</Col>
+            <Col md={2}>{props.jobData.massTransferAngularMomentumLossPrescription}</Col>
+        </Row>
+        <Row>
+            <Col md={4} className="paramater-name">Accretion Efficiency Prescription</Col>
+            <Col md={2}>{props.jobData.massTransferAccretionEfficiencyPrescription}</Col>
+            <Col md={4} className="paramater-name">Fraction Accreted</Col>
+            <Col md={2}>{props.jobData.massTransferFa}</Col>
+        </Row>
+        <Row>
+            <Col md={4} className="paramater-name">Alpha</Col>
+            <Col md={2}>{props.jobData.commonEnvelopeAlpha}</Col>
+            <Col md={4} className="paramater-name">Lambda Prescription</Col>
+            <Col md={2}>{props.jobData.commonEnvelopeLambdaPrescription}</Col>
+        </Row>
     </React.Fragment>;
 
 
