@@ -11,7 +11,7 @@ const ViewJob = ({data, ...rest}) => (
                 <Row className="mt-5">
                     <Col>
                         <h1>{data.compasJob.start.name}</h1>
-                        <h6>
+                        <h6 data-testid="jobInfo">
                             {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
                             {data.compasJob.user} . {data.compasJob.userId} . {data.compasJob.start.private}
                         </h6>
@@ -59,6 +59,7 @@ export default createFragmentContainer(ViewJob,
             ){
                 compasJob(id: $jobId){
                     id
+                    user
                     userId
                     lastUpdated
                     start {
