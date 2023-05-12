@@ -39,6 +39,7 @@ def basic_parameter_resolvers(name):
             return None
     return func
 
+
 def advanced_parameter_resolvers(name):
     def func(parent, info):
         try:
@@ -131,11 +132,13 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
                 "number": 0,
                 "data": "Unknown"
             }
+
     def resolve_user(parent, info):
         success, users = request_lookup_users([parent.user_id], info.context.user.id)
         if success and users:
             return f"{users[0]['firstName']} {users[0]['lastName']}"
         return "Unknown User"
+
 
 populate_fields(
     CompasJobNode,
