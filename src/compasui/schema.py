@@ -27,7 +27,6 @@ def basic_parameter_resolvers(name):
     def func(parent, info):
         try:
             param = parent.basic_parameter.get(name=name)
-            print(param)
             if param.value in ['true', 'True']:
                 return True
             elif param.value in ['false', 'False']:
