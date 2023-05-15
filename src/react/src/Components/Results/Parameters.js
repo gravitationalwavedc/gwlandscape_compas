@@ -1,6 +1,7 @@
 import React from 'react';
 import {graphql,  createFragmentContainer} from 'react-relay';
 import { Row, Col} from 'react-bootstrap';
+import ParameterTableRow from './ParameterTableRow';
 
 const Parameters = (props) =>
     <React.Fragment>
@@ -9,102 +10,87 @@ const Parameters = (props) =>
                 <h2 className="mb-md-3 mt-md-2">Basic Options</h2>
             </Col>
         </Row>
-        <Row>
-            <Col md={4} >Number of Systems</Col>
-            <Col md={2}>{props.jobData.numberOfSystems}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Initial Mass Function</Col>
-            <Col md={2}>{props.jobData.initialMassFunction}</Col>
-            <Col md={4} >Initial Mass Power</Col>
-            <Col md={2}>{props.jobData.initialMassPower}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Min Initial Mass</Col>
-            <Col md={2}>{props.jobData.minInitialMass}</Col>
-            <Col md={4} >Max Initial Mass</Col>
-            <Col md={2}>{props.jobData.maxInitialMass}</Col>
-        </Row>
-        <Row>
-            <Col md={4}  >Mass Ratio Distribution</Col>
-            <Col md={2}>{props.jobData.massRatioDistribution}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Min Mass Ratio</Col>
-            <Col md={2}>{props.jobData.minMassRatio}</Col>
-            <Col md={4} >Max Mass Ratio</Col>
-            <Col md={2}>{props.jobData.maxMassRatio}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Semi Major Axis Distribution</Col>
-            <Col md={2}>{props.jobData.semiMajorAxisDistribution}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Min Semi Major Axis (AU)</Col>
-            <Col md={2}>{props.jobData.minSemiMajorAxis}</Col>
-            <Col md={4} >Max Semi Major Axis (AU)</Col>
-            <Col md={2}>{props.jobData.maxSemiMajorAxis}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Min Orbital Period (Hours)</Col>
-            <Col md={2}>{props.jobData.minOrbitalPeriod}</Col>
-            <Col md={4} >Max Orbital Period (Hours)</Col>
-            <Col md={2}>{props.jobData.maxOrbitalPeriod}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Metallicity Distribution</Col>
-            <Col md={2}>{props.jobData.metallicityDistribution}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Min Metallicity</Col>
-            <Col md={2}>{props.jobData.minMetallicity}</Col>
-            <Col md={4} >Max Metallicity</Col>
-            <Col md={2}>{props.jobData.maxMetallicity}</Col>
-        </Row>
+        <ParameterTableRow params={[
+            {name: 'Number of Systems', value: props.jobData.numberOfSystems},
+            {name: '', value: ''}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Initial Mass Function', value: props.jobData.initialMassFunction},
+            {name: 'Initial Mass Power', value: props.jobData.initialMassPower}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Min Initial Mass', value: props.jobData.minInitialMass},
+            {name: 'Max Initial Mass', value: props.jobData.maxInitialMass}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Mass Ratio Distribution', value: props.jobData.massRatioDistribution},
+            {name: '', value: ''}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Min Mass Ratio', value: props.jobData.minMassRatio},
+            {name: 'Max Mass Ratio', value: props.jobData.maxMassRatio}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Semi Major Axis Distribution', value: props.jobData.semiMajorAxisDistribution},
+            {name: '', value: ''}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Min Semi Major Axis (AU)', value: props.jobData.minSemiMajorAxis},
+            {name: 'Max Semi Major Axis (AU)', value: props.jobData.maxSemiMajorAxis}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Min Orbital Period (Hours)', value: props.jobData.minOrbitalPeriod},
+            {name: 'Max Orbital Period (Hours)', value: props.jobData.maxOrbitalPeriod}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Metallicity Distribution', value: props.jobData.metallicityDistribution},
+            {name: '', value: ''}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Min Metallicity', value: props.jobData.minMetallicity},
+            {name: 'Max Metallicity', value: props.jobData.maxMetallicity}
+        ]}/>
 
         <Row>
             <Col>
                 <h2 className="mb-md-3 mt-md-3">Supernova - Kick Options</h2>
             </Col>
         </Row>
-        <Row>
-            <Col md={4} >Remnant Mass Prescription</Col>
-            <Col md={2}>{props.jobData.remnantMassPrescription}</Col>
-            <Col md={4} >Fryer Supernova Engine</Col>
-            <Col md={2}>{props.jobData.fryerSupernovaEngine}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Kick Velocity Distribution</Col>
-            <Col md={2}>{props.jobData.kickVelocityDistribution}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Velocity 1 (km/s)</Col>
-            <Col md={2}>{props.jobData.velocity1}</Col>
-            <Col md={4} >Velocity 2 (km/s)</Col>
-            <Col md={2}>{props.jobData.velocity2}</Col>
-        </Row>
-
+        <ParameterTableRow params={[
+            {name: 'Remnant Mass Prescription', value: props.jobData.remnantMassPrescription},
+            {name: 'Fryer Supernova Engine', value: props.jobData.fryerSupernovaEngine}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Kick Velocity Distribution', value: props.jobData.kickVelocityDistribution},
+            {name: '', value: ''}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Velocity 1 (km/s)', value: props.jobData.velocity1},
+            {name: 'Velocity 2 (km/s)', value: props.jobData.velocity2}
+        ]}/>
         <Row>
             <Col>
                 <h2 className="mb-md-3 mt-md-3">Mass Transfer - CE Options</h2>
             </Col>
         </Row>
-        <Row>
-            <Col md={4} >Angular Momentum Loss Prescription</Col>
-            <Col md={2}>{props.jobData.massTransferAngularMomentumLossPrescription}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Accretion Efficiency Prescription</Col>
-            <Col md={2}>{props.jobData.massTransferAccretionEfficiencyPrescription}</Col>
-            <Col md={4} >Fraction Accreted</Col>
-            <Col md={2}>{props.jobData.massTransferFa}</Col>
-        </Row>
-        <Row>
-            <Col md={4} >Alpha</Col>
-            <Col md={2}>{props.jobData.commonEnvelopeAlpha}</Col>
-            <Col md={4} >Lambda Prescription</Col>
-            <Col md={2}>{props.jobData.commonEnvelopeLambdaPrescription}</Col>
-        </Row>
+        <ParameterTableRow params={[
+            {
+                name: 'Angular Momentum Loss Prescription',
+                value: props.jobData.massTransferAngularMomentumLossPrescription
+            },
+            {name: '', value: ''}
+        ]}/>
+        <ParameterTableRow params={[
+            {
+                name: 'Accretion Efficiency Prescription',
+                value: props.jobData.massTransferAccretionEfficiencyPrescription
+            },
+            {name: 'Fraction Accreted', value: props.jobData.massTransferFa}
+        ]}/>
+        <ParameterTableRow params={[
+            {name: 'Alpha', value: props.jobData.commonEnvelopeAlpha},
+            {name: 'Lambda Prescription', value: props.jobData.commonEnvelopeLambdaPrescription}
+        ]}/>
     </React.Fragment>;
 
 
