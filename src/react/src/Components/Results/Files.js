@@ -33,13 +33,13 @@ const Files = ({jobId}) =>
                     variables={{jobId: jobId}}
                     render={({error, props}) => {
                         if (error) {
-                            return <tr><td><div>{error.message}</div></td></tr>;
+                            return <tr><td>{error.message}</td></tr>;
                         } else if (props && props.compasResultFiles) {
                             return <React.Fragment>
                                 {
                                     props.compasResultFiles.files.map(
                                         (f, i) =>
-                                            <ResultFile jobId={jobId} file={f} key={i}/>
+                                            <ResultFile jobId={jobId} file={f} key={f.downloadToken}/>
                                     )
                                 }
                             </React.Fragment>;
