@@ -43,7 +43,6 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
     const [bottom, setBottom] = useState(initialState.bottom);
 
     const isZoomed = filteredData1?.length !== data1?.length || filteredData2?.length !== data2?.length;
-
     const drawReferenceLine = (R, xDomain, yDomain) => <ReferenceLine
         key={`${R}-${xDomain}-${yDomain}`}
         label={`${R} R_sun`}
@@ -158,8 +157,11 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     type='number'
                 />
                 <Tooltip
+                    allowEscapeViewBox={{ x: true, y: false }}
+                    offset={20}
                     cursor={{ strokeDasharray: '3 3' }}
-                    formatter={(value, name) => <>{value} {units[name]}</>}
+                    formatter={(value, name) => <>{value.toFixed(2)} {units[name]}</>}
+                    labelFormatter={label => `${label.toFixed(2)}`}
                 />
                 <Legend wrapperStyle={{ paddingLeft: '40px' }} layout="vertical" align="right" verticalAlign="top" />
                 {

@@ -75,7 +75,7 @@ const mapLineData = (dataset, keys = null) => {
     return data;
 };
 
-const mapScatterData = (dataset, aliases) => { 
+const mapScatterData = (dataset, aliases) => {
     // has two separate datasets
     let data1 = [];
     let data2 = [];

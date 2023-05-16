@@ -34,15 +34,15 @@ services:
       - gwlandscape-compas-django
     volumes:
       - media_files:/files/
-      
+
   gwlandscape-compas-static:
     build:
       dockerfile: ./docker/gwlandscape_compas_static.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.16
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.17
     ports:
       - "8000"
-      
+
   db:
     image: mysql:5.7
     environment:
@@ -72,7 +72,7 @@ services:
     depends_on:
       - gwlandscape-compas-redis
       - gwlandscape-compas-django
-  
+
 volumes:
   var_lib_mysql:
   media_files:
