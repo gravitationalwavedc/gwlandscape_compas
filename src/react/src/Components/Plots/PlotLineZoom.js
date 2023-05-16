@@ -160,10 +160,11 @@ const PlotLineZoom = ({
                         y2={zoomArea?.y2}
                     />
                     <Tooltip
-                        allowEscapeViewBox={{ x: false, y: false }}
+                        allowEscapeViewBox={{ x: true, y: false }}
+                        offset={20}
                         ref={ToolTip}
                         formatter={value => <>{value.toFixed(2)} {yunit}</>}
-                        labelFormatter={label => `Time : ${label} Myr`}
+                        labelFormatter={label => `Time : ${label.toFixed(2)} Myr`}
                         filterNull={false}
                     />
                 </LineChart>
