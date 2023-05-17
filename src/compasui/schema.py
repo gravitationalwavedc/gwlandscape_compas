@@ -132,8 +132,9 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
                 "data": "Unknown"
             }
 
+    @login_required
     def resolve_user(parent, info):
-        success, users = request_lookup_users([parent.user_id], info.context.user.id)
+        success, users = request_lookup_users([parent.user_id], info.context.user.user_id)
         if success and users:
             return f"{users[0]['firstName']} {users[0]['lastName']}"
         return "Unknown User"
