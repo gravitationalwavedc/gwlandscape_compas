@@ -8,12 +8,12 @@ const ViewJob = ({data, ...rest}) => (
     <>
         {data.compasJob ? <><Container>
             {data.compasJob && <>
-                <Row className="mt-5">
+                <Row className="mt-5 mb-3">
                     <Col>
                         <h1>{data.compasJob.start.name}</h1>
                         <h6 data-testid="jobInfo">
                             {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
-                            {data.compasJob.user} . {data.compasJob.userId} . {data.compasJob.start.private}
+                            {data.compasJob.user} . {data.compasJob.start.private}
                         </h6>
                         <h5>{data.compasJob.start.description}</h5>
                     </Col>
@@ -60,7 +60,6 @@ export default createFragmentContainer(ViewJob,
                 compasJob(id: $jobId){
                     id
                     user
-                    userId
                     lastUpdated
                     start {
                         name
