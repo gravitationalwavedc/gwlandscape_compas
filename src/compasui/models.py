@@ -132,7 +132,7 @@ class CompasJob(models.Model):
         :param user_job_filter: The UserCompasJobFilter instance
         :return: The queryset filtered by the requesting user
         """
-        return qs.filter(user_id=user_job_filter.request.user.id)
+        return qs.filter(user_id=user_job_filter.request.user.user_id)
 
     @classmethod
     def public_compas_job_filter(cls, qs, public_job_filter):
