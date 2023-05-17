@@ -52,7 +52,7 @@ class CompasJob(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
-    private = models.BooleanField(default=False)
+    private = models.BooleanField(default=True)
 
     job_controller_id = models.IntegerField(default=None, blank=True, null=True)
 
@@ -118,7 +118,7 @@ class CompasJob(models.Model):
         #     raise Exception("Permission Denied")
 
         # Users can only access the job if it is public or the user owns the job
-        if job.private and user.id != job.user_id:
+        if job.private and user.user_id != job.user_id:
             raise Exception("Permission Denied")
 
         return job
