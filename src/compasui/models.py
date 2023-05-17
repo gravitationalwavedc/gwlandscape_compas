@@ -52,7 +52,7 @@ class CompasJob(models.Model):
     creation_time = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
-    private = models.BooleanField(default=True)
+    private = models.BooleanField(default=False)
 
     job_controller_id = models.IntegerField(default=None, blank=True, null=True)
 
