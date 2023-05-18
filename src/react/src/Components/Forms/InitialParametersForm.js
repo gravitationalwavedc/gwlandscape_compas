@@ -66,7 +66,7 @@ const InitialParametersForm = ({formik}) => {
                     <Input
                         formik={formik}
                         title="Initial Mass Power"
-                        name="intialMassPower"
+                        name="initialMassPower"
                         type="number"
                         show={showMassPower}
                     />

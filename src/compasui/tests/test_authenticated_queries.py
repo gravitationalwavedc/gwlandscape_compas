@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from graphql_relay.node.node import to_global_id
 from compasui.models import CompasJob
 from compasui.tests.testcases import CompasTestCase
+from unittest.mock import patch
 
 User = get_user_model()
 
@@ -48,17 +49,22 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
         return True, 26
 
     def request_lookup_users_mock(*args, **kwargs):
-        return '', [{
-            'userId': 1,
-            'username': 'buffy',
-            'lastName': 'summers',
-            'firstName': 'buffy'
-        }]
+        user = User.objects.first()
+        if user:
+            return True, [{
+                'userId': user.id,
+                'username': user.username,
+                'firstName': user.first_name,
+                'lastName': user.last_name
+            }]
+        return False, []
 
-    def test_compas_job_query(self):
+    @patch('compasui.schema.request_lookup_users')
+    def test_compas_job_query(self, request_lookup_users):
         """
         compasJob node query should return a single job for an autheniticated user."
         """
+        request_lookup_users.side_effect = self.request_lookup_users_mock
         job = CompasJob.objects.create(user_id=self.user.id)
         global_id = to_global_id("CompasJobNode", job.id)
         response = self.client.execute(
@@ -68,6 +74,7 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
                     id
                     name
                     userId
+                    user
                     description
                     jobControllerId
                     private
@@ -86,11 +93,32 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
                 "id": "Q29tcGFzSm9iTm9kZTox",
                 "name": "",
                 "userId": 1,
+                "user": "buffy summers",
                 "description": None,
                 "jobControllerId": None,
                 "private": False,
                 "lastUpdated": job.last_updated.strftime("%Y-%m-%d %H:%M:%S UTC"),
                 "start": {"name": "", "description": None, "private": False},
+            }
+        }
+        self.assertDictEqual(
+            expected, response.data, "compasJob query returned unexpected data."
+        )
+
+        # If it returns no user
+        User.objects.first().delete()
+        response = self.client.execute(
+            f"""
+            query {{
+                compasJob(id:"{global_id}"){{
+                    user
+                }}
+            }}
+            """
+        )
+        expected = {
+            "compasJob": {
+                "user": "Unknown User"
             }
         }
         self.assertDictEqual(

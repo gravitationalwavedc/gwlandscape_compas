@@ -1,25 +1,53 @@
 import React from 'react';
 import {graphql, createFragmentContainer} from 'react-relay';
-import { Row, Col, Container } from 'react-bootstrap';
+import {Row, Col, Container, Nav, Tab} from 'react-bootstrap';
+import Files from '../Components/Results/Files';
+import Parameters from '../Components/Results/Parameters';
 
-
-const ViewJob = ({data}) => (
-
-    <Container fluid>
-        <Row className="mb-3">
-            <Col md={2} />
-            <Col md={8}>
-                <h1>Job Details</h1>
-                {data.compasJob && <>
-                    <div> Name: {data.compasJob.start.name}</div>
-                    <div>Description: {data.compasJob.start.description}</div>
-                    <div>Created: {data.compasJob.lastUpdated}</div>
-                    <div>Private: {data.compasJob.start.private}</div>
-                    <div>Status: {data.compasJob.jobStatus.name}</div>
-                </>}
-            </Col>
-        </Row>
-    </Container>
+const ViewJob = ({data, ...rest}) => (
+    <>
+        {data.compasJob ? <><Container>
+            {data.compasJob && <>
+                <Row className="mt-5 mb-3">
+                    <Col>
+                        <h1>{data.compasJob.start.name}</h1>
+                        <h6 data-testid="jobInfo">
+                            {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
+                            {data.compasJob.user} . {data.compasJob.start.private}
+                        </h6>
+                        <h5>{data.compasJob.start.description}</h5>
+                    </Col>
+                </Row>
+                <Tab.Container id="job_info_tabs" defaultActiveKey="results">
+                    <Row>
+                        <Col md={3}>
+                            <Nav fill variant="pills" className="flex-column text-center">
+                                <Nav.Item>
+                                    <Nav.Link eventKey="explore">Explore</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="parameters">Parameters</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="results">Results</Nav.Link>
+                                </Nav.Item>
+                            </Nav>
+                        </Col>
+                        <Col md={9}>
+                            <Tab.Content className="mt-2">
+                                <Tab.Pane eventKey="results">
+                                    <Files jobId={data.compasJob.id} {...rest}/>
+                                </Tab.Pane>
+                                <Tab.Pane eventKey="parameters">
+                                    <Parameters jobData={data.compasJob} {...rest}/>
+                                </Tab.Pane>
+                            </Tab.Content>
+                        </Col>
+                    </Row>
+                </Tab.Container>
+            </>}
+        </Container></> : <Container><Row><Col>Job not found</Col></Row></Container>}
+    </>
 );
 
 
@@ -31,7 +59,7 @@ export default createFragmentContainer(ViewJob,
             ){
                 compasJob(id: $jobId){
                     id
-                    userId
+                    user
                     lastUpdated
                     start {
                         name
@@ -42,6 +70,7 @@ export default createFragmentContainer(ViewJob,
                         name
                         number
                     }
+                    ...Parameters_jobData
                 }
             }
         `,

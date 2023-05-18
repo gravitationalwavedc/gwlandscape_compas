@@ -10,13 +10,19 @@ import Publications from './Pages/Publications';
 import NewJob from './Pages/NewJob';
 import ViewJob from './Pages/ViewJob';
 
+// List of components that require authentication
+const PROTECTED_COMPONENTS = [
+    ViewJob,
+    NewJob
+];
+
 const handleRender = ({ Component, props }) => {
     if (!Component || !props)
         return <Loading/>;
 
-    if (! Component === NewSingleBinaryJob)
-        if (!harnessApi.hasAuthToken())
-            throw new RedirectException('/auth/?next=' + props.match.location.pathname);
+    // redirect to login page for authentication if a route is protected
+    if (!harnessApi.hasAuthToken() && PROTECTED_COMPONENTS.includes(Component))
+        throw new RedirectException('/auth/?next=' + props.match.location.pathname);
 
     return <Component data={props} {...props}/>;
 };
