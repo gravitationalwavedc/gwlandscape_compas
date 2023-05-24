@@ -10,7 +10,6 @@ const Publications = ({data, match, router}) => {
     const [search, setSearch] = useState('');
     const [publications, setPublications] = useState();
     const allPublications = data && data.compasPublications ? data.compasPublications.edges.map(e => e.node) : null;
-    console.log(data.compasPublications.edges);
     
     useEffect(() => setPublications(allPublications), []);
     useEffect(() => handleSearchChange(), [search]);

@@ -30,7 +30,6 @@ const createTicks = (min, max, numTicks) => {
 
 const DatasetPlot = ({ inpdata, axis }) => {
     const {histData, minmaxX, minmaxY, logCheckX, logCheckY, sides, scatterData} = inpdata;
-    console.log(inpdata);
 
     const countMax = histData.reduce((a, b) => a.counts > b.counts ? a : b).counts;
     const countMin = histData.reduce((a, b) => a.counts < b.counts ? a : b).counts;
