@@ -1,15 +1,4 @@
-import React, {
-    useState,
-    useEffect,
-    useContext,
-    useReducer,
-    useCallback,
-    useMemo,
-    useRef,
-    useImperativeHandle,
-    useLayoutEffect,
-    useDebugValue
-} from 'react';
+import React from 'react';
 import { setHarnessApi } from './index';
 import { render } from '@testing-library/react';
 import { createMockEnvironment } from 'relay-test-utils';
@@ -67,3 +56,11 @@ global.router = {
 };
 
 global.environment = environment;
+
+// This leaves behind a warning, but I can't figure out how to get rid of it :(
+// eslint-disable-next-line jest/prefer-spy-on
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+    observe: jest.fn(),
+    disconnect: jest.fn(),
+    unobserve: jest.fn()
+}));
