@@ -15,10 +15,11 @@ const ViewPublication = ({data}) => {
                 <h1>Publication Details</h1>
                 {
                     data.compasPublication && <>
-                        <div>{title}</div>
+                        <h2>{title}</h2>
                     </>
                 }
-                <DatasetPlot inpdata={plotData.truncData} axis={['x', 'y']}/>
+                Page is under construction!
+                {/* <DatasetPlot inpdata={plotData.truncData} axis={['x', 'y']}/> */}
             </Col>
         </Row>
     </Container>;
