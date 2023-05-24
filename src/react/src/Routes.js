@@ -9,6 +9,7 @@ import Home from './Pages/Home';
 import Publications from './Pages/Publications';
 import NewJob from './Pages/NewJob';
 import ViewJob from './Pages/ViewJob';
+import ViewPublication from './Pages/ViewPublication';
 
 // List of components that require authentication
 const PROTECTED_COMPONENTS = [
@@ -68,6 +69,33 @@ function getRoutes() {
                 `}
                 prepareVariables={(params) => ({
                     jobId: params.jobId
+                })}
+                render={handleRender}
+            />
+            <Route
+                path="publication/:publicationId/"
+                environment={harnessApi.getEnvironment('compas')}
+                Component={ViewPublication}
+                query={graphql`
+                    query Routes_ViewPublication_Query(
+                        $publicationId: ID!,
+                        $rootGroup: String
+                        $subgroupX: String
+                        $subgroupY: String
+                        $strideLength: Int
+                    ){
+                        ...ViewPublication_data @arguments(
+                            publicationId: $publicationId,
+                            rootGroup: $rootGroup,
+                            subgroupX: $subgroupX,
+                            subgroupY: $subgroupY,
+                            strideLength: $strideLength
+                        )
+                    }
+                `}
+                prepareVariables={(params) => ({
+                    publicationId: params.publicationId,
+                    rootGroup: 'BSE_Common_Envelopes',
                 })}
                 render={handleRender}
             />

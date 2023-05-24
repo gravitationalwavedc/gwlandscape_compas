@@ -5,7 +5,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Publications from '../Publications';
 
-/* global environment */
+/* global environment, router */
 
 describe('publications Page', () => {
     const TestRenderer = () => (
@@ -18,7 +18,7 @@ describe('publications Page', () => {
             `}
             render={({ error, props }) => {
                 if (props) {
-                    return <Publications data={props}/>;
+                    return <Publications data={props} match={{}} router={router}/>;
                 } else if (error) {
                     return error.message;
                 }

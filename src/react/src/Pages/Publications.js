@@ -71,6 +71,13 @@ export default createFragmentContainer(Publications,
                             author
                             year
                             title
+                            datasetModels {
+                                edges {
+                                    node {
+                                        id
+                                    }
+                                }
+                            }
                             keywords {
                                 edges {
                                     node {

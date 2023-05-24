@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from publications.utils import check_publication_management_user
+from publications.utils.misc import check_publication_management_user
 
 
 class Keyword(models.Model):
@@ -212,6 +212,9 @@ class CompasDatasetModel(models.Model):
         dataset_tar.close()
         # remove the tar file after decompression
         self.file.delete()
+    
+    def get_data_file(self):
+        return self.upload_set.get(file__iendswith=".h5").file
 
 
 class Upload(models.Model):

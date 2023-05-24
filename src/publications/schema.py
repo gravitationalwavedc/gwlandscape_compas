@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import h5py
+
 import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType
@@ -11,7 +13,8 @@ from graphql_relay import from_global_id, to_global_id
 
 from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel, \
     CompasDatasetModelUploadToken
-from publications.utils import check_publication_management_user
+from publications.utils.misc import check_publication_management_user
+from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data
 
 
 class KeywordNode(DjangoObjectType):
@@ -92,6 +95,14 @@ class CompasDatasetModelNode(DjangoObjectType):
     Type for CompasDatasetModel without authentication
     """
     files = graphene.List(graphene.String)
+    plot_data = graphene.Field(
+        graphene.String,
+        root_group=graphene.String(),
+        subgroup_x=graphene.String(),
+        subgroup_y=graphene.String(),
+        stride_length=graphene.Int()
+    )
+    plot_meta = graphene.Field(graphene.String, root_group=graphene.String())
 
     class Meta:
         model = CompasDatasetModel
@@ -106,6 +117,14 @@ class CompasDatasetModelNode(DjangoObjectType):
     def resolve_files(root, info, **kwargs):
         return [Path(f.file.url).absolute() for f in root.upload_set.all()]
 
+    def resolve_plot_meta(root, info, **kwargs):
+        f = h5py.File(Path(root.get_data_file().path).absolute())
+        return get_h5_subgroup_meta(f, **kwargs)
+
+    def resolve_plot_data(root, info, **kwargs):
+        f = h5py.File(Path(root.get_data_file().path).absolute())
+        return get_h5_subgroup_data(f, **kwargs)
+
 
 class GenerateCompasDatasetModelUploadToken(graphene.ObjectType):
     token = graphene.String()
@@ -113,6 +132,7 @@ class GenerateCompasDatasetModelUploadToken(graphene.ObjectType):
 
 class Query(object):
     keywords = DjangoFilterConnectionField(KeywordNode)
+    compas_publication = relay.Node.Field(CompasPublicationNode)
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
     compas_models = DjangoFilterConnectionField(CompasModelNode)
     compas_dataset_models = DjangoFilterConnectionField(CompasDatasetModelNode)

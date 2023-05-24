@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import PublicationList from '../PublicationList';
 
+/* global router */
+
 describe('publications Page', () => {
     const publications = [
 
@@ -14,6 +16,13 @@ describe('publications Page', () => {
                 edges: [
                     {
                         node: {tag: 'Keyword1'}
+                    }
+                ]
+            },
+            datasetModels: {
+                edges: [
+                    {
+                        node: {id: 'test-id'}
                     }
                 ]
             }
@@ -29,13 +38,20 @@ describe('publications Page', () => {
                         node: {tag: 'Keyword2'}
                     }
                 ]
+            },
+            datasetModels: {
+                edges: [
+                    {
+                        node: {id: 'test-id'}
+                    }
+                ]
             }
         }
     ];
 
     it('renders', async () => {
         expect.hasAssertions();
-        render(<PublicationList publications={publications}/>);
+        render(<PublicationList publications={publications} match={{}} router={router}/>);
         expect(screen.getByText(publications[0].title)).toBeInTheDocument();
         expect(screen.getByText(publications[1].title)).toBeInTheDocument();
     });
