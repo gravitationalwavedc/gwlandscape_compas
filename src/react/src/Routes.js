@@ -85,11 +85,7 @@ function getRoutes() {
                         $strideLength: Int
                     ){
                         ...ViewPublication_data @arguments(
-                            publicationId: $publicationId,
-                            rootGroup: $rootGroup,
-                            subgroupX: $subgroupX,
-                            subgroupY: $subgroupY,
-                            strideLength: $strideLength
+                            publicationId: $publicationId
                         )
                     }
                 `}

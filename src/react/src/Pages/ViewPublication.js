@@ -1,12 +1,11 @@
 import React from 'react';
 import {graphql, createFragmentContainer} from 'react-relay';
 import { Row, Col, Container } from 'react-bootstrap';
-import DatasetPlot from '../Components/Plots/DatasetPlot';
+import MenuPlot from '../Components/Plots/MenuPlot';
 
 
 const ViewPublication = ({data}) => {
-    const {title, datasetModels} = data.compasPublication;
-    const plotData = datasetModels.edges && JSON.parse(datasetModels.edges[0].node.plotData);
+    const {title} = data.compasPublication;
 
     return <Container fluid>
         <Row className="mb-3">
@@ -18,8 +17,8 @@ const ViewPublication = ({data}) => {
                         <h2>{title}</h2>
                     </>
                 }
-                Page is under construction!
-                {/* <DatasetPlot inpdata={plotData.truncData} axis={['x', 'y']}/> */}
+                {/* Page is under construction! */}
+                <MenuPlot data={data.compasPublication}/>
             </Col>
         </Row>
     </Container>;
@@ -30,28 +29,16 @@ export default createFragmentContainer(ViewPublication,
         data: graphql`
             fragment ViewPublication_data on Query @argumentDefinitions(
                 publicationId: {type: "ID!"},
-                rootGroup: {type: "String"},
-                subgroupX: {type: "String"},
-                subgroupY: {type: "String"},
-                strideLength: {type: "Int"}
             ){
                 compasPublication(id: $publicationId){
                     id
                     title
-                    datasetModels {
-                        edges {
-                            node {
-                                id
-                                plotData(
-                                    rootGroup: $rootGroup,
-                                    subgroupX: $subgroupX,
-                                    subgroupY: $subgroupY,
-                                    strideLength: $strideLength
-                                )
-                                plotMeta(rootGroup: $rootGroup)
-                            }
-                        }
-                    }
+                    ...MenuPlot_data @arguments(
+                        rootGroup: $rootGroup,
+                        subgroupX: $subgroupX,
+                        subgroupY: $subgroupY,
+                        strideLength: $strideLength
+                    )
                 }
             }
         `,

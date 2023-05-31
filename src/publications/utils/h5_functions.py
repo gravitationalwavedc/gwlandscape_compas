@@ -1,5 +1,6 @@
 import json
-from .plotting_functions import data_query
+import numpy as np
+from .plotting_functions import log_check, histo2d_scatter_hybrid
 
 def get_h5_keys(h5_file):
     return list(h5_file.keys())
@@ -20,38 +21,51 @@ def get_h5_subgroup_meta(h5_file, root_group):
     total_length = h5_file[root_group][subgroup_list[0]].shape[0]
     stride_length = 1 if total_length < 1e6 else total_length // 5e5
 
-    # Ceiling division - apparently more accurate and faster than dividing and using math.ceil
-    # https://stackoverflow.com/a/17511341
-    file_length = -int(1.0 // -stride_length)
-
     default_values = default_prefs.get(root_group, None)
 
-    initial_values = [
-        subgroup_list.index(default_values[0]) if default_values else 0,
-        subgroup_list.index(default_values[1]) if default_values else 1
-    ]
+    return {
+        "groups": get_h5_keys(h5_file),
+        "group": root_group,
+        "subgroups": subgroup_list,
+        "subgroup_x": default_values[0] if default_values else subgroup_list[0],
+        "subgroup_y": default_values[1] if default_values else subgroup_list[1],
+        "stride_length": stride_length,
+    }
 
-    return json.dumps({
-        "subgroupList": subgroup_list,
-        "subgroupInit": initial_values,
-        "numSamples": [file_length, total_length],
-        "strideLength": stride_length,
-    })
+def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_length=1):
+    """Takes a H5 file and returns the data necessary for a histogram-scatter plot
 
-def get_h5_subgroup_data(h5_file, root_group, subgroup_x=None, subgroup_y=None, stride_length=1):
-    default_values = default_prefs.get(root_group, None)
-    if default_values and subgroup_x is None:
-        subgroup_x = default_values[0]
-    if default_values and subgroup_y is None:
-        subgroup_y = default_values[1]
-    
-    total_length = h5_file[root_group][subgroup_x].shape[0]
+    Parameters
+    ----------
+    h5_file : h5py.File
+        H5 file containing the necessary data
+    root_group : str
+        The base group of the H5 file
+    subgroup_x : str
+        Subgroup for the x axis
+    subgroup_y : str
+        subgroup for the y axis
+    stride_length : int, optional
+        Will use obtain a subset of the data by striding at this interval, by default 1
 
-    # Ceiling division - apparently more accurate and faster than dividing and using math.ceil
-    # https://stackoverflow.com/a/17511341
-    file_length = -int(1.0 // -stride_length)
+    Returns
+    -------
+    dict
+        Dictionary with the required data and metadata
+    """    
+    data_group_x = h5_file[root_group][subgroup_x][::stride_length]
+    data_group_y = h5_file[root_group][subgroup_y][::stride_length]
 
-    return json.dumps({
-        "truncData": data_query(h5_file, root_group, subgroup_x, subgroup_y, stride_length),
-        "numSamples": [file_length, total_length],
-    })
+    # Check for log
+    data_group_x, log_check_x, minmax_x = log_check(data_group_x)
+    data_group_y, log_check_y, minmax_y = log_check(data_group_y)
+
+    plot_data = histo2d_scatter_hybrid(np.squeeze(np.array([data_group_x, data_group_y]).T))
+
+    plot_data['min_max_x'] = minmax_x
+    plot_data['min_max_y'] = minmax_y
+
+    plot_data['log_check_x'] = log_check_x
+    plot_data['log_check_y'] = log_check_y
+
+    return plot_data
