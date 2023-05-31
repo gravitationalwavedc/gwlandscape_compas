@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import h5py
@@ -14,7 +15,7 @@ from graphql_relay import from_global_id, to_global_id
 from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel, \
     CompasDatasetModelUploadToken
 from publications.utils.misc import check_publication_management_user
-from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data
+from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data, get_h5_keys
 
 
 class KeywordNode(DjangoObjectType):
@@ -89,20 +90,39 @@ class CompasModelNode(DjangoObjectType):
         }
         interfaces = (relay.Node,)
 
+class PlotDataType(graphene.ObjectType):
+    log_check_x = graphene.Boolean()
+    log_check_y = graphene.Boolean()
+    min_max_x = graphene.List(graphene.Float)
+    min_max_y = graphene.List(graphene.Float)
+    sides = graphene.List(graphene.Float)
+    hist_data = graphene.String()
+    scatter_data = graphene.String()
+
+class PlotMetaType(graphene.ObjectType):
+    groups = graphene.List(graphene.String)
+    group = graphene.String()
+    subgroups = graphene.List(graphene.String)
+    subgroup_x = graphene.String()
+    subgroup_y = graphene.String()
+    stride_length = graphene.Int()
+
+class PlotInfoType(graphene.ObjectType):
+    plot_data = graphene.Field(PlotDataType)
+    plot_meta = graphene.Field(PlotMetaType)
 
 class CompasDatasetModelNode(DjangoObjectType):
     """
     Type for CompasDatasetModel without authentication
     """
     files = graphene.List(graphene.String)
-    plot_data = graphene.Field(
-        graphene.String,
+    plot_info = graphene.Field(
+        PlotInfoType,
         root_group=graphene.String(),
         subgroup_x=graphene.String(),
         subgroup_y=graphene.String(),
         stride_length=graphene.Int()
     )
-    plot_meta = graphene.Field(graphene.String, root_group=graphene.String())
 
     class Meta:
         model = CompasDatasetModel
@@ -117,14 +137,25 @@ class CompasDatasetModelNode(DjangoObjectType):
     def resolve_files(root, info, **kwargs):
         return [Path(f.file.url).absolute() for f in root.upload_set.all()]
 
-    def resolve_plot_meta(root, info, **kwargs):
+    def resolve_plot_info(root, info, **kwargs):
         f = h5py.File(Path(root.get_data_file().path).absolute())
-        return get_h5_subgroup_meta(f, **kwargs)
+        root_group = kwargs.get('root_group', get_h5_keys(f)[0])
+        plot_meta = get_h5_subgroup_meta(f, root_group)
 
-    def resolve_plot_data(root, info, **kwargs):
-        f = h5py.File(Path(root.get_data_file().path).absolute())
-        return get_h5_subgroup_data(f, **kwargs)
+        plot_meta['subgroup_x'] = kwargs.get('subgroup_x', plot_meta['subgroup_x'])
+        plot_meta['subgroup_y'] = kwargs.get('subgroup_y', plot_meta['subgroup_y'])
+        plot_meta['stride_length'] = kwargs.get('stride_length', plot_meta['stride_length'])
 
+        return {
+            "plot_meta": plot_meta,
+            "plot_data": get_h5_subgroup_data(
+                f,
+                root_group=plot_meta['group'],
+                subgroup_x=plot_meta['subgroup_x'],
+                subgroup_y=plot_meta['subgroup_y'],
+                stride_length=plot_meta['stride_length']
+            )
+        }
 
 class GenerateCompasDatasetModelUploadToken(graphene.ObjectType):
     token = graphene.String()

@@ -1,3 +1,4 @@
+import json
 import numpy as np
 
 def smooth_histogram(arr, limx, limy):
@@ -30,6 +31,9 @@ def log_check(arr, max_cond=80, min_cond=1e-2):
     arr_max = float(np.max(arr))
     arr_min = float(np.min(arr))
 
+    log_arr_max = np.log10(arr_max)
+    log_arr_min = np.log10(arr_min)
+
     # If the array minimum is lower than 0, it is likely a parameter and shouldn't be logged
     if arr_min < 0:
         return arr, 0, [arr_min, arr_max]
@@ -41,6 +45,7 @@ def log_check(arr, max_cond=80, min_cond=1e-2):
         return arr, 0, [arr_max - 0.5, arr_max + 0.5]
 
     if arr_max > max_cond or arr_max < min_cond:
+        # If any of the logged array is infinite or NaN
         if (~np.isfinite(np.log10(arr))).any():
             arr_min = np.min(arr[arr != 0])            
             if arr_max:
@@ -104,49 +109,8 @@ def histo2d_scatter_hybrid(arr, min_cnt=3, bins=40):
             scatter_json[running_count]['y'] = float(array[1])
             running_count += 1
 
-    hist_object = {
+    return {
         'sides': [x_side, y_side],
-        'histData': hist_json,
-        'scatterData': scatter_json
+        'hist_data': json.dumps(hist_json),
+        'scatter_data': json.dumps(scatter_json)
     }
-
-    return hist_object
-
-
-def data_query(h5_file, root_group, subgroup_x, subgroup_y, stride_length=1):
-    """Takes a H5 file and returns the data necessary for a histogram-scatter plot
-
-    Parameters
-    ----------
-    h5_file : h5py.File
-        H5 file containing the necessary data
-    root_group : str
-        The base group of the H5 file
-    subgroup_x : str
-        Subgroup for the x axis
-    subgroup_y : str
-        subgroup for the y axis
-    stride_length : int, optional
-        Will use obtain a subset of the data by striding at this interval, by default 1
-
-    Returns
-    -------
-    dict
-        Dictionary with the required data and metadata
-    """    
-    data_group_x = h5_file[root_group][subgroup_x][::stride_length]
-    data_group_y = h5_file[root_group][subgroup_y][::stride_length]
-
-    #Check for log
-    data_group_x, log_check_x, minmax_x = log_check(data_group_x)
-    data_group_y, log_check_y, minmax_y = log_check(data_group_y)
-
-    hist_json = histo2d_scatter_hybrid(np.squeeze(np.array([data_group_x, data_group_y]).T))
-
-    hist_json['minmaxX'] = minmax_x
-    hist_json['minmaxY'] = minmax_y
-
-    hist_json['logCheckX'] = log_check_x
-    hist_json['logCheckY'] = log_check_y
-
-    return hist_json

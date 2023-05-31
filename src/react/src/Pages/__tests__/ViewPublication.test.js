@@ -7,37 +7,20 @@ import 'regenerator-runtime/runtime';
 
 /* global environment */
 
-const testData = `{
-    "truncData": {
-        "sides": [
-            1,
-            1
-        ],
-        "histData": [
-            {
-                "x": 1,
-                "y": 1,
-                "counts": 1
-            }
-        ],
-        "scatterData": [
-            {
-                "x": 1,
-                "y": 1
-            }
-        ],
-        "minmaxX": [
-            0,
-            2000
-        ],
-        "minmaxY": [
-            0,
-            2000
-        ],
-        "logCheckX": 1,
-        "logCheckY": 1
+const histData = `[
+    {
+        "x": 1,
+        "y": 1,
+        "counts": 1
     }
-}`;
+]`;
+
+const scatterData = `[
+    {
+        "x": 1,
+        "y": 1
+    }
+]`;
 
 describe('view Compas Job details page', () => {
     const TestRenderer = () => (
@@ -53,10 +36,6 @@ describe('view Compas Job details page', () => {
                 ) @relay_test_operation {
                     ...ViewPublication_data @arguments(
                         publicationId: $publicationId,
-                        rootGroup: $rootGroup,
-                        subgroupX: $subgroupX,
-                        subgroupY: $subgroupY,
-                        strideLength: $strideLength
                     )
                 }
             `}
@@ -82,8 +61,12 @@ describe('view Compas Job details page', () => {
                     edges: [
                         {
                             node: {
-                                plotData: testData,
-                                plotMeta: null
+                                plotInfo: {
+                                    plotData: {
+                                        histData: histData,
+                                        scatterData: scatterData
+                                    },
+                                }
                             }
                         }
                     ]

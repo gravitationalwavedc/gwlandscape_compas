@@ -28,19 +28,17 @@ const createTicks = (min, max, numTicks) => {
     return axisRange;
 };
 
-const DatasetPlot = ({ inpdata, axis }) => {
-    const {histData, minmaxX, minmaxY, logCheckX, logCheckY, sides, scatterData} = inpdata;
-
+const DatasetPlot = ({ histData, minMaxX, minMaxY, logCheckX, logCheckY, sides, scatterData, axis }) => {
     const countMax = histData.reduce((a, b) => a.counts > b.counts ? a : b).counts;
     const countMin = histData.reduce((a, b) => a.counts < b.counts ? a : b).counts;
 
-    const diffRangeX = Math.abs(minmaxX[1] - minmaxX[0]) * AXIS_SCALE;
-    const diffRangeY = Math.abs(minmaxY[1] - minmaxY[0]) * AXIS_SCALE;
+    const diffRangeX = Math.abs(minMaxX[1] - minMaxX[0]) * AXIS_SCALE;
+    const diffRangeY = Math.abs(minMaxY[1] - minMaxY[0]) * AXIS_SCALE;
 
-    const plotMinX = Math.floor((minmaxX[0] - diffRangeX) * 10) / 10;
-    const plotMaxX = Math.ceil((minmaxX[1] + diffRangeX) * 10) / 10;
-    const plotMinY = Math.floor((minmaxY[0] - diffRangeY) * 10) / 10;
-    const plotMaxY = Math.ceil((minmaxY[1] + diffRangeY) * 10) / 10;
+    const plotMinX = Math.floor((minMaxX[0] - diffRangeX) * 10) / 10;
+    const plotMaxX = Math.ceil((minMaxX[1] + diffRangeX) * 10) / 10;
+    const plotMinY = Math.floor((minMaxY[0] - diffRangeY) * 10) / 10;
+    const plotMaxY = Math.ceil((minMaxY[1] + diffRangeY) * 10) / 10;
 
     const ticksX = createTicks(plotMinX, plotMaxX, NUM_TICKS);
     const ticksY = createTicks(plotMinY, plotMaxY, NUM_TICKS);
@@ -73,7 +71,7 @@ const DatasetPlot = ({ inpdata, axis }) => {
                         fontSize: 15,
                     }}
                     type="number"
-                    ticks={minmaxX[2] ? ticksX.slice(1) : ticksX}
+                    ticks={minMaxX[2] ? ticksX.slice(1) : ticksX}
                     tick={{ fontSize: 13, transform: 'translate(0, 3)' }}
                     tickFormatter={formatAxis}
                     domain={[plotMinX, plotMaxX]}
@@ -91,7 +89,7 @@ const DatasetPlot = ({ inpdata, axis }) => {
                         fontSize: 15,
                     }}
                     type="number"
-                    ticks={minmaxY[2] ? ticksY.slice(1) : ticksY}
+                    ticks={minMaxY[2] ? ticksY.slice(1) : ticksY}
                     tick={{ fontSize: 13, transform: 'translate(-3, 0)' }}
                     tickFormatter={formatAxis}
                     domain={[plotMinY, plotMaxY]}
