@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 
 import h5py
@@ -90,6 +89,7 @@ class CompasModelNode(DjangoObjectType):
         }
         interfaces = (relay.Node,)
 
+
 class PlotDataType(graphene.ObjectType):
     log_check_x = graphene.Boolean()
     log_check_y = graphene.Boolean()
@@ -99,6 +99,7 @@ class PlotDataType(graphene.ObjectType):
     hist_data = graphene.String()
     scatter_data = graphene.String()
 
+
 class PlotMetaType(graphene.ObjectType):
     groups = graphene.List(graphene.String)
     group = graphene.String()
@@ -107,9 +108,11 @@ class PlotMetaType(graphene.ObjectType):
     subgroup_y = graphene.String()
     stride_length = graphene.Int()
 
+
 class PlotInfoType(graphene.ObjectType):
     plot_data = graphene.Field(PlotDataType)
     plot_meta = graphene.Field(PlotMetaType)
+
 
 class CompasDatasetModelNode(DjangoObjectType):
     """

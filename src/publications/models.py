@@ -212,7 +212,7 @@ class CompasDatasetModel(models.Model):
         dataset_tar.close()
         # remove the tar file after decompression
         self.file.delete()
-    
+
     def get_data_file(self):
         return self.upload_set.get(file__iendswith=".h5").file
 
