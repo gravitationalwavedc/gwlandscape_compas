@@ -2,9 +2,20 @@ import React from 'react';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import {fireEvent, render, waitFor, screen} from '@testing-library/react';
 import NewJob from '../NewJob';
-import 'regenerator-runtime';
+import 'regenerator-runtime/runtime';
 
 /* global router,environment */
+
+const mockReturn = {
+    newCompasJob() {
+        return null;
+    },
+    errors(){
+        return [{
+            message: 'Error submitting job!'
+        }];
+    }
+};
 
 describe('new compas population job page', () => {
     it('should send a mutation when the form is submitted', async () => {
@@ -53,6 +64,40 @@ describe('new compas population job page', () => {
         expect(getByLabelText('Velocity 1 (km/s)').closest('div')).not.toHaveClass('hidden');
         expect(getByLabelText('Velocity 2 (km/s)').closest('div')).not.toHaveClass('hidden');
 
+    });
+
+    it('should display error message if job is not submitted' , async () => {
+        expect.hasAssertions();
+        render(<NewJob router={router}/>);
+        fireEvent.click(screen.getByTestId('submit-btn'));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation(() => ({
+                errors:[
+                    {message: 'Error...'}
+                ],
+                data: {
+                    newCompasJob: null
+                }
+            })));
+        expect(screen.getByTestId('error-msg')).toBeInTheDocument();
+        expect(screen.getByTestId('error-msg')).toHaveTextContent('Error submitting job!');
+    });
+
+    it('should display error message if job name is not unique', async () => {
+        expect.hasAssertions();
+        render(<NewJob router={router}/>);
+        fireEvent.click(screen.getByTestId('submit-btn'));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation(() => ({
+                errors:[
+                    {message: 'UNIQUE constraint'}
+                ],
+                data: {
+                    newCompasJob: null
+                }
+            })));
+        expect(screen.getByTestId('error-msg')).toBeInTheDocument();
+        expect(screen.getByTestId('error-msg')).toHaveTextContent('Job name is already in use!');
     });
 
 });
