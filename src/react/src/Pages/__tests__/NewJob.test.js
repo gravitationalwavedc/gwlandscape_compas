@@ -2,20 +2,9 @@ import React from 'react';
 import { MockPayloadGenerator } from 'relay-test-utils';
 import {fireEvent, render, waitFor, screen} from '@testing-library/react';
 import NewJob from '../NewJob';
-import 'regenerator-runtime/runtime';
+import 'regenerator-runtime';
 
 /* global router,environment */
-
-const mockReturn = {
-    newCompasJob() {
-        return null;
-    },
-    errors(){
-        return [{
-            message: 'Error submitting job!'
-        }];
-    }
-};
 
 describe('new compas population job page', () => {
     it('should send a mutation when the form is submitted', async () => {
