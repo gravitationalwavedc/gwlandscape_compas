@@ -47,6 +47,4 @@ spec:
         - name: gwlandscape-compas-nfs-job-data
           persistentVolumeClaim:
             claimName: gwlandscape-compas-nfs-job-data-pvc
-      nodeSelector:
-        kubernetes.io/hostname: node7
 ... 
