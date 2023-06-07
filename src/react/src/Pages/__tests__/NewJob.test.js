@@ -79,7 +79,7 @@ describe('new compas population job page', () => {
         await waitFor(() =>
             environment.mock.resolveMostRecentOperation(() => ({
                 errors:[
-                    {message: 'UNIQUE constraint'}
+                    {message: 'UNIQUE constraint failed'}
                 ],
                 data: {
                     newCompasJob: null
