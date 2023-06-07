@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {commitMutation} from 'relay-runtime';
 import {graphql} from 'react-relay';
 import {harnessApi} from '../index';
-import {Container, Col, Row, Nav, Tab} from 'react-bootstrap';
+import {Container, Col, Row, Nav, Tab, Alert} from 'react-bootstrap';
 import { useFormik } from 'formik'; 
 import JobTitle from '../Components/Forms/JobTitle';
 import ReviewJob from '../Components/Forms/ReviewJob';
@@ -24,6 +24,8 @@ const submitMutation = graphql`
 
 const NewJob = ({initialValues, router}) => {
 
+    const [outputError, setOutputError] = useState(null);
+
     const formik = useFormik({
         initialValues: initialValues,
         onSubmit: values => handleJobSubmission(values),
@@ -31,6 +33,9 @@ const NewJob = ({initialValues, router}) => {
     });
 
     const handleJobSubmission = (values) => {
+
+        setOutputError(null);
+
         // The mutation requires all number values to be strings.
         Object.entries(values)
             .filter(([key, value]) => typeof(value) === 'number')
@@ -83,6 +88,12 @@ const NewJob = ({initialValues, router}) => {
                 if (!errors) {
                     router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
                 }
+                else if(errors[0].message.toUpperCase().includes('UNIQUE CONSTRAINT FAILED')){
+                    setOutputError('Job name is already in use!');
+                }
+                else {
+                    setOutputError('Error submitting job!');
+                }
             },
         });
     };
@@ -92,6 +103,13 @@ const NewJob = ({initialValues, router}) => {
             <Row>
                 <Container>
                     <Row><Col><h1 className="pt-5 mb-4">Launch COMPAS Job</h1></Col></Row>
+                    {outputError &&
+                        <Row>
+                            <Col>
+                                <Alert data-testid='error-msg' variant="danger">{outputError}</Alert>
+                            </Col>
+                        </Row>
+                    }
                     <Row>
                         <Col md={6} style={{minHeight: '110px'}}>
                             <JobTitle formik={formik} />

@@ -5,7 +5,7 @@ import os
 import jwt
 import requests
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction, IntegrityError
 
 from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
 from .tasks import run_compas
@@ -15,6 +15,7 @@ from .utils.constants import TASK_FAIL, TASK_TIMEOUT
 def create_compas_job(user, start, basic_parameters, advanced_parameters):
 
     with transaction.atomic():
+
         compas_job = CompasJob(
             user_id=user.user_id,
             name=start.name,
@@ -22,7 +23,15 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
             private=start.private,
             is_ligo_job=False
         )
-        compas_job.save()
+        try:
+            compas_job.save()
+        except IntegrityError as e:
+            if 'UNIQUE CONSTRAINT' in str(e).upper():
+                # If job name is already used by the user, job name unique constraint is violated
+                # The error is raised again with a custom error message, that is checked in frontend
+                # check frontend behavior if changing the message
+                raise Exception('Unique constraint failed: Job name is already in use!')
+
         for name, value in basic_parameters.items():
             BasicParameter(job=compas_job, name=name, value=value).save()
 
