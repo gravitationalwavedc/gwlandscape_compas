@@ -1,6 +1,6 @@
 import json
 import numpy as np
-from .plotting_functions import log_check, histo2d_scatter_hybrid
+from .plotting_functions import get_log_and_limits, histo2d_scatter_hybrid
 
 def get_h5_keys(h5_file):
     return list(h5_file.keys())
@@ -52,18 +52,18 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
     -------
     dict
         Dictionary with the required data and metadata
-    """    
+    """
     data_group_x = h5_file[root_group][subgroup_x][::stride_length]
     data_group_y = h5_file[root_group][subgroup_y][::stride_length]
 
     # Check for log
-    data_group_x, log_check_x, minmax_x = log_check(data_group_x)
-    data_group_y, log_check_y, minmax_y = log_check(data_group_y)
+    data_group_x, log_check_x, min_max_x = get_log_and_limits(data_group_x)
+    data_group_y, log_check_y, min_max_y = get_log_and_limits(data_group_y)
 
-    plot_data = histo2d_scatter_hybrid(np.squeeze(np.array([data_group_x, data_group_y]).T))
+    plot_data = histo2d_scatter_hybrid(data_group_x, data_group_y)
 
-    plot_data['min_max_x'] = minmax_x
-    plot_data['min_max_y'] = minmax_y
+    plot_data['min_max_x'] = min_max_x
+    plot_data['min_max_y'] = min_max_y
 
     plot_data['log_check_x'] = log_check_x
     plot_data['log_check_y'] = log_check_y
