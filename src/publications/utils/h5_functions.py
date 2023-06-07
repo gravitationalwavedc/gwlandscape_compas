@@ -1,12 +1,4 @@
-import json
-import numpy as np
 from .plotting_functions import get_log_and_limits, histo2d_scatter_hybrid
-
-def get_h5_keys(h5_file):
-    return list(h5_file.keys())
-
-def get_h5_subgroups(h5_file, root_group):
-    return get_h5_keys(h5_file[root_group])
 
 default_prefs = {
     'BSE_Common_Envelopes': ['SemiMajorAxis>CE', 'SemiMajorAxis<CE'],
@@ -14,6 +6,15 @@ default_prefs = {
     'BSE_System_Parameters': ['Mass@ZAMS(1)', 'Mass@ZAMS(2)'],
     'BSE_Supernovae': ['Mass(SN)', 'Mass_CO_Core@CO(SN)']
 }
+
+
+def get_h5_keys(h5_file):
+    return list(h5_file.keys())
+
+
+def get_h5_subgroups(h5_file, root_group):
+    return get_h5_keys(h5_file[root_group])
+
 
 def get_h5_subgroup_meta(h5_file, root_group):
     subgroup_list = get_h5_subgroups(h5_file, root_group)
@@ -31,6 +32,7 @@ def get_h5_subgroup_meta(h5_file, root_group):
         "subgroup_y": default_values[1] if default_values else subgroup_list[1],
         "stride_length": stride_length,
     }
+
 
 def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_length=1):
     """Takes a H5 file and returns the data necessary for a histogram-scatter plot

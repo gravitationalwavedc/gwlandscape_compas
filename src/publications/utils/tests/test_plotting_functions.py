@@ -10,11 +10,12 @@ from publications.utils.plotting_functions import (
     histo2d_scatter_hybrid
 )
 
+
 class TestGetSurroundingBins(TestCase):
     def setUp(self):
         self.x_lim, self.y_lim = 10, 10
         self.x_mid, self.y_mid = self.x_lim // 2, self.y_lim // 2
-    
+
     def test_0_0(self):
         self.assertSequenceEqual(
             get_surrounding_bins([0, 0], self.x_lim, self.y_lim).tolist(),
@@ -23,7 +24,7 @@ class TestGetSurroundingBins(TestCase):
                 [1, 0], [1, 1]
             ]).tolist()
         )
-    
+
     def test_x_lim_0(self):
         self.assertSequenceEqual(
             get_surrounding_bins([self.x_lim, 0], self.x_lim, self.y_lim).tolist(),
@@ -99,6 +100,7 @@ class TestGetSurroundingBins(TestCase):
             ]).tolist()
         )
 
+
 class TestGetLogAndLimits(TestCase):
     def test_min_below_zero(self):
         test_array = np.array([-10, 0, 10])
@@ -133,7 +135,7 @@ class TestGetLogAndLimits(TestCase):
         self.assertFalse(log_check)
         self.assertCountEqual(min_max, [10, 100])
 
-    def test_uniform_array_outside_bounds(self):
+    def test_array_outside_bounds(self):
         test_array = np.array([10, 50, 100])
         returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=50, min_cond=5)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
@@ -145,6 +147,7 @@ class TestGetLogAndLimits(TestCase):
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
         self.assertCountEqual(min_max, [1, 2])
+
 
 class TestSplitHistogramByCount(TestCase):
     def setUp(self):
@@ -176,6 +179,7 @@ class TestSplitHistogramByCount(TestCase):
             ]).tolist()
         )
 
+
 class TestHisto2DScatterHybrid(TestCase):
     def setUp(self):
         # 1 0 0 0 1
@@ -185,27 +189,6 @@ class TestHisto2DScatterHybrid(TestCase):
         # 1 0 0 0 1
         self.x_array = np.array([1, 5, 1, 5, 2, 4, 2, 4, 3, 3, 3, 3, 3, 3, 2, 2, 4, 4])
         self.y_array = np.array([1, 1, 5, 5, 2, 2, 4, 4, 3, 3, 2, 2, 4, 4, 3, 3, 3, 3])
-
-    def test_histo2d_scatter_hybrid(self):
-        plot_data = histo2d_scatter_hybrid(self.x_array, self.y_array, min_count=1, bins=5)
-        self.assertEqual(plot_data['sides'], [0.812, 0.812])
-        self.assertCountEqual(json.loads(plot_data['hist_data']), [
-            {"x": 2.208, "y": 2.208, "counts": 1.0},
-            {"x": 2.208, "y": 3.02, "counts": 2.0},
-            {"x": 2.208, "y": 3.832, "counts": 1.0},
-            {"x": 3.02, "y": 2.208, "counts": 2.0},
-            {"x": 3.02, "y": 3.02, "counts": 2.0},
-            {"x": 3.02, "y": 3.832, "counts": 2.0},
-            {"x": 3.832, "y": 2.208, "counts": 1.0},
-            {"x": 3.832, "y": 3.02, "counts": 2.0},
-            {"x": 3.832, "y": 3.832, "counts": 1.0}
-        ])
-        self.assertCountEqual(json.loads(plot_data['scatter_data']), [
-            {"x": 1.0, "y": 1.0},
-            {"x": 5.0, "y": 1.0},
-            {"x": 1.0, "y": 5.0},
-            {"x": 5.0, "y": 5.0}
-        ])
 
     def test_histo2d_scatter_hybrid(self):
         plot_data = histo2d_scatter_hybrid(self.x_array, self.y_array, min_count=1, bins=5)

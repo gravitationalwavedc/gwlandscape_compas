@@ -1,7 +1,7 @@
 import json
 import numpy as np
 from itertools import product
-import time
+
 
 def get_surrounding_bins(indices, x_lim, y_lim):
     """Given x and y indices, return the 3x3 indices surrounding the indices
@@ -20,11 +20,12 @@ def get_surrounding_bins(indices, x_lim, y_lim):
     array_like
         Array containing indices for the original indices and all surrounding in a 3x3 block,
         as long as they are within the limits
-    """    
+    """
     x, y = indices
     x1, x2 = max(x - 1, 0), min(x + 1, x_lim)
     y1, y2 = max(y - 1, 0), min(y + 1, y_lim)
     return np.array(list(product(range(x1, x2+1), range(y1, y2+1))))
+
 
 def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
     """Checks whether or not the input array should be logged,
@@ -63,7 +64,7 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
         logged_arr = np.log10(arr)
         # If any of the logged array is infinite or NaN
         if (~np.isfinite(logged_arr)).any():
-            arr_min = np.min(arr[arr != 0])            
+            arr_min = np.min(arr[arr != 0])
             if arr_max:
                 min_allowed_value = np.log10(arr_min) - 0.25 * (np.log10(arr_max) - np.log10(arr_min))
             else:
@@ -74,6 +75,7 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
         return logged_arr, True, [np.min(logged_arr), np.log10(arr_max)]
 
     return arr, False, [arr_min, arr_max]
+
 
 def split_histogram_by_count(counts, split_count):
     """Takes the counts output of numpy.histogram2d and returns both the list of indices for counts
@@ -92,7 +94,7 @@ def split_histogram_by_count(counts, split_count):
     tuple
         First index contains an array of the smoothed histogram indices, second index contains the remaining
         indices for bins with any counts at all
-    """    
+    """
     all_count_indices = np.array(np.where(counts > 0)).T
     min_count_indices = np.array(np.where(counts > split_count)).T
 

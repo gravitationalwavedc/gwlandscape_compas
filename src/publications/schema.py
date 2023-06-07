@@ -160,6 +160,7 @@ class CompasDatasetModelNode(DjangoObjectType):
             )
         }
 
+
 class GenerateCompasDatasetModelUploadToken(graphene.ObjectType):
     token = graphene.String()
 
