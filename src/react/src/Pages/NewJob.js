@@ -88,7 +88,7 @@ const NewJob = ({initialValues, router}) => {
                 if (!errors) {
                     router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
                 }
-                else if(errors[0].message.toUpperCase().includes('UNIQUE')){
+                else if(errors[0].message.toUpperCase().includes('UNIQUE CONSTRAINT')){
                     setOutputError('Job name is already in use!');
                 }
                 else {
@@ -103,11 +103,13 @@ const NewJob = ({initialValues, router}) => {
             <Row>
                 <Container>
                     <Row><Col><h1 className="pt-5 mb-4">Launch COMPAS Job</h1></Col></Row>
-                    <Row>
-                        <Col>
-                            {outputError && <Alert data-testid='error-msg' variant="danger">{outputError}</Alert>}
-                        </Col>
-                    </Row>
+                    {outputError &&
+                        <Row>
+                            <Col>
+                                <Alert data-testid='error-msg' variant="danger">{outputError}</Alert>
+                            </Col>
+                        </Row>
+                    }
                     <Row>
                         <Col md={6} style={{minHeight: '110px'}}>
                             <JobTitle formik={formik} />
