@@ -12,3 +12,4 @@ spec:
   selector:
     matchLabels:
       volume: gwlandscape-compas-nfs-job-data-pv
+  storageClassName: ""
