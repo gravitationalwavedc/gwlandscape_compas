@@ -23,14 +23,7 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
             private=start.private,
             is_ligo_job=False
         )
-        try:
-            compas_job.save()
-        except IntegrityError as e:
-            if 'UNIQUE CONSTRAINT' in str(e).upper():
-                # If job name is already used by the user, job name unique constraint is violated
-                # The error is raised again with a custom error message, that is checked in frontend
-                # check frontend behavior if changing the message
-                raise Exception('Unique constraint failed: Job name is already in use!')
+        compas_job.save()
 
         for name, value in basic_parameters.items():
             BasicParameter(job=compas_job, name=name, value=value).save()
