@@ -26,27 +26,20 @@ const SelectInput = ({ title, value, options, ...rest }) =>
 
 
 const MenuPlot = ({data, relay}) => {
-    const { datasetModels } = data;
-    const plotMeta = datasetModels.edges && datasetModels.edges[0].node.plotInfo.plotMeta;
-    const plotData = datasetModels.edges && datasetModels.edges[0].node.plotInfo.plotData;
+    const {plotMeta, plotData} = data.plotInfo;
     const groupKeys = plotMeta.groups.map((group) => ({value: group, label: group}));
     const subgroupKeys = plotMeta.subgroups.map((subgroup) => ({value: subgroup, label: subgroup}));
 
     const { histData, scatterData, ...restData } = plotData;
 
+    let stride = plotMeta.strideLength;
+
     return <Row>
-        <Col md={8}>
-            <DatasetPlot
-                histData={JSON.parse(histData)}
-                scatterData={JSON.parse(scatterData)}
-                axis={[plotMeta.subgroupX, plotMeta.subgroupY]}
-                {...restData}
-            />
-        </Col>
         <Col md={4}>
+            <h5>Visualisation</h5>
             <SelectInput
-                data-testid='root-group'
-                title='Root group'
+                data-testid='group'
+                title='Group'
                 options={groupKeys}
                 value={plotMeta.group}
                 onChange={e => {
@@ -56,8 +49,8 @@ const MenuPlot = ({data, relay}) => {
                 }}
             />
             <SelectInput
-                data-testid='subgroup-x'
-                title='X subgroup'
+                data-testid='x-axis'
+                title='X-axis'
                 options={subgroupKeys}
                 value={plotMeta.subgroupX}
                 onChange={e => {
@@ -71,8 +64,8 @@ const MenuPlot = ({data, relay}) => {
                 }}
             />
             <SelectInput
-                data-testid='subgroup-y'
-                title='Y subgroup'
+                data-testid='y-axis'
+                title='Y-axis'
                 options={subgroupKeys}
                 value={plotMeta.subgroupY}
                 onChange={e => {
@@ -85,6 +78,34 @@ const MenuPlot = ({data, relay}) => {
                     );
                 }}
             />
+            <Form.Group>
+                <Form.Label>{`Stride = ${stride}`}</Form.Label>
+                <Form.Control
+                    type="range"
+                    value={stride}
+                    min={1}
+                    max={20}
+                    onChange={e => stride = e.target.value}
+                    onMouseUp={() => {
+                        relay.refetch(
+                            {
+                                rootGroup: plotMeta.group,
+                                subgroupX: plotMeta.subgroupX,
+                                subgroupY: plotMeta.subgroupY,
+                                strideLength: stride
+                            },
+                        );
+                    }}
+                />
+            </Form.Group>
+        </Col>
+        <Col md={8}>
+            <DatasetPlot
+                histData={JSON.parse(histData)}
+                scatterData={JSON.parse(scatterData)}
+                axis={[plotMeta.subgroupX, plotMeta.subgroupY]}
+                {...restData}
+            />
         </Col>
     </Row>;
 };
@@ -92,41 +113,34 @@ const MenuPlot = ({data, relay}) => {
 export default createRefetchContainer(MenuPlot,
     {
         data: graphql`
-        fragment MenuPlot_data on CompasPublicationNode @argumentDefinitions(
+        fragment MenuPlot_data on CompasDatasetModelNode @argumentDefinitions(
             rootGroup: {type: "String"},
             subgroupX: {type: "String"},
             subgroupY: {type: "String"},
             strideLength: {type: "Int"}
         ){
-            datasetModels {
-                edges {
-                    node {
-                        id
-                        plotInfo(
-                            rootGroup: $rootGroup,
-                            subgroupX: $subgroupX,
-                            subgroupY: $subgroupY,
-                            strideLength: $strideLength
-                        ){
-                            plotData {
-                                histData
-                                sides
-                                scatterData
-                                minMaxX
-                                minMaxY
-                                logCheckX
-                                logCheckY
-                            }
-                            plotMeta {
-                                groups
-                                group
-                                subgroups
-                                subgroupX
-                                subgroupY
-                                strideLength
-                            }
-                        }
-                    }
+            plotInfo(
+                rootGroup: $rootGroup,
+                subgroupX: $subgroupX,
+                subgroupY: $subgroupY,
+                strideLength: $strideLength
+            ){
+                plotData {
+                    histData
+                    sides
+                    scatterData
+                    minMaxX
+                    minMaxY
+                    logCheckX
+                    logCheckY
+                }
+                plotMeta {
+                    groups
+                    group
+                    subgroups
+                    subgroupX
+                    subgroupY
+                    strideLength
                 }
             }
         }
@@ -134,19 +148,26 @@ export default createRefetchContainer(MenuPlot,
     },
     graphql`
     query MenuPlotRefetchQuery(
-        $publicationId: ID!,
+        $publicationId: ID!
+        $datasetId: ID
         $rootGroup: String
         $subgroupX: String
         $subgroupY: String
         $strideLength: Int 
     ) {
         compasPublication(id: $publicationId) {
-            ...MenuPlot_data @arguments(
-                rootGroup: $rootGroup,
-                subgroupX: $subgroupX,
-                subgroupY: $subgroupY,
-                strideLength: $strideLength
-            )
+            plotInfo: datasetModels (id: $datasetId) {
+                edges {
+                    node {
+                        ...MenuPlot_data @arguments(
+                            rootGroup: $rootGroup,
+                            subgroupX: $subgroupX,
+                            subgroupY: $subgroupY,
+                            strideLength: $strideLength
+                        )
+                    }
+                }
+            }
         }
     }
     `
