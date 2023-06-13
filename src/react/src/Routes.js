@@ -91,7 +91,7 @@ function getRoutes() {
                 `}
                 prepareVariables={(params) => ({
                     publicationId: params.publicationId,
-                    rootGroup: 'BSE_Common_Envelopes',
+                    datasetId: ''
                 })}
                 render={handleRender}
             />
