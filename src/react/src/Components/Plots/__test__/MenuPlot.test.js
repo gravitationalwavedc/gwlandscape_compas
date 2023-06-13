@@ -71,7 +71,7 @@ describe('interactive plot for publications', () => {
             }}
             render={({error, props}) => {
                 if (props) {
-                    return <MenuPlot data={props.compasPublication} />;
+                    return <MenuPlot data={props.compasPublication.plotInfo.edges[0].node} />;
                 } else if (error) {
                     return error.message;
                 }
@@ -94,7 +94,7 @@ describe('interactive plot for publications', () => {
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
         ));
-        expect(screen.getByText('Root group')).toBeInTheDocument();
+        expect(screen.getByText('Group')).toBeInTheDocument();
     });
 
     it('should refetch on select new root group', async () => {
