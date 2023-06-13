@@ -69,6 +69,7 @@ describe('new compas population job page', () => {
                 }
             })));
         expect(screen.getByTestId('error-msg')).toBeInTheDocument();
+        expect(screen.getByTestId('error-msg')).toHaveTextContent('Error submitting job!');
     });
 
 });
