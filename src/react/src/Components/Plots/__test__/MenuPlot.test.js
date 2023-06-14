@@ -39,18 +39,26 @@ describe('interactive plot for publications', () => {
             query={graphql`
                 query MenuPlotTestQuery(
                     $publicationId: ID!,
+                    $datasetId: ID,
                     $rootGroup: String
                     $subgroupX: String
                     $subgroupY: String
                     $strideLength: Int
                 ) @relay_test_operation {
                     compasPublication(id: $publicationId) {
-                        ...MenuPlot_data @arguments(
-                            rootGroup: $rootGroup,
-                            subgroupX: $subgroupX,
-                            subgroupY: $subgroupY,
-                            strideLength: $strideLength
-                        )
+                        plotInfo: datasetModels (first: 1, id: $datasetId) {
+                            edges {
+                                node {
+                                    id
+                                    ...MenuPlot_data @arguments(
+                                        rootGroup: $rootGroup,
+                                        subgroupX: $subgroupX,
+                                        subgroupY: $subgroupY,
+                                        strideLength: $strideLength
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             `}
@@ -63,7 +71,7 @@ describe('interactive plot for publications', () => {
             }}
             render={({error, props}) => {
                 if (props) {
-                    return <MenuPlot data={props.compasPublication} />;
+                    return <MenuPlot data={props.compasPublication.plotInfo.edges[0].node} />;
                 } else if (error) {
                     return error.message;
                 }
@@ -86,7 +94,7 @@ describe('interactive plot for publications', () => {
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
         ));
-        expect(screen.getByText('Root group')).toBeInTheDocument();
+        expect(screen.getByText('Group')).toBeInTheDocument();
     });
 
     it('should refetch on select new root group', async () => {
@@ -96,7 +104,7 @@ describe('interactive plot for publications', () => {
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
         ));
-        user.selectOptions(screen.getByTestId('root-group'), 'another_test_group');
+        user.selectOptions(screen.getByTestId('group'), 'another_test_group');
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, {
                 PlotInfoType(){
@@ -121,7 +129,7 @@ describe('interactive plot for publications', () => {
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
         ));
-        user.selectOptions(screen.getByTestId('subgroup-x'), 'test_subgroup_z');
+        user.selectOptions(screen.getByTestId('x-axis'), 'test_subgroup_z');
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, {
                 PlotInfoType(){
@@ -146,7 +154,7 @@ describe('interactive plot for publications', () => {
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
         ));
-        user.selectOptions(screen.getByTestId('subgroup-y'), 'test_subgroup_z');
+        user.selectOptions(screen.getByTestId('y-axis'), 'test_subgroup_z');
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
             MockPayloadGenerator.generate(operation, {
                 PlotInfoType(){

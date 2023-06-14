@@ -3,6 +3,7 @@ import ViewPublication from '../ViewPublication';
 import {graphql, QueryRenderer} from 'react-relay';
 import {MockPayloadGenerator} from 'relay-test-utils';
 import {render, waitFor, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import 'regenerator-runtime/runtime';
 
 /* global environment */
@@ -21,6 +22,17 @@ const scatterData = `[
         "y": 1
     }
 ]`;
+
+const plotInfo = {
+    plotData: {
+        histData: histData,
+        scatterData: scatterData
+    },
+    plotMeta: {
+        groups: [],
+        subgroups: [],
+    }
+};
 
 describe('view Compas Job details page', () => {
     const TestRenderer = () => (
@@ -52,35 +64,48 @@ describe('view Compas Job details page', () => {
         />
     );
 
-    const mockViewCompasPublicationReturn = {
+    const mockViewCompasPublicationReturn = (i) => ({
         CompasPublicationNode(){
             return {
                 id: 'Q29tcGFzSm9iTm9kZToxNTA=',
                 title: 'Test Title',
-                datasetModels: {
+                datasets: {
                     edges: [
-                        {
-                            node: {
-                                plotInfo: {
-                                    plotData: {
-                                        histData: histData,
-                                        scatterData: scatterData
-                                    },
-                                }
-                            }
-                        }
+                        {node: {id: 'test-id-1', compasModel: {name: 'Test Model 1'}}},
+                        {node: {id: 'test-id-2', compasModel: {name: 'Test Model 2'}}},
+                    ]
+                },
+                plotInfo: {
+                    edges: [
+                        {node: {id: `test-id-${i}`, plotInfo: plotInfo}},
                     ]
                 }
             };
         }
-    };
+    });
 
     it('should render the actual page', async () => {
         expect.hasAssertions();
         render(<TestRenderer />);
         await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockViewCompasPublicationReturn)
+            MockPayloadGenerator.generate(operation, mockViewCompasPublicationReturn(1))
         ));
         expect(screen.getByText('Test Title')).toBeInTheDocument();
+    });
+
+    it('should refetch on select new root group', async () => {
+        expect.hasAssertions();
+        const user = userEvent.setup();
+        render(<TestRenderer />);
+        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
+            MockPayloadGenerator.generate(operation, mockViewCompasPublicationReturn(1))
+        ));
+        expect(screen.getByDisplayValue('Test Model 1')).toBeInTheDocument();
+        await user.selectOptions(screen.getByTestId('model'), 'Test Model 2');
+        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
+            MockPayloadGenerator.generate(operation, mockViewCompasPublicationReturn(2))
+        ));
+        // The value of the select only changes based on the props of the MenuPlot component, so this works as a test
+        expect(screen.getByDisplayValue('Test Model 2')).toBeInTheDocument();
     });
 });
