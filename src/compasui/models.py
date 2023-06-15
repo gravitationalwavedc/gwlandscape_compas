@@ -168,6 +168,31 @@ class CompasJob(models.Model):
 
         return queryset
 
+    @classmethod
+    def get_by_name(cls, user, name):
+        """
+        Get CompasJob by the provided id
+
+        This function will raise an exception if:-
+        * the job requested is a ligo job, but the user is not a ligo user
+        * the job requested is private an not owned by the requesting user
+
+        :param bid: The id of the CompasJob to return
+        :param user: The GWCloudUser instance making the request
+        :return: CompasJob
+        """
+        job = cls.objects.get(name=name, user_id=user.user_id)
+
+        # Ligo jobs may only be accessed by ligo users
+        # if job.is_ligo_job and not user.is_ligo:
+        #     raise Exception("Permission Denied")
+
+        # Users can only access the job if it is public or the user owns the job
+        # if user.user_id != job.user_id:
+        #     raise Exception("Permission Denied")
+
+        return job
+
 
 class BasicParameter(models.Model):
     job = models.ForeignKey(CompasJob, related_name='basic_parameter', on_delete=models.CASCADE)

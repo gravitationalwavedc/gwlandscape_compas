@@ -315,6 +315,13 @@ class CompasJobMutation(relay.ClientIDMutation):
     @classmethod
     @login_required
     def mutate_and_get_payload(cls, root, info, start, basic_parameters, advanced_parameters):
+        # Check job name is already used
+        existing_job = CompasJob.get_by_name(info.context.user, start.name)
+        if existing_job is not None:
+            err_msg = "Job name is already in use!"
+            print(err_msg)
+            raise Exception(err_msg)
+
         # Create the compas job
         compas_job = create_compas_job(info.context.user, start, basic_parameters, advanced_parameters)
 
