@@ -28,6 +28,16 @@ const MyJobs = ({data, match, router}) => {
                             </InputGroup>
                         </Form.Group>
                     </Col>
+                    <Col>
+                        <Link
+                            to={'/compas/job-form'}
+                            exact
+                            match={match}
+                            router={router}
+                            as={Button}
+                            variant='outline-primary'
+                        >New Job</Link>
+                    </Col>
                 </Form.Row>
             </Form>
             {jobs ?
