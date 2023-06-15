@@ -38,7 +38,7 @@ const MyJobs = ({data, match, router}) => {
                             <Card.Title>{job.start.name}</Card.Title>
                             <Card.Subtitle>
                                 <span className={'job-'+job.jobStatus.name.toLowerCase()}>{job.jobStatus.name}</span> .
-                                {job.user} . {job.lastUpdated}
+                                {job.lastUpdated}
                             </Card.Subtitle>
                             <Card.Text>{job.start.description}</Card.Text>
                             <Link
