@@ -89,7 +89,7 @@ const NewJob = ({initialValues, router}) => {
                     router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
                 }
                 else {
-                    setOutputError('Error submitting job!');
+                    setOutputError(errors[0].message);
                 }
             },
         });
