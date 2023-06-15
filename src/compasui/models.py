@@ -177,13 +177,19 @@ class CompasJob(models.Model):
         * the job requested is a ligo job, but the user is not a ligo user
         * the job requested is private an not owned by the requesting user
 
+        :param bid: The id of the CompasJob to return
         :param user: The GWCloudUser instance making the request
-        :param name: job name to be looked up
         :return: CompasJob
         """
+        job = cls.objects.get(name=name, user_id=user.user_id)
 
-        qs = cls.objects.filter(name__exact=name, user_id__exact=user.user_id)
-        job = None if qs.count() == 0 else qs[0]
+        # Ligo jobs may only be accessed by ligo users
+        # if job.is_ligo_job and not user.is_ligo:
+        #     raise Exception("Permission Denied")
+
+        # Users can only access the job if it is public or the user owns the job
+        # if user.user_id != job.user_id:
+        #     raise Exception("Permission Denied")
 
         return job
 
