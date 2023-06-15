@@ -35,7 +35,10 @@ const MyJobs = ({data, match, router}) => {
                     <Card key={job.id} className="job-card">
                         <Card.Body>
                             <Card.Title>{job.start.name}</Card.Title>
-                            <Card.Subtitle>{job.jobStatus.name} . {job.user} . {job.lastUpdated}</Card.Subtitle>
+                            <Card.Subtitle>
+                                <span className={'job-'+job.jobStatus.name.toLowerCase()}>{job.jobStatus.name}</span> .
+                                {job.user} . {job.lastUpdated}
+                            </Card.Subtitle>
                             <Card.Text>{job.start.description}</Card.Text>
                             <Link
                                 to={'/compas/job-results/' + job.id + '/'}
