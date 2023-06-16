@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.utils import timezone
 from django.conf import settings
+from unittest.mock import Mock
 
 from compasui.models import CompasJob, BasicParameter, AdvancedParameter, FileDownloadToken
 
@@ -16,6 +17,17 @@ class TestCompasJobModel(TestCase):
         )
         cls.job.save()
 
+    def test_get_job_by_name_exists(self):
+        mock_user = Mock()
+        mock_user.user_id = 1
+        job = CompasJob.get_by_name(name=self.job.name, user=mock_user)
+        self.assertIsNotNone(job)
+
+    def test_get_job_by_name_not_found(self):
+        mock_user = Mock()
+        mock_user.user_id = 1
+        job = CompasJob.get_by_name(name='another name', user=mock_user)
+        self.assertIsNone(job)
 
 class TestModels(TestCase):
     def test_job_to_json(self):
