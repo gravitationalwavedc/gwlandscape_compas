@@ -61,7 +61,7 @@ const vdhattr = (data) => ({
     MT_history: data['MT_History'],
     Stellar_Type1: data['Stellar_Type(1)'],
     Stellar_Type2: data['Stellar_Type(2)'],
-    Z1: data['Mass@ZAMS(1)']
+    Z1: data['Metallicity@ZAMS(1)']
 });
 
 const mapLineData = (dataset, keys = null) => {
