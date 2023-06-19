@@ -6,7 +6,7 @@ import Link from 'found/Link';
 
 const MyJobs = ({data, match, router}) => {
 
-    const jobs = data.compasJobs ? data.compasJobs.edges.map(e => e.node) : null;
+    const jobs = data && data.compasJobs && data.compasJobs.edges.length ? data.compasJobs.edges.map(e => e.node) : null;
     return (
         <Container>
             <h1 className="pt-5 mb-4">
@@ -45,7 +45,7 @@ const MyJobs = ({data, match, router}) => {
                 jobs.map(job =>
                     <Card key={job.id} className="job-card">
                         <Card.Body>
-                            <Card.Title>{job.start.name}</Card.Title>
+                            <Card.Title data-testid='job-name'>{job.start.name}</Card.Title>
                             <Card.Subtitle>
                                 <span className={'job-'+job.jobStatus.name.toLowerCase()}>{job.jobStatus.name}</span> .
                                 {job.lastUpdated}
@@ -61,8 +61,12 @@ const MyJobs = ({data, match, router}) => {
                             >Explore Job Details</Link>
                         </Card.Body>
                     </Card>)
+<<<<<<< HEAD
 
                 : <p>No Jobs Found!</p>
+=======
+                : <p data-testid='no-jobs'>No Jobs Found!</p>
+>>>>>>> add test for MyJobs page
             }
         </Container>
     );
