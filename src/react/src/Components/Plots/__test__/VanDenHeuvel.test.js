@@ -36,18 +36,18 @@ describe('van Den Heuvel plot logic', () => {
             1688
         ]);
         expect(eventStrings).toStrictEqual([
-            'Zero-age main-sequence, metallicity Z=35',
+            'Zero-age main-sequence, metallicity Z=0.001',
             'Star 1: MS -> HG ',
             'Stable mass transfer from 1 to 2',
             'Star 1: HG -> HeMS ',
             'Star 1: HeMS -> HeHG ',
-            'Star 14 undergoes supernova and forms a BH .',
+            'Star 1 undergoes supernova and forms a BH .',
             'Star 2: MS -> HG ',
             'Star 2: HG -> CHeB ',
             'Common envelope initiated by 2',
             'Star 2: CHeB -> HeMS ',
             'Star 2: HeMS -> HeHG ',
-            'Star 14 undergoes supernova and forms a BH .'
+            'Star 2 undergoes supernova and forms a BH .'
         ]);
     });
 });

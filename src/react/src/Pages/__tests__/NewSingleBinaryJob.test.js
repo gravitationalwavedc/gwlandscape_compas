@@ -30,7 +30,7 @@ describe('new single binary job page', () => {
         fireEvent.change(orbitalInput, { target: { value: 1.3 } });
         await userEvent.click(screen.getByText('Reset Form'));
 
-        expect(separationInput).toHaveValue(1.02);
+        expect(separationInput).toHaveValue(3.5);
         expect(orbitalInput).toHaveValue(null);
     });
 

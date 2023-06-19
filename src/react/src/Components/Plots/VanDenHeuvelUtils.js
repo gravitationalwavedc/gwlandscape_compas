@@ -79,11 +79,11 @@ export const getEvents = (vdhattrData) => {
         }
 
         const [type_changed_star, isSupernova] = getWhichStar(
-            stype1, 
-            stype2, 
+            stype1,
+            stype2,
             vdhattrData.Stellar_Type1[i - 1],
             vdhattrData.Stellar_Type2[i - 1]
-        ); //which star 
+        ); //which star
 
         if (type_changed_star) {
             let image_num, eventstring;
@@ -92,7 +92,7 @@ export const getEvents = (vdhattrData) => {
                 let remType = type_changed_star === 1 ? stype1 : stype2;
                 let comType = type_changed_star === 1 ? stype2 : stype1;
                 let disrupted = vdhattrData.eccentricity[i] > 1 || vdhattrData.semimajor[i] < 0;
-                eventstring = `Star ${remType} undergoes supernova and forms a ${stellarTypes[remType]} `
+                eventstring = `Star ${type_changed_star} undergoes supernova and forms a ${stellarTypes[remType]} `
                     + `${disrupted ? '. Orbit becomes unbound' : ''}.`;
                 if (disrupted) {
                     if (comType < 13) {
