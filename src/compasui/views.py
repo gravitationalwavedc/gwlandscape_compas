@@ -5,7 +5,7 @@ import os
 import jwt
 import requests
 from django.conf import settings
-from django.db import transaction, IntegrityError
+from django.db import transaction
 
 from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
 from .tasks import run_compas
