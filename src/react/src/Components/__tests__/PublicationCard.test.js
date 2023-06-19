@@ -20,12 +20,15 @@ describe('publications Page', () => {
             ]
         },
         datasetModels: {
-            edges: [
-                {
-                    node: {id: 'test-id'}
-                }
-            ]
+            edges: []
         }
+    };
+    const datasetModels = {
+        edges: [
+            {
+                node: {id: 'test-id'}
+            }
+        ]
     };
 
     it('renders', async () => {
@@ -36,5 +39,13 @@ describe('publications Page', () => {
         expect(screen.getByText(
             `${publication.keywords.edges[0].node.tag}, ${publication.keywords.edges[1].node.tag}`
         )).toBeInTheDocument();
+        expect(screen.getByText('No available models')).toBeInTheDocument();
+    });
+
+    it('has an active button when supplied with datasets', async () => {
+        expect.hasAssertions();
+        publication.datasetModels = datasetModels;
+        render(<PublicationCard publication={publication} match={{}} router={router} />);
+        expect(screen.getByText('Start interactive visualisation')).toBeInTheDocument();
     });
 });

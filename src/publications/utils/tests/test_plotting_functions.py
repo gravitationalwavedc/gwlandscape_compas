@@ -143,7 +143,7 @@ class TestGetLogAndLimits(TestCase):
         self.assertCountEqual(min_max, [1, 2])
 
         test_array = np.array([10, 50, 100])
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=500, min_cond=50)
+        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=500, min_cond=400)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
         self.assertCountEqual(min_max, [1, 2])

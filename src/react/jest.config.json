@@ -43,7 +43,8 @@
     ],
     "modulePaths": [],
     "moduleNameMapper": {
-      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy"
+      "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
+      "d3-scale-chromatic": "<rootDir>/node_modules/d3-scale-chromatic/dist/d3-scale-chromatic.min.js"
     },
     "moduleFileExtensions": [
       "web.js",

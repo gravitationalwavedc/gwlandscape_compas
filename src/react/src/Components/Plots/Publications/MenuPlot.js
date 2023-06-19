@@ -1,31 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {graphql, createRefetchContainer} from 'react-relay';
 
 import DatasetPlot from './DatasetPlot';
-import { Col, Row, Form } from 'react-bootstrap';
+import { Col, Row, Button } from 'react-bootstrap';
+import { SelectInput, SliderInput } from './Controls';
 
-const SelectInput = ({ title, value, options, ...rest }) =>
-    <Form.Group>
-        <Form.Label>{ title }</Form.Label>
-        <Form.Control
-            as="select"
-            custom
-            value={value}
-            {...rest}
-        >
-            {options.map(({label, value}) =>
-                <option
-                    value={value}
-                    id={label}
-                    key={label}>
-                    {label}
-                </option>
-            )}
-        </Form.Control>
-    </Form.Group>;
-
+const colourMaps = ['viridis', 'cividis', 'magma', 'inferno', 'spectral'];
+const colourMapOptions = colourMaps.map(colour => ({value: colour, label: colour}));
 
 const MenuPlot = ({data, relay}) => {
+    const [colourMap, setColourMap] = useState(colourMaps[0]);
     const {plotMeta, plotData} = data.plotInfo;
     const groupKeys = plotMeta.groups.map((group) => ({value: group, label: group}));
     const subgroupKeys = plotMeta.subgroups.map((subgroup) => ({value: subgroup, label: subgroup}));
@@ -78,32 +62,45 @@ const MenuPlot = ({data, relay}) => {
                     );
                 }}
             />
-            <Form.Group>
-                <Form.Label>{`Stride = ${stride}`}</Form.Label>
-                <Form.Control
-                    type="range"
-                    value={stride}
-                    min={1}
-                    max={20}
-                    onChange={e => stride = e.target.value}
-                    onMouseUp={() => {
-                        relay.refetch(
-                            {
-                                rootGroup: plotMeta.group,
-                                subgroupX: plotMeta.subgroupX,
-                                subgroupY: plotMeta.subgroupY,
-                                strideLength: stride
-                            },
-                        );
-                    }}
-                />
-            </Form.Group>
+            <SelectInput
+                title='Colour Bar'
+                options={colourMapOptions}
+                value={colourMap}
+                onChange={e => setColourMap(e.target.value)}
+            />
+            <SliderInput
+                title='Stride'
+                text={stride > 1 ? `Using subset of data with step interval of ${stride}` : 'Using complete dataset'}
+                value={stride}
+                min={1}
+                max={20}
+                onChange={e => stride = e.target.value}
+                onMouseUp={() => {
+                    relay.refetch(
+                        {
+                            rootGroup: plotMeta.group,
+                            subgroupX: plotMeta.subgroupX,
+                            subgroupY: plotMeta.subgroupY,
+                            strideLength: stride
+                        },
+                    );
+                }}
+            />
+            <Button
+                variant='outline-primary'
+                onClick={() => relay.refetch({
+                    rootGroup: null
+                })}
+            >
+                Reset Visualisation
+            </Button>
         </Col>
         <Col md={8}>
             <DatasetPlot
                 histData={JSON.parse(histData)}
                 scatterData={JSON.parse(scatterData)}
                 axis={[plotMeta.subgroupX, plotMeta.subgroupY]}
+                colourMap={colourMap}
                 {...restData}
             />
         </Col>

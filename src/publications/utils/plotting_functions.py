@@ -26,7 +26,6 @@ def get_surrounding_bins(indices, x_lim, y_lim):
     y1, y2 = max(y - 1, 0), min(y + 1, y_lim)
     return np.array(list(product(range(x1, x2+1), range(y1, y2+1))))
 
-
 def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
     """Checks whether or not the input array should be logged,
     as well as returning sensible limits on the resulting array
@@ -60,7 +59,7 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
             return np.log10(arr), True, [np.log10(arr_max) - 0.5, np.log10(arr_max) + 0.5]
         return arr, False, [arr_max - 0.5, arr_max + 0.5]
 
-    if arr_max > max_cond or arr_min < min_cond:
+    if arr_max > max_cond or arr_max < min_cond:
         logged_arr = np.log10(arr)
         # If any of the logged array is infinite or NaN
         if (~np.isfinite(logged_arr)).any():
@@ -101,10 +100,15 @@ def split_histogram_by_count(counts, split_count):
     x_lim, y_lim = counts.shape
 
     # Get all coordinates surrounding all histogram bins above split_count
-    smoothed_indices = np.concatenate([
+    min_count_bins = [
         get_surrounding_bins(entry, x_lim=x_lim-1, y_lim=y_lim-1)
         for entry in min_count_indices
-    ])
+    ]
+
+    if not len(min_count_bins):
+        return np.array([]), all_count_indices
+
+    smoothed_indices = np.concatenate(min_count_bins)
 
     # Remove doubles
     smoothed_indices = np.unique(smoothed_indices, axis=0)
