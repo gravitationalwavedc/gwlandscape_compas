@@ -11,7 +11,7 @@ const PublicationCard = ({publication, match, router}) => <Card className="publi
         <Card.Text className='font-italic'>
             {publication.keywords.edges.map(({node}) => node.tag).join(', ')}
         </Card.Text>
-        {/* {
+        {
             publication.datasetModels.edges.length
                 ? <Link 
                     as={Button}
@@ -27,10 +27,7 @@ const PublicationCard = ({publication, match, router}) => <Card className="publi
                 : <Button variant='outline-primary' disabled>
                     No available models
                 </Button>
-        } */}
-        <Button variant='outline-primary' disabled>
-            No available models
-        </Button>
+        }
     </Card.Body>
 </Card>;
 

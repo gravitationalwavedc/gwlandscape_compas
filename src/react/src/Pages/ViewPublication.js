@@ -1,31 +1,11 @@
 import React from 'react';
 import {graphql, createRefetchContainer} from 'react-relay';
-import { Row, Col, Container, Form } from 'react-bootstrap';
-import MenuPlot from '../Components/Plots/MenuPlot';
-
-const SelectInput = ({ title, value, options, ...rest }) =>
-    <Form.Group>
-        <Form.Label>{ title }</Form.Label>
-        <Form.Control
-            as="select"
-            custom
-            value={value}
-            {...rest}
-        >
-            {options.map(({label, value}) =>
-                <option
-                    value={value}
-                    id={label}
-                    key={label}>
-                    {label}
-                </option>
-            )}
-        </Form.Control>
-    </Form.Group>;
-
+import { Row, Col, Container } from 'react-bootstrap';
+import MenuPlot from '../Components/Plots/Publications/MenuPlot';
+import { SelectInput } from '../Components/Plots/Publications/Controls';
 
 const ViewPublication = ({data, relay}) => {
-    const {title, datasets, plotInfo} = data.compasPublication;
+    const {title, author, year, datasets, plotInfo} = data && data.compasPublication;
     const datasetOptions = datasets.edges.map(({node}) => ({
         value: node.id,
         label: node.compasModel.name
@@ -35,29 +15,35 @@ const ViewPublication = ({data, relay}) => {
         <Row className="mb-3">
             <Col md={2} />
             <Col md={8}>
-                <h1>Publication Details</h1>
                 {
-                    data.compasPublication && <>
-                        <h2>{title}</h2>
-                    </>
+                    data.compasPublication
+                        ? <>
+                            <Row className="mb-3">
+                                <Col>
+                                    <h1 className='text-primary'>{title}</h1>
+                                    <div className='text-primary'>{`${author}${year ? `· ${year}` : ''}`}</div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={4}>
+                                    <h5>Model</h5>
+                                    <SelectInput
+                                        data-testid='model'
+                                        value={plotInfo.edges[0].node.id}
+                                        options={datasetOptions}
+                                        onChange={e => {
+                                            relay.refetch(
+                                                {datasetId: e.target.value},
+                                            );
+                                        }}
+                                    />
+        
+                                </Col>
+                            </Row>
+                            <MenuPlot data={plotInfo.edges[0].node}/>
+                        </>
+                        : <h5>Publication not found</h5>
                 }
-                <Row>
-                    <Col md={4}>
-                        <h5>Model</h5>
-                        <SelectInput
-                            data-testid='model'
-                            value={plotInfo.edges[0].node.id}
-                            options={datasetOptions}
-                            onChange={e => {
-                                relay.refetch(
-                                    {datasetId: e.target.value},
-                                );
-                            }}
-                        />
-
-                    </Col>
-                </Row>
-                <MenuPlot data={plotInfo.edges[0].node}/>
             </Col>
         </Row>
     </Container>;
@@ -73,6 +59,8 @@ export default createRefetchContainer(ViewPublication,
                 compasPublication(id: $publicationId){
                     id
                     title
+                    author
+                    year
                     datasets: datasetModels {
                         edges {
                             node {
