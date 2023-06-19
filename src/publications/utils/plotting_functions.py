@@ -26,6 +26,7 @@ def get_surrounding_bins(indices, x_lim, y_lim):
     y1, y2 = max(y - 1, 0), min(y + 1, y_lim)
     return np.array(list(product(range(x1, x2+1), range(y1, y2+1))))
 
+
 def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
     """Checks whether or not the input array should be logged,
     as well as returning sensible limits on the resulting array
