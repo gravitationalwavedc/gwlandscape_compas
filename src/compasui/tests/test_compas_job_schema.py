@@ -95,16 +95,13 @@ class TestCompasJobSchema(CompasTestCase):
         self.assertRaises(Exception, "Error submitting job, got error code: 400\n\nheaders\n\nBad request")
 
     @patch('compasui.views.requests')
-    @patch('compasui.views.CompasJob.get_by_name')
-    def test_create_compas_job_name_exists(self, get_by_name_mock, request_mock):
-        get_by_name_mock.return_value = None
-
+    def test_create_compas_job_name_exists(self, request_mock):
         mock_response = Mock()
-        mock_response.status_code = 400
-        mock_response.content = "Bad request"
+        mock_response.status_code = 200
+        mock_response.content = b'{"jobId":441}'
         mock_response.headers = "headers"
 
-        request_mock.request.side_effect = mock_response
+        request_mock.request.return_value = mock_response
 
         self.client.authenticate(self.user)
 
@@ -113,8 +110,12 @@ class TestCompasJobSchema(CompasTestCase):
             self.compas_job_input
         )
 
+        response = self.client.execute(
+            self.create_compas_job_mutation,
+            self.compas_job_input
+        )
 
-        self.assertIsNotNone(response.errors)
+        self.assertNotEqual(None, response.errors)
         self.assertRaises(Exception, "Job name is already in use!")
 
     @patch('compasui.models.request_file_list')
