@@ -29,6 +29,7 @@ class TestCompasJobModel(TestCase):
         job = CompasJob.get_by_name(name='another name', user=mock_user)
         self.assertIsNone(job)
 
+
 class TestModels(TestCase):
     def test_job_to_json(self):
         """
