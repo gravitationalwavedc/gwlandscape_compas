@@ -5,7 +5,8 @@ import {createFragmentContainer, graphql} from 'react-relay';
 import Link from 'found/Link';
 
 const MyJobs = ({data, match, router}) => {
-    const jobs = data && data.compasJobs && data.compasJobs.edges.length ? data.compasJobs.edges.map(e => e.node) : null;
+    const jobs = data && data.compasJobs && data.compasJobs.edges.length > 0 ?
+        data.compasJobs.edges.map(e => e.node) : null;
     return (
         <Container>
             <h1 className="pt-5 mb-4">
