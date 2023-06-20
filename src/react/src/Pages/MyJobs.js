@@ -47,8 +47,9 @@ const MyJobs = ({data, match, router}) => {
                         <Card.Body>
                             <Card.Title data-testid='job-name'>{job.start.name}</Card.Title>
                             <Card.Subtitle>
-                                <span className={'job-'+job.jobStatus.name.toLowerCase()}>{job.jobStatus.name}</span> .
-                                {job.lastUpdated}
+                                <span className={'job-'+job.jobStatus.name.toLowerCase()}>
+                                    {job.jobStatus.name}
+                                </span> . {job.lastUpdated}
                             </Card.Subtitle>
                             <Card.Text>{job.start.description}</Card.Text>
                             <Link
