@@ -20,7 +20,7 @@ def get_h5_subgroup_meta(h5_file, root_group):
     subgroup_list = get_h5_subgroups(h5_file, root_group)
 
     total_length = h5_file[root_group][subgroup_list[0]].shape[0]
-    stride_length = 1 if total_length < 1e6 else total_length // 5e5
+    stride_length = 1 if total_length < 1e6 else int(total_length / 5e5)
 
     default_values = default_prefs.get(root_group, None)
 
