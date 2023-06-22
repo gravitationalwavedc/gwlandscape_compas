@@ -5,7 +5,6 @@ import {createFragmentContainer, graphql} from 'react-relay';
 import Link from 'found/Link';
 
 const MyJobs = ({data, match, router}) => {
-
     const jobs = data && data.compasJobs && data.compasJobs.edges.length > 0 ?
         data.compasJobs.edges.map(e => e.node) : null;
     return (
