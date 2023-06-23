@@ -10,11 +10,13 @@ import Publications from './Pages/Publications';
 import NewJob from './Pages/NewJob';
 import ViewJob from './Pages/ViewJob';
 import ViewPublication from './Pages/ViewPublication';
+import MyJobs from './Pages/MyJobs';
 
 // List of components that require authentication
 const PROTECTED_COMPONENTS = [
     ViewJob,
-    NewJob
+    NewJob,
+    MyJobs
 ];
 
 const handleRender = ({ Component, props }) => {
@@ -93,6 +95,17 @@ function getRoutes() {
                     publicationId: params.publicationId,
                     datasetId: ''
                 })}
+                render={handleRender}
+            />
+            <Route
+                path="my-jobs"
+                environment={harnessApi.getEnvironment('compas')}
+                Component={MyJobs}
+                query={graphql`
+                    query Routes_MyJobs_Query{
+                        ...MyJobs_data
+                    }
+                `}
                 render={handleRender}
             />
         </Route>
