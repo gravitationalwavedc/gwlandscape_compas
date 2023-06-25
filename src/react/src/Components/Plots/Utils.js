@@ -6,11 +6,20 @@ const filterScatterData = (data, xlabel, ylabel, x1, x2, y1, y2) =>
 const tickExpFormatter = num => {
     const superscript = '⁰¹²³⁴⁵⁶⁷⁸⁹';
     const minus = '⁻';
+
     const toSuper = n => `${n}`.split('').map(m =>
         m === '-' ? minus : superscript[m]
     ).join('');
+
     const [base, exponent] = num.toExponential().split('e').map(n => parseFloat(n));
-    return base === 0 ? 0 : `${base === 1 ? '' : base + '×'}${10 + toSuper(exponent)}`;
+
+    return base === 0 ? 0 : `${base === 1 ? '' : base.toFixed() + '×'}${10 + toSuper(exponent)}`;
+};
+
+const linspace = (start, stop, num, endpoint = true) => {
+    const div = endpoint ? (num - 1) : num;
+    const step = (stop - start) / div;
+    return Array.from({length: num}, (_, i) => start + step * i);
 };
 
 const LineChartTooltip = (props) => {
@@ -90,6 +99,7 @@ const getReferenceLineSegment = (R, xDomain, yDomain) => {
 export {
     filterScatterData as filterData,
     tickExpFormatter,
+    linspace,
     LineChartTooltip as CustomTooltip,
     getLuminosity,
     getTemperature,

@@ -13,36 +13,39 @@ import {
     ZAxis,
     ReferenceArea,
 } from 'recharts';
-import { filterData, tickExpFormatter, getReferenceLineSegment, getReferenceRangeType } from './Utils';
+import { filterData, tickExpFormatter, getReferenceLineSegment, getReferenceRangeType, linspace } from './Utils';
 import { units } from './DataUtil';
 
 
-const DEFAULT_ZOOM = { x1: null, y1: null, x2: null, y2: null };
-const xDomain = [1000, 10e6];
-const yDomain = [10e-11, 10e6];
-const radii = [1e-9, 1e-6, 0.001, 1, 1000,];
 
-const initialState = {
-    left: xDomain[0],
-    right: xDomain[1],
-    refAreaLeft: '',
-    refAreaRight: '',
-    bottom: yDomain[0],
-    top: yDomain[1],
-    animation: false,
-};
-
-const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
+const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) => {
     const [filteredData1, setFilteredData1] = useState([...data1]);
     const [filteredData2, setFilteredData2] = useState([...data2]);
+
+    const DEFAULT_ZOOM = { x1: null, y1: null, x2: null, y2: null };
+
     const [zoomArea, setZoomArea] = useState(DEFAULT_ZOOM);
     const [isZooming, setIsZooming] = useState(false);
+
+    const radii = [1e-9, 1e-6, 0.001, 1, 10, 100, 1000,];
+
+    const initialState = {
+        left: xDomain[0],
+        right: xDomain[1],
+        refAreaLeft: '',
+        refAreaRight: '',
+        bottom: yDomain[0],
+        top: yDomain[1],
+        animation: false,
+    };
+
     const [left, setLeft] = useState(initialState.left);
     const [right, setRight] = useState(initialState.right);
     const [top, setTop] = useState(initialState.top);
     const [bottom, setBottom] = useState(initialState.bottom);
 
     const isZoomed = filteredData1?.length !== data1?.length || filteredData2?.length !== data2?.length;
+
     const drawReferenceLine = (R, xDomain, yDomain) => <ReferenceLine
         key={`${R}-${xDomain}-${yDomain}`}
         label={`${R} R_sun`}
@@ -98,6 +101,9 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
         }
     };
 
+    console.log(left, right);
+    console.log(linspace(left, right, 4));
+
     return (<div style={divStyle || {
         width: '100%',
         height: '400px',
@@ -129,9 +135,10 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     scale='log'
                     reversed={true} //uncomment later
                     domain={[left, right]}
-                    tickCount={4}
-                    tickFormatter={tickExpFormatter}
-                    ticks={[1000, 10000, 100000, 1000000]}
+                    padding={{ left: 30, right: 30 }}
+                    ticks={linspace(left, right, 8)}
+                    tickInterval={3}
+                    tickFormatter={(tick) => tickExpFormatter(Math.floor(tick))}
                 >
                     <Label value="Temperature(K)" position="bottom" offset={0} />
                 </XAxis>
@@ -143,6 +150,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     scale='log'
                     tickFormatter={tickExpFormatter}
                     domain={[bottom, top]}
+                    padding={{ bottom: 30, top: 30 }}
                     label={{
                         value: 'Luminosity/L\u{2299}',
                         angle: -90,
@@ -150,7 +158,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                         textAnchor: 'middle',
                         offset: -7
                     }}
-                    padding={{ bottom: 10 }} />
+                />
                 <ZAxis
                     dataKey='time'
                     name='time'
@@ -175,14 +183,12 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2 }) => {
                     line={{ strokeWidth: 2 }}
                     fill="red"
                     radius={2}
-                //shape={<Dot r={1}/>}
                 />
                 <Scatter
                     name='Star2'
                     data={filteredData2}
                     line={{ strokeWidth: 2 }}
                     fill="blue"
-                //shape={<Dot r={1}/>}
                 />
                 <ReferenceArea
                     x1={zoomArea?.x1}
