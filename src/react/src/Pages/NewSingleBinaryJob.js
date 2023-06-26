@@ -177,9 +177,19 @@ const NewSingleBinaryJob = () => {
                             <>
                                 <VanDenHeuvel data={jsonData} />
                                 <div className="plotContainer">
-                                    <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
-                                    <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
-                                    <RenderHRDiagramContainer className="container" syncId={syncId} data={jsonData} />
+                                    <Col className="mb-5 mt-5">
+                                        <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
+                                    </Col>
+                                    <Col className="mb-5">
+                                        <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
+                                    </Col>
+                                    <Col className="mb-5">
+                                        <RenderHRDiagramContainer
+                                            className="container"
+                                            syncId={syncId}
+                                            data={jsonData}
+                                        />
+                                    </Col>
                                 </div>
                             </>
                         )}
