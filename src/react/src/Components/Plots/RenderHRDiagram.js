@@ -15,8 +15,8 @@ import {
 } from 'recharts';
 import { filterData, tickExpFormatter, getReferenceLineSegment, getReferenceRangeType, linspace } from './Utils';
 import { units } from './DataUtil';
-
-
+import { getLogTickMarks } from './tickHelper';
+import ExponentTick from './ExponentTick';
 
 const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) => {
     const [filteredData1, setFilteredData1] = useState([...data1]);
@@ -27,7 +27,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
     const [zoomArea, setZoomArea] = useState(DEFAULT_ZOOM);
     const [isZooming, setIsZooming] = useState(false);
 
-    const radii = [1e-9, 1e-6, 0.001, 1, 10, 100, 1000,];
+    const radii = [1e-9, 1e-6, 0.001, 1, 10, 100, 1000];
 
     const initialState = {
         left: xDomain[0],
@@ -46,14 +46,16 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
 
     const isZoomed = filteredData1?.length !== data1?.length || filteredData2?.length !== data2?.length;
 
-    const drawReferenceLine = (R, xDomain, yDomain) => <ReferenceLine
-        key={`${R}-${xDomain}-${yDomain}`}
-        label={`${R} R_sun`}
-        stroke="gray"
-        strokeDasharray="3 3"
-        position="start"
-        segment={getReferenceLineSegment(R, xDomain, yDomain)}
-    />;
+    const drawReferenceLine = (R, xDomain, yDomain) => (
+        <ReferenceLine
+            key={`${R}-${xDomain}-${yDomain}`}
+            label={`${R} R_sun`}
+            stroke="gray"
+            strokeDasharray="3 3"
+            position="start"
+            segment={getReferenceLineSegment(R, xDomain, yDomain)}
+        />
+    );
 
     const handleZoomOUt = () => {
         setFilteredData1([...data1]);
@@ -65,14 +67,14 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
         setBottom(initialState.bottom);
     };
 
-    const handleMouseDown = e => {
+    const handleMouseDown = (e) => {
         const { xValue, yValue } = e || {};
         if (!xValue || !yValue) return;
         setIsZooming(true);
         setZoomArea({ x1: xValue, y1: yValue, x2: xValue, y2: yValue });
     };
 
-    const handleMouseMove = e => {
+    const handleMouseMove = (e) => {
         if (isZooming) {
             setZoomArea((prev) => ({ ...prev, x2: e?.xValue, y2: e?.yValue }));
         }
@@ -81,8 +83,10 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
     const handleMouseUp = () => {
         if (isZooming) {
             let { x1, y1, x2, y2 } = zoomArea;
+
             setIsZooming(false);
             setZoomArea(DEFAULT_ZOOM);
+
             // ensure x1 <= x2 and y1 <= y2
             if (x1 > x2) [x1, x2] = [x2, x1];
             if (y1 > y2) [y1, y2] = [y2, y1];
@@ -90,7 +94,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
             const dataPointsInRange1 = filterData(filteredData1, 'Temperature', 'Luminosity', x1, x2, y1, y2);
             const dataPointsInRange2 = filterData(filteredData2, 'Temperature', 'Luminosity', x1, x2, y1, y2);
 
-            if (dataPointsInRange1.length || dataPointsInRange2.length) {
+            if (dataPointsInRange1.length > 0 || dataPointsInRange2.length > 0) {
                 setLeft(x1);
                 setRight(x2);
                 setTop(y2);
@@ -101,104 +105,96 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
         }
     };
 
-    console.log(left, right);
-    console.log(linspace(left, right, 4));
+    const xTicks = getLogTickMarks(left, right, 8);
+    const yTicks = getLogTickMarks(bottom, top, 5);
 
-    return (<div style={divStyle || {
-        width: '100%',
-        height: '400px',
-    }}>
-        {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
-
-        <ResponsiveContainer width="80%"
-            height="100%">
-            <ScatterChart
-                width={700}
-                height={300}
-                syncId={syncId}
-                margin={{
-                    top: 5,
-                    right: 20,
-                    left: 20,
-                    bottom: 25,
-                }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-            >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                    allowDataOverflow
-                    dataKey='Temperature'
-                    name="Temperature"
-                    type="number"
-                    scale='log'
-                    reversed={true} //uncomment later
-                    domain={[left, right]}
-                    padding={{ left: 30, right: 30 }}
-                    ticks={linspace(left, right, 8)}
-                    tickInterval={3}
-                    tickFormatter={(tick) => tickExpFormatter(Math.floor(tick))}
-                >
-                    <Label value="Temperature(K)" position="bottom" offset={0} />
-                </XAxis>
-                <YAxis
-                    allowDataOverflow
-                    dataKey='Luminosity'
-                    name="Luminosity"
-                    type="number"
-                    scale='log'
-                    tickFormatter={tickExpFormatter}
-                    domain={[bottom, top]}
-                    padding={{ bottom: 30, top: 30 }}
-                    label={{
-                        value: 'Luminosity/L\u{2299}',
-                        angle: -90,
-                        position: 'insideLeft',
-                        textAnchor: 'middle',
-                        offset: -7
-                    }}
-                />
-                <ZAxis
-                    dataKey='time'
-                    name='time'
-                    type='number'
-                />
-                <Tooltip
-                    allowEscapeViewBox={{ x: true, y: false }}
-                    offset={20}
-                    cursor={{ strokeDasharray: '3 3' }}
-                    formatter={(value, name) => <>{value.toFixed(2)} {units[name]}</>}
-                    labelFormatter={label => `${label.toFixed(2)}`}
-                />
-                <Legend wrapperStyle={{ paddingLeft: '40px' }} layout="vertical" align="right" verticalAlign="top" />
-                {
-                    radii
-                        .filter(r => getReferenceRangeType(r, xDomain, yDomain))
-                        .map(r => drawReferenceLine(r, xDomain, yDomain))
+    return (
+        <div
+            style={
+                divStyle || {
+                    width: '100%',
+                    height: '400px',
                 }
-                <Scatter
-                    name='Star1'
-                    data={filteredData1}
-                    line={{ strokeWidth: 2 }}
-                    fill="red"
-                    radius={2}
-                />
-                <Scatter
-                    name='Star2'
-                    data={filteredData2}
-                    line={{ strokeWidth: 2 }}
-                    fill="blue"
-                />
-                <ReferenceArea
-                    x1={zoomArea?.x1}
-                    x2={zoomArea?.x2}
-                    y1={zoomArea?.y1}
-                    y2={zoomArea?.y2}
-                />
-            </ScatterChart>
-        </ResponsiveContainer>
-    </div>);
+            }
+        >
+            {isZoomed && <button onClick={handleZoomOUt}>Zoom Out</button>}
+
+            <ResponsiveContainer width="80%" height="100%">
+                <ScatterChart
+                    width={700}
+                    height={300}
+                    syncId={syncId}
+                    margin={{
+                        top: 5,
+                        right: 20,
+                        left: 20,
+                        bottom: 25,
+                    }}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                        allowDataOverflow
+                        dataKey="Temperature"
+                        name="Temperature"
+                        type="number"
+                        scale="log"
+                        reversed={true} //uncomment later
+                        interval={0}
+                        domain={[xTicks[0], xTicks[xTicks.length - 1]]}
+                        ticks={xTicks}
+                        tick={<ExponentTick />}
+                    >
+                        <Label value="Temperature(K)" position="bottom" offset={0} />
+                    </XAxis>
+                    <YAxis
+                        allowDataOverflow
+                        dataKey="Luminosity"
+                        name="Luminosity"
+                        type="number"
+                        scale="log"
+                        interval={0}
+                        tick={<ExponentTick />}
+                        ticks={yTicks}
+                        domain={[yTicks[0], yTicks[yTicks.length - 1]]}
+                        label={{
+                            value: 'Luminosity/L\u{2299}',
+                            angle: -90,
+                            position: 'insideLeft',
+                            textAnchor: 'middle',
+                            offset: -7,
+                        }}
+                    />
+                    <ZAxis dataKey="time" name="time" type="number" />
+                    <Tooltip
+                        allowEscapeViewBox={{ x: true, y: false }}
+                        offset={20}
+                        cursor={{ strokeDasharray: '3 3' }}
+                        formatter={(value, name) => (
+                            <>
+                                {value.toFixed(2)} {units[name]}
+                            </>
+                        )}
+                        labelFormatter={(label) => `${label.toFixed(2)}`}
+                    />
+                    <Legend
+                        wrapperStyle={{ paddingLeft: '40px' }}
+                        layout="vertical"
+                        align="right"
+                        verticalAlign="top"
+                    />
+                    {radii
+                        .filter((r) => getReferenceRangeType(r, xDomain, yDomain))
+                        .map((r) => drawReferenceLine(r, xDomain, yDomain))}
+                    <Scatter name="Star1" data={filteredData1} line={{ strokeWidth: 2 }} fill="red" radius={2} />
+                    <Scatter name="Star2" data={filteredData2} line={{ strokeWidth: 2 }} fill="blue" />
+                    <ReferenceArea x1={zoomArea?.x1} x2={zoomArea?.x2} y1={zoomArea?.y1} y2={zoomArea?.y2} />
+                </ScatterChart>
+            </ResponsiveContainer>
+        </div>
+    );
 };
 
 export default RenderHRDiagram;
