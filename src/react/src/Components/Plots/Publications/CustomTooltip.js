@@ -10,7 +10,8 @@ const CustomTooltip = ({ active, payload }) => {
                     {`Counts : ${format('.0f')(payload[2].value)}`}
                 </div>
             }
-            <div>{`${format('.4f')(payload[0].value)}, ${format('.4f')(payload[1].value)}`}</div>
+            <div>{`x: ${format('.6~f')(payload[0].value)}`}</div>
+            <div>{`y: ${format('.6~f')(payload[1].value)}`}</div>
         </Card>;
     }
 

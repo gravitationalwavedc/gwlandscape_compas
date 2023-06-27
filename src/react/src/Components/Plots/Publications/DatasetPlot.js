@@ -1,6 +1,4 @@
 import React from 'react';
-import { scaleSequential } from 'd3-scale';
-import { range } from 'd3-array';
 import {
     interpolateViridis,
     interpolateCividis,
@@ -18,10 +16,9 @@ import {
     Tooltip,
     ZAxis
 } from 'recharts';
-import { createTicks, logString, formatAxis, getCountLimits } from './Utils';
+import { logString, formatAxis, getColourbarData, getTickMarks } from './Utils';
 import CustomTooltip from './CustomTooltip';
 
-const AXIS_SCALE = 0.05;
 const NUM_TICKS = 6;
 
 const colourScales = {
@@ -43,29 +40,15 @@ const DatasetPlot = ({
     axis,
     colourMap,
 }) => {
-    const diffRangeX = Math.abs(minMaxX[1] - minMaxX[0]) * AXIS_SCALE;
-    const diffRangeY = Math.abs(minMaxY[1] - minMaxY[0]) * AXIS_SCALE;
-    
-    const plotMinX = Math.floor((minMaxX[0] - diffRangeX) * 10) / 10;
-    const plotMaxX = Math.ceil((minMaxX[1] + diffRangeX) * 10) / 10;
-    const plotMinY = Math.floor((minMaxY[0] - diffRangeY) * 10) / 10;
-    const plotMaxY = Math.ceil((minMaxY[1] + diffRangeY) * 10) / 10;
-    
-    const ticksX = createTicks(plotMinX, plotMaxX, NUM_TICKS);
-    const ticksY = createTicks(plotMinY, plotMaxY, NUM_TICKS);
+    const ticksX = getTickMarks(minMaxX[0], minMaxX[1], NUM_TICKS);
+    const ticksY = getTickMarks(minMaxY[0], minMaxY[1], NUM_TICKS);
 
-    // Only want to calc these values if we're plotting a histogram
-    if (histData.length) {
-        var {countMin, countMax} = getCountLimits(histData);
-        var cbX = plotMaxX + 2.25 * sides[0];
-        var cbY = plotMaxY;
-        var cbWidth = sides[0];
-        var cbHeight = 0.4 * Math.abs(plotMaxY - plotMinY);
-        var cbNumCells = 10;
-        var cbCellHeight = cbHeight / cbNumCells;
-        var colourRange = range(countMin, countMax * 1.001, (countMax - countMin) / cbNumCells);
-        var colourFn = scaleSequential(colourScales[colourMap]).domain([countMin, countMax]);
-    }
+    const plotMinX = ticksX[0];
+    const plotMaxX = ticksX[ticksX.length-1];
+    const plotMinY = ticksY[0];
+    const plotMaxY = ticksY[ticksY.length-1];
+
+    const cb = getColourbarData(histData, [plotMinX, plotMaxX], [plotMinY, plotMaxY], colourScales[colourMap]);
 
     return (
         <ResponsiveContainer width="100%" aspect={1.25} minWidth={500}>
@@ -120,10 +103,10 @@ const DatasetPlot = ({
                         <ZAxis zAxisId="invis-z" dataKey="counts" range={[100, 100]} />
                         <ReferenceArea
                             key={'extra'}
-                            x1={cbX}
-                            x2={cbX}
-                            y1={cbY}
-                            y2={cbY}
+                            x1={cb.x}
+                            x2={cb.x}
+                            y1={cb.y}
+                            y2={cb.y}
                             ifOverflow="visible"
                             label={{
                                 value: logString('COUNT'),
@@ -137,24 +120,24 @@ const DatasetPlot = ({
                         />
 
                         {
-                            colourRange.map((sector, index) => (
+                            cb.colourRange.map((sector, index) => (
                                 <ReferenceArea
                                     key={`cb${index}`}
-                                    x1={cbX}
-                                    x2={cbX + cbWidth}
-                                    y1={cbY - cbCellHeight * ((cbNumCells - index) + 0.5)}
-                                    y2={cbY - cbCellHeight * ((cbNumCells - index) - 0.5)}
-                                    fill={colourFn(sector)}
-                                    fillOpacity={0.5}
+                                    x1={cb.x}
+                                    x2={cb.x + cb.width}
+                                    y1={cb.y - cb.cellHeight * ((cb.numCells - index) + 0.5)}
+                                    y2={cb.y - cb.cellHeight * ((cb.numCells - index) - 0.5)}
+                                    fill={cb.colourFn(sector)}
+                                    fillOpacity={1}
                                     stroke="#dadada"
                                     strokeOpacity={0.3}
                                     ifOverflow="visible"
                                     label={{
                                         value: `${
                                             index == 0
-                                                ? countMin
-                                                : index == cbNumCells
-                                                    ? countMax
+                                                ? cb.countMin
+                                                : index == cb.numCells
+                                                    ? cb.countMax
                                                     : ''
                                         }`,
                                         stroke: '#898989',
@@ -175,11 +158,11 @@ const DatasetPlot = ({
                                     x2={sector.x + sides[0] / 2}
                                     y1={sector.y - sides[1] / 2}
                                     y2={sector.y + sides[1] / 2}
-                                    fill={colourFn(Math.log10(sector.counts))}
-                                    fillOpacity={0.5}
+                                    fill={cb.colourFn(Math.log10(sector.counts))}
+                                    fillOpacity={1}
                                     stroke="#dadada"
                                     strokeOpacity={0.3}
-                                    ifOverflow="visible"
+                                    ifOverflow="extendDomain"
                                 />
                             ))
                         }
@@ -198,7 +181,7 @@ const DatasetPlot = ({
                 <Scatter
                     data={scatterData}
                     zAxisId="standard"
-                    fill="purple"
+                    fill={cb?.colourFn && cb.colourFn(0)}
                     shape="circle"
                     ifOverflow="visible"
                 />

@@ -153,7 +153,7 @@ export default createRefetchContainer(MenuPlot,
         $strideLength: Int 
     ) {
         compasPublication(id: $publicationId) {
-            plotInfo: datasetModels (id: $datasetId) {
+            plotInfo: datasetModels (first: 1, id: $datasetId) {
                 edges {
                     node {
                         ...MenuPlot_data @arguments(

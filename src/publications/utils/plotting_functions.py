@@ -57,8 +57,9 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
     # If the array is uniform, log values if it is above or below a specific threshold, else leave
     if arr_max == arr_min:
         if arr_max != 0 and (arr_max > max_cond or arr_min < min_cond):
-            return np.log10(arr), True, [np.log10(arr_max) - 0.5, np.log10(arr_max) + 0.5]
-        return arr, False, [arr_max - 0.5, arr_max + 0.5]
+            return np.log10(arr), True, [np.log10(arr_max) - 0.01, np.log10(arr_max) + 0.01]
+
+        return arr, False, [arr_max - 0.01, arr_max + 0.01]
 
     if arr_max > max_cond or arr_max < min_cond:
         logged_arr = np.log10(arr)
@@ -146,8 +147,13 @@ def histo2d_scatter_hybrid(x_array, y_array, min_count=3, bins=40):
     dict
         Contains json data for the scatter plot and histogram, along with the side lengths of the histogram bins
     """
-    x_range = (0.99*np.min(x_array), 1.01*np.max(x_array))
-    y_range = (0.99*np.min(y_array), 1.01*np.max(y_array))
+    # Small adjustment to the limits to capture all points, make histogram display reasonably
+    # This adjustment is not perfect, but can be fixed later if needed
+    x_min, x_max, y_min, y_max = np.min(x_array), np.max(x_array), np.min(y_array), np.max(y_array)
+    x_adjust = abs(x_max - x_min) / (bins - 1) if x_min != x_max else 0.01
+    y_adjust = abs(y_max - y_min) / (bins - 1) if y_min != y_max else 0.01
+    x_range = (x_min - x_adjust, x_max + x_adjust)
+    y_range = (y_min - y_adjust, y_max + y_adjust)
     counts, x_edges, y_edges = np.histogram2d(x_array, y_array, bins=bins, range=(x_range, y_range))
 
     x_centers = (x_edges[1:] + x_edges[:-1])/2.
