@@ -13,7 +13,7 @@ import {
     ZAxis,
     ReferenceArea,
 } from 'recharts';
-import { filterData, tickExpFormatter, getReferenceLineSegment, getReferenceRangeType, linspace } from './Utils';
+import { filterData, getReferenceLineSegment, getReferenceRangeType } from './Utils';
 import { units } from './DataUtil';
 import { getLogTickMarks } from './tickHelper';
 import ExponentTick from './ExponentTick';
