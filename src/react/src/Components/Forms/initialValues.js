@@ -3,7 +3,7 @@ const initialValues = {
     mass2: 31.0,
     metallicity: 0.001,
     eccentricity: 0.0,
-    separation: 1.02,
+    separation: 3.5,
     orbitalPeriod: '',
     velocity1: 0.0,
     velocity2: 0.0,
