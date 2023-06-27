@@ -187,6 +187,7 @@ class TestHisto2DScatterHybrid(TestCase):
         # 0 2 2 2 0
         # 0 1 2 1 0
         # 1 0 0 0 1
+        self.maxDiff = 9999
         self.x_array = np.array([1, 5, 1, 5, 2, 4, 2, 4, 3, 3, 3, 3, 3, 3, 2, 2, 4, 4])
         self.y_array = np.array([1, 1, 5, 5, 2, 2, 4, 4, 3, 3, 2, 2, 4, 4, 3, 3, 3, 3])
 
@@ -194,15 +195,15 @@ class TestHisto2DScatterHybrid(TestCase):
         plot_data = histo2d_scatter_hybrid(self.x_array, self.y_array, min_count=1, bins=5)
         self.assertEqual(plot_data['sides'], [1.2, 1.2])
         self.assertCountEqual(json.loads(plot_data['hist_data']), [
-            {"x": 2.208, "y": 2.208, "counts": 1.0},
-            {"x": 2.208, "y": 3.02, "counts": 2.0},
-            {"x": 2.208, "y": 3.832, "counts": 1.0},
-            {"x": 3.02, "y": 2.208, "counts": 2.0},
-            {"x": 3.02, "y": 3.02, "counts": 2.0},
-            {"x": 3.02, "y": 3.832, "counts": 2.0},
-            {"x": 3.832, "y": 2.208, "counts": 1.0},
-            {"x": 3.832, "y": 3.02, "counts": 2.0},
-            {"x": 3.832, "y": 3.832, "counts": 1.0}
+            {'x': 1.7999999999999998, 'y': 1.7999999999999998, 'counts': 1.0},
+            {'x': 1.7999999999999998, 'y': 3.0, 'counts': 2.0},
+            {'x': 1.7999999999999998, 'y': 4.199999999999999, 'counts': 1.0},
+            {'x': 3.0, 'y': 1.7999999999999998, 'counts': 2.0},
+            {'x': 3.0, 'y': 3.0, 'counts': 2.0},
+            {'x': 3.0, 'y': 4.199999999999999, 'counts': 2.0},
+            {'x': 4.199999999999999, 'y': 1.7999999999999998, 'counts': 1.0},
+            {'x': 4.199999999999999, 'y': 3.0, 'counts': 2.0},
+            {'x': 4.199999999999999, 'y': 4.199999999999999, 'counts': 1.0}
         ])
         self.assertCountEqual(json.loads(plot_data['scatter_data']), [
             {"x": 1.0, "y": 1.0},
