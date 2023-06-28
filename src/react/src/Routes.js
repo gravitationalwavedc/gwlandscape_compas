@@ -80,7 +80,8 @@ function getRoutes() {
                 Component={ViewPublication}
                 query={graphql`
                     query Routes_ViewPublication_Query(
-                        $publicationId: ID!,
+                        $publicationId: ID!
+                        $datasetId: ID
                         $rootGroup: String
                         $subgroupX: String
                         $subgroupY: String
@@ -88,12 +89,12 @@ function getRoutes() {
                     ){
                         ...ViewPublication_data @arguments(
                             publicationId: $publicationId
+                            datasetId: $datasetId
                         )
                     }
                 `}
                 prepareVariables={(params) => ({
                     publicationId: params.publicationId,
-                    datasetId: ''
                 })}
                 render={handleRender}
             />

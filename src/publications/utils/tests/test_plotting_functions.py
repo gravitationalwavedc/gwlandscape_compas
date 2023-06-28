@@ -114,19 +114,19 @@ class TestGetLogAndLimits(TestCase):
         returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=15, min_cond=5)
         self.assertSequenceEqual(test_array.tolist(), returned_array.tolist())
         self.assertFalse(log_check)
-        self.assertCountEqual(min_max, [9.5, 10.5])
+        self.assertCountEqual(min_max, [9.99, 10.01])
 
     def test_uniform_array_outside_bounds(self):
         test_array = np.array([10, 10, 10])
         returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=7.5, min_cond=5)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
-        self.assertCountEqual(min_max, [0.5, 1.5])
+        self.assertCountEqual(min_max, [0.99, 1.01])
 
         returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=15, min_cond=12.5)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
-        self.assertCountEqual(min_max, [0.5, 1.5])
+        self.assertCountEqual(min_max, [0.99, 1.01])
 
     def test_array_inside_bounds(self):
         test_array = np.array([10, 50, 100])
@@ -187,22 +187,23 @@ class TestHisto2DScatterHybrid(TestCase):
         # 0 2 2 2 0
         # 0 1 2 1 0
         # 1 0 0 0 1
+        self.maxDiff = 9999
         self.x_array = np.array([1, 5, 1, 5, 2, 4, 2, 4, 3, 3, 3, 3, 3, 3, 2, 2, 4, 4])
         self.y_array = np.array([1, 1, 5, 5, 2, 2, 4, 4, 3, 3, 2, 2, 4, 4, 3, 3, 3, 3])
 
     def test_histo2d_scatter_hybrid(self):
         plot_data = histo2d_scatter_hybrid(self.x_array, self.y_array, min_count=1, bins=5)
-        self.assertEqual(plot_data['sides'], [0.812, 0.812])
+        self.assertEqual(plot_data['sides'], [1.2, 1.2])
         self.assertCountEqual(json.loads(plot_data['hist_data']), [
-            {"x": 2.208, "y": 2.208, "counts": 1.0},
-            {"x": 2.208, "y": 3.02, "counts": 2.0},
-            {"x": 2.208, "y": 3.832, "counts": 1.0},
-            {"x": 3.02, "y": 2.208, "counts": 2.0},
-            {"x": 3.02, "y": 3.02, "counts": 2.0},
-            {"x": 3.02, "y": 3.832, "counts": 2.0},
-            {"x": 3.832, "y": 2.208, "counts": 1.0},
-            {"x": 3.832, "y": 3.02, "counts": 2.0},
-            {"x": 3.832, "y": 3.832, "counts": 1.0}
+            {'x': 1.7999999999999998, 'y': 1.7999999999999998, 'counts': 1.0},
+            {'x': 1.7999999999999998, 'y': 3.0, 'counts': 2.0},
+            {'x': 1.7999999999999998, 'y': 4.199999999999999, 'counts': 1.0},
+            {'x': 3.0, 'y': 1.7999999999999998, 'counts': 2.0},
+            {'x': 3.0, 'y': 3.0, 'counts': 2.0},
+            {'x': 3.0, 'y': 4.199999999999999, 'counts': 2.0},
+            {'x': 4.199999999999999, 'y': 1.7999999999999998, 'counts': 1.0},
+            {'x': 4.199999999999999, 'y': 3.0, 'counts': 2.0},
+            {'x': 4.199999999999999, 'y': 4.199999999999999, 'counts': 1.0}
         ])
         self.assertCountEqual(json.loads(plot_data['scatter_data']), [
             {"x": 1.0, "y": 1.0},
