@@ -88,11 +88,8 @@ const NewJob = ({initialValues, router}) => {
                 if (!errors) {
                     router.replace(`/compas/job-results/${response.newCompasJob.result.jobId}/`);
                 }
-                else if(errors[0].message.toUpperCase().includes('UNIQUE CONSTRAINT FAILED')){
-                    setOutputError('Job name is already in use!');
-                }
                 else {
-                    setOutputError('Error submitting job!');
+                    setOutputError(errors[0].message);
                 }
             },
         });

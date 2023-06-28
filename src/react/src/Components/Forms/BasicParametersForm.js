@@ -1,8 +1,8 @@
 import React from 'react';
-import {Col, Row} from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import Input from './Atoms/Input';
 
-const BasicParametersForm = ({ formik }) => 
+const BasicParametersForm = ({ formik }) => (
     <>
         <Row>
             <Col>
@@ -28,7 +28,7 @@ const BasicParametersForm = ({ formik }) =>
             <Col>
                 <Input
                     formik={formik}
-                    title="Metallicity (Z&#9737;)"
+                    title="Metallicity (Z)"
                     name="metallicity"
                     type="number"
                     help="Metallicity of stars.  1E-4 < Value < 0.03"
@@ -57,8 +57,9 @@ const BasicParametersForm = ({ formik }) =>
                     help="Value > 0. Only used with no Separation"
                 />
             </Col>
-            <Col/>
+            <Col />
         </Row>
-    </>;
+    </>
+);
 
 export default BasicParametersForm;

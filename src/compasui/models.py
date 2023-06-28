@@ -168,6 +168,25 @@ class CompasJob(models.Model):
 
         return queryset
 
+    @classmethod
+    def get_by_name(cls, user, name):
+        """
+        Get CompasJob by the provided id
+
+        This function will raise an exception if:-
+        * the job requested is a ligo job, but the user is not a ligo user
+        * the job requested is private an not owned by the requesting user
+
+        :param user: The GWCloudUser instance making the request
+        :param name: job name to be looked up
+        :return: CompasJob
+        """
+
+        qs = cls.objects.filter(name__exact=name, user_id__exact=user.user_id)
+        job = None if qs.count() == 0 else qs[0]
+
+        return job
+
 
 class BasicParameter(models.Model):
     job = models.ForeignKey(CompasJob, related_name='basic_parameter', on_delete=models.CASCADE)

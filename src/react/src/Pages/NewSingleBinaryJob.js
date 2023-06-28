@@ -18,15 +18,15 @@ import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContain
 import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
 
 const submitMutation = graphql`
-  mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
-    newSingleBinary(input: $input) {
-      result {
-        jobId
-        jsonData
-        detailedOutputFilePath
-      }
+    mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
+        newSingleBinary(input: $input) {
+            result {
+                jobId
+                jsonData
+                detailedOutputFilePath
+            }
+        }
     }
-  }
 `;
 
 const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
@@ -42,7 +42,7 @@ const NewSingleBinaryJob = () => {
 
     const formik = useFormik({
         initialValues: initialValues,
-        onSubmit: values => handleJobSubmission(values),
+        onSubmit: (values) => handleJobSubmission(values),
         validationSchema: validationSchema,
     });
 
@@ -66,16 +66,14 @@ const NewSingleBinaryJob = () => {
 
         // We don't want to update the Formik values to null because
         // it causes errors with uncontrolled components.
-        const valuesCopy = {...values};
+        const valuesCopy = { ...values };
 
-        // But graphql expects null instead of ''. 
-        Object.keys(valuesCopy).forEach(
-            (key) => {
-                if (valuesCopy[key] === '') {
-                    valuesCopy[key] = null;
-                }
+        // But graphql expects null instead of ''.
+        Object.keys(valuesCopy).forEach((key) => {
+            if (valuesCopy[key] === '') {
+                valuesCopy[key] = null;
             }
-        );
+        });
 
         setDetailedOutputFile('');
         setIsLoadingOutput(true);
@@ -98,14 +96,14 @@ const NewSingleBinaryJob = () => {
                 massTransferAngularMomentumLossPrescription: valuesCopy.massTransferAngularMomentumLossPrescription,
                 massTransferAccretionEfficiencyPrescription: valuesCopy.massTransferAccretionEfficiencyPrescription,
                 massTransferFa: valuesCopy.massTransferFa,
-            }
+            },
         };
 
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                if (!errors && (response.newSingleBinary.result.detailedOutputFilePath !== '')) {
+                if (!errors && response.newSingleBinary.result.detailedOutputFilePath !== '') {
                     setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
                     setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
                 } else {
@@ -125,8 +123,8 @@ const NewSingleBinaryJob = () => {
                 <Col>
                     <h1>Simulate the evolution of a binary</h1>
                     <h5>
-                        Run a simulation of an evolution of a specific binary.
-                        Detailed plots will be automatically generated using COMPAS and available to download.
+                        Run a simulation of an evolution of a specific binary. Detailed plots will be automatically
+                        generated using COMPAS and available to download.
                     </h5>
                 </Col>
             </Row>
@@ -142,7 +140,10 @@ const NewSingleBinaryJob = () => {
                                 <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link eventKey="mass-transfer">Mass Transfer &<br />Common Envelope</Nav.Link>
+                                <Nav.Link eventKey="mass-transfer">
+                                    Mass Transfer &<br />
+                                    Common Envelope
+                                </Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
@@ -172,17 +173,26 @@ const NewSingleBinaryJob = () => {
                             error={outputError}
                             isLoading={isLoadingOutput}
                         />
-                        {jsonData &&
+                        {jsonData && (
                             <>
                                 <VanDenHeuvel data={jsonData} />
                                 <div className="plotContainer">
-                                    <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
-                                    <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
-                                    <RenderHRDiagramContainer 
-                                        className="container" syncId={syncId} data={jsonData} />
+                                    <Col className="mb-5 mt-5">
+                                        <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
+                                    </Col>
+                                    <Col className="mb-5">
+                                        <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
+                                    </Col>
+                                    <Col className="mb-5">
+                                        <RenderHRDiagramContainer
+                                            className="container"
+                                            syncId={syncId}
+                                            data={jsonData}
+                                        />
+                                    </Col>
                                 </div>
                             </>
-                        }
+                        )}
                     </Col>
                 </Row>
             </Tab.Container>
