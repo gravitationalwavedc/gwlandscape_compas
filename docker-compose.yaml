@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: ./docker/gwlandscape_compas_django.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.20
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.21
     environment:
       MYSQL_ROOT_PASSWORD: 76vcqmGKP19Z1AEx
       MYSQL_DATABASE: gwlandscape_compas
@@ -39,7 +39,7 @@ services:
     build:
       dockerfile: ./docker/gwlandscape_compas_static.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.19
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.20
     ports:
       - "8000"
 
