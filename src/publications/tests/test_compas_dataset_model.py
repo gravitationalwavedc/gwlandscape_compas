@@ -2,7 +2,9 @@ import pathlib
 from tempfile import TemporaryDirectory
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.exceptions import ValidationError
 from django.test import testcases, override_settings
+from django.conf import settings
 
 from publications.models import Upload, CompasPublication, CompasModel, CompasDatasetModel
 
@@ -23,10 +25,22 @@ class TestCompasDatasetModel(testcases.TestCase):
             content_type='application/gzip'
         )
 
+        self.test_job_archive_multiple_h5 = SimpleUploadedFile(
+            name='test_multiple_h5.tar.gz',
+            content=open('./publications/tests/test_data/test_job_multiple_h5.tar.gz', 'rb').read(),
+            content_type='application/gzip'
+        )
+
         self.test_job_single = SimpleUploadedFile(
             name='COMPAS_Output.h5',
             content=open('./publications/tests/test_data/test_job/COMPAS_Output/COMPAS_Output.h5', 'rb').read(),
             content_type='application/x-bag'
+        )
+
+        self.test_job_not_h5 = SimpleUploadedFile(
+            name='Run_Details',
+            content=open('./publications/tests/test_data/test_job/COMPAS_Output/Run_Details', 'rb').read(),
+            content_type='text/plain'
         )
 
     @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
@@ -113,7 +127,7 @@ class TestCompasDatasetModel(testcases.TestCase):
             self.test_job_archive
         )
 
-        self.assertEqual(Upload.objects.all().count(), 5)
+        self.assertEqual(Upload.objects.all().count(), 3)
 
     @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
     def test_save_single_file(self):
@@ -125,3 +139,33 @@ class TestCompasDatasetModel(testcases.TestCase):
 
         self.assertEqual(Upload.objects.all().count(), 1)
         self.assertEqual(Upload.objects.last().file.name, 'publications/1/1/COMPAS_Output.h5')
+
+    @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
+    def test_save_multiple_h5(self):
+        with self.assertRaises(
+            ValidationError,
+            msg='CompasDatasetModel was created with more than one h5 file when it should have failed'
+        ):
+            CompasDatasetModel.create_dataset_model(
+                self.publication,
+                self.model,
+                self.test_job_archive_multiple_h5
+            )
+
+        self.assertEqual(CompasDatasetModel.objects.all().count(), 0)
+        self.assertEqual(Upload.objects.all().count(), 0)
+
+    @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
+    def test_save_multiple_h5(self):
+        with self.assertRaises(
+            ValidationError,
+            msg='CompasDatasetModel was created with a data file that is not a h5 file'
+        ):
+            CompasDatasetModel.create_dataset_model(
+                self.publication,
+                self.model,
+                self.test_job_not_h5
+            )
+
+        self.assertEqual(CompasDatasetModel.objects.all().count(), 0)
+        self.assertEqual(Upload.objects.all().count(), 0)

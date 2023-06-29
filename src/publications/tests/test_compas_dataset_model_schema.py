@@ -117,14 +117,12 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
         )
 
         files = [
-            'BSE_Detailed_Output_0.h5',
-            'gw151226evol.png',
             'COMPAS_Output.h5',
             'Run_Details',
             'BSE_grid.txt'
         ]
 
-        self.assertEqual(5, Upload.objects.all().count())
+        self.assertEqual(3, Upload.objects.all().count())
         for f in files:
             self.assertTrue(
                 Upload.objects.filter(file__contains=f, dataset_model=CompasDatasetModel.objects.last()).exists()
@@ -278,7 +276,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
         self.assertDictEqual(self.null_output, response.data)
 
         self.assertEqual(CompasDatasetModel.objects.all().count(), 1)
-        self.assertEqual(Upload.objects.all().count(), 5)
+        self.assertEqual(Upload.objects.all().count(), 3)
 
     @silence_errors
     def test_delete_compas_dataset_model_unauthenticated(self):
@@ -288,7 +286,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
         self.assertDictEqual(self.null_output, response.data)
 
         self.assertEqual(CompasDatasetModel.objects.all().count(), 1)
-        self.assertEqual(Upload.objects.all().count(), 5)
+        self.assertEqual(Upload.objects.all().count(), 3)
 
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -499,11 +497,9 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
                                 'description': 'description'
                             },
                             'files': [
-                                '/compas/files/publications/1/1/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5',
-                                '/compas/files/publications/1/1/COMPAS_Output/Detailed_Output/gw151226evol.png',
-                                '/compas/files/publications/1/1/COMPAS_Output/COMPAS_Output.h5',
-                                '/compas/files/publications/1/1/COMPAS_Output/Run_Details',
-                                '/compas/files/publications/1/1/BSE_grid.txt'
+                                '/compas/files/publications/1/1/test_job/COMPAS_Output/COMPAS_Output.h5',
+                                '/compas/files/publications/1/1/test_job/COMPAS_Output/Run_Details',
+                                '/compas/files/publications/1/1/test_job/BSE_grid.txt'
                             ]
                         }
                     }
