@@ -2,10 +2,12 @@ import datetime
 import os
 import tarfile
 import uuid
+from pathlib import Path
 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from publications.utils.misc import check_publication_management_user
 
@@ -186,6 +188,17 @@ class CompasDatasetModel(models.Model):
         """
         overwrites default save behavior
         """
+        # Validate uploaded file has one and only one h5 file
+        # Can't check with is_tarfile because it requires a path, and the file hasn't been written to disk yet
+        if self.file.name:
+            try:
+                with tarfile.open(fileobj=self.file) as f:
+                    if sum(Path(name).suffix == '.h5' for name in f.getnames()) != 1:
+                        raise ValidationError('Dataset must have exactly one assigned h5 file')
+            except tarfile.ReadError:
+                if Path(self.file.name).suffix != '.h5':
+                    raise ValidationError('Uploaded dataset should be a .h5 file')
+        
         super().save(*args, **kwargs)
         # Check file name is not empty after saving the model and uploading file
         if self.file.name:
@@ -200,7 +213,7 @@ class CompasDatasetModel(models.Model):
         # Get the actual path for uploaded file
         dataset_dir = os.path.dirname(self.file.path)
         dataset_tar = tarfile.open(self.file.path)
-        # dataset_tar.extractall(dataset_dir)
+
         for member in dataset_tar.getmembers():
             # ignore any directory but include its contents
             if not member.isdir():

@@ -32,14 +32,12 @@ class TestUploadModel(testcases.TestCase):
     def test_create(self):
         # Create is triggered when we initiate the creation of CompasDatasetModel in setUp()
         files = [
-            'BSE_Detailed_Output_0.h5',
-            'gw151226evol.png',
             'COMPAS_Output.h5',
             'Run_Details',
             'BSE_grid.txt'
         ]
 
-        self.assertEqual(5, Upload.objects.all().count())
+        self.assertEqual(3, Upload.objects.all().count())
         for f in files:
             self.assertTrue(Upload.objects.filter(file__contains=f, dataset_model=self.dataset_model).exists())
 
