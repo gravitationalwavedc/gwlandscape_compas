@@ -11,7 +11,8 @@ def read_h5_data_as_json(h5filepath):
         data = h5.File(h5filepath, 'r')
         for key in data.keys():
             dataset = data[key]
-            dataset = dataset[~np.isnan(dataset)]
+            # filter any nan, +inf, -inf values
+            dataset = dataset[np.isfinite(dataset)]
             data_dict[key] = dataset.tolist()
         json_data = json.dumps(data_dict)
         del data
