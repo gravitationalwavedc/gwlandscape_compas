@@ -52,13 +52,17 @@ const NewSingleBinaryJob = () => {
         setDetailedOutputFile('');
         setJsonData('');
         setIsLoadingOutput(false);
-        // setOutputError('');
         setDisableButtons(false);
     };
     const handleFormReset = () => {
         formik.resetForm();
         resetOutput();
         setOutputError('');
+    };
+
+    const handleError = () => {
+        setOutputError('Output could not be generated');
+        resetOutput();
     };
 
     const handleJobSubmission = (values) => {
@@ -107,11 +111,17 @@ const NewSingleBinaryJob = () => {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                if (!errors && response.newSingleBinary.result.detailedOutputFilePath !== '') {
-                    setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
-                    setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
-                } else {
-                    setOutputError('Output could not be generated');
+                try{
+                    if (!errors && response.newSingleBinary.result.detailedOutputFilePath !== '') {
+                        setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
+                        setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
+                    } else {
+                        handleError();
+                    }
+                    setIsLoadingOutput(false);
+                    setDisableButtons(false);
+                } catch (e) {
+                    handleError();
                 }
 
             },
