@@ -20,7 +20,7 @@ export default memo(function VanDenHeuvel({ data }) {
                     <Col>
                         <Table borderless responsive size="sm">
                             <tbody>
-                                {vdhattrData.time[index].toFixed && <tr>
+                                {vdhattrData.time[index] && <tr>
                                     <th>
                                         Time
                                     </th>
