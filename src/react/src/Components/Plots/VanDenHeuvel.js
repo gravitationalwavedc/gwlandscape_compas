@@ -20,38 +20,38 @@ export default memo(function VanDenHeuvel({ data }) {
                     <Col>
                         <Table borderless responsive size="sm">
                             <tbody>
-                                <tr>
+                                {vdhattrData.time[index] && <tr>
                                     <th>
                                         Time
                                     </th>
                                     <td>
                                         {vdhattrData.time[index].toFixed(2)} Myr
                                     </td>
-                                </tr>
-                                <tr>
+                                </tr>}
+                                { vdhattrData.semimajor[index] && <tr>
                                     <th>
                                         a
                                     </th>
                                     <td>
                                         {vdhattrData.semimajor[index].toFixed(2)} R<sub>⊙</sub>
                                     </td>
-                                </tr>
-                                <tr>
+                                </tr>}
+                                {vdhattrData.mass1[index] && <tr>
                                     <th>
                                         M<sub>1</sub>
                                     </th>
                                     <td>
                                         {vdhattrData.mass1[index].toFixed(2)} M<sub>⊙</sub>
                                     </td>
-                                </tr>
-                                <tr>
+                                </tr>}
+                                {vdhattrData.mass2[index] && <tr>
                                     <th>
                                         M<sub>2</sub>
                                     </th>
                                     <td>
                                         {vdhattrData.mass2[index].toFixed(2)} M<sub>⊙</sub>
                                     </td>
-                                </tr>
+                                </tr>}
                                 <tr>
                                     <td colSpan={2}>
                                         <h6>{eventStrings[i]}</h6>
