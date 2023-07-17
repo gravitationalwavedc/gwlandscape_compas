@@ -2,7 +2,12 @@ import React from 'react';
 import { format } from 'd3-format';
 import { Card } from 'react-bootstrap';
 
-const CustomTooltip = ({ active, payload }) => {
+const formatValue = (value, zeroValue) => 
+    (zeroValue && (value < zeroValue))
+        ? '0'
+        : format('.6~f')(value);
+
+const CustomTooltip = ({ active, payload, nullValX, nullValY }) => {
     if (active && payload && payload.length) {
         return <Card>
             {
@@ -10,8 +15,8 @@ const CustomTooltip = ({ active, payload }) => {
                     {`Counts : ${format('.0f')(payload[2].value)}`}
                 </div>
             }
-            <div>{`x: ${format('.6~f')(payload[0].value)}`}</div>
-            <div>{`y: ${format('.6~f')(payload[1].value)}`}</div>
+            <div>{`x: ${formatValue(payload[0].value, nullValX)}`}</div>
+            <div>{`y: ${formatValue(payload[1].value, nullValY)}`}</div>
         </Card>;
     }
 

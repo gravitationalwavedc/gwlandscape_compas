@@ -22,7 +22,7 @@ const getColourbarData = (histData, xDomain, yDomain, colourScale) => {
     // Only want to calc these values if we're plotting a histogram
     if (histData.length) {
         const {countMin, countMax} = getCountLimits(histData);
-        const x = xDomain[1] + 0.025 * Math.abs(xDomain[1] - xDomain[0]);
+        const x = xDomain[1] + 0.05 * Math.abs(xDomain[1] - xDomain[0]);
         const y = yDomain[1];
         const width = 0.025 * Math.abs(xDomain[1] - xDomain[0]);
         const height = 0.4 * Math.abs(yDomain[1] - yDomain[0]);

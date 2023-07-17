@@ -104,49 +104,66 @@ class TestGetSurroundingBins(TestCase):
 class TestGetLogAndLimits(TestCase):
     def test_min_below_zero(self):
         test_array = np.array([-10, 0, 10])
-        returned_array, log_check, min_max = get_log_and_limits(test_array)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array)
         self.assertSequenceEqual(test_array.tolist(), returned_array.tolist())
         self.assertFalse(log_check)
         self.assertCountEqual(min_max, [-10, 10])
+        self.assertFalse(null_check)
 
     def test_uniform_array_inside_bounds(self):
         test_array = np.array([10, 10, 10])
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=15, min_cond=5)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=15, min_cond=5)
         self.assertSequenceEqual(test_array.tolist(), returned_array.tolist())
         self.assertFalse(log_check)
         self.assertCountEqual(min_max, [9.99, 10.01])
+        self.assertFalse(null_check)
 
     def test_uniform_array_outside_bounds(self):
         test_array = np.array([10, 10, 10])
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=7.5, min_cond=5)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=7.5, min_cond=5)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
         self.assertCountEqual(min_max, [0.99, 1.01])
+        self.assertFalse(null_check)
 
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=15, min_cond=12.5)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=15, min_cond=12.5)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
         self.assertCountEqual(min_max, [0.99, 1.01])
+        self.assertFalse(null_check)
 
     def test_array_inside_bounds(self):
         test_array = np.array([10, 50, 100])
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=500, min_cond=5)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=500, min_cond=5)
         self.assertSequenceEqual(test_array.tolist(), returned_array.tolist())
         self.assertFalse(log_check)
         self.assertCountEqual(min_max, [10, 100])
+        self.assertFalse(null_check)
 
     def test_array_outside_bounds(self):
         test_array = np.array([10, 50, 100])
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=50, min_cond=5)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=50, min_cond=5)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
         self.assertCountEqual(min_max, [1, 2])
+        self.assertFalse(null_check)
 
         test_array = np.array([10, 50, 100])
-        returned_array, log_check, min_max = get_log_and_limits(test_array, max_cond=500, min_cond=400)
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=500, min_cond=400)
         self.assertSequenceEqual(np.log10(test_array).tolist(), returned_array.tolist())
         self.assertTrue(log_check)
         self.assertCountEqual(min_max, [1, 2])
+        self.assertFalse(null_check)
+
+    def test_array_outside_bounds_with_zero(self):
+        test_array = np.array([0, 10, 50, 100])
+        returned_array, log_check, min_max, null_check = get_log_and_limits(test_array, max_cond=50, min_cond=5)
+        expected = np.log10(test_array[1:]).tolist()
+        expected.insert(0, 0.75)
+        self.assertSequenceEqual(expected, returned_array.tolist())
+        self.assertTrue(log_check)
+        self.assertCountEqual(min_max, [0.75, 2])
+        self.assertTrue(null_check)
 
 
 class TestSplitHistogramByCount(TestCase):
@@ -192,18 +209,18 @@ class TestHisto2DScatterHybrid(TestCase):
         self.y_array = np.array([1, 1, 5, 5, 2, 2, 4, 4, 3, 3, 2, 2, 4, 4, 3, 3, 3, 3])
 
     def test_histo2d_scatter_hybrid(self):
-        plot_data = histo2d_scatter_hybrid(self.x_array, self.y_array, min_count=1, bins=5)
-        self.assertEqual(plot_data['sides'], [1.2, 1.2])
+        plot_data = histo2d_scatter_hybrid(self.x_array, self.y_array, [1, 5], [1, 5], min_count=1, bins=5)
+        self.assertEqual(plot_data['sides'], [1.0, 1.0])
         self.assertCountEqual(json.loads(plot_data['hist_data']), [
-            {'x': 1.7999999999999998, 'y': 1.7999999999999998, 'counts': 1.0},
-            {'x': 1.7999999999999998, 'y': 3.0, 'counts': 2.0},
-            {'x': 1.7999999999999998, 'y': 4.199999999999999, 'counts': 1.0},
-            {'x': 3.0, 'y': 1.7999999999999998, 'counts': 2.0},
+            {'x': 2.0, 'y': 2.0, 'counts': 1.0},
+            {'x': 2.0, 'y': 3.0, 'counts': 2.0},
+            {'x': 2.0, 'y': 4.0, 'counts': 1.0},
+            {'x': 3.0, 'y': 2.0, 'counts': 2.0},
             {'x': 3.0, 'y': 3.0, 'counts': 2.0},
-            {'x': 3.0, 'y': 4.199999999999999, 'counts': 2.0},
-            {'x': 4.199999999999999, 'y': 1.7999999999999998, 'counts': 1.0},
-            {'x': 4.199999999999999, 'y': 3.0, 'counts': 2.0},
-            {'x': 4.199999999999999, 'y': 4.199999999999999, 'counts': 1.0}
+            {'x': 3.0, 'y': 4.0, 'counts': 2.0},
+            {'x': 4.0, 'y': 2.0, 'counts': 1.0},
+            {'x': 4.0, 'y': 3.0, 'counts': 2.0},
+            {'x': 4.0, 'y': 4.0, 'counts': 1.0}
         ])
         self.assertCountEqual(json.loads(plot_data['scatter_data']), [
             {"x": 1.0, "y": 1.0},

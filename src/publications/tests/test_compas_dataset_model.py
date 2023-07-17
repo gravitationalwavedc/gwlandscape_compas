@@ -4,7 +4,6 @@ from tempfile import TemporaryDirectory
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ValidationError
 from django.test import testcases, override_settings
-from django.conf import settings
 
 from publications.models import Upload, CompasPublication, CompasModel, CompasDatasetModel
 
@@ -156,7 +155,7 @@ class TestCompasDatasetModel(testcases.TestCase):
         self.assertEqual(Upload.objects.all().count(), 0)
 
     @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
-    def test_save_multiple_h5(self):
+    def test_save_non_h5(self):
         with self.assertRaises(
             ValidationError,
             msg='CompasDatasetModel was created with a data file that is not a h5 file'

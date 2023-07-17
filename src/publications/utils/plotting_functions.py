@@ -46,36 +46,32 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
         Returns the array, a flag to show if it has been logged,
         and a list of sensible min and max values for the array when plotted
     """
-    arr = np.nan_to_num(arr)
     arr_max = float(np.max(arr))
     arr_min = float(np.min(arr))
 
     # If the array minimum is lower than 0, shouldn't be logged
     if arr_min < 0:
-        return arr, False, [arr_min, arr_max]
+        return arr, False, [arr_min, arr_max], False
 
     # If the array is uniform, log values if it is above or below a specific threshold, else leave
     if arr_max == arr_min:
-        if arr_max != 0 and (arr_max > max_cond or arr_min < min_cond):
-            return np.log10(arr), True, [np.log10(arr_max) - 0.01, np.log10(arr_max) + 0.01]
+        if min_cond < arr_max < max_cond or arr_max == 0:
+            return arr, False, [arr_max - 0.01, arr_max + 0.01], False
+        return np.log10(arr), True, [np.log10(arr_max) - 0.01, np.log10(arr_max) + 0.01], False
 
-        return arr, False, [arr_max - 0.01, arr_max + 0.01]
+    if min_cond < arr_max < max_cond:
+        return arr, False, [arr_min, arr_max], False
 
-    if arr_max > max_cond or arr_max < min_cond:
-        logged_arr = np.log10(arr)
-        # If any of the logged array is infinite or NaN
-        if (~np.isfinite(logged_arr)).any():
-            arr_min = np.min(arr[arr != 0])
-            if arr_max:
-                min_allowed_value = np.log10(arr_min) - 0.25 * (np.log10(arr_max) - np.log10(arr_min))
-            else:
-                min_allowed_value = np.log10(arr_min) - 1
+    logged_arr = np.log10(arr)
+    # If there are any negative infinites in the data, we replaced them with a value lower than the next lowest value
+    # This will be used in plotting to display zeroes in a log plot
+    if np.isinf(logged_arr).any():
+        arr_min = np.min(arr[arr != 0])
+        zero_value = np.log10(arr_min) - 0.25 * (np.log10(arr_max) - np.log10(arr_min))
+        logged_arr = np.nan_to_num(logged_arr, neginf=zero_value)
+        return logged_arr, True, [np.min(logged_arr), np.log10(arr_max)], True
 
-            logged_arr = np.nan_to_num(logged_arr, neginf=min_allowed_value)
-            return logged_arr, True, [np.min(logged_arr), np.log10(arr_max), np.log10(arr_min)]
-        return logged_arr, True, [np.min(logged_arr), np.log10(arr_max)]
-
-    return arr, False, [arr_min, arr_max]
+    return logged_arr, True, [np.min(logged_arr), np.log10(arr_max)], False
 
 
 def split_histogram_by_count(counts, split_count):
@@ -128,7 +124,7 @@ def split_histogram_by_count(counts, split_count):
     return smoothed_unique_indices, inverse_unique_indices
 
 
-def histo2d_scatter_hybrid(x_array, y_array, min_count=3, bins=40):
+def histo2d_scatter_hybrid(x_array, y_array, min_max_x, min_max_y, min_count=3, bins=40):
     """Return data necessary to build a hybrid scatter-histogram plot
 
     Parameters
@@ -147,14 +143,18 @@ def histo2d_scatter_hybrid(x_array, y_array, min_count=3, bins=40):
     dict
         Contains json data for the scatter plot and histogram, along with the side lengths of the histogram bins
     """
-    # Small adjustment to the limits to capture all points, make histogram display reasonably
-    # This adjustment is not perfect, but can be fixed later if needed
-    x_min, x_max, y_min, y_max = np.min(x_array), np.max(x_array), np.min(y_array), np.max(y_array)
-    x_adjust = abs(x_max - x_min) / (bins - 1) if x_min != x_max else 0.01
-    y_adjust = abs(y_max - y_min) / (bins - 1) if y_min != y_max else 0.01
-    x_range = (x_min - x_adjust, x_max + x_adjust)
-    y_range = (y_min - y_adjust, y_max + y_adjust)
-    counts, x_edges, y_edges = np.histogram2d(x_array, y_array, bins=bins, range=(x_range, y_range))
+    # Small adjustment to the limits to force bins to fall on integer values if that's how the data are
+    # This helps with displaying boolean data, and data for classifying stellar types etc.
+    x_min, x_max = min_max_x
+    y_min, y_max = min_max_y
+    x_range, y_range = abs(x_max - x_min), abs(y_max - y_min)
+    x_bins = round(round(bins / x_range) * x_range) if (bins / x_range > 1) else bins
+    y_bins = round(round(bins / y_range) * y_range) if (bins / y_range > 1) else bins
+
+    x_offset, y_offset = 0.5 * x_range / x_bins, 0.5 * y_range / y_bins
+    x_limits = (x_min - x_offset, x_max + x_offset)
+    y_limits = (y_min - y_offset, y_max + y_offset)
+    counts, x_edges, y_edges = np.histogram2d(x_array, y_array, bins=(x_bins+1, y_bins+1), range=(x_limits, y_limits))
 
     x_centers = (x_edges[1:] + x_edges[:-1])/2.
     y_centers = (y_edges[1:] + y_edges[:-1])/2.
