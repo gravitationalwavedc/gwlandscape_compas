@@ -8,6 +8,7 @@ import {
 } from 'd3-scale-chromatic';
 import {
     ReferenceArea,
+    ReferenceLine,
     ScatterChart,
     Scatter,
     XAxis,
@@ -29,12 +30,18 @@ const colourScales = {
     'spectral': interpolateSpectral
 };
 
+// Can't really help complexity in Recharts, because you can't really make reusable components
+// I could move all the logic to other functions, but it would
+// just clutter the code with heaps of effectively useless functions
+/* eslint-disable complexity */
 const DatasetPlot = ({
     histData,
     minMaxX,
     minMaxY,
     logCheckX,
     logCheckY,
+    nullCheckX,
+    nullCheckY,
     sides,
     scatterData,
     axis,
@@ -73,7 +80,7 @@ const DatasetPlot = ({
                         fontSize: 15,
                     }}
                     type="number"
-                    ticks={minMaxX[2] ? ticksX.slice(1) : ticksX}
+                    ticks={nullCheckX ? ticksX.slice(1) : ticksX}
                     tick={{ fontSize: 13, transform: 'translate(0, 3)' }}
                     tickFormatter={formatAxis}
                     domain={[plotMinX, plotMaxX]}
@@ -91,7 +98,7 @@ const DatasetPlot = ({
                         fontSize: 15,
                     }}
                     type="number"
-                    ticks={minMaxY[2] ? ticksY.slice(1) : ticksY}
+                    ticks={nullCheckY ? ticksY.slice(1) : ticksY}
                     tick={{ fontSize: 13, transform: 'translate(-3, 0)' }}
                     tickFormatter={formatAxis}
                     domain={[plotMinY, plotMaxY]}
@@ -176,7 +183,11 @@ const DatasetPlot = ({
                         />
                     </>
                 }
-                <Tooltip content={CustomTooltip}/>
+                <Tooltip
+                    content={CustomTooltip}
+                    zeroValX={nullCheckX && minMaxX[0] + sides[0] / 2}
+                    zeroValY={nullCheckY && minMaxY[0] + sides[1] / 2}
+                />
 
                 <Scatter
                     data={scatterData}
@@ -185,6 +196,50 @@ const DatasetPlot = ({
                     shape="circle"
                     ifOverflow="visible"
                 />
+                {nullCheckX && (
+                    <ReferenceLine
+                        segment={[
+                            { x: minMaxX[0] + sides[0] / 2, y: plotMinY },
+                            { x: minMaxX[0] + sides[0] / 2, y: plotMaxY },
+                        ]}
+                        stroke="#bababa"
+                        strokeOpacity={0.7}
+                        strokeDasharray="4 6"
+                        strokeWidth={2}
+                        label={{
+                            value: 'ZERO',
+                            angle: -90,
+                            position: 'top',
+                            stroke: '#bababa',
+                            opacity: 0.9,
+                            dx: 4,
+                            dy: -13,
+                            fontSize: 10,
+                        }}
+                        ifOverflow="visible"
+                    />
+                )}
+
+                {nullCheckY && (
+                    <ReferenceLine
+                        segment={[
+                            { x: plotMinX, y: minMaxY[0] + sides[1] / 2 },
+                            { x: plotMaxX, y: minMaxY[0] + sides[1] / 2 },
+                        ]}
+                        stroke="#bababa"
+                        strokeOpacity={0.7}
+                        strokeDasharray="4 6"
+                        strokeWidth={2}
+                        label={{
+                            value: 'ZERO',
+                            position: 'right',
+                            stroke: '#bababa',
+                            opacity: 0.9,
+                            fontSize: 10,
+                        }}
+                        ifOverflow="visible"
+                    />
+                )}
                 
             </ScatterChart>
         </ResponsiveContainer>

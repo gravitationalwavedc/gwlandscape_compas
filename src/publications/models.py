@@ -198,7 +198,7 @@ class CompasDatasetModel(models.Model):
             except tarfile.ReadError:
                 if Path(self.file.name).suffix != '.h5':
                     raise ValidationError('Uploaded dataset should be a .h5 file')
-        
+
         super().save(*args, **kwargs)
         # Check file name is not empty after saving the model and uploading file
         if self.file.name:
