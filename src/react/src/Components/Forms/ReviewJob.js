@@ -1,11 +1,14 @@
 import React, {useState} from 'react';
 import {Button, Col, Row} from 'react-bootstrap';
+import {useFormikContext} from 'formik';
 
-const ReviewJob = ({handleSubmit, formik, handleReset, disableButtons}) => {
+const ReviewJob = ({ disableButtons }) => {
     const [errors, setErrors] = useState([]);
-
+    
+    const {handleSubmit, handleReset, validateForm} = useFormikContext();
+    
     const submitReview = async () => {
-        const errors = await formik.validateForm();
+        const errors = await validateForm();
         setErrors(Object.values(errors));
 
         if (Object.keys(errors).length === 0 && errors.constructor === Object) {

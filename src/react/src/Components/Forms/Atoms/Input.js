@@ -1,22 +1,25 @@
 import React from 'react';
+import {useField} from 'formik';
 import { Form } from 'react-bootstrap';
 
-const Input = ({formik, title, name, type, help, show= true, ...rest}) =>
-    <Form.Group controlId={ name } className={show? '' : 'hidden'}>
+const Input = ({ title, name, type, help, show=true, ...rest }) => {
+    const [field, { error, touched }] = useField(name);
+    return <Form.Group controlId={name} className={show ? '' : 'hidden'}>
         <Form.Label>{ title }</Form.Label>
-        <Form.Control 
-            name={ name }
-            type={ type } 
-            isValid={formik.touched[name] && !formik.errors[name]}
-            isInvalid={!!formik.errors[name]}
-            {...formik.getFieldProps(name)} {...rest}/>
+        <Form.Control
+            { ...field }
+            name={name}
+            type={type}
+            isValid={touched && !error}
+            isInvalid={!!error}
+            { ...rest }
+        />
         <Form.Text>{help}</Form.Text>
-        {formik.errors[name] &&
-            <Form.Control.Feedback type='invalid' role='alert'>
-                {formik.errors[name]}
-            </Form.Control.Feedback>
-        }
+        <Form.Control.Feedback type='invalid' role='alert'>
+            {error}
+        </Form.Control.Feedback>
     </Form.Group>;
+};
 
 
 export default Input;
