@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import re
 
 import jwt
 import requests
@@ -12,7 +13,20 @@ from .tasks import run_compas
 from .utils.constants import TASK_FAIL, TASK_TIMEOUT
 
 
+def validate_job_name(name):
+    if len(name) < 5:
+        raise Exception("Job name must be at least 5 characters long.")
+
+    if len(name) > 30:
+        raise Exception("Job name must be less than 30 characters long.")
+
+    pattern = re.compile(r"^[0-9a-z_-]+\Z", flags=re.IGNORECASE | re.ASCII)
+    if not pattern.match(name):
+        raise Exception("Job name must not contain any spaces or special characters.")
+
+
 def create_compas_job(user, start, basic_parameters, advanced_parameters):
+    validate_job_name(start.name)
 
     with transaction.atomic():
 
