@@ -31,7 +31,7 @@ class TestCompasJobSchema(CompasTestCase):
         self.compas_job_input = {
             'input': {
                 'start': {
-                    'name': 'first job',
+                    'name': 'first_job',
                     'description': 'first job description',
                     'private': 'true'
                 },

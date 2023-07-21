@@ -1,19 +1,22 @@
 import React from 'react';
 import { HiOutlinePencil, HiOutlineCheck, HiOutlineX} from 'react-icons/hi';
 import EdiText from 'react-editext';
+import { useField } from 'formik';
 
 const EditButton = () => <React.Fragment><HiOutlinePencil /> edit</React.Fragment>;
 const SaveButton = () => <HiOutlineCheck/>;
 const CancelButton = () => <HiOutlineX/>;
 
-const JobTitle = ({formik}) => (
-    <React.Fragment>
+const JobTitle = () => {
+    const [{ value: nameValue }, { error: nameError }, { setValue: setNameValue }] = useField('name');
+    const [{ value: descriptionValue }, _, { setValue: setDescriptionValue }] = useField('description');
+    return <React.Fragment>
         <EdiText 
             type="text" 
             name="name"
-            value={formik.values.name}
+            value={nameValue}
             viewProps={{className: 'h2'}}
-            onSave={(value) => formik.setFieldValue('name', value)}
+            onSave={(value) => setNameValue(value)}
             hint="You can use letters, numbers, underscores, and hyphens."
             editButtonContent={<EditButton/>}
             editButtonClassName="edit-button"
@@ -26,15 +29,15 @@ const JobTitle = ({formik}) => (
             submitOnUnfocus
             submitOnEnter
         />
-        {formik.errors.name && 
-          <p className="text-danger small">
+        {nameError && 
+          <small className="text-danger">
               Invalid name. You can use letters, numbers, underscores, and hyphens.
-          </p>}
+          </small>}
         <EdiText 
             type="text" 
             name="description"
-            value={formik.values.description}
-            onSave={(value) => formik.setFieldValue('description', value)}
+            value={descriptionValue}
+            onSave={(value) => setDescriptionValue(value)}
             editButtonContent={<EditButton/>}
             editButtonClassName="edit-button"
             saveButtonContent={<SaveButton />}
@@ -46,6 +49,6 @@ const JobTitle = ({formik}) => (
             submitOnUnfocus
             submitOnEnter
         />
-    </React.Fragment>
-);
+    </React.Fragment>;
+};
 export default JobTitle;

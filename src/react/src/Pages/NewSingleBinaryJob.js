@@ -3,7 +3,7 @@ import { commitMutation } from 'relay-runtime';
 import { graphql } from 'react-relay';
 import { harnessApi } from '../index';
 import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
-import { useFormik } from 'formik';
+import { Formik } from 'formik';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
@@ -40,12 +40,6 @@ const NewSingleBinaryJob = () => {
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
 
-    const formik = useFormik({
-        initialValues: initialValues,
-        onSubmit: (values) => handleJobSubmission(values),
-        validationSchema: validationSchema,
-    });
-
     let syncId = 1;
 
     const resetOutput = () => {
@@ -55,7 +49,6 @@ const NewSingleBinaryJob = () => {
         setDisableButtons(false);
     };
     const handleFormReset = () => {
-        formik.resetForm();
         resetOutput();
         setOutputError('');
     };
@@ -128,7 +121,12 @@ const NewSingleBinaryJob = () => {
         });
     };
 
-    return (
+    return <Formik
+        initialValues={initialValues}
+        onSubmit={values => handleJobSubmission(values)}
+        onReset={handleFormReset}
+        validationSchema={validationSchema}
+    >
         <Container fluid>
             <Row className="mt-5">
                 <Col>
@@ -161,22 +159,16 @@ const NewSingleBinaryJob = () => {
                     <Col md={4}>
                         <Tab.Content className="mt-2">
                             <SingleBinaryTab title="Binary" eventKey="binary">
-                                <BasicParametersForm formik={formik} />
+                                <BasicParametersForm />
                             </SingleBinaryTab>
                             <SingleBinaryTab title="Supernova & Kick" eventKey="kick">
-                                <SupernovaKickParametersForm formik={formik} />
+                                <SupernovaKickParametersForm />
                             </SingleBinaryTab>
                             <SingleBinaryTab title="Mass Transfer & Common Envelope" eventKey="mass-transfer">
-                                <MassTransferCEParameters formik={formik} />
+                                <MassTransferCEParameters />
                             </SingleBinaryTab>
                         </Tab.Content>
-                        <ReviewJob
-                            formik={formik}
-                            values={formik.values}
-                            handleSubmit={formik.handleSubmit}
-                            handleReset={handleFormReset}
-                            disableButtons={disableButtons}
-                        />
+                        <ReviewJob disableButtons={disableButtons}/>
                     </Col>
                     <Col md={6}>
                         <JobOutput
@@ -189,10 +181,18 @@ const NewSingleBinaryJob = () => {
                                 <VanDenHeuvel data={jsonData} />
                                 <div className="plotContainer">
                                     <Col className="mb-5 mt-5">
-                                        <RenderMassContainer className="container" syncId={syncId} data={jsonData} />
+                                        <RenderMassContainer
+                                            className="container"
+                                            syncId={syncId}
+                                            data={jsonData}
+                                        />
                                     </Col>
                                     <Col className="mb-5">
-                                        <RenderLengthContainer className="container" syncId={syncId} data={jsonData} />
+                                        <RenderLengthContainer
+                                            className="container"
+                                            syncId={syncId}
+                                            data={jsonData}
+                                        />
                                     </Col>
                                     <Col className="mb-5">
                                         <RenderHRDiagramContainer
@@ -208,7 +208,7 @@ const NewSingleBinaryJob = () => {
                 </Row>
             </Tab.Container>
         </Container>
-    );
+    </Formik>;
 };
 
 export default NewSingleBinaryJob;
