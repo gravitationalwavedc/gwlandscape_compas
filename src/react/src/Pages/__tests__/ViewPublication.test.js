@@ -8,30 +8,29 @@ import 'regenerator-runtime/runtime';
 
 /* global environment */
 
-const histData = `[
-    {
-        "x": 1,
-        "y": 1,
-        "counts": 1
-    }
-]`;
+const plotData = {
+    histData: `[
+        {
+            "x": 1,
+            "y": 1,
+            "counts": 1
+        }
+    ]`,
+    scatterData: `[
+        {
+            "x": 1,
+            "y": 1
+        }
+    ]`
+};
 
-const scatterData = `[
-    {
-        "x": 1,
-        "y": 1
-    }
-]`;
-
-const plotInfo = {
-    plotData: {
-        histData: histData,
-        scatterData: scatterData
-    },
-    plotMeta: {
-        groups: [],
-        subgroups: [],
-    }
+const plotMeta = {
+    groups: ['test_group', 'another_test_group'],
+    group: 'test_group',
+    subgroups: ['test_subgroup_x', 'test_subgroup_y', 'test_subgroup_z'],
+    subgroupX: 'test_subgroup_x',
+    subgroupY: 'test_subgroup_y',
+    strideLength: 1
 };
 
 describe('view Compas Job details page', () => {
@@ -77,7 +76,7 @@ describe('view Compas Job details page', () => {
                 },
                 plotInfo: {
                     edges: [
-                        {node: {id: `test-id-${i}`, plotInfo: plotInfo}},
+                        {node: {id: `test-id-${i}`, plotData, plotMeta}},
                     ]
                 }
             };

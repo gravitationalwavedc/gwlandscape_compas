@@ -1,8 +1,9 @@
 import React from 'react';
 import { graphql, createRefetchContainer } from 'react-relay';
+import { Formik } from 'formik';
 import { Row, Col, Container } from 'react-bootstrap';
 import MenuPlot from '../Components/Plots/Publications/MenuPlot';
-import { SelectInput } from '../Components/Plots/Publications/Controls';
+import SelectInput from '../Components/Forms/Atoms/SelectInput';
 
 const ViewPublication = ({ data, relay }) => {
     const { title, author, year, datasets, plotInfo } = data && data.compasPublication;
@@ -16,32 +17,38 @@ const ViewPublication = ({ data, relay }) => {
             <Row className="mb-3">
                 <Col md={2} />
                 <Col md={8}>
-                    {data.compasPublication ? (
-                        <>
-                            <Row className="mb-3">
-                                <Col>
-                                    <h1 className="text-primary">{title}</h1>
-                                    <div className="text-primary">{`${author}${year ? `· ${year}` : ''}`}</div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col md={4}>
-                                    <h5>Model</h5>
-                                    <SelectInput
-                                        data-testid="model"
-                                        value={plotInfo.edges[0].node.id}
-                                        options={datasetOptions}
-                                        onChange={(e) => {
-                                            relay.refetch({ datasetId: e.target.value });
-                                        }}
-                                    />
-                                </Col>
-                            </Row>
-                            <MenuPlot data={plotInfo.edges[0].node} />
-                        </>
-                    ) : (
-                        <h5>Publication not found</h5>
-                    )}
+                    {
+                        data.compasPublication ? 
+                            <>
+                                <Row className="mb-3">
+                                    <Col>
+                                        <h1 className="text-primary">{title}</h1>
+                                        <div className="text-primary">{`${author}${year ? `· ${year}` : ''}`}</div>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Formik
+                                        initialValues={{model: plotInfo.edges[0].node.id}}
+                                        enableReinitialize
+                                    >
+                                        <Col md={4}>
+                                            <h5>Model</h5>
+                                            <SelectInput
+                                                data-testid="model"
+                                                name="model"
+                                                options={datasetOptions}
+                                                onChange={(e) => {
+                                                    relay.refetch({ datasetId: e.target.value });
+                                                }}
+                                                validate={false}
+                                            />
+                                        </Col>
+                                    </Formik>
+                                </Row>
+                                <MenuPlot data={plotInfo.edges[0].node} />
+                            </>
+                            : <h5>Publication not found</h5>
+                    }
                 </Col>
             </Row>
         </Container>

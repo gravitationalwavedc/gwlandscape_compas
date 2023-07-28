@@ -2,16 +2,16 @@ import React from 'react';
 import {Form} from 'react-bootstrap';
 import {useField} from 'formik';
 
-const SelectInput = ({ title, name, options, show=true, help, ...rest }) => {
+const SelectInput = ({ title, name, options, show=true, help, validate=true, ...rest }) => {
     const [field, { error, touched }] = useField(name);
+    const validProps = validate ? {isValid: touched && !error, isInvalid: !!error} : {};
     return <Form.Group controlId={name} className={show ? '' : 'hidden'}>
         <Form.Label>{title}</Form.Label>
         <Form.Control
             { ...field }
             as="select"
             custom
-            isValid={touched && !error}
-            isInvalid={!!error}
+            { ...validProps }
             { ...rest }
         >
             {options.map(({label, value}) =>
