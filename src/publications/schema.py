@@ -14,7 +14,7 @@ from graphql_relay import from_global_id, to_global_id
 from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel, \
     CompasDatasetModelUploadToken
 from publications.utils.misc import check_publication_management_user
-from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data, get_h5_keys
+from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data
 
 
 class KeywordNode(DjangoObjectType):
@@ -109,11 +109,7 @@ class PlotMetaType(graphene.ObjectType):
     subgroup_x = graphene.String()
     subgroup_y = graphene.String()
     stride_length = graphene.Int()
-
-
-class PlotInfoType(graphene.ObjectType):
-    plot_data = graphene.Field(PlotDataType)
-    plot_meta = graphene.Field(PlotMetaType)
+    total_length = graphene.Int()
 
 
 class CompasDatasetModelNode(DjangoObjectType):
@@ -121,8 +117,15 @@ class CompasDatasetModelNode(DjangoObjectType):
     Type for CompasDatasetModel without authentication
     """
     files = graphene.List(graphene.String)
-    plot_info = graphene.Field(
-        PlotInfoType,
+    plot_meta = graphene.Field(
+        PlotMetaType,
+        root_group=graphene.String(),
+        subgroup_x=graphene.String(),
+        subgroup_y=graphene.String(),
+        stride_length=graphene.Int()
+    )
+    plot_data = graphene.Field(
+        PlotDataType,
         root_group=graphene.String(),
         subgroup_x=graphene.String(),
         subgroup_y=graphene.String(),
@@ -142,25 +145,20 @@ class CompasDatasetModelNode(DjangoObjectType):
     def resolve_files(root, info, **kwargs):
         return [Path(f.file.url).absolute() for f in root.upload_set.all()]
 
-    def resolve_plot_info(root, info, **kwargs):
+    def resolve_plot_meta(root, info, **kwargs):
         f = h5py.File(Path(root.get_data_file().path).absolute())
-        root_group = kwargs.get('root_group', get_h5_keys(f)[0])
-        plot_meta = get_h5_subgroup_meta(f, root_group)
+        return get_h5_subgroup_meta(f, **kwargs)
 
-        plot_meta['subgroup_x'] = kwargs.get('subgroup_x', plot_meta['subgroup_x'])
-        plot_meta['subgroup_y'] = kwargs.get('subgroup_y', plot_meta['subgroup_y'])
-        plot_meta['stride_length'] = kwargs.get('stride_length', plot_meta['stride_length'])
-
-        return {
-            "plot_meta": plot_meta,
-            "plot_data": get_h5_subgroup_data(
-                f,
-                root_group=plot_meta['group'],
-                subgroup_x=plot_meta['subgroup_x'],
-                subgroup_y=plot_meta['subgroup_y'],
-                stride_length=plot_meta['stride_length']
-            )
-        }
+    def resolve_plot_data(root, info, **kwargs):
+        f = h5py.File(Path(root.get_data_file().path).absolute())
+        plot_meta = get_h5_subgroup_meta(f, **kwargs)
+        return get_h5_subgroup_data(
+            f,
+            root_group=plot_meta["group"],
+            subgroup_x=plot_meta["subgroup_x"],
+            subgroup_y=plot_meta["subgroup_y"],
+            stride_length=plot_meta["stride_length"]
+        )
 
 
 class GenerateCompasDatasetModelUploadToken(graphene.ObjectType):

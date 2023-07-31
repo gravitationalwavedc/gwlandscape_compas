@@ -1,4 +1,3 @@
-import traceback
 import numpy as np
 from .plotting_functions import get_log_and_limits, histo2d_scatter_hybrid
 
@@ -18,7 +17,8 @@ def get_h5_subgroups(h5_file, root_group):
     return get_h5_keys(h5_file[root_group])
 
 
-def get_h5_subgroup_meta(h5_file, root_group):
+def get_h5_subgroup_meta(h5_file, **kwargs):
+    root_group = kwargs.pop("root_group", get_h5_keys(h5_file)[0])
     subgroup_list = get_h5_subgroups(h5_file, root_group)
 
     total_length = h5_file[root_group][subgroup_list[0]].shape[0]
@@ -30,9 +30,10 @@ def get_h5_subgroup_meta(h5_file, root_group):
         "groups": [key for key in get_h5_keys(h5_file) if key not in ['Run_Details']],
         "group": root_group,
         "subgroups": subgroup_list,
-        "subgroup_x": default_values[0] if default_values else subgroup_list[0],
-        "subgroup_y": default_values[1] if default_values else subgroup_list[1],
-        "stride_length": stride_length,
+        "subgroup_x": kwargs.get("subgroup_x", default_values[0] if default_values else subgroup_list[0]),
+        "subgroup_y": kwargs.get("subgroup_y", default_values[1] if default_values else subgroup_list[1]),
+        "stride_length": kwargs.get("stride_length", stride_length),
+        "total_length": total_length
     }
 
 
@@ -57,38 +58,33 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
     dict
         Dictionary with the required data and metadata
     """
-    try:
-        data_group_x = h5_file[root_group][subgroup_x][::stride_length]
-        data_group_y = h5_file[root_group][subgroup_y][::stride_length]
+    data_group_x = h5_file[root_group][subgroup_x][::stride_length]
+    data_group_y = h5_file[root_group][subgroup_y][::stride_length]
 
-        if data_group_x.dtype.type is np.string_ or data_group_y.dtype.type is np.string_:
-            print('One of the subgroups has a dtype of string')
-            return None
-
-        # Select only points where both are not null
-        indices = np.isfinite(data_group_x) | np.isfinite(data_group_y)
-        data_group_x = data_group_x[indices]
-        data_group_y = data_group_y[indices]
-
-        # Check for log, get limits and flag if the minimum value is representing a log(0)
-        data_group_x, log_check_x, min_max_x, null_check_x = get_log_and_limits(data_group_x)
-        data_group_y, log_check_y, min_max_y, null_check_y = get_log_and_limits(data_group_y)
-        plot_data = histo2d_scatter_hybrid(data_group_x, data_group_y, min_max_x, min_max_y)
-
-        plot_data['min_max_x'] = min_max_x
-        plot_data['min_max_y'] = min_max_y
-
-        plot_data['null_check_x'] = null_check_x
-        plot_data['null_check_y'] = null_check_y
-
-        plot_data['log_check_x'] = log_check_x
-        plot_data['log_check_y'] = log_check_y
-
-        return plot_data
-
-    except Exception:
-        # This is just to make totally sure that the frontend will render
-        # Normally we'd just handle it all on the frontend, but it's better if None is passed back
-        # explicitly so that we can still render the controls for navigating the hdf5 file
-        traceback.print_exc()
+    if data_group_x.dtype.type is np.string_ or data_group_y.dtype.type is np.string_:
+        print('One of the subgroups has a dtype of string')
         return None
+
+    data_group_x, data_group_y = remove_null_coords(data_group_x, data_group_y)
+
+    # Check for log, get limits and flag if the minimum value is representing a log(0)
+    data_group_x, log_check_x, min_max_x, null_check_x = get_log_and_limits(data_group_x)
+    data_group_y, log_check_y, min_max_y, null_check_y = get_log_and_limits(data_group_y)
+    plot_data = histo2d_scatter_hybrid(data_group_x, data_group_y, min_max_x, min_max_y)
+
+    plot_data['min_max_x'] = min_max_x
+    plot_data['min_max_y'] = min_max_y
+
+    plot_data['null_check_x'] = null_check_x
+    plot_data['null_check_y'] = null_check_y
+
+    plot_data['log_check_x'] = log_check_x
+    plot_data['log_check_y'] = log_check_y
+
+    return plot_data
+
+
+def remove_null_coords(x_array, y_array):
+    # Select only points where both are not null
+    null_indices = np.isfinite(x_array) & np.isfinite(y_array)
+    return x_array[null_indices], y_array[null_indices]
