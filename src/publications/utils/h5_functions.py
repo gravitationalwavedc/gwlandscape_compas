@@ -58,7 +58,6 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
     dict
         Dictionary with the required data and metadata
     """
-    # try:
     data_group_x = h5_file[root_group][subgroup_x][::stride_length]
     data_group_y = h5_file[root_group][subgroup_y][::stride_length]
 
@@ -66,10 +65,7 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
         print('One of the subgroups has a dtype of string')
         return None
 
-    # Select only points where both are not null
-    indices = np.isfinite(data_group_x) | np.isfinite(data_group_y)
-    data_group_x = data_group_x[indices]
-    data_group_y = data_group_y[indices]
+    data_group_x, data_group_y = remove_null_coords(data_group_x, data_group_y)
 
     # Check for log, get limits and flag if the minimum value is representing a log(0)
     data_group_x, log_check_x, min_max_x, null_check_x = get_log_and_limits(data_group_x)
@@ -87,9 +83,8 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
 
     return plot_data
 
-    # except Exception:
-    #     # This is just to make totally sure that the frontend will render
-    #     # Normally we'd just handle it all on the frontend, but it's better if None is passed back
-    #     # explicitly so that we can still render the controls for navigating the hdf5 file
-    #     traceback.print_exc()
-    #     return None
+
+def remove_null_coords(x_array, y_array):
+    # Select only points where both are not null
+    null_indices = np.isfinite(x_array) & np.isfinite(y_array)
+    return x_array[null_indices], y_array[null_indices]
