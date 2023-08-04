@@ -103,10 +103,17 @@ function getRoutes() {
                 environment={harnessApi.getEnvironment('compas')}
                 Component={MyJobs}
                 query={graphql`
-                    query Routes_MyJobs_Query{
-                        ...MyJobs_data
+                    query Routes_MyJobs_Query(
+                      $count: Int!,
+                      $cursor: String,
+                    ) {
+                      ...MyJobs_data
                     }
                 `}
+                prepareVariables={() => ({
+                    count: 10,
+                    // timeRange: 'all',
+                })}
                 render={handleRender}
             />
         </Route>
