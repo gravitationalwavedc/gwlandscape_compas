@@ -106,12 +106,14 @@ function getRoutes() {
                     query Routes_MyJobs_Query(
                       $count: Int!,
                       $cursor: String,
+                      $orderBy: String
                     ) {
                       ...MyJobs_data
                     }
                 `}
                 prepareVariables={() => ({
                     count: 10,
+                    orderBy: '-lastUpdated'
                     // timeRange: 'all',
                 })}
                 render={handleRender}

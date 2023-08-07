@@ -16,12 +16,7 @@ const MyJobs = ({data, match, router, relay}) => {
         if (! relay.hasMore() || relay.isLoading()) {
             return;
         }
-        relay.loadMore(
-            RECORDS_PER_PAGE,
-            error => {
-                console.log(error);
-            },
-        );
+        relay.loadMore(RECORDS_PER_PAGE);
     };
 
     return (
@@ -125,6 +120,7 @@ export default createPaginationContainer(MyJobs,
                 compasJobs(
                     first: $count,
                     after: $cursor,
+                    orderBy: $orderBy
                 ) @connection(key: "MyJobs_compasJobs") {
                     edges {
                         node {
@@ -153,6 +149,7 @@ export default createPaginationContainer(MyJobs,
             query MyJobsForwardQuery(
                 $count: Int!,
                 $cursor: String,
+                $orderBy: String
             ) {
               ...MyJobs_data
             }
@@ -172,7 +169,7 @@ export default createPaginationContainer(MyJobs,
             return {
                 count,
                 cursor,
-                orderBy,
+                orderBy: orderBy,
             };
         }
     }

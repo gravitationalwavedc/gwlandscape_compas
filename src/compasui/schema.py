@@ -75,7 +75,7 @@ class UserCompasJobFilter(FilterSet):
 
     order_by = OrderingFilter(
         fields=(
-            ('last_updated', 'lastUpdated'),
+            ('last_updated', 'last_updated'),
             ('name', 'name'),
         )
     )
