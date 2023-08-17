@@ -38,6 +38,7 @@ const NewSingleBinaryJob = () => {
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
+    const [activeTab, setActiveTab] = useState('binary');
 
     let syncId = 1;
 
@@ -58,6 +59,8 @@ const NewSingleBinaryJob = () => {
     };
 
     const handleJobSubmission = (values) => {
+        setActiveTab('job-output');
+
         // Reset errors if any
         setOutputError('');
 
@@ -103,7 +106,7 @@ const NewSingleBinaryJob = () => {
             mutation: submitMutation,
             variables: variables,
             onCompleted: async (response, errors) => {
-                try{
+                try {
                     if (!errors && response.newSingleBinary.result.detailedOutputFilePath !== '') {
                         setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
                         setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
@@ -115,99 +118,104 @@ const NewSingleBinaryJob = () => {
                 } catch (e) {
                     handleError();
                 }
-
             },
         });
     };
 
-    return <Formik
-        initialValues={initialValues}
-        onSubmit={values => handleJobSubmission(values)}
-        onReset={handleFormReset}
-        validationSchema={validationSchema}
-    >
-        <Container fluid>
-            <Row className="mt-5">
-                <Col>
-                    <h1>Simulate the evolution of a binary</h1>
-                    <h5>
-                        Run a simulation of an evolution of a specific binary. Detailed plots will be automatically
-                        generated using COMPAS and available to download.
-                    </h5>
-                </Col>
-            </Row>
-            <Tab.Container id="single-binary-tabs" defaultActiveKey="binary">
-                <Row className="mt-4">
-                    <Col md={2}>
-                        <Nav fill variant="pills" className="flex-column text-center">
-                            <Nav.Item>
-                                <Nav.Link eventKey="binary">Binary</Nav.Link>
-                            </Nav.Item>
-                            <h5 className="mt-3 mb-0">Advanced settings</h5>
-                            <Nav.Item>
-                                <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                                <Nav.Link eventKey="mass-transfer">
-                                    Mass Transfer &<br />
-                                    Common Envelope
-                                </Nav.Link>
-                            </Nav.Item>
-                        </Nav>
-                    </Col>
-                    <Col md={4}>
-                        <Tab.Content className="mt-2">
-                            <SingleBinaryTab title="Binary" eventKey="binary">
-                                <BasicParametersForm />
-                            </SingleBinaryTab>
-                            <SingleBinaryTab title="Supernova & Kick" eventKey="kick">
-                                <SupernovaKickParametersForm />
-                            </SingleBinaryTab>
-                            <SingleBinaryTab title="Mass Transfer & Common Envelope" eventKey="mass-transfer">
-                                <MassTransferCEParameters />
-                            </SingleBinaryTab>
-                        </Tab.Content>
-                        <ReviewJob disableButtons={disableButtons}/>
-                    </Col>
-                    <Col md={6}>
-                        <JobOutput
-                            detailedOutputFileName={detailedOutputFile}
-                            error={outputError}
-                            isLoading={isLoadingOutput}
-                        />
-                        {jsonData && (
-                            <>
-                                <VanDenHeuvel data={jsonData} />
-                                <div className="plotContainer">
-                                    <Col className="mb-5 mt-5">
-                                        <RenderMassContainer
-                                            className="container"
-                                            syncId={syncId}
-                                            data={jsonData}
-                                        />
-                                    </Col>
-                                    <Col className="mb-5">
-                                        <RenderLengthContainer
-                                            className="container"
-                                            syncId={syncId}
-                                            data={jsonData}
-                                        />
-                                    </Col>
-                                    <Col className="mb-5">
-                                        <RenderHRDiagramContainer
-                                            className="container"
-                                            syncId={syncId}
-                                            data={jsonData}
-                                        />
-                                    </Col>
-                                </div>
-                            </>
-                        )}
+    return (
+        <Formik
+            initialValues={initialValues}
+            onSubmit={(values) => handleJobSubmission(values)}
+            onReset={handleFormReset}
+            validationSchema={validationSchema}
+        >
+            <Container fluid>
+                <Row className="mt-5">
+                    <Col>
+                        <h1>Simulate the evolution of a binary</h1>
+                        <h5>
+                            Run a simulation of an evolution of a specific binary. Detailed plots will be automatically
+                            generated using COMPAS and available to download.
+                        </h5>
                     </Col>
                 </Row>
-            </Tab.Container>
-        </Container>
-    </Formik>;
+                <Tab.Container id="single-binary-tabs" activeKey={activeTab} onSelect={(tab) => setActiveTab(tab)}>
+                    <Row className="mt-4">
+                        <Col md={2}>
+                            <Nav fill variant="pills" className="flex-column text-center">
+                                <Nav.Item>
+                                    <Nav.Link eventKey="binary">Binary</Nav.Link>
+                                </Nav.Item>
+                                <h5 className="mt-3 mb-0">Advanced settings</h5>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="kick">Supernova & Kick</Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="mass-transfer">
+                                        Mass Transfer &<br />
+                                        Common Envelope
+                                    </Nav.Link>
+                                </Nav.Item>
+                                <h5 className="mt-3 mb-0">Results</h5>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="job-output">COMPAS Output</Nav.Link>
+                                </Nav.Item>
+                            </Nav>
+                        </Col>
+                        <Col md={activeTab !== 'job-output' ? 6 : 10}>
+                            <Tab.Content className="mt-2">
+                                <SingleBinaryTab title="Binary" eventKey="binary">
+                                    <BasicParametersForm />
+                                </SingleBinaryTab>
+                                <SingleBinaryTab title="Supernova & Kick" eventKey="kick">
+                                    <SupernovaKickParametersForm />
+                                </SingleBinaryTab>
+                                <SingleBinaryTab title="Mass Transfer & Common Envelope" eventKey="mass-transfer">
+                                    <MassTransferCEParameters />
+                                </SingleBinaryTab>
+                                <SingleBinaryTab title="COMPAS Output" eventKey="job-output">
+                                    <JobOutput
+                                        detailedOutputFileName={detailedOutputFile}
+                                        error={outputError}
+                                        isLoading={isLoadingOutput}
+                                    />
+                                    {jsonData && (
+                                        <>
+                                            <VanDenHeuvel data={jsonData} />
+                                            <div className="plotContainer">
+                                                <Col className="mb-5 mt-5">
+                                                    <RenderMassContainer
+                                                        className="container"
+                                                        syncId={syncId}
+                                                        data={jsonData}
+                                                    />
+                                                </Col>
+                                                <Col className="mb-5">
+                                                    <RenderLengthContainer
+                                                        className="container"
+                                                        syncId={syncId}
+                                                        data={jsonData}
+                                                    />
+                                                </Col>
+                                                <Col className="mb-5">
+                                                    <RenderHRDiagramContainer
+                                                        className="container"
+                                                        syncId={syncId}
+                                                        data={jsonData}
+                                                    />
+                                                </Col>
+                                            </div>
+                                        </>
+                                    )}
+                                </SingleBinaryTab>
+                            </Tab.Content>
+                            {activeTab !== 'job-output' && <ReviewJob disableButtons={disableButtons} />}
+                        </Col>
+                    </Row>
+                </Tab.Container>
+            </Container>
+        </Formik>
+    );
 };
 
 export default NewSingleBinaryJob;

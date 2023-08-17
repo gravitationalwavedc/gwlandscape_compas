@@ -113,7 +113,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
             style={
                 divStyle || {
                     width: '100%',
-                    height: '400px',
+                    height: '600px',
                 }
             }
         >

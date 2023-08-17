@@ -1,11 +1,13 @@
 import React from 'react';
-import {Col, Row} from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import Input from './Atoms/Input';
-import {fryerSupernovaEngineOptions, remnantMassPrescriptionOptions, kickVelocityDistributionOptions}
-    from '../../Utils/parameters';
+import {
+    fryerSupernovaEngineOptions,
+    remnantMassPrescriptionOptions,
+    kickVelocityDistributionOptions,
+} from '../../Utils/parameters';
 import SelectInput from './Atoms/SelectInput';
-import {useFormikContext} from 'formik';
-
+import { useFormikContext } from 'formik';
 
 const SupernovaKickParametersForm = () => {
     const { values } = useFormikContext();
@@ -17,16 +19,16 @@ const SupernovaKickParametersForm = () => {
             <Row>
                 <Col md={5}>
                     <SelectInput
-                        title='Remnant Mass Prescription'
-                        name='remnantMassPrescription'
+                        title="Remnant Mass Prescription"
+                        name="remnantMassPrescription"
                         options={remnantMassPrescriptionOptions}
                     />
                 </Col>
                 <Col md={5}>
                     <SelectInput
                         show={showFryerSupernovaEngine}
-                        title='Fryer Supernova Engine'
-                        name='fryerSupernovaEngine'
+                        title="Fryer Supernova Engine"
+                        name="fryerSupernovaEngine"
                         options={fryerSupernovaEngineOptions}
                     />
                 </Col>
@@ -34,8 +36,8 @@ const SupernovaKickParametersForm = () => {
             <Row>
                 <Col md={5}>
                     <SelectInput
-                        title='Kick Velocity Distribution'
-                        name='kickVelocityDistribution'
+                        title="Kick Velocity Distribution"
+                        name="kickVelocityDistribution"
                         options={kickVelocityDistributionOptions}
                     />
                 </Col>
