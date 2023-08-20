@@ -32,6 +32,14 @@ const submitMutation = graphql`
 
 const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
+const resultButtonLabel = (isLoadingOutput) => {
+    if (isLoadingOutput) {
+        return 'Loading...';
+    }
+
+    return 'COMPAS Output';
+};
+
 const NewSingleBinaryJob = () => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
     const [jsonData, setJsonData] = useState('');
@@ -158,7 +166,12 @@ const NewSingleBinaryJob = () => {
                                 </Nav.Item>
                                 <h5 className="mt-3 mb-0">Results</h5>
                                 <Nav.Item>
-                                    <Nav.Link eventKey="job-output">COMPAS Output</Nav.Link>
+                                    <Nav.Link eventKey="job-output" disabled={jsonData === ''}>
+                                        {resultButtonLabel(isLoadingOutput, jsonData)}
+                                    </Nav.Link>
+                                    {jsonData === '' && !isLoadingOutput && (
+                                        <p className="mt-0 pt-0 text-muted">Run a simulation to see results</p>
+                                    )}
                                 </Nav.Item>
                             </Nav>
                         </Col>
