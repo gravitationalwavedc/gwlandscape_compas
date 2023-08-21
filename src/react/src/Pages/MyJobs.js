@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {Col, Container, Form, InputGroup, Card, Button} from 'react-bootstrap';
 import {HiOutlineSearch} from 'react-icons/hi';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -11,12 +11,23 @@ const RECORDS_PER_PAGE = 10;
 const MyJobs = ({data, match, router, relay}) => {
     const jobs = data && data.compasJobs && data.compasJobs.edges.length > 0 ?
         data.compasJobs.edges.map(e => e.node) : null;
+    const [search, setSearch] = useState('');
 
     const _loadMore = () => {
         if (! relay.hasMore() || relay.isLoading()) {
             return;
         }
         relay.loadMore(RECORDS_PER_PAGE);
+    };
+
+    useEffect(() => handleSearchChange(), [search]);
+
+    const handleSearchChange = () => {
+        const refetchVariables = {
+            count: RECORDS_PER_PAGE,
+            search: search
+        };
+        relay.refetchConnection(1, null, refetchVariables);
     };
 
     return (
@@ -37,6 +48,7 @@ const MyJobs = ({data, match, router, relay}) => {
                                 <Form.Control
                                     className="text-left"
                                     placeholder="Search by Name, Description or Last Updated Date"
+                                    onChange={({target}) => setSearch(target.value)}
                                 />
                             </InputGroup>
                         </Form.Group>
