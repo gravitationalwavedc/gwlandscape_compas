@@ -1,11 +1,11 @@
-version: '3'
+version: "3"
 
 services:
   gwlandscape-compas-django:
     build:
       dockerfile: ./docker/gwlandscape_compas_django.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.24
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.25
     environment:
       MYSQL_ROOT_PASSWORD: 76vcqmGKP19Z1AEx
       MYSQL_DATABASE: gwlandscape_compas
@@ -56,7 +56,7 @@ services:
   gwlandscape-compas-redis:
     image: redis:latest
     ports:
-      - '6379'
+      - "6379"
 
   gwlandscape-compas-celery:
     build:
