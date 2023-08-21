@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM nginx:stable-bullseye
 
 # Install needed packages
 RUN apt-get update

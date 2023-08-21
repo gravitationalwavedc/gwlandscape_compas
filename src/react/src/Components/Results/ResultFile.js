@@ -1,8 +1,8 @@
 import React from 'react';
-import {commitMutation, graphql} from 'react-relay';
-import {harnessApi} from '../../index';
+import { commitMutation, graphql } from 'react-relay';
+import { harnessApi } from '../../index';
 
-const downloadUrl = 'https://gwcloud.org.au/job/apiv1/file/?fileId=';
+const downloadUrl = 'https://jobcontroller.adacs.org.au/job/apiv1/file/?fileId=';
 
 const generateFileDownloadIdMutation = graphql`
     mutation ResultFileMutation($input: GenerateFileDownloadIdsInput!) {
@@ -19,11 +19,11 @@ const handleOnFileClick = (e, jobId, token) => {
         variables: {
             input: {
                 jobId: jobId,
-                downloadTokens: [token]
-            }
+                downloadTokens: [token],
+            },
         },
         onCompleted: (response, errors) => {
-            if(errors) {
+            if (errors) {
                 alert('Error downloading file');
             } else {
                 const link = document.createElement('a');
@@ -33,26 +33,22 @@ const handleOnFileClick = (e, jobId, token) => {
                 link.click();
                 document.body.removeChild(link);
             }
-        }
+        },
     });
-
 };
-const ResultFile = ({jobId, file}) =>
+const ResultFile = ({ jobId, file }) => (
     <tr>
         <td>
-            {
-                file.isDir ? file.path : (
-                    <a
-                        href="#"
-                        onClick={e => handleOnFileClick(e, jobId, file.downloadToken)}
-                    >
-                        {file.path}
-                    </a>
-                )
-
-            }
+            {file.isDir ? (
+                file.path
+            ) : (
+                <a href="#" onClick={(e) => handleOnFileClick(e, jobId, file.downloadToken)}>
+                    {file.path}
+                </a>
+            )}
         </td>
         <td>{file.isDir ? 'Directory' : 'File'}</td>
         <td>{file.fileSize}</td>
-    </tr>;
+    </tr>
+);
 export default ResultFile;
