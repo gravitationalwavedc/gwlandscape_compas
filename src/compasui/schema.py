@@ -260,6 +260,7 @@ class StartInput(graphene.InputObjectType):
     name = graphene.String()
     description = graphene.String()
     private = graphene.Boolean()
+    detailed_output = graphene.Boolean()
 
 
 class BasicParametersInput(graphene.InputObjectType):
