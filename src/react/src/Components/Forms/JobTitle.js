@@ -1,15 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { HiOutlinePencil, HiOutlineCheck, HiOutlineX} from 'react-icons/hi';
 import EdiText from 'react-editext';
 import { useField } from 'formik';
+import {Form} from "react-bootstrap";
 
 const EditButton = () => <React.Fragment><HiOutlinePencil /> edit</React.Fragment>;
 const SaveButton = () => <HiOutlineCheck/>;
 const CancelButton = () => <HiOutlineX/>;
 
-const JobTitle = () => {
+
+const JobTitle = ({formik}) => {
     const [{ value: nameValue }, { error: nameError }, { setValue: setNameValue }] = useField('name');
     const [{ value: descriptionValue }, _, { setValue: setDescriptionValue }] = useField('description');
+    const [isChecked, setIsChecked] = useState(formik.values['detailedOutput']);
+
     return <React.Fragment>
         <EdiText 
             type="text" 
@@ -49,6 +53,18 @@ const JobTitle = () => {
             submitOnUnfocus
             submitOnEnter
         />
+        <div>
+            <Form.Check
+                custom
+                id="detailedOutput"
+                type="switch"
+                value={formik.values['detailedOutput']}
+                label="Detailed Output"
+                name="detailedOutput"
+                onChange={formik.handleChange}
+                checked={formik.values['detailedOutput']}/>
+        </div>
+
     </React.Fragment>;
 };
 export default JobTitle;

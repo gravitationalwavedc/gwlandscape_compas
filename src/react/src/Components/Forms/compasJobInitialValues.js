@@ -28,6 +28,7 @@ const compasJobInitialValues = {
     massTransferAccretionEfficiency: 0.0,
     commonEnvelopeAlpha: 1.0,
     commonEnvelopeLambdaPrescription: 'LAMBDA_NANJING',
+    detailedOutput: false
 };
 
 export default compasJobInitialValues;

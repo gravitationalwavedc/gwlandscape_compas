@@ -40,7 +40,8 @@ const NewJob = ({initialValues, router}) => {
                 start: {
                     name: values.name,
                     description: values.description,
-                    private: false
+                    private: false,
+                    detailedOutput: values.detailedOutput
                 },
                 basicParameters: {
                     numberOfSystems: values.numberOfSystems,
