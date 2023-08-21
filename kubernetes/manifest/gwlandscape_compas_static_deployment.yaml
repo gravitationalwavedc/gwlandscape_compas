@@ -11,7 +11,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-        name: gwlandscape-compas-static
+      name: gwlandscape-compas-static
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -24,12 +24,11 @@ spec:
     spec:
       containers:
         - name: gwlandscape-compas-static
-          image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.22
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.23
           ports:
             - name: http
               containerPort: 8000
           resources: {}
           tty: true
       imagePullSecrets:
-      - name: regcred
-...
+        - name: regcred
