@@ -35,7 +35,8 @@ params_to_compas_commands = {
     'fryer_supernova_engine': '--fryer-supernova-engine',
     'kick_velocity_distribution': '--kick-magnitude-distribution',
     'velocity_1': '--kick-magnitude-1',
-    'velocity_2': '--kick-magnitude-2'
+    'velocity_2': '--kick-magnitude-2',
+    'detailed_output': '--detailed-output'
 }
 
 
