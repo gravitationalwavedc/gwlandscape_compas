@@ -25,10 +25,10 @@ def perform_db_search(user, kwargs):
     )
 
     search_params = f"search: \"{kwargs.get('search', '')}\""
-    search_params += f", timeRange: \"{kwargs.get('time_range', '')}\""
+    # search_params += f", timeRange: \"{kwargs.get('time_range', '')}\""
     # Fetch one extra record to trigger "hasNextPage"
     search_params += f", count: {kwargs.get('first', 0) + 1}"
-    search_params += f", excludeLigoJobs: {'false' if user.is_ligo else 'true'}"
+    # search_params += f", excludeLigoJobs: {'false' if user.is_ligo else 'true'}"
 
     query = f"""
     query {{

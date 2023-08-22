@@ -21,6 +21,8 @@ from .utils.jobs.request_job_filter import request_job_filter
 from .utils.h5ToJson import read_h5_data_as_json
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.auth.lookup_users import request_lookup_users
+from .utils.db_search.db_search import perform_db_search
+from .status import JobStatus
 
 
 def basic_parameter_resolvers(name):
@@ -213,18 +215,36 @@ class CompasResultFiles(graphene.ObjectType):
     files = graphene.List(CompasResultFile)
 
 
+class CompasPublicJobNode(graphene.ObjectType):
+    user = graphene.String()
+    job_status = graphene.Field(JobStatusType)
+    name = graphene.String()
+    description = graphene.String()
+    id = graphene.ID()
+    timestamp = graphene.String()
+
+
+class CompasPublicJobConnection(relay.Connection):
+    class Meta:
+        node = CompasPublicJobNode
+
+
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
     all_labels = graphene.List(LabelType)
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
+    public_compas_jobs = relay.ConnectionField(
+        CompasPublicJobConnection,
+        search = graphene.String()
+    )
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
 
-    @login_required
-    def resolve_all_labels(self, info, **kwargs):
-        return Label.all()
+    # @login_required
+    # def resolve_all_labels(self, info, **kwargs):
+    #     return Label.all()
 
     @login_required
     def resolve_gwclouduser(self, info, **kwargs):
@@ -254,6 +274,30 @@ class Query(object):
             for f in files
         ]
         return CompasResultFiles(files=result)
+
+    @login_required
+    def resolve_public_compas_jobs(self, info, **kwargs):
+
+        success, jobs = perform_db_search(info.context.user, kwargs)
+        if not success:
+            return []
+
+        result = []
+        for job in jobs:
+            CompasPublicJobNode(
+                user=f"{job['user']['firstName']} {job['user']['lastName']}",
+                name=job['job']['name'],
+                description=job['job']['description'],
+                job_status=JobStatusType(
+                    name=JobStatus.display_name(job['history'][0]['state']),
+                    number=job['history'][0]['state'],
+                    date=job['history'][0]['timestamp']
+                ),
+                timestamp=job['history'][0]['timestamp'],
+                id=to_global_id("CompasJobNode", job['job']['id'])
+            )
+
+        return result
 
 
 class StartInput(graphene.InputObjectType):
