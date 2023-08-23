@@ -8,12 +8,10 @@ import Link from 'found/Link';
 
 const RECORDS_PER_PAGE = 10;
 
-const MyJobs = ({data, match, router, relay}) => {
-    const jobs = data && data.compasJobs && data.compasJobs.edges.length > 0 ?
-        data.compasJobs.edges.map(e => e.node) : null;
+const PublicJobs = ({data, match, router, relay}) => {
+    const jobs = data && data.publicCompasJobs && data.publicCompasJobs.edges.length > 0 ?
+        data.publicCompasJobs.edges.map(e => e.node) : null;
     const [search, setSearch] = useState('');
-
-    useEffect(() => handleSearchChange(), [search]);
 
     const _loadMore = () => {
         if (! relay.hasMore() || relay.isLoading()) {
@@ -67,13 +65,13 @@ const MyJobs = ({data, match, router, relay}) => {
                     </Col>
                     <Col lg={3}>
                         <Link
-                            to={'/compas/public/'}
+                            to={'/compas/job-list/'}
                             exact
                             match={match}
                             router={router}
                             as={Button}
                             variant='outline-primary'
-                        >Public Jobs</Link>
+                        >My Jobs</Link>
                     </Col>
                 </Form.Row>
             </Form>
@@ -137,29 +135,23 @@ const MyJobs = ({data, match, router, relay}) => {
 // })
 
 
-export default createPaginationContainer(MyJobs,
+export default createPaginationContainer(PublicJobs,
     {
         data: graphql`
-            fragment MyJobs_data on Query {
-                compasJobs(
+            fragment PublicJobs_data on Query {
+                publicCompasJobs(
                     first: $count,
                     after: $cursor,
-                    orderBy: $orderBy
-                ) @connection(key: "MyJobs_compasJobs") {
+                    search: $search
+                ) @connection(key: "PublicJobs_publicCompasJobs") {
                     edges {
                         node {
                             id
                             user
-                            userId
-                            lastUpdated
-                            start {
-                              name
-                              description
-                              private
-                            }
+                            name
+                            description
                             jobStatus{
                               name
-                              date
                             }
                         }
                     }
@@ -170,16 +162,16 @@ export default createPaginationContainer(MyJobs,
     {
         direction: 'forward',
         query: graphql`
-            query MyJobsForwardQuery(
+            query PublicJobsForwardQuery(
                 $count: Int!,
                 $cursor: String,
-                $orderBy: String
+                $search: String
             ) {
-              ...MyJobs_data
+              ...PublicJobs_data
             }
         `,
         getConnectionFromProps(props) {
-            return props.data && props.data.compasJobs;
+            return props.data && props.data.publicCompasJobs;
         },
 
         getFragmentVariables(previousVariables, totalCount) {
@@ -189,11 +181,10 @@ export default createPaginationContainer(MyJobs,
             };
         },
 
-        getVariables(props, {count, cursor}, {orderBy}) {
+        getVariables(props, {count, cursor}) {
             return {
                 count,
-                cursor,
-                orderBy: orderBy,
+                cursor
             };
         }
     }

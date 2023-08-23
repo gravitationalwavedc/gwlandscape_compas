@@ -11,6 +11,7 @@ import NewJob from './Pages/NewJob';
 import ViewJob from './Pages/ViewJob';
 import ViewPublication from './Pages/ViewPublication';
 import MyJobs from './Pages/MyJobs';
+import PublicJobs from './Pages/PublicJobs';
 
 // List of components that require authentication
 const PROTECTED_COMPONENTS = [
@@ -118,6 +119,27 @@ function getRoutes() {
                 })}
                 render={handleRender}
             />
+            <Route
+                Component={PublicJobs}
+                path="public"
+                query={graphql`
+                query Routes_PublicJobs_Query (
+                  $count: Int!,
+                  $cursor: String,
+                  $search: String,
+                ) {
+                    gwclouduser {
+                      username
+                    }
+                    ...PublicJobs_data
+                }
+              `}
+                prepareVariables={() => ({
+                    timeRange: 'all',
+                    count: 100
+                })}
+                environment={harnessApi.getEnvironment('compas')}
+                render={handleRender}/>
         </Route>
     );
 }
