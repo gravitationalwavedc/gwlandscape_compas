@@ -23,9 +23,6 @@ const ViewJob = ({data, ...rest}) => (
                         <Col md={3}>
                             <Nav fill variant="pills" className="flex-column text-center">
                                 <Nav.Item>
-                                    <Nav.Link eventKey="explore">Explore</Nav.Link>
-                                </Nav.Item>
-                                <Nav.Item>
                                     <Nav.Link eventKey="parameters">Parameters</Nav.Link>
                                 </Nav.Item>
                                 <Nav.Item>
