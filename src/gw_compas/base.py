@@ -171,6 +171,7 @@ GRAPHQL_JWT = {
 # URL of the job controller - note: No trailing slash
 GWCLOUD_JOB_CONTROLLER_API_URL = "https://jobcontroller.adacs.org.au/job/apiv1"
 GWCLOUD_AUTH_API_URL = "http://localhost:8000/graphql"
+GWCLOUD_DB_SEARCH_API_URL = "http://gwcloud-db-search:8000/graphql"
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
