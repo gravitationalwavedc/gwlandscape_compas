@@ -1,7 +1,7 @@
 import React from 'react';
 import { HiOutlinePencil, HiOutlineCheck, HiOutlineX} from 'react-icons/hi';
 import EdiText from 'react-editext';
-import { useField } from 'formik';
+import { useField, useFormikContext }  from 'formik';
 import {Form} from 'react-bootstrap';
 
 const EditButton = () => <React.Fragment><HiOutlinePencil /> edit</React.Fragment>;
@@ -9,11 +9,12 @@ const SaveButton = () => <HiOutlineCheck/>;
 const CancelButton = () => <HiOutlineX/>;
 
 
-const JobTitle = ({formik}) => {
+const JobTitle = () => {
+    const { values, handleChange } = useFormikContext();
     const [{value: nameValue}, {error: nameError}, {setValue: setNameValue}] = useField('name');
     const [{value: descriptionValue}, _, {setValue: setDescriptionValue}] = useField('description');
 
-    <React.Fragment>
+    return <React.Fragment>
         <EdiText
             type="text"
             name="name"
@@ -57,11 +58,11 @@ const JobTitle = ({formik}) => {
                 custom
                 id="detailedOutput"
                 type="switch"
-                value={formik.values['detailedOutput']}
+                value={values['detailedOutput']}
                 label="Detailed Output"
                 name="detailedOutput"
-                onChange={formik.handleChange}
-                checked={formik.values['detailedOutput']}/>
+                onChange={handleChange}
+                checked={values['detailedOutput']}/>
         </div>
 
     </React.Fragment>;
