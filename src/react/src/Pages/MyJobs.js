@@ -39,7 +39,7 @@ const MyJobs = ({data, match, router, relay}) => {
             </h1>
             <Form>
                 <Form.Row>
-                    <Col lg={5}>
+                    <Col lg={6}>
                         <Form.Group controlId="searchJobs">
                             <InputGroup>
                                 <InputGroup.Prepend>
@@ -55,7 +55,7 @@ const MyJobs = ({data, match, router, relay}) => {
                             </InputGroup>
                         </Form.Group>
                     </Col>
-                    <Col lg={3}>
+                    <Col lg={2}>
                         <Link
                             to={'/compas/job-form'}
                             exact
@@ -64,10 +64,11 @@ const MyJobs = ({data, match, router, relay}) => {
                             as={Button}
                             variant='outline-primary'
                         >New Job</Link>
+
                     </Col>
-                    <Col lg={3}>
+                    <Col lg={2}>
                         <Link
-                            to={'/compas/public/'}
+                            to={'/compas/jobs/'}
                             exact
                             match={match}
                             router={router}
