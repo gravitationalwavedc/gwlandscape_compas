@@ -108,33 +108,6 @@ const PublicJobs = ({data, match, router, relay}) => {
     );
 };
 
-// export default createFragmentContainer(MyJobs, {
-//     data: graphql`
-//         fragment MyJobs_data on Query {
-//             compasJobs {
-//                 edges {
-//                     node {
-//                         id
-//                         user
-//                         userId
-//                         lastUpdated
-//                         start {
-//                           name
-//                           description
-//                           private
-//                         }
-//                         jobStatus{
-//                           name
-//                           date
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     `
-// })
-
-
 export default createPaginationContainer(PublicJobs,
     {
         data: graphql`
