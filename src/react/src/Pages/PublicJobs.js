@@ -37,7 +37,7 @@ const PublicJobs = ({data, match, router, relay}) => {
             </h1>
             <Form>
                 <Form.Row>
-                    <Col lg={5}>
+                    <Col lg={6}>
                         <Form.Group controlId="searchJobs">
                             <InputGroup>
                                 <InputGroup.Prepend>
@@ -53,7 +53,7 @@ const PublicJobs = ({data, match, router, relay}) => {
                             </InputGroup>
                         </Form.Group>
                     </Col>
-                    <Col lg={3}>
+                    <Col lg={2}>
                         <Link
                             to={'/compas/job-form'}
                             exact
@@ -65,7 +65,7 @@ const PublicJobs = ({data, match, router, relay}) => {
                     </Col>
                     <Col lg={3}>
                         <Link
-                            to={'/compas/job-list/'}
+                            to={'/compas/my-jobs/'}
                             exact
                             match={match}
                             router={router}
@@ -144,6 +144,10 @@ export default createPaginationContainer(PublicJobs,
                     after: $cursor,
                     search: $search
                 ) @connection(key: "PublicJobs_publicCompasJobs") {
+                    pageInfo {
+                      hasNextPage
+                      endCursor
+                    }
                     edges {
                         node {
                             id
@@ -181,7 +185,7 @@ export default createPaginationContainer(PublicJobs,
             };
         },
 
-        getVariables(props, {count, cursor}) {
+        getVariables(props, {count, cursor}, {}) {
             return {
                 count,
                 cursor
