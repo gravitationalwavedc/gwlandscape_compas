@@ -33,7 +33,7 @@ const PublicJobs = ({data, match, router, relay}) => {
     return (
         <Container>
             <h1 className="pt-5 mb-4">
-                My Jobs
+                Jobs
             </h1>
             <Form>
                 <Form.Row>
@@ -47,7 +47,7 @@ const PublicJobs = ({data, match, router, relay}) => {
                                 </InputGroup.Prepend>
                                 <Form.Control
                                     className="text-left"
-                                    placeholder="Search by Name, Description or Last Updated Date"
+                                    placeholder="Search by Name, Description"
                                     onChange={({target}) => setSearch(target.value)}
                                 />
                             </InputGroup>
@@ -84,13 +84,13 @@ const PublicJobs = ({data, match, router, relay}) => {
                         jobs.map(job =>
                             <Card key={job.id} className="job-card">
                                 <Card.Body>
-                                    <Card.Title data-testid='job-name'>{job.start.name}</Card.Title>
+                                    <Card.Title data-testid='job-name'>{job.name}</Card.Title>
                                     <Card.Subtitle>
                                         <span className={'job-'+job.jobStatus.name.toLowerCase()}>
                                             {job.jobStatus.name}
-                                        </span> . {job.lastUpdated}
+                                        </span> . <span>{job.user}</span> . {job.lastUpdated}
                                     </Card.Subtitle>
-                                    <Card.Text>{job.start.description}</Card.Text>
+                                    <Card.Text>{job.description}</Card.Text>
                                     <Link
                                         to={'/compas/job-results/' + job.id + '/'}
                                         exact
@@ -154,6 +154,7 @@ export default createPaginationContainer(PublicJobs,
                             user
                             name
                             description
+                            lastUpdated
                             jobStatus{
                               name
                             }
