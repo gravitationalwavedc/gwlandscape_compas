@@ -88,7 +88,7 @@ const PublicJobs = ({data, match, router, relay}) => {
                                     <Card.Subtitle>
                                         <span className={'job-'+job.jobStatus.name.toLowerCase()}>
                                             {job.jobStatus.name}
-                                        </span> . <span>{job.user}</span> . {job.lastUpdated}
+                                        </span> . <span>{job.user}</span> . {job.timestamp}
                                     </Card.Subtitle>
                                     <Card.Text>{job.description}</Card.Text>
                                     <Link
@@ -154,7 +154,7 @@ export default createPaginationContainer(PublicJobs,
                             user
                             name
                             description
-                            lastUpdated
+                            timestamp
                             jobStatus{
                               name
                             }
