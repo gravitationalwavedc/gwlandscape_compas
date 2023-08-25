@@ -13,7 +13,8 @@ const ViewJob = ({data, ...rest}) => (
                         <h1>{data.compasJob.start.name}</h1>
                         <h6 data-testid="jobInfo">
                             {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
-                            {data.compasJob.user} . {data.compasJob.start.private}
+                            {data.compasJob.user} . {data.compasJob.start.private? ' Private' : ' Public'} .
+                            {data.compasJob.start.detailedOutput? ' Detailed Output': ' No Detailed Output'}
                         </h6>
                         <h5>{data.compasJob.start.description}</h5>
                     </Col>
@@ -62,6 +63,7 @@ export default createFragmentContainer(ViewJob,
                         name
                         description
                         private
+                        detailedOutput
                     }
                     jobStatus {
                         name
