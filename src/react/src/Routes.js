@@ -121,7 +121,7 @@ function getRoutes() {
             />
             <Route
                 Component={PublicJobs}
-                path="public"
+                path="jobs"
                 query={graphql`
                 query Routes_PublicJobs_Query (
                   $count: Int!,
@@ -136,7 +136,7 @@ function getRoutes() {
               `}
                 prepareVariables={() => ({
                     timeRange: 'all',
-                    count: 100
+                    count: 10
                 })}
                 environment={harnessApi.getEnvironment('compas')}
                 render={handleRender}/>
