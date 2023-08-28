@@ -63,6 +63,7 @@ const JobTitle = () => {
                 name="detailedOutput"
                 onChange={handleChange}
                 checked={values['detailedOutput']}/>
+            <small className="text-muted">Enabling detailed output results in very large output files</small>
         </div>
 
     </React.Fragment>;
