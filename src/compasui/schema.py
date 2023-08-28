@@ -109,7 +109,8 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
         return {
             "name": parent.name,
             "description": parent.description,
-            "private": parent.private
+            "private": parent.private,
+            "detailed_output": parent.detailed_output
         }
 
     def resolve_job_status(parent, info):
