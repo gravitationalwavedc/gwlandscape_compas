@@ -1,6 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Col, Container, Form, InputGroup, Card, Button} from 'react-bootstrap';
-import {HiOutlineSearch} from 'react-icons/hi';
+import React from 'react';
+import {Col, Container, Card, Button, Row} from 'react-bootstrap';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import {createPaginationContainer, graphql} from 'react-relay';
 import Link from 'found/Link';
@@ -11,9 +10,6 @@ const RECORDS_PER_PAGE = 10;
 const MyJobs = ({data, match, router, relay}) => {
     const jobs = data && data.compasJobs && data.compasJobs.edges.length > 0 ?
         data.compasJobs.edges.map(e => e.node) : null;
-    const [search, setSearch] = useState('');
-
-    useEffect(() => handleSearchChange(), [search]);
 
     const _loadMore = () => {
         if (! relay.hasMore() || relay.isLoading()) {
@@ -22,61 +18,37 @@ const MyJobs = ({data, match, router, relay}) => {
         relay.loadMore(RECORDS_PER_PAGE);
     };
 
-    useEffect(() => handleSearchChange(), [search]);
-
-    const handleSearchChange = () => {
-        const refetchVariables = {
-            count: RECORDS_PER_PAGE,
-            search: search
-        };
-        relay.refetchConnection(1, null, refetchVariables);
-    };
 
     return (
         <Container>
-            <h1 className="pt-5 mb-4">
-                My Jobs
-            </h1>
-            <Form>
-                <Form.Row>
-                    <Col lg={6}>
-                        <Form.Group controlId="searchJobs">
-                            <InputGroup>
-                                <InputGroup.Prepend>
-                                    <InputGroup.Text>
-                                        <HiOutlineSearch />
-                                    </InputGroup.Text>
-                                </InputGroup.Prepend>
-                                <Form.Control
-                                    className="text-left"
-                                    placeholder="Search by Name, Description or Last Updated Date"
-                                    onChange={({target}) => setSearch(target.value)}
-                                />
-                            </InputGroup>
-                        </Form.Group>
-                    </Col>
-                    <Col lg={2}>
-                        <Link
-                            to={'/compas/jobs/'}
-                            exact
-                            match={match}
-                            router={router}
-                            as={Button}
-                            variant='outline-primary'
-                        >Public Jobs</Link>
-                    </Col>
-                    <Col lg={2}>
-                        <Link
-                            to={'/compas/job-form'}
-                            exact
-                            match={match}
-                            router={router}
-                            as={Button}
-                            variant='primary'
-                        >New Job</Link>
-                    </Col>
-                </Form.Row>
-            </Form>
+            <Row>
+                <Col lg={6}>
+                    <h1 className="pt-5 mb-3">
+                        My Jobs
+                    </h1>
+                </Col>
+                <Col lg={2} className="pt-5 mb-2">
+                    <Link
+                        to={'/compas/jobs/'}
+                        exact
+                        match={match}
+                        router={router}
+                        as={Button}
+                        variant='outline-primary'
+                    >Public Jobs</Link>
+                </Col>
+                <Col lg={2} className="pt-5 mb-2">
+                    <Link
+                        to={'/compas/job-form'}
+                        exact
+                        match={match}
+                        router={router}
+                        as={Button}
+                        variant='primary'
+                    >New Job</Link>
+                </Col>
+            </Row>
+
             {jobs ?
                 <InfiniteScroll
                     next={_loadMore}
