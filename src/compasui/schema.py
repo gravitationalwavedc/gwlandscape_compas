@@ -243,7 +243,7 @@ class Query(object):
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
     public_compas_jobs = relay.ConnectionField(
         CompasPublicJobConnection,
-        search = graphene.String()
+        search=graphene.String()
     )
     gwclouduser = graphene.Field(UserDetails)
 
