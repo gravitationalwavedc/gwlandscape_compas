@@ -110,7 +110,7 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
             "name": parent.name,
             "description": parent.description,
             "private": parent.private,
-            "detailed_output": parent.detailed_output
+            # "detailed_output": parent.detailed_output
         }
 
     def resolve_job_status(parent, info):
@@ -162,6 +162,7 @@ populate_fields(
         "semi_major_axis_distribution",
         "min_orbital_period",
         "max_orbital_period",
+        "detailed_output",
     ],
     basic_parameter_resolvers
 )
@@ -313,7 +314,7 @@ class StartInput(graphene.InputObjectType):
     name = graphene.String()
     description = graphene.String()
     private = graphene.Boolean()
-    detailed_output = graphene.Boolean()
+    # detailed_output = graphene.Boolean()
 
 
 class BasicParametersInput(graphene.InputObjectType):
@@ -333,6 +334,7 @@ class BasicParametersInput(graphene.InputObjectType):
     semi_major_axis_distribution = graphene.String()
     min_orbital_period = graphene.String()
     max_orbital_period = graphene.String()
+    detailed_output = graphene.String()
 
 
 class AdvancedParametersInput(graphene.InputObjectType):

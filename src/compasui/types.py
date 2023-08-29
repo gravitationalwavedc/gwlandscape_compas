@@ -5,7 +5,7 @@ class OutputStartType(ObjectType):
     name = String()
     description = String()
     private = Boolean()
-    detailed_output = Boolean()
+    # detailed_output = Boolean()
 
 
 class JobStatusType(ObjectType):
@@ -31,6 +31,7 @@ class AbstractBasicParameterType(AbstractType):
     semi_major_axis_distribution = String()
     min_orbital_period = String()
     max_orbital_period = String()
+    detailed_output = String()
 
 
 class AbstractAdvancedParametersType(AbstractType):

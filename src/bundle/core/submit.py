@@ -141,7 +141,7 @@ def read_default_yaml_config(yaml_file_path):
 
 
 def update_yaml_config(default_config, input_params):
-    params = {**input_params['basic'], **input_params['advanced'], 'detailed_output': input_params['detailed_output']}
+    params = {**input_params['basic'], **input_params['advanced']}
 
     for name, value in params.items():
         try:
