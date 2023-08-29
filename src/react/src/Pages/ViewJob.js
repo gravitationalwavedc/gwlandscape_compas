@@ -13,13 +13,12 @@ const ViewJob = ({data, ...rest}) => (
                         <h1>{data.compasJob.start.name}</h1>
                         <h6 data-testid="jobInfo">
                             {data.compasJob.jobStatus.name} . Last Updated {data.compasJob.lastUpdated} .
-                            {data.compasJob.user} . {data.compasJob.start.private? ' Private' : ' Public'} .
-                            {data.compasJob.start.detailedOutput? ' Detailed Output': ' No Detailed Output'}
+                            {data.compasJob.user} . {data.compasJob.start.private? ' Private' : ' Public'}
                         </h6>
                         <h5>{data.compasJob.start.description}</h5>
                     </Col>
                 </Row>
-                <Tab.Container id="job_info_tabs" defaultActiveKey="results">
+                <Tab.Container id="job_info_tabs" defaultActiveKey="parameters">
                     <Row>
                         <Col md={3}>
                             <Nav fill variant="pills" className="flex-column text-center">
@@ -63,7 +62,6 @@ export default createFragmentContainer(ViewJob,
                         name
                         description
                         private
-                        detailedOutput
                     }
                     jobStatus {
                         name
