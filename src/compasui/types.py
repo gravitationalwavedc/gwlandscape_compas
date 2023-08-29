@@ -5,7 +5,6 @@ class OutputStartType(ObjectType):
     name = String()
     description = String()
     private = Boolean()
-    # detailed_output = Boolean()
 
 
 class JobStatusType(ObjectType):

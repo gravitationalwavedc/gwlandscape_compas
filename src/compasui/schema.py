@@ -110,7 +110,6 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
             "name": parent.name,
             "description": parent.description,
             "private": parent.private,
-            # "detailed_output": parent.detailed_output
         }
 
     def resolve_job_status(parent, info):
@@ -241,7 +240,6 @@ class CompasPublicJobConnection(relay.Connection):
 class Query(object):
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
-    all_labels = graphene.List(LabelType)
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
     public_compas_jobs = relay.ConnectionField(
         CompasPublicJobConnection,
@@ -251,10 +249,6 @@ class Query(object):
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
-
-    # @login_required
-    # def resolve_all_labels(self, info, **kwargs):
-    #     return Label.all()
 
     @login_required
     def resolve_gwclouduser(self, info, **kwargs):
@@ -314,7 +308,6 @@ class StartInput(graphene.InputObjectType):
     name = graphene.String()
     description = graphene.String()
     private = graphene.Boolean()
-    # detailed_output = graphene.Boolean()
 
 
 class BasicParametersInput(graphene.InputObjectType):
