@@ -57,17 +57,6 @@ const MyJobs = ({data, match, router, relay}) => {
                     </Col>
                     <Col lg={2}>
                         <Link
-                            to={'/compas/job-form'}
-                            exact
-                            match={match}
-                            router={router}
-                            as={Button}
-                            variant='outline-primary'
-                        >New Job</Link>
-
-                    </Col>
-                    <Col lg={2}>
-                        <Link
                             to={'/compas/jobs/'}
                             exact
                             match={match}
@@ -75,6 +64,16 @@ const MyJobs = ({data, match, router, relay}) => {
                             as={Button}
                             variant='outline-primary'
                         >Public Jobs</Link>
+                    </Col>
+                    <Col lg={2}>
+                        <Link
+                            to={'/compas/job-form'}
+                            exact
+                            match={match}
+                            router={router}
+                            as={Button}
+                            variant='primary'
+                        >New Job</Link>
                     </Col>
                 </Form.Row>
             </Form>

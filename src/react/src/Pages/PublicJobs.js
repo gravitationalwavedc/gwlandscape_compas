@@ -33,7 +33,7 @@ const PublicJobs = ({data, match, router, relay}) => {
     return (
         <Container>
             <h1 className="pt-5 mb-4">
-                Jobs
+                Public Jobs
             </h1>
             <Form>
                 <Form.Row>
@@ -55,16 +55,6 @@ const PublicJobs = ({data, match, router, relay}) => {
                     </Col>
                     <Col lg={2}>
                         <Link
-                            to={'/compas/job-form'}
-                            exact
-                            match={match}
-                            router={router}
-                            as={Button}
-                            variant='outline-primary'
-                        >New Job</Link>
-                    </Col>
-                    <Col lg={3}>
-                        <Link
                             to={'/compas/my-jobs/'}
                             exact
                             match={match}
@@ -72,6 +62,16 @@ const PublicJobs = ({data, match, router, relay}) => {
                             as={Button}
                             variant='outline-primary'
                         >My Jobs</Link>
+                    </Col>
+                    <Col lg={3}>
+                        <Link
+                            to={'/compas/job-form'}
+                            exact
+                            match={match}
+                            router={router}
+                            as={Button}
+                            variant='primary'
+                        >New Job</Link>
                     </Col>
                 </Form.Row>
             </Form>
