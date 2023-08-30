@@ -199,13 +199,6 @@ class SingleBinaryJobNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
-class UserDetails(graphene.ObjectType):
-    username = graphene.String()
-
-    def resolve_username(parent, info):
-        return "Todo"
-
-
 class CompasResultFile(graphene.ObjectType):
     path = graphene.String()
     is_dir = graphene.Boolean()
@@ -245,7 +238,6 @@ class Query(object):
         CompasPublicJobConnection,
         search=graphene.String()
     )
-    gwclouduser = graphene.Field(UserDetails)
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)

@@ -128,9 +128,6 @@ function getRoutes() {
                   $cursor: String,
                   $search: String,
                 ) {
-                    gwclouduser {
-                      username
-                    }
                     ...PublicJobs_data
                 }
               `}
