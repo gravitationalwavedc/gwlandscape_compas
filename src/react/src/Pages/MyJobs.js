@@ -5,7 +5,7 @@ import {createPaginationContainer, graphql} from 'react-relay';
 import Link from 'found/Link';
 
 
-const RECORDS_PER_PAGE = 10;
+const RECORDS_PER_PAGE = 100;
 
 const MyJobs = ({data, match, router, relay}) => {
     const jobs = data && data.compasJobs && data.compasJobs.edges.length > 0 ?
