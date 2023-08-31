@@ -59,6 +59,7 @@ const NewJob = ({initialValues, router}) => {
                     semiMajorAxisDistribution: values.semiMajorAxisDistribution,
                     minOrbitalPeriod: values.minOrbitalPeriod,
                     maxOrbitalPeriod: values.maxOrbitalPeriod,
+                    detailedOutput: values.detailedOutput,
                 },
                 advancedParameters: {
                     massTransferAngularMomentumLossPrescription: values.massTransferAngularMomentumLossPrescription,

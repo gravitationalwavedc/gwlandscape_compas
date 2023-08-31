@@ -11,12 +11,19 @@ describe('my Jobs Page', () => {
         <QueryRenderer
             environment={environment}
             query={graphql`
-            query MyJobsTestQuery 
+            query MyJobsTestQuery (
+              $count: Int, 
+              $cursor: String,
+              $orderBy: String
+              )
               @relay_test_operation {
                 ...MyJobs_data
             }
           `}
-
+            variables={{
+                count: 10,
+                orderBy: '-lastUpdated'
+            }}
             render={({error, props}) => {
                 if (props) {
                     return <MyJobs data={props} match={{}} router={router}/>;

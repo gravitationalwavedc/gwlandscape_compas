@@ -30,6 +30,7 @@ class AbstractBasicParameterType(AbstractType):
     semi_major_axis_distribution = String()
     min_orbital_period = String()
     max_orbital_period = String()
+    detailed_output = String()
 
 
 class AbstractAdvancedParametersType(AbstractType):

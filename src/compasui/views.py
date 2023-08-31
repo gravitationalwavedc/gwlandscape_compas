@@ -35,7 +35,7 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
             name=start.name,
             description=start.description,
             private=start.private,
-            is_ligo_job=False
+            is_ligo_job=False,
         )
         compas_job.save()
 

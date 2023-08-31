@@ -11,6 +11,7 @@ import NewJob from './Pages/NewJob';
 import ViewJob from './Pages/ViewJob';
 import ViewPublication from './Pages/ViewPublication';
 import MyJobs from './Pages/MyJobs';
+import PublicJobs from './Pages/PublicJobs';
 
 // List of components that require authentication
 const PROTECTED_COMPONENTS = [
@@ -103,12 +104,39 @@ function getRoutes() {
                 environment={harnessApi.getEnvironment('compas')}
                 Component={MyJobs}
                 query={graphql`
-                    query Routes_MyJobs_Query{
-                        ...MyJobs_data
+                    query Routes_MyJobs_Query(
+                      $count: Int!,
+                      $cursor: String,
+                      $orderBy: String
+                    ) {
+                      ...MyJobs_data
                     }
                 `}
+                prepareVariables={() => ({
+                    count: 10,
+                    orderBy: '-lastUpdated'
+                    // timeRange: 'all',
+                })}
                 render={handleRender}
             />
+            <Route
+                Component={PublicJobs}
+                path="jobs"
+                query={graphql`
+                query Routes_PublicJobs_Query (
+                  $count: Int!,
+                  $cursor: String,
+                  $search: String,
+                ) {
+                    ...PublicJobs_data
+                }
+              `}
+                prepareVariables={() => ({
+                    timeRange: 'all',
+                    count: 10
+                })}
+                environment={harnessApi.getEnvironment('compas')}
+                render={handleRender}/>
         </Route>
     );
 }

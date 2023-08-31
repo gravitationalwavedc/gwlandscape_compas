@@ -35,7 +35,8 @@ params_to_compas_commands = {
     'fryer_supernova_engine': '--fryer-supernova-engine',
     'kick_velocity_distribution': '--kick-magnitude-distribution',
     'velocity_1': '--kick-magnitude-1',
-    'velocity_2': '--kick-magnitude-2'
+    'velocity_2': '--kick-magnitude-2',
+    'detailed_output': '--detailed-output'
 }
 
 
@@ -121,7 +122,7 @@ module load pyyaml/3.12-python-3.6.4
 
 # Run h5copy
 cd {wk_dir}/compas
-srun python /fred/oz979/GWLandscape/COMPAS/utils/h5copy.py input {wk_dir} -r
+srun python /fred/oz979/GWLandscape/COMPAS/compas_python_utils/h5copy.py input {wk_dir} -r
 """
 
 
@@ -184,14 +185,14 @@ def submit(details, input_params):
     compas_dir = Path(wk_dir) / 'compas'
     Path(compas_dir).mkdir(parents=True, exist_ok=True)
 
-    YAMLCONFIGPATH = "/fred/oz979/GWLandscape/COMPAS/utils/preProcessing/compasConfigDefault.yaml"
+    YAMLCONFIGPATH = "/fred/oz979/GWLandscape/COMPAS/compas_python_utils/preprocessing/compasConfigDefault.yaml"
 
     default_yaml_config = read_default_yaml_config(YAMLCONFIGPATH)
     updated_yaml_config = update_yaml_config(default_yaml_config, input_params)
 
     no_of_systems = input_params["basic"]["number_of_systems"]
     no_of_nodes = 1
-    PYTHONSUBMITPATH = '/fred/oz979/GWLandscape/COMPAS/utils/preProcessing/runSubmit.py'
+    PYTHONSUBMITPATH = '/fred/oz979/GWLandscape/COMPAS/compas_python_utils/preprocessing/runSubmit.py'
 
     nsys_per_patch = int(no_of_systems) / int(no_of_nodes)
     nsys_remainder = int(no_of_systems) % int(no_of_nodes)

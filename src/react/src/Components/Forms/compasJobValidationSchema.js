@@ -95,6 +95,9 @@ let validationSchema = Yup.object().shape({
         .min(0.0)
         .transform((value) => (isNaN(value) ? undefined : value))
         .nullable(),
+    detailedOutput: Yup
+        .bool()
+        .required()
 
 }, [['minInitialMass', 'maxInitialMass'],
     ['minMassRatio', 'maxMassRatio'],

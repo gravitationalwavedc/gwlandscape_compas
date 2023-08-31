@@ -12,7 +12,7 @@ const Parameters = (props) =>
         </Row>
         <ParameterTableRow params={[
             {name: 'Number of Systems', value: props.jobData.numberOfSystems},
-            {name: '', value: ''}
+            {name: 'Detailed Output', value: props.jobData.detailedOutput}
         ]}/>
         <ParameterTableRow params={[
             {name: 'Initial Mass Function', value: props.jobData.initialMassFunction},
@@ -123,6 +123,7 @@ export default createFragmentContainer(Parameters, {
             kickVelocityDistribution
             velocity1
             velocity2
+            detailedOutput
         }
     `
 });
