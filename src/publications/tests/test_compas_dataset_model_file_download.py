@@ -35,7 +35,7 @@ def create_model_publication(i=1):
     return model, publication
 
 
-@override_settings(MEDIA_ROOT=TemporaryDirectory().name)
+@override_settings(MEDIA_ROOT=TemporaryDirectory().name, PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
 class TestUploadedJobFileDownload(CompasTestCase):
     def setUp(self):
         self.user = User.objects.create(username="buffy", first_name="buffy", last_name="summers")
