@@ -295,3 +295,55 @@ class CompasDatasetModelUploadToken(models.Model):
         cls.objects.filter(
             created__lt=timezone.now() - datetime.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY)
         ).delete()
+
+
+class FileDownloadToken(models.Model):
+    """
+    Copied from GWLab - This model tracks files from job file lists which can be used to generate file download tokens
+    from the job controller
+    """
+    dataset = models.ForeignKey(CompasDatasetModel, on_delete=models.CASCADE, db_index=True)
+    token = models.UUIDField(unique=True, default=uuid.uuid4, db_index=True)
+    path = models.TextField()
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    @classmethod
+    def prune(cls):
+        """
+        Removes expired tokens from the database
+        :return:
+        """
+        cls.objects.filter(
+            created__lt=timezone.now() - datetime.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY)
+        ).delete()
+
+    @classmethod
+    def get_by_token(cls, token):
+        cls.prune()
+        tok = cls.objects.filter(token=token)
+        if not tok.exists():
+            return None
+        return tok.first()
+
+    @classmethod
+    def create(cls, dataset, paths):
+        """
+        Creates a bulk number of FileDownloadToken objects for a specific dataset and list of paths, and returns the
+        created objects
+        """
+        data = [cls(dataset=dataset, path=p) for p in paths]
+        return cls.objects.bulk_create(data)
+
+    @classmethod
+    def get_paths(cls, dataset, tokens):
+        """
+        Returns a list of paths from a list of tokens, any token that isn't found will have a path of None
+        The resulting list, will have identical size and ordering to the provided list of tokens
+        """
+        cls.prune()
+        objects = {
+            str(f.token): f.path for f in cls.objects.filter(dataset=dataset, token__in=tokens)
+        }
+        return [
+            objects[str(tok)] if str(tok) in objects else None for tok in tokens
+        ]

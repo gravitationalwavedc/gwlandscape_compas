@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
 from django.test import override_settings
 from graphql_relay import to_global_id
 
@@ -442,7 +443,9 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
                                 summary
                                 description
                             }
-                            files
+                            files {
+                                path
+                            }
                         }
                     }
                 }
@@ -458,6 +461,8 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
                 content_type='application/gzip'
             )
         )
+
+        tmp_dir = settings.MEDIA_ROOT
 
         self.expected_output = {
             'compasDatasetModels': {
@@ -497,9 +502,9 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
                                 'description': 'description'
                             },
                             'files': [
-                                '/compas/files/publications/1/1/test_job/COMPAS_Output/COMPAS_Output.h5',
-                                '/compas/files/publications/1/1/test_job/COMPAS_Output/Run_Details',
-                                '/compas/files/publications/1/1/test_job/BSE_grid.txt'
+                                {'path': f'{tmp_dir}/publications/1/1/test_job/COMPAS_Output/COMPAS_Output.h5'},
+                                {'path': f'{tmp_dir}/publications/1/1/test_job/COMPAS_Output/Run_Details'},
+                                {'path': f'{tmp_dir}/publications/1/1/test_job/BSE_grid.txt'}
                             ]
                         }
                     }
