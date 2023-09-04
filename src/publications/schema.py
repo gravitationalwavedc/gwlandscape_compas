@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pathlib import Path
 
 import h5py
@@ -12,7 +13,7 @@ from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
 
 from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel, \
-    CompasDatasetModelUploadToken
+    CompasDatasetModelUploadToken, FileDownloadToken
 from publications.utils.misc import check_publication_management_user
 from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data
 
@@ -112,11 +113,18 @@ class PlotMetaType(graphene.ObjectType):
     total_length = graphene.Int()
 
 
+class DatasetFile(graphene.ObjectType):
+    path = graphene.String()
+    file_size = graphene.Decimal()
+    download_token = graphene.String()
+
+
 class CompasDatasetModelNode(DjangoObjectType):
     """
     Type for CompasDatasetModel without authentication
     """
-    files = graphene.List(graphene.String)
+    files = graphene.List(DatasetFile)
+    data_file = graphene.Field(DatasetFile)
     plot_meta = graphene.Field(
         PlotMetaType,
         root_group=graphene.String(),
@@ -143,7 +151,32 @@ class CompasDatasetModelNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
     def resolve_files(root, info, **kwargs):
-        return [Path(f.file.url).absolute() for f in root.upload_set.all()]
+        paths = [Path(f.file.path).absolute() for f in root.upload_set.all()]
+        tokens = FileDownloadToken.create(root, paths)
+
+        # Generate a dict that can be used to query the generated tokens
+        token_dict = {tk.path: tk.token for tk in tokens}
+
+        # Build the resulting file list and send it back to the client
+        return [
+            DatasetFile(
+                path=path,
+                file_size=Decimal(path.stat().st_size),
+                download_token=token_dict.get(path, None),
+            )
+            for path in paths
+        ]
+
+    def resolve_data_file(root, info, **kwargs):
+        path = Path(root.get_data_file().path).absolute()
+        tokens = FileDownloadToken.create(root, [path])
+
+        # Build the resulting file list and send it back to the client
+        return DatasetFile(
+            path=path,
+            file_size=Decimal(path.stat().st_size),
+            download_token=tokens[0].token if len(tokens) else None,
+        )
 
     def resolve_plot_meta(root, info, **kwargs):
         f = h5py.File(Path(root.get_data_file().path).absolute())
@@ -170,6 +203,7 @@ class Query(object):
     compas_publication = relay.Node.Field(CompasPublicationNode)
     compas_publications = DjangoFilterConnectionField(CompasPublicationNode)
     compas_models = DjangoFilterConnectionField(CompasModelNode)
+    compas_dataset_model = relay.Node.Field(CompasDatasetModelNode)
     compas_dataset_models = DjangoFilterConnectionField(CompasDatasetModelNode)
 
     generate_compas_dataset_model_upload_token = graphene.Field(GenerateCompasDatasetModelUploadToken)

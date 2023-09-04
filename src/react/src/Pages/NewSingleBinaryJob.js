@@ -4,6 +4,7 @@ import { graphql } from 'react-relay';
 import { harnessApi } from '../index';
 import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
 import { Formik } from 'formik';
+import { IS_DEV } from '../Utils/misc';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
@@ -28,8 +29,6 @@ const submitMutation = graphql`
         }
     }
 `;
-
-const IS_DEV = !process.env.NODE_ENV || process.env.NODE_ENV === 'development';
 
 const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
