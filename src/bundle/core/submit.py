@@ -9,31 +9,39 @@ from _bundledb import create_or_update_job
 from scheduler.slurm import slurm_submit
 
 
-params_to_compas_commands = {
-    'number_of_systems': '--number-of-systems',
-    'min_initial_mass': '--initial-mass-min',
-    'max_initial_mass': '--initial-mass-max',
+string_params = {
+
     'initial_mass_function': '--initial-mass-function',
-    'initial_mass_power': '--initial-mass-power',
-    'min_metallicity': '--metallicity-min',
-    'max_metallicity': '--metallicity-max',
     'metallicity_distribution': '--metallicity-distribution',
-    'min_mass_ratio': '--mass-ratio-min',
-    'max_mass_ratio': '--mass-ratio-max',
     'mass_ratio_distribution': '--mass-ratio-distribution',
-    'min_semi_major_axis': '--semi-major-axis-min',
-    'max_semi_major_axis': '--semi-major-axis-max',
     'semi_major_axis_distribution': '--semi-major-axis-distribution',
-    'min_orbital_period': '--orbital-period-min',
-    'max_orbital_period': '--orbital-period-max',
     'mass_transfer_angular_momentum_loss_prescription': '--mass-transfer-angular-momentum-loss-prescription',
     'mass_transfer_accretion_efficiency_prescription': '--mass-transfer-accretion-efficiency-prescription',
-    'mass_transfer_fa': '--mass-transfer-fa',
-    'common_envelope_alpha': '--common-envelope-alpha',
     'common_envelope_lambda_prescription': '--common-envelope-lambda-prescription',
     'remnant_mass_prescription': '--remnant-mass-prescription',
     'fryer_supernova_engine': '--fryer-supernova-engine',
     'kick_velocity_distribution': '--kick-magnitude-distribution',
+}
+
+boolean_params = {
+    'detailed_output': '--detailed-output'
+}
+
+numeric_params = {
+    'number_of_systems': '--number-of-systems',
+    'min_initial_mass': '--initial-mass-min',
+    'max_initial_mass': '--initial-mass-max',
+    'initial_mass_power': '--initial-mass-power',
+    'min_metallicity': '--metallicity-min',
+    'max_metallicity': '--metallicity-max',
+    'min_mass_ratio': '--mass-ratio-min',
+    'max_mass_ratio': '--mass-ratio-max',
+    'min_semi_major_axis': '--semi-major-axis-min',
+    'max_semi_major_axis': '--semi-major-axis-max',
+    'min_orbital_period': '--orbital-period-min',
+    'max_orbital_period': '--orbital-period-max',
+    'mass_transfer_fa': '--mass-transfer-fa',
+    'common_envelope_alpha': '--common-envelope-alpha',
     'velocity_1': '--kick-magnitude-1',
     'velocity_2': '--kick-magnitude-2',
     'detailed_output': '--detailed-output'
@@ -91,7 +99,7 @@ GSL_DIR='/apps/skylake/modulefiles/all/compiler/gcc/6.4.0/gsl/2.4.lua'
 # Run python submit
 cd {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}
 srun python {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}/runSubmit_${{SLURM_ARRAY_TASK_ID}}.py \
->& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
+compasConfigDefault.yaml >& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
 """
 
 
@@ -134,31 +142,32 @@ def get_numerical_value(value):
     return float(value) if value != '' else None
 
 
-def read_default_yaml_config(yaml_file_path):
-    with open(yaml_file_path) as f:
-        config = yaml.load(f, yaml.Loader)
-        return config
+def get_boolean_value(value):
+    return True if value in ['true', 'True'] else False
 
 
-def update_yaml_config(default_config, input_params):
+def update_yaml_config(input_params):
     params = {**input_params['basic'], **input_params['advanced']}
-
+    commands = {'stringChoices': {},
+                'booleanChoices': {},
+                'numericalChoices': {},
+                'listChoices': {}}
     for name, value in params.items():
         try:
-            command = params_to_compas_commands[name]
-            if command in default_config['stringChoices'].keys():
-                default_config['stringChoices'][command] = get_string_value(value)
-            elif command in default_config['booleanChoices'].keys():
-                default_config['booleanChoices'][command] = bool(value)
-            elif command in default_config['numericalChoices'].keys():
-                default_config['numericalChoices'][command] = get_numerical_value(value)
+            # command = params_to_compas_commands[name]
+            if name in string_params.keys():
+                commands['stringChoices'][string_params[name]] = get_string_value(value)
+            elif name in boolean_params.keys():
+                commands['booleanChoices'][boolean_params[name]] = get_boolean_value(value)
+            elif name in numeric_params.keys():
+                commands['numericalChoices'][numeric_params[name]] = get_numerical_value(value)
             else:
-                print(f'option {command} cannot be found in compas commands')
+                print(f'parameter {name} does not have a corresponding compas command')
         except KeyError as e:
             print(e)
             continue
 
-    return default_config
+    return commands
 
 
 def submit(details, input_params):
@@ -185,10 +194,7 @@ def submit(details, input_params):
     compas_dir = Path(wk_dir) / 'compas'
     Path(compas_dir).mkdir(parents=True, exist_ok=True)
 
-    YAMLCONFIGPATH = "/fred/oz979/GWLandscape/COMPAS/compas_python_utils/preprocessing/compasConfigDefault.yaml"
-
-    default_yaml_config = read_default_yaml_config(YAMLCONFIGPATH)
-    updated_yaml_config = update_yaml_config(default_yaml_config, input_params)
+    updated_yaml_config = update_yaml_config(input_params)
 
     no_of_systems = input_params["basic"]["number_of_systems"]
     no_of_nodes = 1
@@ -210,9 +216,7 @@ def submit(details, input_params):
             yaml.dump(updated_yaml_config, yaml_file)
 
         start_seed = (i+1) * nsys_per_patch
-        seed_file = Path(run_dir) / 'randomSeed.txt'
-        with open(seed_file, 'w') as f:
-            f.write(str(start_seed))
+        updated_yaml_config['numericalChoices']['--random-seed'] = int(start_seed)
 
     # Write slurm scripts
     slurm_script = Path(wk_dir) / 'submit' / f'{job_name}_slurm.sh'
