@@ -159,7 +159,7 @@ class CompasDatasetModelNode(DjangoObjectType):
 
         # Generate a dict to remove the parent dirs
         output_path_dict = {
-            Path(f.file.path).absolute(): Path(*Path(f.file.name).parts[3:]) 
+            Path(f.file.path).absolute(): Path(*Path(f.file.name).parts[3:])
             for f in root.upload_set.all()
         }
 
