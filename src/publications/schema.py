@@ -157,10 +157,16 @@ class CompasDatasetModelNode(DjangoObjectType):
         # Generate a dict that can be used to query the generated tokens
         token_dict = {tk.path: tk.token for tk in tokens}
 
+        # Generate a dict to remove the parent dirs
+        output_path_dict = {
+            Path(f.file.path).absolute(): Path(*Path(f.file.name).parts[3:]) 
+            for f in root.upload_set.all()
+        }
+
         # Build the resulting file list and send it back to the client
         return [
             DatasetFile(
-                path=path,
+                path=output_path_dict.get(path),
                 file_size=Decimal(path.stat().st_size),
                 download_token=token_dict.get(path, None),
             )

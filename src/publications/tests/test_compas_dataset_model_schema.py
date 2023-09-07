@@ -502,9 +502,9 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
                                 'description': 'description'
                             },
                             'files': [
-                                {'path': f'{tmp_dir}/publications/1/1/test_job/COMPAS_Output/COMPAS_Output.h5'},
-                                {'path': f'{tmp_dir}/publications/1/1/test_job/COMPAS_Output/Run_Details'},
-                                {'path': f'{tmp_dir}/publications/1/1/test_job/BSE_grid.txt'}
+                                {'path': 'test_job/COMPAS_Output/COMPAS_Output.h5'},
+                                {'path': 'test_job/COMPAS_Output/Run_Details'},
+                                {'path': 'test_job/BSE_grid.txt'}
                             ]
                         }
                     }
