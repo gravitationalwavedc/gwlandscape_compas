@@ -422,7 +422,7 @@ class SingleBinaryJob(models.Model):
         overwrites default save model behavior
         """
         super().save(*args, **kwargs)
-        self.save_BSE_Grid_file()
+        # self.save_BSE_Grid_file()
 
     def save_BSE_Grid_file(self):
         """
