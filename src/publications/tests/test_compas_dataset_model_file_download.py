@@ -133,5 +133,6 @@ class TestUploadedJobFileDownload(CompasTestCase):
 
             content = b"".join(list(response))
 
-            with open(path, "rb") as f:
+            test_file_path = Path(__file__) / '../test_data' / path
+            with open(test_file_path.resolve(), "rb") as f:
                 self.assertEqual(content, f.read())
