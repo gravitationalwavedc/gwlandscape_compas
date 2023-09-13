@@ -9,7 +9,7 @@ let validationSchema = Yup.object().shape({
         .test(
             'mass2 vs mass1',
             'Mass 1 should be > Mass 2',
-            (value) => value > mass2.value
+            (value) => value >= mass2.value
         ),
     mass2: Yup
         .number()
@@ -19,7 +19,7 @@ let validationSchema = Yup.object().shape({
         .test(
             'mass1 vs mass2',
             'Mass 2 should be < Mass 1',
-            (value) => mass1.value > value
+            (value) => mass1.value >= value
         ),
     metallicity: Yup
         .number()
