@@ -183,13 +183,6 @@ CELERY_TASK_TIME_LIMIT = 7
 
 COMPAS_IO_PATH = os.path.join(MEDIA_ROOT, 'jobs/')
 
-# COMPAS Python Submit command for Celery task
-# TODO update these settigs to work with COMPAS running in Docker container
-RUN_COMPAS_COMMAND = [
-    'python3',
-    os.path.join(BASE_DIR, 'compasui/utils/celery_pythonSubmit.py'),
-]
-
 PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS = []
 
 COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY = 60*60*24     # User has one day to upload the file for the job

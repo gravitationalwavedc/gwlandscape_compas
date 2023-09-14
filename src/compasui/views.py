@@ -1,6 +1,5 @@
 import datetime
 import json
-import os
 import re
 from pathlib import Path
 
@@ -148,20 +147,10 @@ def create_single_binary_job(
         if (field_value is not None) and (field.name in SINGLE_BINARY_FIELD_COMMANDS):
             parameters += f'{SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value} '
 
-    # grid_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'BSE_grid.txt')
-    # output_path = os.path.join(settings.COMPAS_IO_PATH, model_id)
     output_path = Path(settings.COMPAS_IO_PATH) / model_id
     if not output_path.exists():
         output_path.mkdir()
-    # parameters += f'--output-path {output_path} '
 
-
-    # detailed_output_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
-    #                                          'Detailed_Output', 'BSE_Detailed_Output_0.h5')
-
-    # detailed_output_file_path = \
-    #         Path(settings.COMPAS_IO_PATH) / model_id / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
-    # task = run_compas.delay(grid_file_path, output_path, detailed_output_file_path)
     task = run_compas.delay(parameters, str(output_path))
 
     # get task result

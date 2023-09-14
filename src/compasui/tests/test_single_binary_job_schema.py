@@ -54,7 +54,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 }
             }
         }
-
         self.test_detailed_output_file_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
 
     def test_h5_file_to_json(self):
@@ -64,8 +63,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         # Test it return None if the file doesn't exist
         json_data = read_h5_data_as_json(f'../{self.test_detailed_output_file_path}')
         self.assertIsNone(json_data)
-
-
 
     def test_new_single_binary_job_exception_no_redis_raised(self):
         # Not mocking tasks or redis. Tasks fail as celery cannot connect to redis
@@ -93,10 +90,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             self.create_single_binary_job_mutation,
             self.single_binary_job_input
         )
-        # grid_file_path = path.join(settings.COMPAS_IO_PATH, '1', 'BSE_grid.txt')
         output_path = path.join(settings.COMPAS_IO_PATH, '1')
-        # detailed_output_file_path = path.join(settings.COMPAS_IO_PATH, '1', 'COMPAS_Output',
-        #                                       'Detailed_Output', 'BSE_Detailed_Output_0.h5')
 
         run_compas.delay.assert_called_with(self.parameter_str, output_path)
 
@@ -118,7 +112,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             self.single_binary_job_input
         )
         self.assertEqual(self.expected_failed, response.data)
-
 
     @patch('compasui.views.run_compas')
     def test_new_single_binary_mutation_when_tasks_succeed(self, run_compas):
