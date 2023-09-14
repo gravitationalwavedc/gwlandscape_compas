@@ -39,7 +39,7 @@ services:
     build:
       dockerfile: ./docker/gwlandscape_compas_static.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.24
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.25
     ports:
       - "8000"
 
@@ -62,7 +62,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/gwlandscape_compas_celery.Dockerfile
-    image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.12
+    image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.13
     restart: always
     environment:
       PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS: "[]"
