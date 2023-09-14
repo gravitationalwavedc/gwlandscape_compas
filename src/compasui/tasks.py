@@ -35,7 +35,6 @@ def run_compas(parameter_str, output_path):
 
         detailed_output_file_path = f'{output_path}/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
 
-        print(compas_command)
         call(compas_command, shell=True)
         result = check_output_file_generated(detailed_output_file_path)
 

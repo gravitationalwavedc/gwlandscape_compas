@@ -28,14 +28,15 @@ class TestCeleryTasks(TestCase):
         result = run_compas(self.parameter_str, self.output_path)
         self.assertEqual(result, TASK_SUCCESS)
 
-    # @patch("compasui.tasks.run_compas_cmd")
-    # def test_run_compas_failure(self, run_compas_cmd):
-    #     run_compas_cmd.side_effect = Exception('something went wrong')
-    #     result = run_compas(self.parameter_str, self.detailed_output_path)
-    #     self.assertEqual(result, TASK_FAIL)
-    #
-    # @patch("compasui.tasks.run_compas_cmd")
-    # def test_run_compas_timeout(self, run_compas_cmd):
-    #     run_compas_cmd.side_effect = SoftTimeLimitExceeded
-    #     result = run_compas(self.parameter_str, self.detailed_output_path)
-    #     self.assertEqual(result, TASK_TIMEOUT)
+    @patch("compasui.tasks.check_output_file_generated")
+    def test_run_compas_failure(self, check_output_file_generated):
+        check_output_file_generated.side_effect = Exception('something went wrong')
+        result = run_compas(self.parameter_str, self.output_path)
+        self.assertEqual(result, TASK_FAIL)
+
+    @patch("compasui.tasks.check_output_file_generated")
+    def test_run_compas_timeout(self, check_output_file_generated):
+        check_output_file_generated.side_effect = SoftTimeLimitExceeded
+        result = run_compas(self.parameter_str, self.output_path)
+        self.assertRaises(SoftTimeLimitExceeded)
+        self.assertEqual(result, TASK_TIMEOUT)
