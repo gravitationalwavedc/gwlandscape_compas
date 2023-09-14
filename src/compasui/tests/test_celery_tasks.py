@@ -1,5 +1,4 @@
 from unittest.mock import patch
-import os.path
 from tempfile import TemporaryDirectory
 from celery.exceptions import SoftTimeLimitExceeded
 from django.test import TestCase
