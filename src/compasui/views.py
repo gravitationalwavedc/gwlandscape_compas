@@ -1,7 +1,7 @@
 import datetime
 import json
-import os
 import re
+from pathlib import Path
 
 import jwt
 import requests
@@ -10,7 +10,7 @@ from django.db import transaction
 
 from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
 from .tasks import run_compas
-from .utils.constants import TASK_FAIL, TASK_TIMEOUT
+from .utils.constants import TASK_FAIL, TASK_TIMEOUT, SINGLE_BINARY_FIELD_COMMANDS
 
 
 def validate_job_name(name):
@@ -118,6 +118,7 @@ def create_single_binary_job(
             kick_velocity_distribution,
             mass_transfer_angular_momentum_loss_prescription,
             mass_transfer_accretion_efficiency_prescription, mass_transfer_fa):
+
     single_binary_job = SingleBinaryJob(
         mass1=mass1,
         mass2=mass2,
@@ -136,15 +137,21 @@ def create_single_binary_job(
         mass_transfer_accretion_efficiency_prescription=mass_transfer_accretion_efficiency_prescription,
         mass_transfer_fa=mass_transfer_fa,
     )
+
     single_binary_job.save()
     model_id = str(single_binary_job.id)
 
-    grid_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'BSE_grid.txt')
-    output_path = os.path.join(settings.COMPAS_IO_PATH, model_id)
-    detailed_output_file_path = os.path.join(settings.COMPAS_IO_PATH, model_id, 'COMPAS_Output',
-                                             'Detailed_Output', 'BSE_Detailed_Output_0.h5')
+    parameters = ""
+    for field in SingleBinaryJob._meta.get_fields():
+        field_value = getattr(single_binary_job, field.name)
+        if (field_value is not None) and (field.name in SINGLE_BINARY_FIELD_COMMANDS):
+            parameters += f'{SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value} '
 
-    task = run_compas.delay(grid_file_path, output_path, detailed_output_file_path)
+    output_path = Path(settings.COMPAS_IO_PATH) / model_id
+    if not output_path.exists():
+        output_path.mkdir()
+
+    task = run_compas.delay(parameters, str(output_path))
 
     # get task result
     result = task.get()

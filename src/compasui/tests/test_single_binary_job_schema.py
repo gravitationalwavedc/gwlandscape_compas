@@ -1,4 +1,6 @@
+import os
 from os import path
+import shutil
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 from django.conf import settings
@@ -35,9 +37,13 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 'commonEnvelopeAlpha': 0.1,
                 'commonEnvelopeLambdaPrescription': 'LAMBDA_FIXED',
                 'fryerSupernovaEngine': 'DELAYED',
-                'kickVelocityDistribution': 'ZERO',
             }
         }
+
+        self.parameter_str = ("--initial-mass-1 1.5 --initial-mass-2 1.51 --metallicity 0.02 --eccentricity 0.1 "
+                              "--semi-major-axis 0.1 "
+                              "--common-envelope-alpha 0.1 --common-envelope-lambda-prescription LAMBDA_FIXED "
+                              "--fryer-supernova-engine DELAYED ")
 
         self.expected_failed = {
             'newSingleBinary': {
@@ -48,18 +54,15 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 }
             }
         }
-
-        self.details_output_file_path = "../compasui/tests/test_data/BSE_Detailed_Output_0.h5"
+        self.test_detailed_output_file_path = "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
 
     def test_h5_file_to_json(self):
-        json_data = read_h5_data_as_json("./compasui/tests/test_data/BSE_Detailed_Output_0.h5")
+        json_data = read_h5_data_as_json(self.test_detailed_output_file_path)
         self.assertIsNotNone(json_data)
 
         # Test it return None if the file doesn't exist
-        json_data = read_h5_data_as_json(f'../{self.details_output_file_path}')
+        json_data = read_h5_data_as_json(f'../{self.test_detailed_output_file_path}')
         self.assertIsNone(json_data)
-
-
 
     def test_new_single_binary_job_exception_no_redis_raised(self):
         # Not mocking tasks or redis. Tasks fail as celery cannot connect to redis
@@ -87,13 +90,9 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             self.create_single_binary_job_mutation,
             self.single_binary_job_input
         )
-
-        grid_file_path = path.join(settings.COMPAS_IO_PATH, '1', 'BSE_grid.txt')
         output_path = path.join(settings.COMPAS_IO_PATH, '1')
-        detailed_output_file_path = path.join(settings.COMPAS_IO_PATH, '1', 'COMPAS_Output',
-                                              'Detailed_Output', 'BSE_Detailed_Output_0.h5')
 
-        run_compas.delay.assert_called_with(grid_file_path, output_path, detailed_output_file_path)
+        run_compas.delay.assert_called_with(self.parameter_str, output_path)
 
     @patch('compasui.views.run_compas')
     def test_new_single_binary_mutation_when_tasks_fail(self, run_compas):
@@ -116,8 +115,13 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
     @patch('compasui.views.run_compas')
     def test_new_single_binary_mutation_when_tasks_succeed(self, run_compas):
-        detailed_output_file_path = f'{settings.MEDIA_URL}jobs/1/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
-
+        detailed_output_file_url = f'{settings.MEDIA_URL}jobs/1/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+        # mock run_compas_output
+        output_path = path.join(settings.COMPAS_IO_PATH, '1', 'COMPAS_Output', 'Detailed_Output')
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        output_file_path = os.path.join(output_path, 'BSE_Detailed_Output_0.h5')
+        shutil.copy(self.test_detailed_output_file_path, output_file_path)
         run_compas.delay().get.return_value = TASK_SUCCESS
 
         response = self.client.execute(
@@ -129,8 +133,8 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             'newSingleBinary': {
                 'result': {
                     'jobId': '1',
-                    'jsonData': read_h5_data_as_json("../compasui/tests/test_data/BSE_Detailed_Output_0.h5"),
-                    'detailedOutputFilePath': detailed_output_file_path
+                    'jsonData': read_h5_data_as_json(self.test_detailed_output_file_path),
+                    'detailedOutputFilePath': detailed_output_file_url
                 }
             }
         }

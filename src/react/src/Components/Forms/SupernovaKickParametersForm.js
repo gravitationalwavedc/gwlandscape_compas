@@ -57,7 +57,7 @@ const SupernovaKickParametersForm = () => {
                         data-testid="velocity2"
                         type="number"
                         show={showVelocity}
-                    />s
+                    />
                 </Col>
             </Row>
         </React.Fragment>

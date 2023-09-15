@@ -1,7 +1,5 @@
 import datetime
-import os
 import uuid
-from pathlib import Path
 
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -422,31 +420,3 @@ class SingleBinaryJob(models.Model):
         overwrites default save model behavior
         """
         super().save(*args, **kwargs)
-        self.save_BSE_Grid_file()
-
-    def save_BSE_Grid_file(self):
-        """
-        saves initial parameters and advanced settings in BSE_grid.txt file to filesystem
-        """
-        content = ""
-
-        for field in self._meta.get_fields():
-
-            field_value = getattr(self, field.name)
-            if (field_value is not None) and (field.name in constants.SINGLE_BINARY_FIELD_COMMANDS):
-                content += f'{constants.SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value} '
-
-        # path where the file is saved: media_root/job_key
-        storage_location = Path(settings.COMPAS_IO_PATH).joinpath(str(self.id))
-
-        # create directory
-        if not os.path.exists(storage_location):
-            os.makedirs(
-                storage_location,
-            )
-        # name parameter file
-        grid_file_path = Path(storage_location).joinpath('BSE_grid.txt')
-
-        # write parameters string to file
-        with open(grid_file_path, 'w') as f:
-            f.write(content)
