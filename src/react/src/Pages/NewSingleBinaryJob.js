@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
 import { graphql } from 'react-relay';
 import { harnessApi } from '../index';
-import { Container, Col, Nav, Row, Tab } from 'react-bootstrap';
+import { Container, Col, Nav, Row, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
 import { IS_DEV } from '../Utils/misc';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
@@ -40,6 +40,7 @@ const resultButtonLabel = (isLoadingOutput) => {
     return 'COMPAS Output';
 };
 
+/* eslint-disable complexity */
 const NewSingleBinaryJob = () => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
     const [jsonData, setJsonData] = useState('');
@@ -61,8 +62,9 @@ const NewSingleBinaryJob = () => {
         setOutputError('');
     };
 
-    const handleError = () => {
-        setOutputError('Output could not be generated');
+    const handleError = (errorMessage) => {
+        setActiveTab('binary');
+        setOutputError(errorMessage);
         resetOutput();
     };
 
@@ -113,24 +115,32 @@ const NewSingleBinaryJob = () => {
         commitMutation(harnessApi.getEnvironment('compas'), {
             mutation: submitMutation,
             variables: variables,
+            onError: async (error) => {
+                handleError(`${error.name}: ${error.message}`);
+            },
             onCompleted: async (response, errors) => {
-                try {
-                    if (!errors && response.newSingleBinary.result.detailedOutputFilePath !== '') {
+                if (errors) {
+                    const errorMessages = errors.reduce((prev, curr) => `${prev}, ${curr.message}`, '');
+                    handleError(`Output failed to generate with errors: ${errorMessages}`);
+                }
+                else if (response.newSingleBinary.result.detailedOutputFilePath === '') {
+                    handleError('Output file failed to generate and returned an empty string');
+                }
+                else {
+                    try {
                         setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
                         setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
-                    } else {
-                        handleError();
+                        setIsLoadingOutput(false);
+                        setDisableButtons(false);
+                    } catch (error) {
+                        handleError(`${error.name}: ${error.message}`);
                     }
-                    setIsLoadingOutput(false);
-                    setDisableButtons(false);
-                } catch (e) {
-                    handleError();
                 }
-            },
+            }
         });
     };
-
     return (
+
         <Formik
             initialValues={initialValues}
             onSubmit={(values) => handleJobSubmission(values)}
@@ -147,6 +157,16 @@ const NewSingleBinaryJob = () => {
                         </h5>
                     </Col>
                 </Row>
+                {outputError !== '' &&
+                  <Row className="mt-5" data-testid="error-message">
+                      <Col>
+                          <Alert variant='danger' dismissible onClose={() => setOutputError('')}>
+                              <Alert.Heading>Something went wrong.</Alert.Heading>
+                              <p>Error was "{outputError}". That's all we know. Please try again in a few minutes.</p>
+                          </Alert>
+                      </Col>
+                  </Row>
+                }
                 <Tab.Container id="single-binary-tabs" activeKey={activeTab} onSelect={(tab) => setActiveTab(tab)}>
                     <Row className="mt-4">
                         <Col md={2}>
@@ -189,7 +209,6 @@ const NewSingleBinaryJob = () => {
                                 <SingleBinaryTab title="COMPAS Output" eventKey="job-output">
                                     <JobOutput
                                         detailedOutputFileName={detailedOutputFile}
-                                        error={outputError}
                                         isLoading={isLoadingOutput}
                                     />
                                     {jsonData && (

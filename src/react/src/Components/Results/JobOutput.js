@@ -1,7 +1,7 @@
 import React from 'react';
-import { Col, Row, Alert } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
-const JobOutput = ({ detailedOutputFileName, error, isLoading }) => (
+const JobOutput = ({ detailedOutputFileName, isLoading }) => (
     <>
         <Row className="mt-2">
             <Col>
@@ -11,15 +11,6 @@ const JobOutput = ({ detailedOutputFileName, error, isLoading }) => (
                     </a>
                 ) : (
                     isLoading && <div>Loading...</div>
-                )}
-            </Col>
-        </Row>
-        <Row>
-            <Col>
-                {error && (
-                    <Alert data-testid="error-msg" variant="danger">
-                        {error}
-                    </Alert>
                 )}
             </Col>
         </Row>
