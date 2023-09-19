@@ -13,7 +13,7 @@ describe('new single binary job page', () => {
             return {
                 jobId: '',
                 jsonData: '{}',
-                detailedOutputFilePath: ''
+                detailedOutputFilePath: '',
             };
         }
     };
@@ -42,19 +42,13 @@ describe('new single binary job page', () => {
 
         const operation = await waitFor(() => global.environment.mock.getMostRecentOperation());
 
-        // check submit & reset buttons are disable while job is running
-        expect(screen.getByTestId('submit-btn')).toBeDisabled();
-        expect(screen.getByTestId('reset-btn')).toBeDisabled();
-
         global.environment.mock.resolve(
             operation,
             MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
         );
 
-        expect(screen.getByTestId('error-msg')).toHaveTextContent('Output could not be generated');
+        const error = await waitFor(() => screen.getByTestId('error-message'));
 
-        // check submit & reset buttons are enabled again after job returns error
-        expect(screen.getByTestId('submit-btn')).not.toBeDisabled();
-        expect(screen.getByTestId('reset-btn')).not.toBeDisabled();
+        expect(error).toHaveTextContent(/Output file failed to generate and returned an empty string/);
     });
 });

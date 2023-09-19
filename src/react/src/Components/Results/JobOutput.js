@@ -1,25 +1,17 @@
 import React from 'react';
-import { Col, Row, Alert } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
-const JobOutput = ({ detailedOutputFileName, error, isLoading }) => (
+const JobOutput = ({ detailedOutputFileName, isLoading }) => (
     <>
-        <Row>
+        <Row className="mt-2">
             <Col>
-                <h4>Compas Output</h4>
-            </Col>
-            <Col>
-                {detailedOutputFileName
-                    ? <a 
-                        data-testid="download-link"
-                        className='float-right mr-4'
-                        href={detailedOutputFileName}>Download Output File</a>
-                    : (isLoading && <div>Loading...</div>)
-                }
-            </Col>
-        </Row>
-        <Row>
-            <Col>
-                {error && <Alert data-testid='error-msg' variant="danger">{error}</Alert>}
+                {detailedOutputFileName ? (
+                    <a data-testid="download-link" href={detailedOutputFileName}>
+                        Download Output File
+                    </a>
+                ) : (
+                    isLoading && <div>Loading...</div>
+                )}
             </Col>
         </Row>
     </>

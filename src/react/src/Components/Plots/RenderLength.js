@@ -9,7 +9,7 @@ import {
     Legend,
     ResponsiveContainer,
     Label,
-    ReferenceArea
+    ReferenceArea,
 } from 'recharts';
 import propTypes from 'prop-types';
 import { tickExpFormatter } from './Utils';
@@ -23,7 +23,7 @@ const strokeStyle = {
     roche_radius_2: { stroke: 'blue', strokeDasharray: '5 5', strokeWidth: '2' },
 };
 
-const xDomain = ['auto', dataMax => (dataMax * 1.1)];
+const xDomain = ['auto', (dataMax) => dataMax * 1.1];
 const yDomain = ['auto', 'dataMax+1000'];
 
 const getAxisYDomainOneDataset = (refData, ref, offset) => {
@@ -39,7 +39,7 @@ const getAxisYDomain = (data, from, to, datakeys, offset) => {
     let mins = [];
     let maxes = [];
     const refData = data.slice(from - 1, to);
-    Object.values(datakeys).forEach(ref => {
+    Object.values(datakeys).forEach((ref) => {
         let [min, max] = getAxisYDomainOneDataset(refData, ref, offset);
         mins.push(min);
         maxes.push(max);
@@ -57,8 +57,6 @@ const initialState = {
     animation: true,
 };
 
-
-
 export default class RenderLength extends React.Component {
     constructor(props) {
         super(props);
@@ -68,12 +66,7 @@ export default class RenderLength extends React.Component {
 
     drawLine(dataKey, alias = null, style, type = null, dot = false) {
         if (dataKey === 'time') return;
-        return (<Line type={type || 'monotone'}
-            dataKey={dataKey}
-            name={alias}
-            {...style}
-            dot={dot}
-        />);
+        return <Line type={type || 'monotone'} dataKey={dataKey} name={alias} {...style} dot={dot} />;
     }
 
     zoom() {
@@ -124,19 +117,17 @@ export default class RenderLength extends React.Component {
         const { data, left, right, refAreaLeft, refAreaRight, top, bottom } = this.state;
 
         return (
-            <div style={{ width: '100%', height: '400px'}} className="mt-3">
+            <div style={{ width: '100%', height: '600px' }} className="mt-3">
                 <button type="button" className="btn update" onClick={this.zoomOut.bind(this)}>
                     Zoom Out
                 </button>
 
-                <ResponsiveContainer width="100%"
-                    height="100%">
+                <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                         width={500}
                         height={300}
                         data={data}
                         syncId={syncId}
-
                         margin={{
                             top: 5,
                             right: 20,
@@ -155,15 +146,18 @@ export default class RenderLength extends React.Component {
                             allowDataOverflow
                             name="time"
                             type="number"
-                            scale='time'
+                            scale="time"
                             domain={[left, right]}
                             padding={{ left: 20 }}
-                            dataKey="time" unit="" tickFormatter={f => f.toFixed(2)}>
+                            dataKey="time"
+                            unit=""
+                            tickFormatter={(f) => f.toFixed(2)}
+                        >
                             <Label value="Time(Myr)" position="bottom" offset={0} />
                         </XAxis>
                         <YAxis
                             allowDataOverflow
-                            scale='log'
+                            scale="log"
                             tickFormatter={tickExpFormatter}
                             domain={[bottom, top]}
                             padding={{ bottom: 5 }}
@@ -172,13 +166,18 @@ export default class RenderLength extends React.Component {
                                 angle: -90,
                                 position: 'insideLeft',
                                 textAnchor: 'middle',
-                                offset: -5
-                            }} />
-                        <Tooltip formatter={(value, name) => {
-                            if (name === 'time') { return [`${value} Myr`, name]; }
-                            return [value, name];
-                        }}
-                        position={{}} />
+                                offset: -5,
+                            }}
+                        />
+                        <Tooltip
+                            formatter={(value, name) => {
+                                if (name === 'time') {
+                                    return [`${value} Myr`, name];
+                                }
+                                return [value, name];
+                            }}
+                            position={{}}
+                        />
                         <Legend layout="vertical" align="right" verticalAlign="top" />
                         {Object.keys(datakeys).map((key) => this.drawLine(key, datakeys[key], strokeStyle[key]))}
                         {refAreaLeft && refAreaRight ? (
@@ -186,7 +185,8 @@ export default class RenderLength extends React.Component {
                         ) : null}
                     </LineChart>
                 </ResponsiveContainer>
-            </div>);
+            </div>
+        );
     }
 }
 //<Legend wrapperStyle={{ paddingBottom: "20px" }} layout="vertical" align="right" verticalAlign="top" />
@@ -198,5 +198,4 @@ RenderLength.propTypes = {
     stroke: propTypes.string,
     dot: propTypes.object,
     divStyle: propTypes.object,
-
 };
