@@ -201,7 +201,7 @@ class CompasDatasetModel(models.Model):
 
         super().save(*args, **kwargs)
         # Check file name is not empty after saving the model and uploading file
-        if self.file.name:
+        if self.file.name and not self.upload_set.exists():
             # Check the uploaded file could be decompressed using tarfile
             if tarfile.is_tarfile(self.file.path):
                 self.decompress_tar_file()
