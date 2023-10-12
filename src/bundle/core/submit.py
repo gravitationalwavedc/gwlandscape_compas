@@ -83,18 +83,18 @@ def compas_run_template(wk_dir, job_name, no_of_nodes):
 #SBATCH --tmp=8G
 
 # Load modules
-module load gcc/6.4.0
-module load openmpi/3.0.0
-module load boost/1.66.0-python-3.6.4
-module load gsl/2.4
-module load h5py/2.7.1-python-3.6.4-serial
-module load numpy/1.14.1-python-3.6.4
-module load pandas/0.22.0-python-3.6.4
-module load astropy/3.1.2-python-3.6.4
-module load scipy/1.0.0-python-3.6.4
-module load pyyaml/3.12-python-3.6.4
-BOOST_DIR='/apps/skylake/modulefiles/all/mpi/gcc/6.4.0/openmpi/3.0.0/boost/1.66.0-python-3.6.4.lua'
-GSL_DIR='/apps/skylake/modulefiles/all/compiler/gcc/6.4.0/gsl/2.4.lua'
+module load gcc/12.2.0
+module load openmpi/4.1.4
+module load boost/1.81.0
+module load gsl/2.7
+module load hdf5/1.14.0
+module load python/3.10.8-bare
+
+BOOST_DIR='/apps/modules/software/Boost/1.81.0-GCC-12.2.0'
+GSL_DIR='/apps/modules/software/GSL/2.7-GCC-12.2.0'
+
+# activate virtual environment
+. /fred/oz979/GWLandscape/client/venv/bin/activate
 
 # Run python submit
 cd {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}
@@ -117,16 +117,15 @@ def combine_output_template(wk_dir, job_name):
 
 
 # Load modules
-module load gcc/6.4.0
-module load openmpi/3.0.0
-module load boost/1.66.0-python-3.6.4
-module load gsl/2.4
-module load h5py/2.7.1-python-3.6.4-serial
-module load numpy/1.14.1-python-3.6.4
-module load pandas/0.22.0-python-3.6.4
-module load astropy/3.1.2-python-3.6.4
-module load scipy/1.0.0-python-3.6.4
-module load pyyaml/3.12-python-3.6.4
+module load gcc/12.2.0
+module load openmpi/4.1.4
+module load boost/1.81.0
+module load gsl/2.7
+module load hdf5/1.14.0
+module load python/3.10.8-bare
+
+# activate virtual environment
+. /fred/oz979/GWLandscape/client/venv/bin/activate
 
 # Run h5copy
 cd {wk_dir}/compas
