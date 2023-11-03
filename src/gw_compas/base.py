@@ -189,3 +189,6 @@ COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY = 60*60*24     # User has one day to up
 
 # The expiry of FileDownloadTokens (in seconds)
 FILE_DOWNLOAD_TOKEN_EXPIRY = 60*60*24
+
+EXTERNAL_STORAGE_PATH = '/files'
+FILE_UPLOAD_TEMP_DIR = os.path.join(EXTERNAL_STORAGE_PATH, 'upload')
