@@ -29,7 +29,7 @@ spec:
             - secretRef:
                 name: common
           name: gwlandscape-compas-django
-          image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.30
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.31
           ports:
             - name: http
               containerPort: 8000
