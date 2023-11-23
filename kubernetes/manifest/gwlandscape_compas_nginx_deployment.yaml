@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: gwlandscape-compas-nginx
-          image: nexus.gwdc.org.au/docker/gwlandscape_compas_nginx:0.4
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_nginx:0.5
           ports:
             - name: http
               containerPort: 8000
