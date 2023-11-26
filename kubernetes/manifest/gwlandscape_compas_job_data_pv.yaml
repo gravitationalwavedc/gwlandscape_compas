@@ -9,7 +9,7 @@ spec:
   accessModes:
   - ReadWriteMany
   capacity:
-    storage: 256Gi
+    storage: 10Ti
   nfs:
-    server: 10.8.41.12
-    path: "/mnt/sharedfolder/gwlandscape/compas/job_data"
+    server: 192.168.0.10
+    path: "/lustre/oz324"
