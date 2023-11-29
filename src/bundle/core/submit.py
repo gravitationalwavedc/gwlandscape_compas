@@ -73,7 +73,7 @@ def compas_run_template(wk_dir, job_name, no_of_nodes):
     return f"""#!/bin/bash
 #SBATCH --job-name={job_name}_compas
 #SBATCH --array=1-{no_of_nodes}
-#SBATCH --account=oz979
+#SBATCH --account=oz324
 #SBATCH --ntasks=1
 #SBATCH --output={wk_dir}/compas/run%a/{job_name}_compas_%a.out
 #SBATCH --nodes=1
@@ -94,7 +94,7 @@ BOOST_DIR='/apps/modules/software/Boost/1.81.0-GCC-12.2.0'
 GSL_DIR='/apps/modules/software/GSL/2.7-GCC-12.2.0'
 
 # activate virtual environment
-. /fred/oz979/GWLandscape/client/venv/bin/activate
+. /fred/oz324/GWLandscape/client/venv/bin/activate
 
 # Run python submit
 cd {wk_dir}/compas/run${{SLURM_ARRAY_TASK_ID}}
@@ -105,7 +105,7 @@ compasConfigDefault.yaml >& {job_name}_${{SLURM_ARRAY_TASK_ID}}.log
 
 def combine_output_template(wk_dir, job_name):
     return f"""#!/bin/bash
-#SBATCH --account=oz979
+#SBATCH --account=oz324
 #SBATCH --job-name={job_name}_combineh5
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -125,11 +125,11 @@ module load hdf5/1.14.0
 module load python/3.10.8-bare
 
 # activate virtual environment
-. /fred/oz979/GWLandscape/client/venv/bin/activate
+. /fred/oz324/GWLandscape/client/venv/bin/activate
 
 # Run h5copy
 cd {wk_dir}/compas
-srun python /fred/oz979/GWLandscape/COMPAS/compas_python_utils/h5copy.py input {wk_dir} -r
+srun python /fred/oz324/GWLandscape/COMPAS/compas_python_utils/h5copy.py input {wk_dir} -r
 """
 
 
@@ -197,7 +197,7 @@ def submit(details, input_params):
 
     no_of_systems = input_params["basic"]["number_of_systems"]
     no_of_nodes = 1
-    PYTHONSUBMITPATH = '/fred/oz979/GWLandscape/COMPAS/compas_python_utils/preprocessing/runSubmit.py'
+    PYTHONSUBMITPATH = '/fred/oz324/GWLandscape/COMPAS/compas_python_utils/preprocessing/runSubmit.py'
 
     nsys_per_patch = int(no_of_systems) / int(no_of_nodes)
     nsys_remainder = int(no_of_systems) % int(no_of_nodes)
