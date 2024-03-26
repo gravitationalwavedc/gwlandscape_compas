@@ -29,7 +29,7 @@ spec:
             - secretRef:
                 name: common
           name: gwlandscape-compas-celery
-          image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.13
+          image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.14
           resources:
             limits:
               cpu: "8000m"
