@@ -6,14 +6,9 @@ services:
       dockerfile: ./docker/gwlandscape_compas_django.Dockerfile
       context: .
     image: nexus.gwdc.org.au/docker/gwlandscape_compas_django:0.33
-    environment:
-      MYSQL_ROOT_PASSWORD: 76vcqmGKP19Z1AEx
-      MYSQL_DATABASE: gwlandscape_compas
-      MYSQL_USER: django
-      MYSQL_PASSWORD: 76vcqmGKP19Z1AEx
-      MYSQL_HOST: db
-      PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS: "[]"
-      SECRET_KEY: "super_secret"
+    env_file: 
+      - ".env"
+      - ".env.production"
     volumes:
       - media_files:/files/
     ports:
@@ -21,6 +16,7 @@ services:
     depends_on:
       - db
       - gwlandscape-compas-redis
+    restart: always
 
   gwlandscape-compas-nginx:
     build:
@@ -34,6 +30,7 @@ services:
       - gwlandscape-compas-django
     volumes:
       - media_files:/files/
+    restart: always
 
   gwlandscape-compas-static:
     build:
@@ -42,21 +39,22 @@ services:
     image: nexus.gwdc.org.au/docker/gwlandscape_compas_static:0.25
     ports:
       - "8000"
+    restart: always
 
   db:
     image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: 76vcqmGKP19Z1AEx
-      MYSQL_DATABASE: gwlandscape_compas
-      MYSQL_USER: django
-      MYSQL_PASSWORD: 76vcqmGKP19Z1AEx
+    env_file: 
+      - ".env"
+      - ".env.production"
     volumes:
       - var_lib_mysql:/var/lib/mysql
+    restart: always
 
   gwlandscape-compas-redis:
     image: redis:latest
     ports:
       - "6379"
+    restart: always
 
   gwlandscape-compas-celery:
     build:
@@ -64,9 +62,9 @@ services:
       dockerfile: ./docker/gwlandscape_compas_celery.Dockerfile
     image: nexus.gwdc.org.au/docker/gwlandscape_compas_celery:0.14
     restart: always
-    environment:
-      PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS: "[]"
-      SECRET_KEY: "super_secret"
+    env_file: 
+      - ".env"
+      - ".env.production"
     volumes:
       - media_files:/files/
     depends_on:
@@ -75,4 +73,14 @@ services:
 
 volumes:
   var_lib_mysql:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./data/mysql
   media_files:
+    # Comment the following block if using this locally
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/oz324

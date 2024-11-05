@@ -15,3 +15,5 @@ src/react/dist
 src/COMPAS_Output
 files/*
 .run/
+.env.production
+data/
