@@ -12,7 +12,7 @@ const MenuPlot = ({data, relay}) => {
     const plotMeta = data?.plotMeta;
     const plotData = data?.plotData;
 
-    const { groups, subgroups, ...restMeta } = plotMeta || {};
+    const { groups, subgroups, subgroupXUnit, subgroupYUnit, ...restMeta } = plotMeta || {};
     const { histData, scatterData, ...restData } = plotData || {};
     
     const formikRef = useRef();
@@ -39,7 +39,12 @@ const MenuPlot = ({data, relay}) => {
                                 ? <DatasetPlot
                                     histData={JSON.parse(histData)}
                                     scatterData={JSON.parse(scatterData)}
-                                    axis={[values.subgroupX, values.subgroupY]}
+                                    axis={
+                                        [
+                                            `${values.subgroupX}${subgroupXUnit ? ` / ${subgroupXUnit}` : ""}`,
+                                            `${values.subgroupY}${subgroupYUnit ? ` / ${subgroupYUnit}` : ""}`,
+                                        ]
+                                    }
                                     colourMap={values.colourMap}
                                     {...restData}
                                 />
@@ -72,6 +77,8 @@ export default createRefetchContainer(MenuPlot,
                 subgroups
                 subgroupX
                 subgroupY
+                subgroupXUnit
+                subgroupYUnit
                 strideLength
                 totalLength
             }

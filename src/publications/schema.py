@@ -109,6 +109,8 @@ class PlotMetaType(graphene.ObjectType):
     subgroups = graphene.List(graphene.String)
     subgroup_x = graphene.String()
     subgroup_y = graphene.String()
+    subgroup_x_unit = graphene.String()
+    subgroup_y_unit = graphene.String()
     stride_length = graphene.Int()
     total_length = graphene.Int()
 

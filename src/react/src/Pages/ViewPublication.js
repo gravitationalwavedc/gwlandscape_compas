@@ -12,7 +12,7 @@ const fileDownloadUrl = IS_DEV
 
 
 const ViewPublication = ({ data, relay }) => {
-    const { title, author, year, datasets, plotInfo } = data && data.compasPublication;
+    const { title, author, year, datasets, keywords, plotInfo } = data && data.compasPublication;
     const datasetOptions = datasets.edges.map(({ node }) => ({
         value: node.id,
         label: node.compasModel.name,
@@ -38,10 +38,11 @@ const ViewPublication = ({ data, relay }) => {
                     {
                         data.compasPublication ? 
                             <>
-                                <Row className="mb-3">
+                                <Row className="mt-3 mb-3">
                                     <Col>
-                                        <h1 className="text-primary">{title}</h1>
-                                        <div className="text-primary">{`${author}${year ? `· ${year}` : ''}`}</div>
+                                        <h2 className="text-primary font-weight-bold">{title}</h2>
+                                        <h5 className="text-primary">{`${author}${year ? ` · ${year}` : ''}`}</h5>
+                                        <h6 className="font-italic">{keywords?.edges.map(({node}) => node.tag).join(', ')}</h6>
                                     </Col>
                                 </Row>
                                 <Row><Col><h5>Model</h5></Col></Row>
@@ -92,6 +93,13 @@ export default createRefetchContainer(
                     title
                     author
                     year
+                    keywords {
+                        edges {
+                            node {
+                                tag
+                            }
+                        }
+                    }
                     datasets: datasetModels {
                         edges {
                             node {

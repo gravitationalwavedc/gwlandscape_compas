@@ -17,6 +17,13 @@ def get_h5_subgroups(h5_file, root_group):
     return get_h5_keys(h5_file[root_group])
 
 
+def get_subgroup_units(h5_file, root_group, subgroup):
+    units = h5_file[root_group][subgroup].attrs.get("units", b"-").decode("utf-8")
+    if units in ["-", "State"]:
+        return None
+    return units
+
+
 def get_h5_subgroup_meta(h5_file, **kwargs):
     root_group = kwargs.pop("root_group", get_h5_keys(h5_file)[0])
     subgroup_list = get_h5_subgroups(h5_file, root_group)
@@ -26,12 +33,17 @@ def get_h5_subgroup_meta(h5_file, **kwargs):
 
     default_values = default_prefs.get(root_group, None)
 
+    subgroup_x = kwargs.get("subgroup_x", default_values[0] if default_values else subgroup_list[0])
+    subgroup_y = kwargs.get("subgroup_y", default_values[1] if default_values else subgroup_list[1])
+
     return {
         "groups": [key for key in get_h5_keys(h5_file) if key not in ['Run_Details']],
         "group": root_group,
         "subgroups": subgroup_list,
-        "subgroup_x": kwargs.get("subgroup_x", default_values[0] if default_values else subgroup_list[0]),
-        "subgroup_y": kwargs.get("subgroup_y", default_values[1] if default_values else subgroup_list[1]),
+        "subgroup_x": subgroup_x,
+        "subgroup_y": subgroup_y,
+        "subgroup_x_unit": get_subgroup_units(h5_file, root_group, subgroup_x),
+        "subgroup_y_unit": get_subgroup_units(h5_file, root_group, subgroup_y),
         "stride_length": kwargs.get("stride_length", stride_length),
         "total_length": total_length
     }
