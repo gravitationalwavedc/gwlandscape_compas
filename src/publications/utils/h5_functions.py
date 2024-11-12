@@ -27,6 +27,8 @@ def get_subgroup_units(h5_file, root_group, subgroup):
 
 
 def check_subgroup_boolean(h5_file, root_group, subgroup):
+    # Infer data to be boolean if it is unitless and the datatype is 8-bit int
+    # Might need to add an extra check if this isn't stringent enough
     if get_subgroup_units(h5_file, root_group, subgroup) is not None:
         return False
 
