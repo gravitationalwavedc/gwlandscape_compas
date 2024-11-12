@@ -27,7 +27,7 @@ def get_surrounding_bins(indices, x_lim, y_lim):
     return np.array(list(product(range(x1, x2+1), range(y1, y2+1))))
 
 
-def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
+def get_log_and_limits(arr, is_bool, max_cond=80, min_cond=1e-2):
     """Checks whether or not the input array should be logged,
     as well as returning sensible limits on the resulting array
 
@@ -49,6 +49,11 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
     arr_max = float(np.max(arr))
     arr_min = float(np.min(arr))
 
+    # If the data is boolean, we know what the limits should be
+    # While the data will only be 0 or 1, we add a buffer on either side to make the plot look nicer
+    if is_bool:
+        return arr, False, [-0.5, 1.5], False
+
     # If the array minimum is lower than 0, shouldn't be logged
     if arr_min < 0:
         return arr, False, [arr_min, arr_max], False
@@ -63,6 +68,7 @@ def get_log_and_limits(arr, max_cond=80, min_cond=1e-2):
         return arr, False, [arr_min, arr_max], False
 
     logged_arr = np.log10(arr)
+
     # If there are any negative infinites in the data, we replaced them with a value lower than the next lowest value
     # This will be used in plotting to display zeroes in a log plot
     if np.isinf(logged_arr).any():

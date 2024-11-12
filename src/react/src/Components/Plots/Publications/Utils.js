@@ -2,7 +2,12 @@ import { format } from 'd3-format';
 import { scaleSequential } from 'd3-scale';
 import { range } from 'd3-array';
 
-const formatAxis = (value) => Math.abs(value) >= 1e3 ? format('.1e')(value) : format('.2~f')(value);
+const formatAxis = (value, isBool) => {
+    if (isBool) {
+        return !!value ? 'True' : 'False'
+    }
+    return Math.abs(value) >= 1e3 ? format('.1e')(value) : format('.2~f')(value)
+};
 
 const logString = (str, isLog=true) => isLog ? `log[${str}]` : str;
 

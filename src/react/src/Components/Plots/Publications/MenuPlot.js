@@ -97,6 +97,8 @@ export default createRefetchContainer(MenuPlot,
                 nullCheckY
                 logCheckX
                 logCheckY
+                boolCheckX
+                boolCheckY
             }
         }
         `

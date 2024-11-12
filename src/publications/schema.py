@@ -98,6 +98,8 @@ class PlotDataType(graphene.ObjectType):
     min_max_y = graphene.List(graphene.Float)
     null_check_x = graphene.Boolean()
     null_check_y = graphene.Boolean()
+    bool_check_x = graphene.Boolean()
+    bool_check_y = graphene.Boolean()
     sides = graphene.List(graphene.Float)
     hist_data = graphene.String()
     scatter_data = graphene.String()

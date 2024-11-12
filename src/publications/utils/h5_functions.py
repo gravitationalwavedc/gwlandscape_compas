@@ -19,9 +19,18 @@ def get_h5_subgroups(h5_file, root_group):
 
 def get_subgroup_units(h5_file, root_group, subgroup):
     units = h5_file[root_group][subgroup].attrs.get("units", b"-").decode("utf-8")
-    if units in ["-", "State"]:
+
+    if units in ["-", "State", "Event"]:
         return None
+
     return units
+
+
+def check_subgroup_boolean(h5_file, root_group, subgroup):
+    if get_subgroup_units(h5_file, root_group, subgroup) is not None:
+        return False
+
+    return h5_file[root_group][subgroup].dtype.type is np.uint8
 
 
 def get_h5_subgroup_meta(h5_file, **kwargs):
@@ -79,9 +88,13 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
 
     data_group_x, data_group_y = remove_null_coords(data_group_x, data_group_y)
 
+    # Check that the data is boolean
+    bool_check_x = check_subgroup_boolean(h5_file, root_group, subgroup_x)
+    bool_check_y = check_subgroup_boolean(h5_file, root_group, subgroup_y)
+
     # Check for log, get limits and flag if the minimum value is representing a log(0)
-    data_group_x, log_check_x, min_max_x, null_check_x = get_log_and_limits(data_group_x)
-    data_group_y, log_check_y, min_max_y, null_check_y = get_log_and_limits(data_group_y)
+    data_group_x, log_check_x, min_max_x, null_check_x = get_log_and_limits(data_group_x, bool_check_x)
+    data_group_y, log_check_y, min_max_y, null_check_y = get_log_and_limits(data_group_y, bool_check_y)
     plot_data = histo2d_scatter_hybrid(data_group_x, data_group_y, min_max_x, min_max_y)
 
     plot_data['min_max_x'] = min_max_x
@@ -92,6 +105,9 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
 
     plot_data['log_check_x'] = log_check_x
     plot_data['log_check_y'] = log_check_y
+
+    plot_data['bool_check_x'] = bool_check_x
+    plot_data['bool_check_y'] = bool_check_y
 
     return plot_data
 

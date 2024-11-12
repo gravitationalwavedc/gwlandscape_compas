@@ -42,18 +42,20 @@ const DatasetPlot = ({
     logCheckY,
     nullCheckX,
     nullCheckY,
+    boolCheckX,
+    boolCheckY,
     sides,
     scatterData,
     axis,
     colourMap,
 }) => {
-    const ticksX = getTickMarks(minMaxX[0], minMaxX[1], NUM_TICKS);
-    const ticksY = getTickMarks(minMaxY[0], minMaxY[1], NUM_TICKS);
+    const ticksX = boolCheckX ? [0, 1] : getTickMarks(minMaxX[0], minMaxX[1], NUM_TICKS);
+    const ticksY = boolCheckY ? [0, 1] : getTickMarks(minMaxY[0], minMaxY[1], NUM_TICKS);
 
-    const plotMinX = ticksX[0];
-    const plotMaxX = ticksX[ticksX.length-1];
-    const plotMinY = ticksY[0];
-    const plotMaxY = ticksY[ticksY.length-1];
+    const plotMinX = boolCheckX ? minMaxX[0] : ticksX[0];
+    const plotMaxX = boolCheckX ? minMaxX[1] : ticksX[ticksX.length-1];
+    const plotMinY = boolCheckY ? minMaxY[0] : ticksY[0];
+    const plotMaxY = boolCheckY ? minMaxY[1] : ticksY[ticksY.length-1];
 
     const cb = getColourbarData(histData, [plotMinX, plotMaxX], [plotMinY, plotMaxY], colourScales[colourMap]);
 
@@ -82,7 +84,7 @@ const DatasetPlot = ({
                     type="number"
                     ticks={nullCheckX ? ticksX.slice(1) : ticksX}
                     tick={{ fontSize: 13, transform: 'translate(0, 3)' }}
-                    tickFormatter={formatAxis}
+                    tickFormatter={(value) => formatAxis(value, boolCheckX)}
                     domain={[plotMinX, plotMaxX]}
                 />
                 <YAxis
@@ -100,7 +102,7 @@ const DatasetPlot = ({
                     type="number"
                     ticks={nullCheckY ? ticksY.slice(1) : ticksY}
                     tick={{ fontSize: 13, transform: 'translate(-3, 0)' }}
-                    tickFormatter={formatAxis}
+                    tickFormatter={(value) => formatAxis(value, boolCheckY)}
                     domain={[plotMinY, plotMaxY]}
                 />
                 <ZAxis zAxisId="standard" dataKey="counts" range={[15, 15]} />
