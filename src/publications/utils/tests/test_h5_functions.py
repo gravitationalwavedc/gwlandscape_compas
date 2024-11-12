@@ -42,7 +42,7 @@ class TestGetH5SubgroupMethods(TestCase):
 
             float_dataset = f.create_dataset('/base_group/float_dataset', data=np.arange(10, dtype=np.float32))
             float_dataset.attrs['units'] = np.bytes_('float_unit')
-            
+
             state_dataset = f.create_dataset('/base_group/state_dataset', data=np.arange(10, dtype=np.uint32))
             state_dataset.attrs['units'] = np.bytes_('State')
 
