@@ -42,7 +42,9 @@ const ViewPublication = ({ data, relay }) => {
                                     <Col>
                                         <h2 className="text-primary font-weight-bold">{title}</h2>
                                         <h5 className="text-primary">{`${author}${year ? ` · ${year}` : ''}`}</h5>
-                                        <h6 className="font-italic">{keywords?.edges.map(({node}) => node.tag).join(', ')}</h6>
+                                        <h6 className="font-italic">
+                                            {keywords?.edges.map(({node}) => node.tag).join(', ')}
+                                        </h6>
                                     </Col>
                                 </Row>
                                 <Row><Col><h5>Model</h5></Col></Row>

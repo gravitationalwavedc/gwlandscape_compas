@@ -42,7 +42,7 @@ class TestGetH5SubgroupMeta(TestCase):
             'BSE_System_Parameters': ['Mass@ZAMS(1)', 'Mass@ZAMS(2)'],
             'BSE_Supernovae': ['Mass(SN)', 'Mass_CO_Core@CO(SN)']
         }
-        
+
         self.root_groups = ['test_group', *self.default_subgroups.keys()]
 
         self.subgroups = [
@@ -55,7 +55,7 @@ class TestGetH5SubgroupMeta(TestCase):
                 for subgroup in self.subgroups:
                     dataset = f.create_dataset(f'/{root_group}/{subgroup}', data=np.arange(10))
                     dataset.attrs['units'] = np.bytes_(f'{subgroup}_unit')
-            
+
             f.create_dataset('/Run_Details/run_details_dataset', data=np.array([1, 2, 3]))
 
     def test_returns_default_data_without_kwargs(self):
@@ -109,7 +109,9 @@ class TestGetH5SubgroupData(TestCase):
     def setUp(self):
         self.tf = NamedTemporaryFile(suffix='.h5')
         with h5py.File(self.tf, 'w') as f:
-            test_dataset = f.create_dataset('/base_group/test_dataset', data=np.array([10, 10, 10, 10, 20, 30], dtype=np.uint32))
+            test_dataset = f.create_dataset(
+                '/base_group/test_dataset', data=np.array([10, 10, 10, 10, 20, 30], dtype=np.uint32)
+            )
             test_dataset.attrs['units'] = np.bytes_('test_unit')
 
             f.create_dataset('/base_group/string_dataset', data=np.array([b'string_type']))

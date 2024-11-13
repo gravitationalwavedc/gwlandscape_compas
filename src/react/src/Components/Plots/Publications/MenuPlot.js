@@ -41,8 +41,8 @@ const MenuPlot = ({data, relay}) => {
                                     scatterData={JSON.parse(scatterData)}
                                     axis={
                                         [
-                                            `${values.subgroupX}${subgroupXUnit ? ` / ${subgroupXUnit}` : ""}`,
-                                            `${values.subgroupY}${subgroupYUnit ? ` / ${subgroupYUnit}` : ""}`,
+                                            `${values.subgroupX}${subgroupXUnit ? ` / ${subgroupXUnit}` : ''}`,
+                                            `${values.subgroupY}${subgroupYUnit ? ` / ${subgroupYUnit}` : ''}`,
                                         ]
                                     }
                                     colourMap={values.colourMap}
