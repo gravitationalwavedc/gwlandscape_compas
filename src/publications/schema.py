@@ -98,6 +98,8 @@ class PlotDataType(graphene.ObjectType):
     min_max_y = graphene.List(graphene.Float)
     null_check_x = graphene.Boolean()
     null_check_y = graphene.Boolean()
+    bool_check_x = graphene.Boolean()
+    bool_check_y = graphene.Boolean()
     sides = graphene.List(graphene.Float)
     hist_data = graphene.String()
     scatter_data = graphene.String()
@@ -109,6 +111,8 @@ class PlotMetaType(graphene.ObjectType):
     subgroups = graphene.List(graphene.String)
     subgroup_x = graphene.String()
     subgroup_y = graphene.String()
+    subgroup_x_unit = graphene.String()
+    subgroup_y_unit = graphene.String()
     stride_length = graphene.Int()
     total_length = graphene.Int()
 
