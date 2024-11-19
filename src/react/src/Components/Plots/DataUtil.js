@@ -5,7 +5,7 @@ const units = {
     Temperature: 'K',
     Luminosity: <>L<sub>&#8857;</sub></>,
     mass: <>M<sub>&#8857;</sub></>,
-    length: <>R<sub>&#8857;</sub></>
+    _length: <>R<sub>&#8857;</sub></>
 };
 
 const mass = (data) => ({
@@ -64,6 +64,19 @@ const vdhattr = (data) => ({
     Z1: data['Metallicity@ZAMS(1)']
 });
 
+const getMinMax = (data, xKey, yKeys) => {
+    let yData = [];
+    Object.keys(yKeys).forEach((key) => {
+        yData = yData.concat(data[key]);
+    });
+    return [[data[xKey][0], data[xKey].at(-1)], [Math.min(...yData), Math.max(...yData)]];
+};
+
+const compareDomains = (d1, d2) => d1.x1 === d2.x1 &&
+    d1.x2 === d2.x2 &&
+    d1.y1 === d2.y1 &&
+    d1.y2 === d2.y2;
+
 const mapLineData = (dataset, keys = null) => {
     let data = [];
     dataset.time.forEach((_, i) => {
@@ -118,4 +131,15 @@ const mapLineDataForScatterChart = (dataset, ykey, aliases = null) => {
     return data_total;
 };
 
-export { units, mass, length, hrattr, vdhattr, mapLineData, mapScatterData, mapLineDataForScatterChart };
+export {
+    units,
+    mass,
+    length,
+    hrattr,
+    vdhattr,
+    mapLineData,
+    mapScatterData,
+    mapLineDataForScatterChart,
+    getMinMax,
+    compareDomains
+};

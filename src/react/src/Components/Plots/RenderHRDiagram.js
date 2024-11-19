@@ -32,11 +32,8 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
     const initialState = {
         left: xDomain[0],
         right: xDomain[1],
-        refAreaLeft: '',
-        refAreaRight: '',
         bottom: yDomain[0],
         top: yDomain[1],
-        animation: false,
     };
 
     const [left, setLeft] = useState(initialState.left);
@@ -49,7 +46,7 @@ const RenderHRDiagram = ({ divStyle, syncId, data1, data2, yDomain, xDomain }) =
     const drawReferenceLine = (R, xDomain, yDomain) => (
         <ReferenceLine
             key={`${R}-${xDomain}-${yDomain}`}
-            label={`${R} R_sun`}
+            label={`${R} R\u{2299}`}
             stroke="gray"
             strokeDasharray="3 3"
             position="start"
