@@ -1,8 +1,8 @@
-import React, { useState, memo, useMemo } from 'react';
-import { mapLineData, units, mass, getMinMax, compareDomains } from './DataUtil';
+import React, { memo, useMemo } from 'react';
+import { mapLineData, units, mass, getMinMax } from './DataUtil';
 import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
 import PlotLineZoom from './PlotLineZoom';
-import { getTickMarks } from './tickHelper';
+import useZoomableDomain from './useZoomableDomain';
 
 const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) {
     const aliases = {
@@ -33,19 +33,12 @@ const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) 
     const chartData = mapLineData(dataset);
     const [minMaxX, minMaxY] = useMemo(() => getMinMax(dataset, xkey, ykeys), []);
 
-    const initialDomain = {
-        x1: minMaxX[0],
-        x2: minMaxX[1],
-        y1: minMaxY[0],
-        y2: minMaxY[1],
-    };
+    const xScale = 'linear';
+    const yScale = 'linear';
 
-    const [domain, setDomain] = useState(initialDomain);
-
-    const isInitialDomain = compareDomains(domain, initialDomain);
-
-    const xTicks = getTickMarks(domain.x1, domain.x2, 8, !isInitialDomain);
-    const yTicks = getTickMarks(domain.y1, domain.y2, 5, !isInitialDomain);
+    const {
+        handleZoomIn, handleZoomOut, isZoomed, xTicks, yTicks, xDomain, yDomain
+    } = useZoomableDomain({minMaxX, minMaxY, xScale, yScale});
 
     return (
         <PlotLineZoom
@@ -53,17 +46,19 @@ const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) 
             data={chartData}
             xkey={xkey}
             ykeys={Object.keys(ykeys)}
-            initialDomain={initialDomain}
-            setDomain={setDomain}
+            handleZoomIn={handleZoomIn}
+            handleZoomOut={handleZoomOut}
+            isZoomed={isZoomed}
             strokeStyle={strokeStyle}
             aliases={aliases}
-            yunit={units.mass}
+            yunit={units._length}
         >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
                 allowDataOverflow
+                scale={xScale}
                 type="number"
-                domain={isInitialDomain ? [xTicks[0], xTicks[xTicks.length - 1]] : [domain.x1, domain.x2]}
+                domain={xDomain}
                 dataKey={xkey}
                 padding={{ left: 20 }}
                 tickFormatter={(f) => f.toFixed(2)}
@@ -73,7 +68,8 @@ const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) 
             </XAxis>
             <YAxis
                 allowDataOverflow
-                domain={isInitialDomain ? [yTicks[0], yTicks[yTicks.length - 1]] : [domain.y1, domain.y2]}
+                scale={yScale}
+                domain={yDomain}
                 padding={{ bottom: 5, left: 10 }}
                 tickFormatter={(f) => f.toFixed(2)}
                 ticks={yTicks}
