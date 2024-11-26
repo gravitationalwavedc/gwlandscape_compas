@@ -56,6 +56,7 @@ const getTemperature = (radius, luminosity, Tsol = NaN) => {
 
 const getReferenceRangeType = (R, xDomain, yDomain) => {
     // returns 0 if out of bounds, 1 if left edge, 2 if right edge, 3 if both
+    // 4 if outside on both edges but still crosses domain
     const Lmin = getLuminosity(R, xDomain[0]);
     const Lmax = getLuminosity(R, xDomain[1]);
 
@@ -64,17 +65,11 @@ const getReferenceRangeType = (R, xDomain, yDomain) => {
     const left = edgeCheck(Lmin);
     const right = edgeCheck(Lmax);
 
-    let rangeType = 0;
-
-    if (left && right) {
-        rangeType = 3;
-    } else if (right) {
-        rangeType = 2;
-    } else if (left) {
-        rangeType = 1;
-    }
-
-    return rangeType;
+    if ((yDomain[0] > Lmin && yDomain[1] < Lmax) || (yDomain[0] < Lmin && yDomain[1] > Lmax)) return 4;
+    if (left && right) return 3;
+    if (right) return 2;
+    if (left) return 1;
+    return 0;
 };
 
 const getReferenceLineSegment = (R, xDomain, yDomain) => {
@@ -97,6 +92,12 @@ const getReferenceLineSegment = (R, xDomain, yDomain) => {
         segment = [
             { x: xDomain[0], y: getLuminosity(R, xDomain[0]) },
             { x: xDomain[1], y: getLuminosity(R, xDomain[1]) },
+        ];
+        break;
+    case 4: // top and bottom edges
+        segment = [
+            { x: getTemperature(R, yDomain[0]), y: yDomain[0]},
+            { x: getTemperature(R, yDomain[1]), y: yDomain[1]},
         ];
         break;
     default:

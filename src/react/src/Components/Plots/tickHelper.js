@@ -27,7 +27,7 @@ const getTickInterval = (minVal, maxVal, desiredNumTicks) => {
     return tickInterval;
 };
 
-export const getTickMarks = (minVal, maxVal, numTicks) => {
+export const getTickMarks = (minVal, maxVal, numTicks, clamp=false) => {
     const tickInterval = getTickInterval(minVal, maxVal, numTicks);
     const startingPoint = Math.floor(minVal / tickInterval) * tickInterval;
     const tickMarks = [];
@@ -35,10 +35,12 @@ export const getTickMarks = (minVal, maxVal, numTicks) => {
         tickMarks.push(tick);
     }
     tickMarks.push(tick);
-    return tickMarks;
+    return clamp ? tickMarks.filter(tick => tick >= minVal && tick <= maxVal) : tickMarks;
 };
 
-export const getLogTickMarks = (minVal, maxVal, numTicks) => {
-    const ticks = getTickMarks(minVal > 0 ? Math.log10(minVal) : 0, maxVal > 0 ? Math.log10(maxVal) : 0, numTicks);
+export const getLogTickMarks = (minVal, maxVal, numTicks, clamp=false) => {
+    const ticks = getTickMarks(
+        minVal > 0 ? Math.log10(minVal) : 0, maxVal > 0 ? Math.log10(maxVal) : 0, numTicks, clamp
+    );
     return ticks.map((tick) => Math.pow(10, tick));
 };
