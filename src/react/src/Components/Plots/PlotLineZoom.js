@@ -1,22 +1,26 @@
 import React, { useRef } from 'react';
-import { ResponsiveContainer, LineChart, Line, ReferenceArea, Tooltip } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, ReferenceArea, Tooltip, ReferenceLine, Customized } from 'recharts';
 import useZoom from './useZoom';
+
+const TestCustom = (props) => {
+    console.log(props);
+    return <></>;
+};
 
 const PlotLineZoom = ({
     syncId,
     data,
-    xkey,
-    ykeys,
+    meta,
+    refLines,
     handleZoomIn,
     handleZoomOut,
     isZoomed,
-    strokeStyle,
-    aliases,
     children,
     yunit,
 }) => {
     const onZoomIn = ({x1, y1, x2, y2}) =>{
-        const xrangeData = data.filter((p) => p[xkey] >= x1 && p[xkey] <= x2);
+        const xKey = meta[0].xKey;
+        const xrangeData = data.filter((p) => p[xKey] >= x1 && p[xKey] <= x2);
         const hasDataInRange = xrangeData.some((point) => {
             let datapoints = Object.values(point);
             return datapoints.some((p) => p >= y1 && p <= y2);
@@ -28,22 +32,28 @@ const PlotLineZoom = ({
 
     const chartRef = useRef();
 
+    const drawReferenceLine = ({ key, dashes, colour, points, width }) => <ReferenceLine
+        key={key}
+        stroke={colour}
+        strokeWidth={width}
+        strokeDasharray={dashes}
+        segment={points}
+    />;
+
     const {isZooming, zoomArea, handleMouseDown, handleMouseMove, handleMouseUp } = useZoom({onZoomIn, chartRef});
 
-    const drawLine = (dataKey, alias = null, style, type = null, dot = false) => {
-        if (dataKey === 'time') return;
-        return (
-            <Line
-                id={dataKey}
-                type={type || 'monotone'}
-                dataKey={dataKey}
-                key={dataKey}
-                name={alias}
-                {...style}
-                dot={dot}
-            />
-        );
-    };
+    const drawLine = ({ key, label, width, dashes, colour }) => (
+        <Line
+            id={key}
+            dataKey={key}
+            key={key}
+            name={label}
+            stroke={colour}
+            strokeWidth={width}
+            strokeDasharray={dashes}
+            dot={false}
+        />
+    );
 
     return (
         <div style={{ width: '100%', height: '600px' }}>
@@ -66,9 +76,10 @@ const PlotLineZoom = ({
                     ref={chartRef}
                 >
                     {children}
-                    {ykeys.map((key) => drawLine(key, aliases[key], strokeStyle[key]))}
+                    {meta.map((lineMeta) => drawLine(lineMeta))}
                     {isZooming && <ReferenceArea {...zoomArea}/>}
-                    
+                    {refLines.map(refLine => drawReferenceLine(refLine))}
+                    <Customized component={TestCustom}/>
                     <Tooltip
                         allowEscapeViewBox={{ x: true, y: false }}
                         offset={20}

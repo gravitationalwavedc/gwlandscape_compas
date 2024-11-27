@@ -1,65 +1,34 @@
-import React, { memo, useMemo } from 'react';
-import { mapLineData, units, mass, getMinMax } from './DataUtil';
+import React, { memo } from 'react';
+import { units } from './DataUtil';
 import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
 import PlotLineZoom from './PlotLineZoom';
 import useZoomableDomain from './useZoomableDomain';
 
 const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) {
-    const aliases = {
-        totalMass1: 'Mass1',
-        totalMass2: 'Mass2',
-        systemMass: 'System Mass',
-        mass_CO_core1: 'CO core1',
-        mass_CO_core2: 'CO core2',
-        mass_HE_core1: 'HE core1',
-        mass_HE_core2: 'HE core2',
-        time: 'time',
-    };
-
-    const strokeStyle = {
-        totalMass1: { stroke: 'red', strokeWidth: '2' },
-        totalMass2: { stroke: 'blue', strokeWidth: '2' },
-        systemMass: { stroke: 'black', strokeWidth: '2' },
-        mass_CO_core1: { stroke: 'red', strokeDasharray: '5 5', strokeWidth: '2' },
-        mass_CO_core2: { stroke: 'blue', strokeDasharray: '5 5', strokeWidth: '2' },
-        mass_HE_core1: { stroke: 'red', strokeDasharray: '1 1 3', strokeWidth: '2' },
-        mass_HE_core2: { stroke: 'blue', strokeDasharray: '1 1 3', strokeWidth: '2' },
-    };
-
-    // 'time' is the xkey, the other aliases are the ykeys
-    const { time: xkey, ...ykeys } = aliases;
-
-    const dataset = mass(data);
-    const chartData = mapLineData(dataset);
-    const [minMaxX, minMaxY] = useMemo(() => getMinMax(dataset, xkey, ykeys), []);
-
-    const xScale = 'linear';
-    const yScale = 'linear';
-
+    const {meta: {xAxis, yAxis}, lines, refLines} = data.plots.mass_plot;
+    console.log(lines);
     const {
         handleZoomIn, handleZoomOut, isZoomed, xTicks, yTicks, xDomain, yDomain
-    } = useZoomableDomain({minMaxX, minMaxY, xScale, yScale});
+    } = useZoomableDomain({xAxis, yAxis});
 
     return (
         <PlotLineZoom
             syncId={syncId}
-            data={chartData}
-            xkey={xkey}
-            ykeys={Object.keys(ykeys)}
+            data={lines.data}
+            meta={lines.meta}
+            refLines={refLines}
             handleZoomIn={handleZoomIn}
             handleZoomOut={handleZoomOut}
             isZoomed={isZoomed}
-            strokeStyle={strokeStyle}
-            aliases={aliases}
             yunit={units.mass}
         >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
                 allowDataOverflow
-                scale={xScale}
+                scale={xAxis.scale}
                 type="number"
                 domain={xDomain}
-                dataKey={xkey}
+                dataKey="x"
                 padding={{ left: 20 }}
                 tickFormatter={(f) => f.toFixed(2)}
                 ticks={xTicks}
@@ -68,7 +37,7 @@ const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) 
             </XAxis>
             <YAxis
                 allowDataOverflow
-                scale={yScale}
+                scale={yAxis.scale}
                 domain={yDomain}
                 padding={{ bottom: 5, left: 10 }}
                 tickFormatter={(f) => f.toFixed(2)}

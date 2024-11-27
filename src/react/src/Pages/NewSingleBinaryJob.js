@@ -213,7 +213,7 @@ const NewSingleBinaryJob = () => {
                                     />
                                     {jsonData && (
                                         <>
-                                            <VanDenHeuvel data={jsonData} />
+                                            {/* <VanDenHeuvel data={jsonData} /> */}
                                             <div className="plotContainer">
                                                 <Col className="mb-5 mt-5">
                                                     <RenderMassContainer
@@ -229,13 +229,13 @@ const NewSingleBinaryJob = () => {
                                                         data={jsonData}
                                                     />
                                                 </Col>
-                                                <Col className="mb-5">
+                                                {/* <Col className="mb-5">
                                                     <RenderHRDiagramContainer
                                                         className="container"
                                                         syncId={syncId}
                                                         data={jsonData}
                                                     />
-                                                </Col>
+                                                </Col> */}
                                             </div>
                                         </>
                                     )}

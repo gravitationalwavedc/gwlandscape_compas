@@ -24,6 +24,10 @@ from .utils.auth.lookup_users import request_lookup_users
 from .utils.db_search.db_search import perform_db_search
 from .status import JobStatus
 
+import sys
+sys.path.append('..')
+from COMPAS.compas_python_utils.detailed_evolution_plotter.plot_detailed_evolution_new import run_main_plotter
+
 
 def basic_parameter_resolvers(name):
     def func(parent, info):
@@ -490,8 +494,8 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
 
             detailed_output_file_path = \
                 Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
-
-            json_data = read_h5_data_as_json(detailed_output_file_path)
+            json_data = run_main_plotter(detailed_output_file_path, as_json=True)
+            # json_data = read_h5_data_as_json(detailed_output_file_path)
 
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
