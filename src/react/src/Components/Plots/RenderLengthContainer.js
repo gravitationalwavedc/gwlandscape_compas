@@ -77,7 +77,7 @@ const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId
             >
                 <Label value={'Radius(R\u{2299})'} angle="-90" position="insideLeft" textAnchor="middle" offset="-5" />
             </YAxis>
-            <Legend layout="vertical" align="right" verticalAlign="top" />
+            <Legend layout="vertical" align="right" verticalAlign="top" iconType="plainline"/>
         </PlotLineZoom>
     );
 });
