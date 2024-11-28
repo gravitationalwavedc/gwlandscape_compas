@@ -1,10 +1,10 @@
-import React, { useState, memo, useMemo } from 'react';
-import { getMinMax, units, length, mapLineData, compareDomains } from './DataUtil';
+import React, { memo, useMemo } from 'react';
+import { units, length, mapLineData, getMinMax } from './DataUtil';
 import { tickExpFormatter } from './Utils';
 import PlotLineZoom from './PlotLineZoom';
 import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
-import { getLogTickMarks, getTickMarks } from './tickHelper';
 import ExponentTick from './ExponentTick';
+import useZoomableDomain from './useZoomableDomain';
 
 const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId }) {
     const aliases = {
@@ -33,19 +33,12 @@ const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId
     const chartData = mapLineData(dataset);
     const [minMaxX, minMaxY] = useMemo(() => getMinMax(dataset, xkey, ykeys), []);
 
-    const initialDomain = {
-        x1: minMaxX[0],
-        x2: minMaxX[1],
-        y1: minMaxY[0],
-        y2: minMaxY[1],
-    };
+    const xScale = 'linear';
+    const yScale = 'log';
 
-    const [domain, setDomain] = useState(initialDomain);
-
-    const isInitialDomain = compareDomains(domain, initialDomain);
-
-    const xTicks = getTickMarks(domain.x1, domain.x2, 8, !isInitialDomain);
-    const yTicks = getLogTickMarks(domain.y1, domain.y2, 5, !isInitialDomain);
+    const {
+        handleZoomIn, handleZoomOut, isZoomed, xTicks, yTicks, xDomain, yDomain
+    } = useZoomableDomain({minMaxX, minMaxY, xScale, yScale});
 
     return (
         <PlotLineZoom
@@ -53,8 +46,9 @@ const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId
             data={chartData}
             xkey={xkey}
             ykeys={Object.keys(ykeys)}
-            initialDomain={initialDomain}
-            setDomain={setDomain}
+            handleZoomIn={handleZoomIn}
+            handleZoomOut={handleZoomOut}
+            isZoomed={isZoomed}
             strokeStyle={strokeStyle}
             aliases={aliases}
             yunit={units._length}
@@ -62,8 +56,9 @@ const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
                 allowDataOverflow
+                scale={xScale}
                 type="number"
-                domain={isInitialDomain ? [xTicks[0], xTicks[xTicks.length - 1]] : [domain.x1, domain.x2]}
+                domain={xDomain}
                 dataKey={xkey}
                 padding={{ left: 20 }}
                 tickFormatter={(f) => f.toFixed(2)}
@@ -73,16 +68,16 @@ const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId
             </XAxis>
             <YAxis
                 allowDataOverflow
-                scale="log"
+                scale={yScale}
                 tickFormatter={tickExpFormatter}
-                domain={isInitialDomain ? [yTicks[0], yTicks[yTicks.length - 1]] : [domain.y1, domain.y2]}
+                domain={yDomain}
                 padding={{ bottom: 5, left: 10 }}
                 tick={<ExponentTick />}
                 ticks={yTicks}
             >
                 <Label value={'Radius(R\u{2299})'} angle="-90" position="insideLeft" textAnchor="middle" offset="-5" />
             </YAxis>
-            <Legend layout="vertical" align="right" verticalAlign="top" />
+            <Legend layout="vertical" align="right" verticalAlign="top" iconType="plainline"/>
         </PlotLineZoom>
     );
 });

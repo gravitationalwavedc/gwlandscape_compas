@@ -10,7 +10,7 @@ const RenderHRDiagramContainer = ({ data, syncId }) => {
         luminosity_2: 'Luminosity',
     };
 
-    const [data1, data2, yDomain, xDomain] = useMemo(() => {
+    const [data1, data2, minMaxY, minMaxX] = useMemo(() => {
         const [raw1, raw2] = mapScatterData(hrattr(data), aliases);
 
         const data1 = raw1.filter((point) => point.Luminosity > 100);
@@ -29,7 +29,7 @@ const RenderHRDiagramContainer = ({ data, syncId }) => {
         return [data1, data2, [minY, maxY], [minX, maxX]];
     }, [data]);
 
-    return <RenderHRDiagram data1={data1} data2={data2} syncId={syncId} yDomain={yDomain} xDomain={xDomain} />;
+    return <RenderHRDiagram data1={data1} data2={data2} syncId={syncId} minMaxY={minMaxY} minMaxX={minMaxX} />;
 };
 
 export default memo(RenderHRDiagramContainer);
