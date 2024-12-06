@@ -1,5 +1,16 @@
 import React from 'react';
 
+const groupHasDataInDomain = (group, domain) => {
+    const { meta, data } = group;
+    const { x1, y1, x2, y2 } = domain;
+    const xKey = meta[0].xKey; // A group only uses one xKey
+    const xRangeData = data.filter((p) => p[xKey] >= x1 && p[xKey] <= x2);
+    return xRangeData.some((point) => {
+        let datapoints = Object.values(point);
+        return datapoints.some((p) => p >= y1 && p <= y2);
+    });
+};
+
 const filterScatterData = (data, xlabel, ylabel, x1, x2, y1, y2) =>
     data.filter((d) => d[xlabel] >= x1 && d[xlabel] <= x2 && d[ylabel] >= y1 && d[ylabel] <= y2);
 
@@ -108,6 +119,7 @@ const getReferenceLineSegment = (R, xDomain, yDomain) => {
 
 export {
     filterScatterData as filterData,
+    groupHasDataInDomain,
     tickExpFormatter,
     linspace,
     LineChartTooltip as CustomTooltip,

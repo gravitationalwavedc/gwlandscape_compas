@@ -1,28 +1,24 @@
 import React, { memo } from 'react';
+import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
 import { units } from './DataUtil';
 import { tickExpFormatter } from './Utils';
 import PlotLineZoom from './PlotLineZoom';
-import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
-import ExponentTick from './ExponentTick';
 import useZoomableDomain from './useZoomableDomain';
+import ExponentTick from './ExponentTick';
 
 const RenderLengthContainer = memo(function RenderLengthContainer({ data, syncId }) {
-    const {meta: {xAxis, yAxis}, lines, refLines} = data.plots.length_plot;
-
-    const {
-        handleZoomIn, handleZoomOut, isZoomed, xTicks, yTicks, xDomain, yDomain
-    } = useZoomableDomain({xAxis, yAxis});
+    const {meta: {xAxis, yAxis}, groups, refLines} = data.plots.length_plot;
+    const {isZoomed, xTicks, yTicks, xDomain, yDomain, ...handlers} = useZoomableDomain({xAxis, yAxis});
 
     return (
         <PlotLineZoom
             syncId={syncId}
-            data={lines.data}
-            meta={lines.meta}
+            groups={groups}
             refLines={refLines}
-            handleZoomIn={handleZoomIn}
-            handleZoomOut={handleZoomOut}
+            onZoomIn={handlers.handleZoomIn}
+            onZoomOut={handlers.handleZoomOut}
             isZoomed={isZoomed}
-            yunit={units._length}
+            yUnit={units._length}
         >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis

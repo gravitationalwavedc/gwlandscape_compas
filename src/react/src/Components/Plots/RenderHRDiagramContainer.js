@@ -1,35 +1,60 @@
-import React, { memo, useMemo } from 'react';
-import { hrattr, mapScatterData } from './DataUtil';
-import RenderHRDiagram from './RenderHRDiagram';
+import React, { memo } from 'react';
+import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
+import ExponentTick from './ExponentTick';
+import useZoomableDomain from './useZoomableDomain';
+import PlotLineZoom from './PlotLineZoom';
 
-const RenderHRDiagramContainer = ({ data, syncId }) => {
-    const aliases = {
-        teff_1: 'Temperature',
-        teff_2: 'Temperature',
-        luminosity_1: 'Luminosity',
-        luminosity_2: 'Luminosity',
-    };
+const RenderHRDiagramContainer = memo(function RenderHRDiagram({ data }) {
+    const {meta: {xAxis, yAxis}, groups, refLines} = data.plots.hr_plot;
+    const {isZoomed, xTicks, yTicks, xDomain, yDomain, ...handlers} = useZoomableDomain({xAxis, yAxis});
 
-    const [data1, data2, minMaxY, minMaxX] = useMemo(() => {
-        const [raw1, raw2] = mapScatterData(hrattr(data), aliases);
+    return (
+        <PlotLineZoom
+            groups={groups}
+            refLines={refLines}
+            onZoomIn={handlers.handleZoomIn}
+            onZoomOut={handlers.handleZoomOut}
+            isZoomed={isZoomed}
+        >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+                allowDataOverflow
+                allowDuplicatedCategory={false}
+                scale={xAxis.scale}
+                domain={xDomain}
+                dataKey="x"
+                name="Temperature"
+                type="number"
+                reversed={true} //uncomment later
+                ticks={xTicks}
+                tick={<ExponentTick />}
+            >
+                <Label value="Temperature(K)" position="bottom" offset={0} />
+            </XAxis>
+            <YAxis
+                allowDataOverflow
+                scale={yAxis.scale}
+                domain={yDomain}
+                name="Luminosity"
+                type="number"
+                ticks={yTicks}
+                tick={<ExponentTick />}
+                label={{
+                    value: 'Luminosity/L\u{2299}',
+                    angle: -90,
+                    position: 'insideLeft',
+                    textAnchor: 'middle',
+                    offset: -7,
+                }}
+            />
+            <Legend
+                wrapperStyle={{ paddingLeft: '40px' }}
+                layout="vertical"
+                align="right"
+                verticalAlign="top"
+            />
+        </PlotLineZoom>
+    );
+});
 
-        const data1 = raw1.filter((point) => point.Luminosity > 100);
-        const data2 = raw2.filter((point) => point.Luminosity > 100);
-
-        const maxY = [...data1, ...data2].reduce((acc, curr) => (curr.Luminosity > acc ? curr.Luminosity : acc), 0);
-        const minY = data2[0].Luminosity;
-
-        const maxX = Math.ceil(
-            [...data1, ...data2].reduce((acc, curr) => (curr.Temperature > acc ? curr.Temperature : acc), 0)
-        );
-        const minX = Math.floor(
-            [...data1, ...data2].reduce((acc, curr) => (curr.Temperature < acc ? curr.Temperature : acc), maxX)
-        );
-
-        return [data1, data2, [minY, maxY], [minX, maxX]];
-    }, [data]);
-
-    return <RenderHRDiagram data1={data1} data2={data2} syncId={syncId} minMaxY={minMaxY} minMaxX={minMaxX} />;
-};
-
-export default memo(RenderHRDiagramContainer);
+export default RenderHRDiagramContainer;

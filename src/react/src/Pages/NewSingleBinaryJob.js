@@ -229,13 +229,12 @@ const NewSingleBinaryJob = () => {
                                                         data={jsonData}
                                                     />
                                                 </Col>
-                                                {/* <Col className="mb-5">
+                                                <Col className="mb-5">
                                                     <RenderHRDiagramContainer
                                                         className="container"
-                                                        syncId={syncId}
                                                         data={jsonData}
                                                     />
-                                                </Col> */}
+                                                </Col>
                                             </div>
                                         </>
                                     )}

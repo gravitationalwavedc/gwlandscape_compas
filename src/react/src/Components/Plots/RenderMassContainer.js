@@ -1,26 +1,22 @@
 import React, { memo } from 'react';
-import { units } from './DataUtil';
 import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
+import { units } from './DataUtil';
 import PlotLineZoom from './PlotLineZoom';
 import useZoomableDomain from './useZoomableDomain';
 
 const RenderMassContainer = memo(function RenderMassContainer({ data, syncId }) {
-    const {meta: {xAxis, yAxis}, lines, refLines} = data.plots.mass_plot;
-    console.log(lines);
-    const {
-        handleZoomIn, handleZoomOut, isZoomed, xTicks, yTicks, xDomain, yDomain
-    } = useZoomableDomain({xAxis, yAxis});
+    const {meta: {xAxis, yAxis}, groups, refLines} = data.plots.mass_plot;
+    const {isZoomed, xTicks, yTicks, xDomain, yDomain, ...handlers} = useZoomableDomain({xAxis, yAxis});
 
     return (
         <PlotLineZoom
             syncId={syncId}
-            data={lines.data}
-            meta={lines.meta}
+            groups={groups}
             refLines={refLines}
-            handleZoomIn={handleZoomIn}
-            handleZoomOut={handleZoomOut}
+            onZoomIn={handlers.handleZoomIn}
+            onZoomOut={handlers.handleZoomOut}
             isZoomed={isZoomed}
-            yunit={units.mass}
+            yUnit={units.mass}
         >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
