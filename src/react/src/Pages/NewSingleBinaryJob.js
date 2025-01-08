@@ -213,7 +213,7 @@ const NewSingleBinaryJob = () => {
                                     />
                                     {jsonData && (
                                         <>
-                                            {/* <VanDenHeuvel data={jsonData} /> */}
+                                            <VanDenHeuvel data={jsonData} />
                                             <div className="plotContainer">
                                                 <Col className="mb-5 mt-5">
                                                     <RenderMassContainer

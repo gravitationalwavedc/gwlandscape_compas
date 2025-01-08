@@ -1,74 +1,66 @@
 import React, { memo } from 'react';
 import { Col, Image, Row, Table } from 'react-bootstrap';
-import { vdhattr } from './DataUtil';
-import { eventAlphabet, getEvents } from './VanDenHeuvelUtils';
 
 const DOMAIN = process.env.NODE_ENV !== 'development' ? '' : 'http://localhost:3004';
 
 export default memo(function VanDenHeuvel({ data }) {
-    const vdhattrData = vdhattr(data);
-    const [imageIndices, sequenceIndices, eventStrings] = getEvents(vdhattrData);
-
+    const { events } = data;
     return (
         <Col>
-            {sequenceIndices &&
-                sequenceIndices.map((index, i) =>
-                    imageIndices[i] !== undefined ? (
-                        <Row key={i} className="mb-4 mt-4">
-                            <Col sm={1} md={1} className="text-right">
-                                {eventAlphabet[i]}
-                            </Col>
-                            <Col>
-                                <Image fluid src={`${DOMAIN}/compas/static/assets/${imageIndices[i]}.png`} />
-                            </Col>
-                            <Col>
-                                <Table borderless responsive size="sm">
-                                    <tbody>
-                                        {vdhattrData.time[index] !== undefined && (
-                                            <tr>
-                                                <th>Time</th>
-                                                <td>{vdhattrData.time[index].toFixed(2)} Myr</td>
-                                            </tr>
-                                        )}
-                                        {vdhattrData.semimajor[index] !== undefined && (
-                                            <tr>
-                                                <th>a</th>
-                                                <td>
-                                                    {vdhattrData.semimajor[index].toFixed(2)} R<sub>⊙</sub>
-                                                </td>
-                                            </tr>
-                                        )}
-                                        {vdhattrData.mass1[index] !== undefined && (
-                                            <tr>
-                                                <th>
-                                                    M<sub>1</sub>
-                                                </th>
-                                                <td>
-                                                    {vdhattrData.mass1[index].toFixed(2)} M<sub>⊙</sub>
-                                                </td>
-                                            </tr>
-                                        )}
-                                        {vdhattrData.mass2[index] !== undefined && (
-                                            <tr>
-                                                <th>
-                                                    M<sub>2</sub>
-                                                </th>
-                                                <td>
-                                                    {vdhattrData.mass2[index].toFixed(2)} M<sub>⊙</sub>
-                                                </td>
-                                            </tr>
-                                        )}
-                                        <tr>
-                                            <td colSpan={2}>
-                                                <h6>{eventStrings[i]}</h6>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </Table>
-                            </Col>
-                        </Row>
-                    ) : null
-                )}
+            {
+                // eslint-disable-next-line complexity
+                events.map((event, index) => {
+                    const showPrev = index !== 0 && index !== data.length - 1;
+                    return <Row key={event.eventChar} className="mb-4 mt-4">
+                        <Col sm={1} md={1} className="text-right">
+                            {event.eventChar}
+                        </Col>
+                        <Col>
+                            <Image
+                                fluid
+                                src={`${DOMAIN}/compas/static/assets/${event.imageNum}.png`}
+                                style={event.flipImage ? {transform: 'scaleX(-1)'} : {}}
+                            />
+                        </Col>
+                        <Col>
+                            <Table borderless responsive size="sm">
+                                <tbody>
+                                    <tr>
+                                        <th width="25%">Time</th>
+                                        <td>{event.time.toFixed(2)} Myr</td>
+                                    </tr>
+                                    <tr>
+                                        <th width="25%">a</th>
+                                        <td>
+                                            {showPrev && event.a[0].toFixed(2) + ' to '}
+                                            {event.a[1].toFixed(2)} R<sub>⊙</sub>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="25%">M<sub>1</sub></th>
+                                        <td>
+                                            {showPrev && event.m1[0].toFixed(2) + ' to '}
+                                            {event.m1[1].toFixed(2)} M<sub>⊙</sub>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="25%">M<sub>2</sub></th>
+                                        <td>
+                                            {showPrev && event.m2[0].toFixed(2) + ' to '}
+                                            {event.m2[1].toFixed(2)} M<sub>⊙</sub>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colSpan={2}>
+                                            <h6>{event.eventString}</h6>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </Table>
+                        </Col>
+                    </Row>;
+                })
+            }
         </Col>
     );
 });
