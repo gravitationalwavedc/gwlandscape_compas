@@ -11,6 +11,38 @@ const groupHasDataInDomain = (group, domain) => {
     });
 };
 
+const wideFilter = (data, i, key, data1, data2) => {
+    let next;
+    let prev;
+    let nextInRange = false;
+    let prevInRange = false;
+    if (i > 0 && i <= data.length - 1) {
+        prev = data[i-1][key];
+        prevInRange = prev >= data1 && prev <= data2;
+    }
+    if (i >= 0 && i < data.length - 1) {
+        next = data[i+1][key];
+        nextInRange = next >= data1 && next <= data2;
+    }
+    const rangeInPrevNext = prev <= data1 && data2 <= next;
+    return prevInRange || nextInRange || rangeInPrevNext; 
+};
+
+const groupDataInDomain = (group, domain) => {
+    const { meta, data } = group;
+    const { x1, y1, x2, y2 } = domain;
+    const xKey = meta[0].xKey; // A group only uses one xKey
+    const xRangeData = data.filter((_, i) => wideFilter(data, i, xKey, x1, x2));
+    const filteredData = xRangeData.filter((point, j) => {
+        let yKeys = Object.keys(point);
+        return yKeys.some((yKey) => wideFilter(xRangeData, j, yKey, y1, y2));
+    });
+    return {
+        meta: meta,
+        data: filteredData
+    };
+};
+
 const filterScatterData = (data, xlabel, ylabel, x1, x2, y1, y2) =>
     data.filter((d) => d[xlabel] >= x1 && d[xlabel] <= x2 && d[ylabel] >= y1 && d[ylabel] <= y2);
 
@@ -120,6 +152,7 @@ const getReferenceLineSegment = (R, xDomain, yDomain) => {
 export {
     filterScatterData as filterData,
     groupHasDataInDomain,
+    groupDataInDomain,
     tickExpFormatter,
     linspace,
     LineChartTooltip as CustomTooltip,

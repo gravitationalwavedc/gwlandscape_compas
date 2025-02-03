@@ -13,10 +13,8 @@ import validationSchema from '../Components/Forms/validationSchema';
 import JobOutput from '../Components/Results/JobOutput';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
-import RenderMassContainer from '../Components/Plots/RenderMassContainer';
-import RenderLengthContainer from '../Components/Plots/RenderLengthContainer';
-import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContainer';
 import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
+import SingleBinaryPlot from '../Components/Plots/SingleBinaryPlot';
 
 const submitMutation = graphql`
     mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
@@ -48,8 +46,6 @@ const NewSingleBinaryJob = () => {
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
     const [activeTab, setActiveTab] = useState('binary');
-
-    let syncId = 1;
 
     const resetOutput = () => {
         setDetailedOutputFile('');
@@ -215,26 +211,15 @@ const NewSingleBinaryJob = () => {
                                         <>
                                             <VanDenHeuvel data={jsonData} />
                                             <div className="plotContainer">
-                                                <Col className="mb-5 mt-5">
-                                                    <RenderMassContainer
-                                                        className="container"
-                                                        syncId={syncId}
-                                                        data={jsonData}
-                                                    />
-                                                </Col>
-                                                <Col className="mb-5">
-                                                    <RenderLengthContainer
-                                                        className="container"
-                                                        syncId={syncId}
-                                                        data={jsonData}
-                                                    />
-                                                </Col>
-                                                <Col className="mb-5">
-                                                    <RenderHRDiagramContainer
-                                                        className="container"
-                                                        data={jsonData}
-                                                    />
-                                                </Col>
+                                                {
+                                                    jsonData?.plots.map((plotData) => 
+                                                        <Col key={plotData.meta.label} className="mb-5 mt-5">
+                                                            <SingleBinaryPlot
+                                                                className="container"
+                                                                data={plotData}
+                                                            />
+                                                        </Col>)
+                                                }
                                             </div>
                                         </>
                                     )}
