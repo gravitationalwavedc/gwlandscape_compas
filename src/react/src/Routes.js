@@ -60,6 +60,11 @@ function getRoutes() {
                 path="single-binary-form"
                 environment={harnessApi.getEnvironment('compas')}
                 Component={NewSingleBinaryJob}
+                query={graphql`
+                    query Routes_NewSingleBinaryJob_Query {
+                        ...NewSingleBinaryJob_data
+                    }
+                `}
                 render={handleRender}/>
             <Route
                 path="job-results/:jobId/"

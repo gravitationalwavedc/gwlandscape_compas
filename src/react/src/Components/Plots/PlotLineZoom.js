@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ResponsiveContainer, LineChart, Line, ReferenceArea, Tooltip, ReferenceLine, Customized } from 'recharts';
 import useZoom from './useZoom';
-import { groupDataInDomain } from './Utils';
+import { filterGroupDataByDomain } from './Utils';
 
 
 const drawLine = ({ meta, data }) => (
@@ -86,7 +86,7 @@ const PlotLineZoom = ({
     const [groups, setGroups] = useState(initialGroups);
 
     const onZoomIn = (domain) => {
-        const filteredGroups = initialGroups.map(group => groupDataInDomain(group, domain));
+        const filteredGroups = initialGroups.map(group => filterGroupDataByDomain(group, domain));
         setGroups(filteredGroups);
         handleZoomIn(domain);
     };

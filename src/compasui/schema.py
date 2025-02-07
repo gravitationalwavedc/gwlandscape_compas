@@ -22,6 +22,7 @@ from .utils.h5ToJson import read_h5_data_as_json
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.auth.lookup_users import request_lookup_users
 from .utils.db_search.db_search import perform_db_search
+from .utils.get_compas_version import get_compas_version
 from .status import JobStatus
 
 import matplotlib
@@ -235,6 +236,7 @@ class CompasPublicJobConnection(relay.Connection):
 
 
 class Query(object):
+    compas_version = graphene.String()
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
@@ -245,6 +247,9 @@ class Query(object):
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
+
+    def resolve_compas_version(self, info, **kwargs):
+        return get_compas_version()
 
     @login_required
     def resolve_gwclouduser(self, info, **kwargs):

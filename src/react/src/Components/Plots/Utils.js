@@ -12,18 +12,21 @@ const wideFilter = (data, i, key, data1, data2) => {
         next = data[i+1][key];
         nextInRange = next >= data1 && next <= data2;
     }
-    const rangeInPrevNext = prev <= data1 && data2 <= next;
+    const rangeInPrevNext = (prev && next) && (prev <= data1 && data2 <= next);
     return prevInRange || nextInRange || rangeInPrevNext; 
 };
 
-const groupDataInDomain = (group, domain) => {
+const filterGroupDataByDomain = (group, domain) => {
     const { meta, data } = group;
     const { x1, y1, x2, y2 } = domain;
     const xKey = meta[0].xKey; // A group only uses one xKey
     const xRangeData = data.filter((_, i) => wideFilter(data, i, xKey, x1, x2));
     const filteredData = xRangeData.filter((point, j) => {
-        let yKeys = Object.keys(point);
-        return yKeys.some((yKey) => wideFilter(xRangeData, j, yKey, y1, y2));
+        let keys = Object.keys(point);
+        return keys.some((key) => {
+            if (key === xKey) return false;
+            return wideFilter(xRangeData, j, key, y1, y2);
+        });
     });
     return {
         meta: meta,
@@ -31,4 +34,4 @@ const groupDataInDomain = (group, domain) => {
     };
 };
 
-export {groupDataInDomain};
+export {filterGroupDataByDomain};

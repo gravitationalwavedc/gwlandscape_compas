@@ -9,11 +9,17 @@ COPY src /src
 # add COMPAS_ROOT_DIR variable so that compose stop complaining about it when parsing COMPAS scripts
 ENV COMPAS_ROOT_DIR /COMPAS
 
+# Install COMPAS
+RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
+
 # Pull down and set up the compas repo
 RUN cd /tmp && rsync -arv /src /tmp/gwlandscape-compas/
 WORKDIR /tmp/gwlandscape-compas/src
 RUN virtualenv -p python3 venv
 RUN venv/bin/pip install -r requirements.txt
+WORKDIR $COMPAS_ROOT_DIR
+RUN /tmp/gwlandscape-compas/src/venv/bin/pip install .
+WORKDIR /tmp/gwlandscape-compas/src
 RUN mkdir -p logs
 # Build the graphql schema from the compas repo
 RUN venv/bin/python development-manage.py graphql_schema

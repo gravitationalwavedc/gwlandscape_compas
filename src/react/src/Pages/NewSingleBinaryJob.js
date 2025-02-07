@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
-import { graphql } from 'react-relay';
+import { createFragmentContainer, graphql } from 'react-relay';
 import { harnessApi } from '../index';
 import { Container, Col, Nav, Row, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
@@ -39,7 +39,7 @@ const resultButtonLabel = (isLoadingOutput) => {
 };
 
 /* eslint-disable complexity */
-const NewSingleBinaryJob = () => {
+const NewSingleBinaryJob = ({data}) => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
     const [jsonData, setJsonData] = useState('');
     const [outputError, setOutputError] = useState('');
@@ -188,6 +188,9 @@ const NewSingleBinaryJob = () => {
                                     {jsonData === '' && !isLoadingOutput && (
                                         <p className="mt-0 pt-0 text-muted">Run a simulation to see results</p>
                                     )}
+                                    <p className="mt-0 pt-0 text-muted">
+                                        COMPAS - {data?.compasVersion ? `v${data.compasVersion}` : 'Unknown' }
+                                    </p>
                                 </Nav.Item>
                             </Nav>
                         </Col>
@@ -234,4 +237,13 @@ const NewSingleBinaryJob = () => {
     );
 };
 
-export default NewSingleBinaryJob;
+// export default NewSingleBinaryJob;
+export default createFragmentContainer(NewSingleBinaryJob,
+    {
+        data: graphql`
+            fragment NewSingleBinaryJob_data on Query {
+                compasVersion
+            }
+        `,
+    },
+);
