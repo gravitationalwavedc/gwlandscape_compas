@@ -237,7 +237,6 @@ const NewSingleBinaryJob = ({data}) => {
     );
 };
 
-// export default NewSingleBinaryJob;
 export default createFragmentContainer(NewSingleBinaryJob,
     {
         data: graphql`
