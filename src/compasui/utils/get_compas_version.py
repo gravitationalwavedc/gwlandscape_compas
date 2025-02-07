@@ -11,7 +11,7 @@ def get_compas_version():
     -------
     str or None
         COMPAS version string
-    """    
+    """
     compas_dir = os.environ.get("COMPAS_ROOT_DIR", None)
     if not compas_dir:
         return None

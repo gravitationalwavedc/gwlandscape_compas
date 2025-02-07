@@ -1,6 +1,6 @@
 import React from 'react';
 import { MockPayloadGenerator } from 'relay-test-utils';
-import { screen, render, fireEvent, waitFor } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import NewSingleBinaryJob from '../NewSingleBinaryJob';
 import 'regenerator-runtime/runtime';
 import userEvent from '@testing-library/user-event';

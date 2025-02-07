@@ -1,6 +1,8 @@
 import traceback
 from _decimal import Decimal
 from pathlib import Path
+import matplotlib
+matplotlib.use("agg")
 
 import django_filters
 import graphene
@@ -13,21 +15,19 @@ from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
+from compas_python_utils.detailed_evolution_plotter.plot_to_json import get_plot_json
+
 from .models import CompasJob, Label, SingleBinaryJob, FileDownloadToken
 from .types import OutputStartType, JobStatusType, AbstractBasicParameterType, AbstractAdvancedParametersType
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
-from .utils.h5ToJson import read_h5_data_as_json
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.auth.lookup_users import request_lookup_users
 from .utils.db_search.db_search import perform_db_search
 from .utils.get_compas_version import get_compas_version
 from .status import JobStatus
 
-import matplotlib
-matplotlib.use("agg")
-from compas_python_utils.detailed_evolution_plotter.plot_to_json import get_plot_json
 
 
 def basic_parameter_resolvers(name):
