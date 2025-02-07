@@ -499,7 +499,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
 
             detailed_output_file_path = \
                 Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
-            json_data = get_plot_json(detailed_output_file_path)
+            json_data = get_plot_json(str(detailed_output_file_path))
 
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(

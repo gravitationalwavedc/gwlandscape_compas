@@ -41,10 +41,10 @@ npm-tests:
   script:
     - cd src/
     - pip3 install -r requirements.txt
-    - python3 development-manage.py graphql_schema
     - cd $COMPAS_ROOT_DIR
     - pip3 install .
     - cd $WD/src/react
+    - python3 development-manage.py graphql_schema
     - cd react/
     - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
     - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"

@@ -113,8 +113,9 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         )
         self.assertEqual(self.expected_failed, response.data)
 
+    @patch('compasui.schema.get_plot_json', return_value='plot_json')
     @patch('compasui.views.run_compas')
-    def test_new_single_binary_mutation_when_tasks_succeed(self, run_compas):
+    def test_new_single_binary_mutation_when_tasks_succeed(self, run_compas, get_plot_json):
         detailed_output_file_url = f'{settings.MEDIA_URL}jobs/1/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
         # mock run_compas_output
         output_path = path.join(settings.COMPAS_IO_PATH, '1', 'COMPAS_Output', 'Detailed_Output')
@@ -133,10 +134,11 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             'newSingleBinary': {
                 'result': {
                     'jobId': '1',
-                    'jsonData': read_h5_data_as_json(self.test_detailed_output_file_path),
+                    'jsonData': 'plot_json',
                     'detailedOutputFilePath': detailed_output_file_url
                 }
             }
         }
         run_compas.delay().get.assert_called_once()
         self.assertEqual(expected_success, response.data)
+        get_plot_json.assert_called_with(output_file_path)
