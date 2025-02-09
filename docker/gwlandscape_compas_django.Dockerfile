@@ -4,7 +4,13 @@ ENV PYTHONUNBUFFERED 1
 # Update the container and install the required packages
 RUN apt-get update
 RUN apt-get -y install python3-virtualenv default-libmysqlclient-dev python3-dev build-essential curl
+
+# Add COMPAS_ROOT_DIR to environment variables. It is required for installing and running COMPAS
+ENV COMPAS_ROOT_DIR /COMPAS
 ENV VIRTUAL_ENV /src/venv
+
+# Install COMPAS
+RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
 
 # Copy the source code in to the container
 COPY src /src
@@ -17,6 +23,8 @@ RUN virtualenv -p python3 /src/venv
 
 # Activate and install the django requirements (mysqlclient requires python3-dev and build-essential)
 RUN . /src/venv/bin/activate && pip install -r /src/requirements.txt && pip install mysqlclient && pip install gunicorn
+RUN cd $COMPAS_ROOT_DIR && pip install .
+RUN cd /
 
 # Clean up unneeded packages
 RUN apt-get remove --purge -y build-essential python3-dev

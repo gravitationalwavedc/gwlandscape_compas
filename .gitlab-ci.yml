@@ -23,6 +23,9 @@ django-tests:
   script:
     - cd src/
     - pip3 install -r requirements.txt
+    - cd $COMPAS_ROOT_DIR
+    - pip3 install .
+    - cd $WD/src
     - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
   artifacts:
@@ -38,6 +41,9 @@ npm-tests:
   script:
     - cd src/
     - pip3 install -r requirements.txt
+    - cd $COMPAS_ROOT_DIR
+    - pip3 install .
+    - cd $WD/src/
     - python3 development-manage.py graphql_schema
     - cd react/
     - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use

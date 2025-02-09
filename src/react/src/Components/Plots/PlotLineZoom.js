@@ -1,59 +1,123 @@
-import React, { useRef } from 'react';
-import { ResponsiveContainer, LineChart, Line, ReferenceArea, Tooltip } from 'recharts';
+import React, { useRef, useState } from 'react';
+import { ResponsiveContainer, LineChart, Line, ReferenceArea, Tooltip, ReferenceLine, Customized } from 'recharts';
 import useZoom from './useZoom';
+import { filterGroupDataByDomain } from './Utils';
+
+
+const drawLine = ({ meta, data }) => (
+    <Line
+        id={meta.yKey}
+        data={data}
+        dataKey={meta.yKey}
+        key={meta.label}
+        name={meta.label}
+        stroke={meta.colour}
+        strokeWidth={meta.width}
+        strokeDasharray={meta.dashes}
+        dot={false}
+        isAnimationActive={false}
+    />
+);
+
+const drawLineGroup = ({ meta, data }) => meta.map(lineMeta => drawLine({meta: lineMeta, data}));
+
+const drawReferenceLine = ({ refLineMeta: {meta, data}, yAxisMap }) => {
+    const {label, dashes, colour, width, type} = meta;
+    const dataCopy = data.map(point => ({...point}));
+    if (type === 'vline') {
+        const yAxis = yAxisMap[0];
+        const yRange = yAxis.scale.range();
+        dataCopy[0].y = yAxis.scale.invert(dataCopy[0].y * (yRange[1] - yRange[0]) + yRange[0]);
+        dataCopy[1].y = yAxis.scale.invert(dataCopy[1].y * (yRange[1] - yRange[0]) + yRange[0]);
+    }
+    return <ReferenceLine
+        key={label}
+        stroke={colour}
+        strokeWidth={width}
+        strokeDasharray={dashes}
+        segment={dataCopy}
+        ifOverflow='hidden'
+    />;
+};
+
+const drawText = ({text: {meta, data}, xAxisMap, yAxisMap}) => {
+    const {label, colour} = meta;
+    const pixX = xAxisMap[0].scale(data.x);
+    const pixY = yAxisMap[0].scale(data.y);
+    return <text
+        key={`${label}-${data.x}-${data.y}`}
+        textAnchor='middle'
+        fill={colour}
+        x={pixX}
+        y={pixY}
+    >
+        {
+            label.map(token => {
+                if (token[0] === 'text') {
+                    return <tspan key={token[1]}>{token[1]}</tspan>;
+                } else if (token[0] === 'subscript') {
+                    return <React.Fragment key={token[1]}>
+                        <tspan dy={6}>{token[1]}</tspan>
+                        <tspan dy={-6}>&#8203;</tspan>
+                    </React.Fragment>;
+                } else if (token[0] === 'superscript') {
+                    return <React.Fragment key={token[1]}>
+                        <tspan dy={-6}>{token[1]}</tspan>
+                        <tspan dy={6}>&#8203;</tspan>
+                    </React.Fragment>;
+                }
+            })
+        }
+    </text>;
+};
+
 
 const PlotLineZoom = ({
     syncId,
-    data,
-    xkey,
-    ykeys,
-    handleZoomIn,
-    handleZoomOut,
+    groups: initialGroups,
+    refLines,
+    texts,
+    onZoomIn: handleZoomIn,
+    onZoomOut: handleZoomOut,
     isZoomed,
-    strokeStyle,
-    aliases,
     children,
     yunit,
 }) => {
-    const onZoomIn = ({x1, y1, x2, y2}) =>{
-        const xrangeData = data.filter((p) => p[xkey] >= x1 && p[xkey] <= x2);
-        const hasDataInRange = xrangeData.some((point) => {
-            let datapoints = Object.values(point);
-            return datapoints.some((p) => p >= y1 && p <= y2);
-        });
-        if (hasDataInRange) {
-            handleZoomIn({x1, y1, x2, y2});
-        }
+    const [groups, setGroups] = useState(initialGroups);
+
+    const onZoomIn = (domain) => {
+        const filteredGroups = initialGroups.map(group => filterGroupDataByDomain(group, domain));
+        setGroups(filteredGroups);
+        handleZoomIn(domain);
+    };
+
+    const onZoomOut = () => {
+        setGroups(initialGroups);
+        handleZoomOut();
     };
 
     const chartRef = useRef();
 
     const {isZooming, zoomArea, handleMouseDown, handleMouseMove, handleMouseUp } = useZoom({onZoomIn, chartRef});
 
-    const drawLine = (dataKey, alias = null, style, type = null, dot = false) => {
-        if (dataKey === 'time') return;
-        return (
-            <Line
-                id={dataKey}
-                type={type || 'monotone'}
-                dataKey={dataKey}
-                key={dataKey}
-                name={alias}
-                {...style}
-                dot={dot}
-            />
-        );
-    };
+    // We split into cases with one group vs multiple groups for the sake of speed
+    // Having multiple groups seems to slow things down, but unfortunately seems to be the best way
+    // to plot lines with different sets of x-values
+    const hasLineGroups = groups && groups.length > 1;
+
+    const drawLineGroups = (groups) => hasLineGroups
+        ? groups.map(group => drawLineGroup(group))
+        : groups[0].meta.map(lineMeta => drawLine({meta: lineMeta}));
 
     return (
         <div style={{ width: '100%', height: '600px' }}>
-            {isZoomed && <button onClick={handleZoomOut}>Zoom Out</button>}
+            {isZoomed && <button onClick={onZoomOut}>Zoom Out</button>}
             <ResponsiveContainer width="80%" height="100%">
                 <LineChart
                     width={700}
                     height={300}
-                    data={data}
                     syncId={syncId}
+                    data={!hasLineGroups && groups[0].data}
                     margin={{
                         top: 5,
                         right: 20,
@@ -66,9 +130,16 @@ const PlotLineZoom = ({
                     ref={chartRef}
                 >
                     {children}
-                    {ykeys.map((key) => drawLine(key, aliases[key], strokeStyle[key]))}
+                    {drawLineGroups(groups)}
                     {isZooming && <ReferenceArea {...zoomArea}/>}
-                    
+                    {
+                        refLines.map(
+                            refLine => <Customized
+                                key={refLine.meta.label} component={drawReferenceLine} refLineMeta={refLine}
+                            />
+                        )
+                    }
+                    {texts.map(text => <Customized key={text.meta.label} component={drawText} text={text}/>)}
                     <Tooltip
                         allowEscapeViewBox={{ x: true, y: false }}
                         offset={20}

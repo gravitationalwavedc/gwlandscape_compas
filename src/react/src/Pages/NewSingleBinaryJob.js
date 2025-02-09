@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
-import { graphql } from 'react-relay';
+import { createFragmentContainer, graphql } from 'react-relay';
 import { harnessApi } from '../index';
 import { Container, Col, Nav, Row, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
@@ -13,10 +13,8 @@ import validationSchema from '../Components/Forms/validationSchema';
 import JobOutput from '../Components/Results/JobOutput';
 import MassTransferCEParameters from '../Components/Forms/MassTransferCEParameters';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
-import RenderMassContainer from '../Components/Plots/RenderMassContainer';
-import RenderLengthContainer from '../Components/Plots/RenderLengthContainer';
-import RenderHRDiagramContainer from '../Components/Plots/RenderHRDiagramContainer';
 import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
+import SingleBinaryPlot from '../Components/Plots/SingleBinaryPlot';
 
 const submitMutation = graphql`
     mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
@@ -41,15 +39,13 @@ const resultButtonLabel = (isLoadingOutput) => {
 };
 
 /* eslint-disable complexity */
-const NewSingleBinaryJob = () => {
+const NewSingleBinaryJob = ({data}) => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
     const [jsonData, setJsonData] = useState('');
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
     const [activeTab, setActiveTab] = useState('binary');
-
-    let syncId = 1;
 
     const resetOutput = () => {
         setDetailedOutputFile('');
@@ -192,6 +188,9 @@ const NewSingleBinaryJob = () => {
                                     {jsonData === '' && !isLoadingOutput && (
                                         <p className="mt-0 pt-0 text-muted">Run a simulation to see results</p>
                                     )}
+                                    <p className="mt-0 pt-0 text-muted">
+                                        COMPAS - {data?.compasVersion ? `v${data.compasVersion}` : 'Unknown' }
+                                    </p>
                                 </Nav.Item>
                             </Nav>
                         </Col>
@@ -215,27 +214,15 @@ const NewSingleBinaryJob = () => {
                                         <>
                                             <VanDenHeuvel data={jsonData} />
                                             <div className="plotContainer">
-                                                <Col className="mb-5 mt-5">
-                                                    <RenderMassContainer
-                                                        className="container"
-                                                        syncId={syncId}
-                                                        data={jsonData}
-                                                    />
-                                                </Col>
-                                                <Col className="mb-5">
-                                                    <RenderLengthContainer
-                                                        className="container"
-                                                        syncId={syncId}
-                                                        data={jsonData}
-                                                    />
-                                                </Col>
-                                                <Col className="mb-5">
-                                                    <RenderHRDiagramContainer
-                                                        className="container"
-                                                        syncId={syncId}
-                                                        data={jsonData}
-                                                    />
-                                                </Col>
+                                                {
+                                                    jsonData?.plots.map((plotData) => 
+                                                        <Col key={plotData.meta.label} className="mb-5 mt-5">
+                                                            <SingleBinaryPlot
+                                                                className="container"
+                                                                data={plotData}
+                                                            />
+                                                        </Col>)
+                                                }
                                             </div>
                                         </>
                                     )}
@@ -250,4 +237,12 @@ const NewSingleBinaryJob = () => {
     );
 };
 
-export default NewSingleBinaryJob;
+export default createFragmentContainer(NewSingleBinaryJob,
+    {
+        data: graphql`
+            fragment NewSingleBinaryJob_data on Query {
+                compasVersion
+            }
+        `,
+    },
+);

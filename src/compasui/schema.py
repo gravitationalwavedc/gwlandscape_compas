@@ -1,6 +1,7 @@
 import traceback
 from _decimal import Decimal
 from pathlib import Path
+import matplotlib
 
 import django_filters
 import graphene
@@ -13,16 +14,21 @@ from graphene_django.types import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
+
 from .models import CompasJob, Label, SingleBinaryJob, FileDownloadToken
 from .types import OutputStartType, JobStatusType, AbstractBasicParameterType, AbstractAdvancedParametersType
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
-from .utils.h5ToJson import read_h5_data_as_json
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.auth.lookup_users import request_lookup_users
 from .utils.db_search.db_search import perform_db_search
+from .utils.get_compas_version import get_compas_version
 from .status import JobStatus
+
+matplotlib.use("agg")
+from compas_python_utils.detailed_evolution_plotter.plot_to_json import get_plot_json  # noqa: E402
+
 
 
 def basic_parameter_resolvers(name):
@@ -231,6 +237,7 @@ class CompasPublicJobConnection(relay.Connection):
 
 
 class Query(object):
+    compas_version = graphene.String()
     compas_job = relay.Node.Field(CompasJobNode)
     compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
     compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
@@ -241,6 +248,9 @@ class Query(object):
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
+
+    def resolve_compas_version(self, info, **kwargs):
+        return get_compas_version()
 
     @login_required
     def resolve_gwclouduser(self, info, **kwargs):
@@ -490,8 +500,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
 
             detailed_output_file_path = \
                 Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
-
-            json_data = read_h5_data_as_json(detailed_output_file_path)
+            json_data = get_plot_json(str(detailed_output_file_path))
 
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
