@@ -6,21 +6,20 @@ RUN apt-get install -y curl git python3 python3-virtualenv rsync
 
 # Copy the compas source code in to the container
 COPY src /src
-# add COMPAS_ROOT_DIR variable so that compose stop complaining about it when parsing COMPAS scripts
-ENV COMPAS_ROOT_DIR /COMPAS
 
-# Install COMPAS
-RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
-
-# Pull down and set up the compas repo
+# Make copy of the gwlandscape source
 RUN cd /tmp && rsync -arv /src /tmp/gwlandscape-compas/
+
+# Install python dependencies in venv
 WORKDIR /tmp/gwlandscape-compas/src
 RUN virtualenv -p python3 venv
 RUN venv/bin/pip install -r requirements.txt
-WORKDIR $COMPAS_ROOT_DIR
-RUN /tmp/gwlandscape-compas/src/venv/bin/pip install .
+RUN venv/bin/pip install git+https://github.com/TeamCOMPAS/COMPAS.git
+
+# Create logs dir
 WORKDIR /tmp/gwlandscape-compas/src
 RUN mkdir -p logs
+
 # Build the graphql schema from the compas repo
 RUN venv/bin/python development-manage.py graphql_schema
 

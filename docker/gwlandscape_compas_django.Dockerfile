@@ -5,12 +5,10 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get update
 RUN apt-get -y install python3-virtualenv default-libmysqlclient-dev python3-dev build-essential curl
 
-# Add COMPAS_ROOT_DIR to environment variables. It is required for installing and running COMPAS
-ENV COMPAS_ROOT_DIR /COMPAS
 ENV VIRTUAL_ENV /src/venv
 
-# Install COMPAS
 RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
+ENV COMPAS_ROOT_DIR /COMPAS
 
 # Copy the source code in to the container
 COPY src /src
@@ -23,7 +21,7 @@ RUN virtualenv -p python3 /src/venv
 
 # Activate and install the django requirements (mysqlclient requires python3-dev and build-essential)
 RUN . /src/venv/bin/activate && pip install -r /src/requirements.txt && pip install mysqlclient && pip install gunicorn
-RUN cd $COMPAS_ROOT_DIR && pip install .
+RUN cd $COMPAS_ROOT_DIR && /src/venv/bin/pip install .
 RUN cd /
 
 # Clean up unneeded packages
@@ -42,6 +40,5 @@ ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # Make sure we're using the production settings
 ENV DJANGO_SETTINGS_MODULE gw_compas.production-settings
-ENV COMPAS_ROOT_DIR /
 
 CMD [ "/runserver.sh" ]
