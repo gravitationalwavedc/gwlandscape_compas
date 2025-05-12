@@ -17,3 +17,4 @@ files/*
 .run/
 .env.production
 data/
+.tmuxinator.yml
