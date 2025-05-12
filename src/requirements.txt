@@ -6,8 +6,6 @@
 #
 amqp==5.3.1
     # via kombu
-aniso8601==7.0.0
-    # via graphene
 asgiref==3.8.1
     # via
     #   django
@@ -45,7 +43,7 @@ cryptography==44.0.3
     # via jwcrypto
 cycler==0.12.1
     # via matplotlib
-django==3.2.25
+django==5.2.1
     # via
     #   -r requirements.in
     #   django-cors-headers
@@ -53,11 +51,11 @@ django==3.2.25
     #   django-graphql-jwt
     #   django-jenkins
     #   graphene-django
-django-cors-headers==4.5.0
+django-cors-headers==4.7.0
     # via -r requirements.in
-django-filter==23.5
+django-filter==25.1
     # via -r requirements.in
-django-graphql-jwt==0.3.1
+django-graphql-jwt==0.4.0
     # via -r requirements.in
 django-jenkins==0.110.0
     # via -r requirements.in
@@ -65,22 +63,25 @@ flake8==7.2.0
     # via -r requirements.in
 fonttools==4.58.0
     # via matplotlib
-graphene==2.1.9
-    # via graphene-django
-graphene-django==2.16.0
+graphene==3.4.3
+    # via
+    #   django-graphql-jwt
+    #   graphene-django
+graphene-django==3.2.3
     # via
     #   -r requirements.in
     #   django-graphql-jwt
 graphene-file-upload==1.3.0
     # via -r requirements.in
-graphql-core==2.3.2
+graphql-core==3.2.6
     # via
-    #   django-graphql-jwt
     #   graphene
     #   graphene-django
     #   graphql-relay
-graphql-relay==2.0.1
-    # via graphene
+graphql-relay==3.2.0
+    # via
+    #   graphene
+    #   graphene-django
 h5py==3.13.0
     # via -r requirements.in
 idna==3.10
@@ -111,10 +112,7 @@ pillow==11.2.1
 pip-tools==7.4.1
     # via -r requirements.in
 promise==2.3
-    # via
-    #   graphene-django
-    #   graphql-core
-    #   graphql-relay
+    # via graphene-django
 prompt-toolkit==3.0.51
     # via click-repl
 pycodestyle==2.13.0
@@ -127,7 +125,7 @@ pyflakes==3.3.2
     #   flake8
 pyhumps==3.8.0
     # via -r requirements.in
-pyjwt==1.7.1
+pyjwt==2.10.1
     # via
     #   -r requirements.in
     #   django-graphql-jwt
@@ -140,25 +138,17 @@ pyproject-hooks==1.2.0
 python-dateutil==2.9.0.post0
     # via
     #   celery
+    #   graphene
     #   matplotlib
 python-jwt==4.1.0
     # via -r requirements.in
-pytz==2025.2
-    # via django
 redis==6.0.0
     # via -r requirements.in
 requests==2.32.3
     # via -r requirements.in
-rx==1.6.3
-    # via graphql-core
-singledispatch==4.1.1
-    # via graphene-django
 six==1.17.0
     # via
-    #   graphene
     #   graphene-file-upload
-    #   graphql-core
-    #   graphql-relay
     #   promise
     #   python-dateutil
 sqlparse==0.5.3
@@ -166,7 +156,9 @@ sqlparse==0.5.3
 text-unidecode==1.3
     # via graphene-django
 typing-extensions==4.13.2
-    # via jwcrypto
+    # via
+    #   graphene
+    #   jwcrypto
 tzdata==2025.2
     # via kombu
 urllib3==2.4.0
