@@ -150,7 +150,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
     def test_delete_compas_model_not_exists(self):
         self.client.authenticate(self.user)
 
-        self.compas_model_input['input']['id'] = to_global_id('CompasModelNode', self.model.id+1),
+        self.compas_model_input['input']['id'] = to_global_id('CompasModelNode', self.model.id+1)
         response = self.execute_query()
 
         self.assertEqual("CompasModel matching query does not exist.", response.errors[0].message)
@@ -254,7 +254,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
     def test_update_compas_model_not_exists(self):
         self.client.authenticate(self.user)
 
-        self.compas_model_input['input']['id'] = to_global_id('CompasModelNode', self.model.id+1),
+        self.compas_model_input['input']['id'] = to_global_id('CompasModelNode', self.model.id+1)
         response = self.execute_query()
         self.model.refresh_from_db()
 
