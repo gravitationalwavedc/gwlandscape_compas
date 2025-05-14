@@ -49,7 +49,7 @@ django==5.2.1
     #   django-cors-headers
     #   django-filter
     #   django-graphql-jwt
-    #   django-jenkins
+    #   django4-jenkins
     #   graphene-django
 django-cors-headers==4.7.0
     # via -r requirements.in
@@ -57,7 +57,7 @@ django-filter==25.1
     # via -r requirements.in
 django-graphql-jwt==0.4.0
     # via -r requirements.in
-django-jenkins==0.110.0
+django4-jenkins==1.0.0
     # via -r requirements.in
 flake8==7.2.0
     # via -r requirements.in
@@ -142,7 +142,7 @@ python-dateutil==2.9.0.post0
     #   matplotlib
 python-jwt==4.1.0
     # via -r requirements.in
-redis==6.0.0
+redis==6.1.0
     # via -r requirements.in
 requests==2.32.3
     # via -r requirements.in
