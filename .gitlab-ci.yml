@@ -13,6 +13,7 @@ default:
     - virtualenv -p3.12 venv
     - . venv/bin/activate
     - pip install -r src/requirements.txt
+    - mkdir -p src/files/upload
     - export WD=`pwd`
     - git clone https://github.com/TeamCOMPAS/COMPAS.git
     - cd COMPAS
