@@ -1,4 +1,4 @@
-from graphene import AbstractType, ObjectType, Int, String, Boolean
+from graphene import ObjectType, Int, String, Boolean
 
 
 class OutputStartType(ObjectType):
@@ -13,7 +13,7 @@ class JobStatusType(ObjectType):
     date = String()
 
 
-class AbstractBasicParameterType(AbstractType):
+class AbstractBasicParameterType(ObjectType):
     number_of_systems = String()
     min_initial_mass = String()
     max_initial_mass = String()
@@ -33,7 +33,7 @@ class AbstractBasicParameterType(AbstractType):
     detailed_output = String()
 
 
-class AbstractAdvancedParametersType(AbstractType):
+class AbstractAdvancedParametersType(ObjectType):
     mass_transfer_angular_momentum_loss_prescription = String()
     mass_transfer_accretion_efficiency_prescription = String()
     mass_transfer_fa = String()

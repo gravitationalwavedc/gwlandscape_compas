@@ -84,7 +84,7 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
     data_group_x = h5_file[root_group][subgroup_x][::stride_length]
     data_group_y = h5_file[root_group][subgroup_y][::stride_length]
 
-    if data_group_x.dtype.type is np.string_ or data_group_y.dtype.type is np.string_:
+    if data_group_x.dtype.type is np.bytes_ or data_group_y.dtype.type is np.bytes_:
         print('One of the subgroups has a dtype of string')
         return None
 

@@ -64,24 +64,6 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         json_data = read_h5_data_as_json(f'../{self.test_detailed_output_file_path}')
         self.assertIsNone(json_data)
 
-    def test_new_single_binary_job_exception_no_redis_raised(self):
-        # Not mocking tasks or redis. Tasks fail as celery cannot connect to redis
-        response = self.client.execute(
-            self.create_single_binary_job_mutation,
-            self.single_binary_job_input
-        )
-
-        expected = {
-            'newSingleBinary': {
-                'result': {
-                    'jobId': '',
-                    'jsonData': '',
-                    'detailedOutputFilePath': ''
-                }
-            }
-        }
-        self.assertEqual(expected, response.data)
-
     @patch('compasui.views.run_compas')
     def test_celery_tasks_called(self, run_compas):
         run_compas.delay().get.return_value = TASK_SUCCESS

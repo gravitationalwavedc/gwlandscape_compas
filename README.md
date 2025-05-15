@@ -6,7 +6,7 @@ GW Landscape Compas module for running Compas jobs from the web.
 
 #### Requirements before you start
 
-* Python 3.8+ with the virtualenv module installed
+* Python 3.12+ with the virtualenv module installed
 * Node Version Manager (NVM) installed
 * In some instances `npm run relay` may raise an error that requires the `watchman` package to be installed.
 * COMPAS (refer to the [docs](https://compas.readthedocs.io/en/latest/pages/Getting%20started/getting-started.html) to install it)
