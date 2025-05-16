@@ -17,6 +17,7 @@ default:
     - git clone https://github.com/TeamCOMPAS/COMPAS.git
     - cd COMPAS
     - pip install .
+    - cd $WD
 
 django-tests:
   stage: test
@@ -76,8 +77,6 @@ flake8:
   script:
     - pip install flake8-gl-codeclimate
     - flake8 --exit-zero --format gl-codeclimate --output-file gl-code-quality-report.json src/
-    - pwd
-    - ls -lah
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
@@ -86,5 +85,4 @@ flake8:
 black-check:
   stage: test
   script:
-    - cd $WD
     - black --check src/
