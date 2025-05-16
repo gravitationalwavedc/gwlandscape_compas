@@ -12,7 +12,8 @@ class CompasJSONWebTokenClient(JSONWebTokenClient):
         """Payload for authentication in compas requires a special userID parameter."""
         self._credentials = {
             jwt_settings.JWT_AUTH_HEADER_NAME: "{0} {1}".format(
-                jwt_settings.JWT_AUTH_HEADER_PREFIX, get_token(user, userId=user.id, isLigo=True)
+                jwt_settings.JWT_AUTH_HEADER_PREFIX,
+                get_token(user, userId=user.id, isLigo=True),
             ),
         }
 

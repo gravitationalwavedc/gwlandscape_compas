@@ -17,6 +17,7 @@ default:
     - git clone https://github.com/TeamCOMPAS/COMPAS.git
     - cd COMPAS
     - pip install .
+    - cd $WD
 
 django-tests:
   stage: test
@@ -79,3 +80,9 @@ flake8:
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
+
+
+black-check:
+  stage: test
+  script:
+    - black --check src/

@@ -43,6 +43,7 @@ class CompasJob(models.Model):
     """
     CompasJob model
     """
+
     user_id = models.IntegerField()
     name = models.CharField(max_length=255, blank=False, null=False)
     description = models.TextField(blank=True, null=True)
@@ -60,9 +61,7 @@ class CompasJob(models.Model):
     is_ligo_job = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = (
-            ('user_id', 'name'),
-        )
+        unique_together = (("user_id", "name"),)
 
     def __str__(self):
         return f"Compas Job: {self.name}"
@@ -71,7 +70,7 @@ class CompasJob(models.Model):
     def job_status(self):
         return request_job_status(self)
 
-    def get_file_list(self, path='', recursive=True):
+    def get_file_list(self, path="", recursive=True):
         return request_file_list(self, path, recursive)
 
     def get_file_download_id(self, path):
@@ -90,10 +89,7 @@ class CompasJob(models.Model):
             advanced[p.name] = p.value
 
         return dict(
-            name=self.name,
-            description=self.description,
-            basic=basic,
-            advanced=advanced
+            name=self.name, description=self.description, basic=basic, advanced=advanced
         )
 
     @classmethod
@@ -187,23 +183,27 @@ class CompasJob(models.Model):
 
 
 class BasicParameter(models.Model):
-    job = models.ForeignKey(CompasJob, related_name='basic_parameter', on_delete=models.CASCADE)
+    job = models.ForeignKey(
+        CompasJob, related_name="basic_parameter", on_delete=models.CASCADE
+    )
 
     name = models.CharField(max_length=55, blank=False, null=False)
     value = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return '{} - {} ({})'.format(self.name, self.value, self.job)
+        return "{} - {} ({})".format(self.name, self.value, self.job)
 
 
 class AdvancedParameter(models.Model):
-    job = models.ForeignKey(CompasJob, related_name='advanced_parameter', on_delete=models.CASCADE)
+    job = models.ForeignKey(
+        CompasJob, related_name="advanced_parameter", on_delete=models.CASCADE
+    )
 
     name = models.CharField(max_length=55, blank=False, null=False)
     value = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return '{} - {} ({})'.format(self.name, self.value, self.job)
+        return "{} - {} ({})".format(self.name, self.value, self.job)
 
 
 class FileDownloadToken(models.Model):
@@ -211,6 +211,7 @@ class FileDownloadToken(models.Model):
     Copied from GWLab - This model tracks files from job file lists which can be used to generate file download tokens
     from the job controller
     """
+
     job = models.ForeignKey(CompasJob, on_delete=models.CASCADE, db_index=True)
     token = models.UUIDField(unique=True, default=uuid.uuid4, db_index=True)
     path = models.TextField()
@@ -223,7 +224,8 @@ class FileDownloadToken(models.Model):
         :return:
         """
         cls.objects.filter(
-            created__lt=timezone.now() - datetime.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY)
+            created__lt=timezone.now()
+            - datetime.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY)
         ).delete()
 
     @classmethod
@@ -253,9 +255,7 @@ class FileDownloadToken(models.Model):
         objects = {
             str(f.token): f.path for f in cls.objects.filter(job=job, token__in=tokens)
         }
-        return [
-            objects[str(tok)] if str(tok) in objects else None for tok in tokens
-        ]
+        return [objects[str(tok)] if str(tok) in objects else None for tok in tokens]
 
 
 class SingleBinaryJob(models.Model):
@@ -411,8 +411,8 @@ class SingleBinaryJob(models.Model):
         null=True,
         validators=[MinValueValidator(0.0)],
         default=0.5,
-        help_text='--mass-transfer-fa: Mass Transfer fraction accreted \
-        in FIXED prescription',
+        help_text="--mass-transfer-fa: Mass Transfer fraction accreted \
+        in FIXED prescription",
     )
 
     def save(self, *args, **kwargs):

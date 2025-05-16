@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('compasui', '0011_auto_20220210_0900'),
+        ("compasui", "0011_auto_20220210_0900"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pair_instability_supernovae',
+            model_name="singlebinaryjob",
+            name="pair_instability_supernovae",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pulsational_pair_instability_supernovae',
+            model_name="singlebinaryjob",
+            name="pulsational_pair_instability_supernovae",
         ),
     ]

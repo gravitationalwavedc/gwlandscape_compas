@@ -10,17 +10,14 @@ class TestJWTTools(TestCase):
         """
 
         # Create a test payload
-        payload = {
-            'username': 'billy',
-            'userId': 43
-        }
+        payload = {"username": "billy", "userId": 43}
 
         # Get the user from the payload and verify that the returned GWCloudUser object is valid
         user = jwt_get_user_by_payload(payload)
 
         # Assert that the fields of the gwcloud user are accurate
-        self.assertEqual(user.username, payload['username'])
-        self.assertEqual(user.user_id, payload['userId'])
+        self.assertEqual(user.username, payload["username"])
+        self.assertEqual(user.user_id, payload["userId"])
 
         # The user object should indicate that the user is active
         self.assertEqual(user.is_active, True)

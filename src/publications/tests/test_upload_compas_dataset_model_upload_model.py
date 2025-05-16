@@ -46,7 +46,9 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
 
         # Check objects just inside the deletion time are not deleted
         r = CompasDatasetModelUploadToken.objects.last()
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1
+        )
         r.save()
 
         CompasDatasetModelUploadToken.prune()
@@ -54,7 +56,9 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
         self.assertEqual(CompasDatasetModelUploadToken.objects.all().count(), 1)
 
         # Check objects just outside the deletion time are deleted
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1
+        )
         r.save()
 
         CompasDatasetModelUploadToken.prune()
@@ -77,7 +81,9 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
         # Check that prune works as expected
         # Check objects just inside the deletion time are not deleted
         r = CompasDatasetModelUploadToken.objects.last()
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1
+        )
         r.save()
 
         result = CompasDatasetModelUploadToken.get_by_token(token)
@@ -87,7 +93,9 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
 
         # Set the object outside the expiry window
         r = CompasDatasetModelUploadToken.objects.last()
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1
+        )
         r.save()
 
         result = CompasDatasetModelUploadToken.get_by_token(token)
