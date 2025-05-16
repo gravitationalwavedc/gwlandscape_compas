@@ -14,7 +14,7 @@ from publications.utils.misc import check_publication_management_user
 
 class Keyword(models.Model):
     class Meta:
-        ordering = ['tag']
+        ordering = ["tag"]
 
     tag = models.CharField(max_length=255, blank=False, null=False, unique=True)
 
@@ -23,9 +23,7 @@ class Keyword(models.Model):
 
     @classmethod
     def create_keyword(cls, tag):
-        return cls.objects.create(
-            tag=tag
-        )
+        return cls.objects.create(tag=tag)
 
     @classmethod
     def delete_keyword(cls, _id):
@@ -59,7 +57,7 @@ def job_directory_path(instance, filename):
 
 class CompasPublication(models.Model):
     class Meta:
-        ordering = ['title']
+        ordering = ["title"]
 
     author = models.CharField(max_length=255, blank=False, null=False)
     # published defines if the job was published in a journal/arxiv
@@ -82,11 +80,15 @@ class CompasPublication(models.Model):
 
     @classmethod
     def filter_by_keyword(cls, keyword=None):
-        return cls.objects.all().filter(keywords__tag=keyword) if keyword else cls.objects.all()
+        return (
+            cls.objects.all().filter(keywords__tag=keyword)
+            if keyword
+            else cls.objects.all()
+        )
 
     @classmethod
     def create_publication(cls, **kwargs):
-        keywords = Keyword.filter_by_ids(kwargs.pop('keywords', []))
+        keywords = Keyword.filter_by_ids(kwargs.pop("keywords", []))
 
         result = cls.objects.create(**kwargs)
         result.keywords.set(keywords)
@@ -100,7 +102,7 @@ class CompasPublication(models.Model):
     @classmethod
     def update_publication(cls, _id, **kwargs):
         publication = cls.objects.get(id=_id)
-        keyword_ids = kwargs.pop('keywords', None)
+        keyword_ids = kwargs.pop("keywords", None)
         if keyword_ids is not None:
             keywords = Keyword.filter_by_ids(keyword_ids)
             publication.keywords.set(keywords)
@@ -119,7 +121,7 @@ class CompasPublication(models.Model):
 
 class CompasModel(models.Model):
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     name = models.CharField(max_length=50, null=False, blank=False)
     summary = models.CharField(max_length=255, null=True, blank=True)
@@ -130,11 +132,7 @@ class CompasModel(models.Model):
 
     @classmethod
     def create_model(cls, name, summary=None, description=None):
-        return cls.objects.create(
-            name=name,
-            summary=summary,
-            description=description
-        )
+        return cls.objects.create(name=name, summary=summary, description=description)
 
     @classmethod
     def delete_model(cls, _id):
@@ -149,16 +147,18 @@ class CompasModel(models.Model):
 
 
 class CompasDatasetModel(models.Model):
-    compas_publication = models.ForeignKey(CompasPublication, models.CASCADE, related_name='dataset_models')
+    compas_publication = models.ForeignKey(
+        CompasPublication, models.CASCADE, related_name="dataset_models"
+    )
     compas_model = models.ForeignKey(CompasModel, models.CASCADE)
-    file = models.FileField(upload_to=job_directory_path, blank=True, null=True, max_length=255)
+    file = models.FileField(
+        upload_to=job_directory_path, blank=True, null=True, max_length=255
+    )
 
     @classmethod
     def create_dataset_model(cls, compas_publication, compas_model, file):
         return cls.objects.create(
-            compas_publication=compas_publication,
-            compas_model=compas_model,
-            file=file
+            compas_publication=compas_publication, compas_model=compas_model, file=file
         )
 
     @classmethod
@@ -193,11 +193,13 @@ class CompasDatasetModel(models.Model):
         if self.file.name:
             try:
                 with tarfile.open(fileobj=self.file) as f:
-                    if sum(Path(name).suffix == '.h5' for name in f.getnames()) != 1:
-                        raise ValidationError('Dataset must have exactly one assigned h5 file')
+                    if sum(Path(name).suffix == ".h5" for name in f.getnames()) != 1:
+                        raise ValidationError(
+                            "Dataset must have exactly one assigned h5 file"
+                        )
             except tarfile.ReadError:
-                if Path(self.file.name).suffix != '.h5':
-                    raise ValidationError('Uploaded dataset should be a .h5 file')
+                if Path(self.file.name).suffix != ".h5":
+                    raise ValidationError("Uploaded dataset should be a .h5 file")
 
         super().save(*args, **kwargs)
         # Check file name is not empty after saving the model and uploading file
@@ -220,7 +222,9 @@ class CompasDatasetModel(models.Model):
                 # extract files into dataset directory
                 # (this will create subdirectories as well, exactly as in the tarball)
                 dataset_tar.extract(member, dataset_dir)
-                Upload.create_upload(os.path.join(os.path.dirname(self.file.name), member.name), self)
+                Upload.create_upload(
+                    os.path.join(os.path.dirname(self.file.name), member.name), self
+                )
 
         dataset_tar.close()
         # remove the tar file after decompression
@@ -254,6 +258,7 @@ class CompasDatasetModelUploadToken(models.Model):
     This model tracks file upload tokens that can be used to upload compas dataset model files rather than using
     traditional JWT authentication
     """
+
     # The job upload token
     token = models.UUIDField(unique=True, default=uuid.uuid4, db_index=True)
     # The ID of the user the upload token was created for (Used to provide the user of the uploaded job)
@@ -293,7 +298,10 @@ class CompasDatasetModelUploadToken(models.Model):
         Removes any expired tokens from the database
         """
         cls.objects.filter(
-            created__lt=timezone.now() - datetime.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY)
+            created__lt=timezone.now()
+            - datetime.timedelta(
+                seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY
+            )
         ).delete()
 
 
@@ -301,7 +309,10 @@ class FileDownloadToken(models.Model):
     """
     This model tracks files uploaded as part of a dataset, allowing them to be downloaded
     """
-    dataset = models.ForeignKey(CompasDatasetModel, on_delete=models.CASCADE, db_index=True)
+
+    dataset = models.ForeignKey(
+        CompasDatasetModel, on_delete=models.CASCADE, db_index=True
+    )
     token = models.UUIDField(unique=True, default=uuid.uuid4, db_index=True)
     path = models.TextField()
     created = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -313,7 +324,8 @@ class FileDownloadToken(models.Model):
         :return:
         """
         cls.objects.filter(
-            created__lt=timezone.now() - datetime.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY)
+            created__lt=timezone.now()
+            - datetime.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY)
         ).delete()
 
     @classmethod
@@ -341,8 +353,7 @@ class FileDownloadToken(models.Model):
         """
         cls.prune()
         objects = {
-            str(f.token): f.path for f in cls.objects.filter(dataset=dataset, token__in=tokens)
+            str(f.token): f.path
+            for f in cls.objects.filter(dataset=dataset, token__in=tokens)
         }
-        return [
-            objects[str(tok)] if str(tok) in objects else None for tok in tokens
-        ]
+        return [objects[str(tok)] if str(tok) in objects else None for tok in tokens]

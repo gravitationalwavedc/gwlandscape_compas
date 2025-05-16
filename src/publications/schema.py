@@ -12,8 +12,14 @@ from graphql import GraphQLError
 from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
 
-from publications.models import Keyword, CompasPublication, CompasModel, CompasDatasetModel, \
-    CompasDatasetModelUploadToken, FileDownloadToken
+from publications.models import (
+    Keyword,
+    CompasPublication,
+    CompasModel,
+    CompasDatasetModel,
+    CompasDatasetModelUploadToken,
+    FileDownloadToken,
+)
 from publications.utils.misc import check_publication_management_user
 from publications.utils.h5_functions import get_h5_subgroup_meta, get_h5_subgroup_data
 
@@ -22,13 +28,11 @@ class KeywordNode(DjangoObjectType):
     """
     Type for Keywords without authentication
     """
+
     class Meta:
         model = Keyword
-        fields = ['tag']
-        filter_fields = {
-            'id': ['exact'],
-            'tag': ['exact', 'icontains']
-        }
+        fields = ["tag"]
+        filter_fields = {"id": ["exact"], "tag": ["exact", "icontains"]}
         interfaces = (relay.Node,)
 
 
@@ -40,32 +44,32 @@ class CompasPublicationNode(DjangoObjectType):
     class Meta:
         model = CompasPublication
         fields = [
-            'author',
-            'published',
-            'title',
-            'year',
-            'journal',
-            'journal_doi',
-            'dataset_doi',
-            'dataset_models',
-            'creation_time',
-            'description',
-            'public',
-            'download_link',
-            'arxiv_id',
-            'keywords'
+            "author",
+            "published",
+            "title",
+            "year",
+            "journal",
+            "journal_doi",
+            "dataset_doi",
+            "dataset_models",
+            "creation_time",
+            "description",
+            "public",
+            "download_link",
+            "arxiv_id",
+            "keywords",
         ]
         filter_fields = {
-            'id': ['exact'],
-            'author': ['exact', 'icontains'],
-            'published': ['exact'],
-            'title': ['exact', 'icontains'],
-            'year': ['exact', 'gt', 'lt', 'gte', 'lte'],
-            'journal': ['exact', 'icontains'],
-            'journal_doi': ['exact', 'icontains'],
-            'dataset_doi': ['exact', 'icontains'],
-            'description': ['exact', 'icontains'],
-            'public': ['exact']
+            "id": ["exact"],
+            "author": ["exact", "icontains"],
+            "published": ["exact"],
+            "title": ["exact", "icontains"],
+            "year": ["exact", "gt", "lt", "gte", "lte"],
+            "journal": ["exact", "icontains"],
+            "journal_doi": ["exact", "icontains"],
+            "dataset_doi": ["exact", "icontains"],
+            "description": ["exact", "icontains"],
+            "public": ["exact"],
         }
         interfaces = (relay.Node,)
 
@@ -79,14 +83,15 @@ class CompasModelNode(DjangoObjectType):
     """
     Type for CompasModels without authentication
     """
+
     class Meta:
         model = CompasModel
-        fields = ['name', 'summary', 'description']
+        fields = ["name", "summary", "description"]
         filter_fields = {
-            'id': ['exact'],
-            'name': ['exact', 'icontains'],
-            'summary': ['exact', 'icontains'],
-            'description': ['exact', 'icontains']
+            "id": ["exact"],
+            "name": ["exact", "icontains"],
+            "summary": ["exact", "icontains"],
+            "description": ["exact", "icontains"],
         }
         interfaces = (relay.Node,)
 
@@ -127,6 +132,7 @@ class CompasDatasetModelNode(DjangoObjectType):
     """
     Type for CompasDatasetModel without authentication
     """
+
     files = graphene.List(DatasetFile)
     data_file = graphene.Field(DatasetFile)
     plot_meta = graphene.Field(
@@ -134,23 +140,23 @@ class CompasDatasetModelNode(DjangoObjectType):
         root_group=graphene.String(),
         subgroup_x=graphene.String(),
         subgroup_y=graphene.String(),
-        stride_length=graphene.Int()
+        stride_length=graphene.Int(),
     )
     plot_data = graphene.Field(
         PlotDataType,
         root_group=graphene.String(),
         subgroup_x=graphene.String(),
         subgroup_y=graphene.String(),
-        stride_length=graphene.Int()
+        stride_length=graphene.Int(),
     )
 
     class Meta:
         model = CompasDatasetModel
-        fields = ['compas_publication', 'compas_model']
+        fields = ["compas_publication", "compas_model"]
         filter_fields = {
-            'id': ['exact'],
-            'compas_publication': ['exact'],
-            'compas_model': ['exact']
+            "id": ["exact"],
+            "compas_publication": ["exact"],
+            "compas_model": ["exact"],
         }
         interfaces = (relay.Node,)
 
@@ -200,7 +206,7 @@ class CompasDatasetModelNode(DjangoObjectType):
             root_group=plot_meta["group"],
             subgroup_x=plot_meta["subgroup_x"],
             subgroup_y=plot_meta["subgroup_y"],
-            stride_length=plot_meta["stride_length"]
+            stride_length=plot_meta["stride_length"],
         )
 
 
@@ -216,7 +222,9 @@ class Query(object):
     compas_dataset_model = relay.Node.Field(CompasDatasetModelNode)
     compas_dataset_models = DjangoFilterConnectionField(CompasDatasetModelNode)
 
-    generate_compas_dataset_model_upload_token = graphene.Field(GenerateCompasDatasetModelUploadToken)
+    generate_compas_dataset_model_upload_token = graphene.Field(
+        GenerateCompasDatasetModelUploadToken
+    )
 
     @login_required
     @user_passes_test(check_publication_management_user)
@@ -296,9 +304,13 @@ class AddPublicationMutation(relay.ClientIDMutation):
     @login_required
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, **kwargs):
-        keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop('keywords', [])]
-        publication = CompasPublication.create_publication(**kwargs, keywords=keyword_ids)
-        return AddPublicationMutation(id=to_global_id('CompasPublicationNode', publication.id))
+        keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop("keywords", [])]
+        publication = CompasPublication.create_publication(
+            **kwargs, keywords=keyword_ids
+        )
+        return AddPublicationMutation(
+            id=to_global_id("CompasPublicationNode", publication.id)
+        )
 
 
 class DeletePublicationMutation(relay.ClientIDMutation):
@@ -339,8 +351,10 @@ class UpdatePublicationMutation(relay.ClientIDMutation):
     @login_required
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, id, **kwargs):
-        keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop('keywords', [])]
-        CompasPublication.update_publication(_id=from_global_id(id)[1], **kwargs, keywords=keyword_ids)
+        keyword_ids = [from_global_id(_id)[1] for _id in kwargs.pop("keywords", [])]
+        CompasPublication.update_publication(
+            _id=from_global_id(id)[1], **kwargs, keywords=keyword_ids
+        )
         return UpdatePublicationMutation(result=True)
 
 
@@ -357,7 +371,7 @@ class AddCompasModelMutation(relay.ClientIDMutation):
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, **kwargs):
         model = CompasModel.create_model(**kwargs)
-        return AddCompasModelMutation(id=to_global_id('CompasModelNode', model.id))
+        return AddCompasModelMutation(id=to_global_id("CompasModelNode", model.id))
 
 
 class DeleteCompasModelMutation(relay.ClientIDMutation):
@@ -417,13 +431,13 @@ class UpdateCompasDatasetModelMutation(relay.ClientIDMutation):
     @login_required
     @user_passes_test(check_publication_management_user)
     def mutate_and_get_payload(cls, root, info, id, **kwargs):
-        if 'compas_publication' in kwargs:
-            kwargs['compas_publication'] = CompasPublication.objects.get(
-                id=from_global_id(kwargs['compas_publication'])[1]
+        if "compas_publication" in kwargs:
+            kwargs["compas_publication"] = CompasPublication.objects.get(
+                id=from_global_id(kwargs["compas_publication"])[1]
             )
-        if 'compas_model' in kwargs:
-            kwargs['compas_model'] = CompasModel.objects.get(
-                id=from_global_id(kwargs['compas_model'])[1]
+        if "compas_model" in kwargs:
+            kwargs["compas_model"] = CompasModel.objects.get(
+                id=from_global_id(kwargs["compas_model"])[1]
             )
         CompasDatasetModel.update_dataset_model(from_global_id(id)[1], **kwargs)
         return UpdateCompasDatasetModelMutation(result=True)
@@ -439,20 +453,26 @@ class UploadCompasDatasetModelMutation(relay.ClientIDMutation):
     id = graphene.ID()
 
     @classmethod
-    def mutate_and_get_payload(cls, root, info, upload_token, compas_publication, compas_model, job_file):
+    def mutate_and_get_payload(
+        cls, root, info, upload_token, compas_publication, compas_model, job_file
+    ):
         # Get the token being used to perform the upload - this will return None if the token doesn't exist or
         # is expired
         token = CompasDatasetModelUploadToken.get_by_token(upload_token)
         if not token:
-            raise GraphQLError("Compas Dataset Model upload token is invalid or expired.")
+            raise GraphQLError(
+                "Compas Dataset Model upload token is invalid or expired."
+            )
 
         dataset_model = CompasDatasetModel.create_dataset_model(
             CompasPublication.objects.get(id=from_global_id(compas_publication)[1]),
             CompasModel.objects.get(id=from_global_id(compas_model)[1]),
-            job_file
+            job_file,
         )
 
-        return UploadCompasDatasetModelMutation(id=to_global_id('CompasDatasetModelNode', dataset_model.id))
+        return UploadCompasDatasetModelMutation(
+            id=to_global_id("CompasDatasetModelNode", dataset_model.id)
+        )
 
 
 class Mutation(graphene.ObjectType):

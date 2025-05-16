@@ -8,22 +8,37 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('publications', '0005_auto_20220823_0631'),
+        ("publications", "0005_auto_20220823_0631"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CompasDatasetModelUploadToken',
+            name="CompasDatasetModelUploadToken",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('token', models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)),
-                ('user_id', models.IntegerField()),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "token",
+                    models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+                ),
+                ("user_id", models.IntegerField()),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='compasdatasetmodel',
-            name='compas_publication',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='dataset_models', to='publications.compaspublication'),
+            model_name="compasdatasetmodel",
+            name="compas_publication",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="dataset_models",
+                to="publications.compaspublication",
+            ),
         ),
     ]

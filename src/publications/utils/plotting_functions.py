@@ -24,7 +24,7 @@ def get_surrounding_bins(indices, x_lim, y_lim):
     x, y = indices
     x1, x2 = max(x - 1, 0), min(x + 1, x_lim)
     y1, y2 = max(y - 1, 0), min(y + 1, y_lim)
-    return np.array(list(product(range(x1, x2+1), range(y1, y2+1))))
+    return np.array(list(product(range(x1, x2 + 1), range(y1, y2 + 1))))
 
 
 def get_log_and_limits(arr, is_bool, max_cond=80, min_cond=1e-2):
@@ -62,7 +62,12 @@ def get_log_and_limits(arr, is_bool, max_cond=80, min_cond=1e-2):
     if arr_max == arr_min:
         if min_cond < arr_max < max_cond or arr_max == 0:
             return arr, False, [arr_max - 0.01, arr_max + 0.01], False
-        return np.log10(arr), True, [np.log10(arr_max) - 0.01, np.log10(arr_max) + 0.01], False
+        return (
+            np.log10(arr),
+            True,
+            [np.log10(arr_max) - 0.01, np.log10(arr_max) + 0.01],
+            False,
+        )
 
     if min_cond < arr_max < max_cond:
         return arr, False, [arr_min, arr_max], False
@@ -105,7 +110,7 @@ def split_histogram_by_count(counts, split_count):
 
     # Get all coordinates surrounding all histogram bins above split_count
     min_count_bins = [
-        get_surrounding_bins(entry, x_lim=x_lim-1, y_lim=y_lim-1)
+        get_surrounding_bins(entry, x_lim=x_lim - 1, y_lim=y_lim - 1)
         for entry in min_count_indices
     ]
 
@@ -119,18 +124,30 @@ def split_histogram_by_count(counts, split_count):
 
     # For each of the coordinates, retain them only if they have any counts in them
     smoothed_unique_indices = smoothed_indices[
-        np.asarray([(entry == all_count_indices).all(axis=1).any() for entry in smoothed_indices])
+        np.asarray(
+            [
+                (entry == all_count_indices).all(axis=1).any()
+                for entry in smoothed_indices
+            ]
+        )
     ]
 
     # Get the coordinates where there are counts, but not covered by smooth histogram
     inverse_unique_indices = all_count_indices[
-        ~np.asarray([(entry == smoothed_indices).all(axis=1).any() for entry in all_count_indices])
+        ~np.asarray(
+            [
+                (entry == smoothed_indices).all(axis=1).any()
+                for entry in all_count_indices
+            ]
+        )
     ]
 
     return smoothed_unique_indices, inverse_unique_indices
 
 
-def histo2d_scatter_hybrid(x_array, y_array, min_max_x, min_max_y, min_count=3, bins=40):
+def histo2d_scatter_hybrid(
+    x_array, y_array, min_max_x, min_max_y, min_count=3, bins=40
+):
     """Return data necessary to build a hybrid scatter-histogram plot
 
     Parameters
@@ -160,40 +177,40 @@ def histo2d_scatter_hybrid(x_array, y_array, min_max_x, min_max_y, min_count=3, 
     x_offset, y_offset = 0.5 * x_range / x_bins, 0.5 * y_range / y_bins
     x_limits = (x_min - x_offset, x_max + x_offset)
     y_limits = (y_min - y_offset, y_max + y_offset)
-    counts, x_edges, y_edges = np.histogram2d(x_array, y_array, bins=(x_bins+1, y_bins+1), range=(x_limits, y_limits))
+    counts, x_edges, y_edges = np.histogram2d(
+        x_array, y_array, bins=(x_bins + 1, y_bins + 1), range=(x_limits, y_limits)
+    )
 
-    x_centers = (x_edges[1:] + x_edges[:-1])/2.
-    y_centers = (y_edges[1:] + y_edges[:-1])/2.
+    x_centers = (x_edges[1:] + x_edges[:-1]) / 2.0
+    y_centers = (y_edges[1:] + y_edges[:-1]) / 2.0
     x_side, y_side = np.abs(x_edges[1] - x_edges[0]), np.abs(y_edges[1] - y_edges[0])
 
     histogram_indices, scatter_indices = split_histogram_by_count(counts, min_count)
 
     hist_json = [
-        {
-            'x': x_centers[xi],
-            'y': y_centers[yi],
-            'counts': counts[xi, yi]
-        }
+        {"x": x_centers[xi], "y": y_centers[yi], "counts": counts[xi, yi]}
         for xi, yi in histogram_indices
     ]
 
     # Now to grab the scatter points of < min_count
-    index_array = np.any([
-        np.logical_and(
-            np.abs(x_array - x_centers[entry[0]]) <= x_side/2.,
-            np.abs(y_array - y_centers[entry[1]]) <= y_side/2.
-        ) for entry in scatter_indices
-    ], axis=0)
+    index_array = np.any(
+        [
+            np.logical_and(
+                np.abs(x_array - x_centers[entry[0]]) <= x_side / 2.0,
+                np.abs(y_array - y_centers[entry[1]]) <= y_side / 2.0,
+            )
+            for entry in scatter_indices
+        ],
+        axis=0,
+    )
 
     scatter_json = [
-        {
-            'x': float(x),
-            'y': float(y)
-        } for x, y in np.column_stack((x_array, y_array))[index_array]
+        {"x": float(x), "y": float(y)}
+        for x, y in np.column_stack((x_array, y_array))[index_array]
     ]
 
     return {
-        'sides': [x_side, y_side],
-        'hist_data': json.dumps(hist_json),
-        'scatter_data': json.dumps(scatter_json)
+        "sides": [x_side, y_side],
+        "hist_data": json.dumps(hist_json),
+        "scatter_data": json.dumps(scatter_json),
     }

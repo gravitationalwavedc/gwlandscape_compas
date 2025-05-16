@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('publications', '0006_auto_20230206_0015'),
+        ("publications", "0006_auto_20230206_0015"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='compasmodel',
-            name='name',
-            field=models.CharField(default='', max_length=50),
+            model_name="compasmodel",
+            name="name",
+            field=models.CharField(default="", max_length=50),
         ),
     ]

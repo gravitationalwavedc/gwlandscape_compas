@@ -9,68 +9,126 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='CompasDatasetModel',
+            name="CompasDatasetModel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('files', models.FileField(blank=True, null=True, upload_to=publications.models.job_directory_path)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "files",
+                    models.FileField(
+                        blank=True,
+                        null=True,
+                        upload_to=publications.models.job_directory_path,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='CompasModel',
+            name="CompasModel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=50, null=True)),
-                ('summary', models.CharField(blank=True, max_length=255, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=50, null=True)),
+                ("summary", models.CharField(blank=True, max_length=255, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Keyword',
+            name="Keyword",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tag', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("tag", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='Upload',
+            name="Upload",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(blank=True, null=True, upload_to='')),
-                ('dataset_model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='publications.CompasDatasetModel')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file", models.FileField(blank=True, null=True, upload_to="")),
+                (
+                    "dataset_model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="publications.CompasDatasetModel",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='CompasPublication',
+            name="CompasPublication",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('author', models.CharField(max_length=255)),
-                ('published', models.BooleanField(default=False)),
-                ('title', models.CharField(max_length=255)),
-                ('year', models.IntegerField(null=True)),
-                ('journal', models.CharField(max_length=255, null=True)),
-                ('journal_DOI', models.CharField(max_length=255, null=True)),
-                ('dataset_DOI', models.CharField(max_length=255, null=True)),
-                ('creation_time', models.DateTimeField(auto_now_add=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('public', models.BooleanField(default=False)),
-                ('download_link', models.TextField(blank=True, null=True)),
-                ('arxiv_id', models.CharField(max_length=255)),
-                ('keywords', models.ManyToManyField(to='publications.Keyword')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("author", models.CharField(max_length=255)),
+                ("published", models.BooleanField(default=False)),
+                ("title", models.CharField(max_length=255)),
+                ("year", models.IntegerField(null=True)),
+                ("journal", models.CharField(max_length=255, null=True)),
+                ("journal_DOI", models.CharField(max_length=255, null=True)),
+                ("dataset_DOI", models.CharField(max_length=255, null=True)),
+                ("creation_time", models.DateTimeField(auto_now_add=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("public", models.BooleanField(default=False)),
+                ("download_link", models.TextField(blank=True, null=True)),
+                ("arxiv_id", models.CharField(max_length=255)),
+                ("keywords", models.ManyToManyField(to="publications.Keyword")),
             ],
         ),
         migrations.AddField(
-            model_name='compasdatasetmodel',
-            name='compas_model',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='publications.CompasModel'),
+            model_name="compasdatasetmodel",
+            name="compas_model",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="publications.CompasModel",
+            ),
         ),
         migrations.AddField(
-            model_name='compasdatasetmodel',
-            name='compas_publication',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='publications.CompasPublication'),
+            model_name="compasdatasetmodel",
+            name="compas_publication",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="publications.CompasPublication",
+            ),
         ),
     ]

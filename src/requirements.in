@@ -18,3 +18,4 @@ pyhumps
 h5py
 matplotlib
 pyjwt
+black

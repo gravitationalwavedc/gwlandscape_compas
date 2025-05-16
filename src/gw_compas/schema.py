@@ -7,7 +7,9 @@ class Query(compasui.schema.Query, publications.schema.Query, graphene.ObjectTyp
     pass
 
 
-class Mutation(compasui.schema.Mutation, publications.schema.Mutation, graphene.ObjectType):
+class Mutation(
+    compasui.schema.Mutation, publications.schema.Mutation, graphene.ObjectType
+):
     pass
 
 

@@ -17,11 +17,11 @@ def perform_db_search(user, kwargs):
     # Create the jwt token
     jwt_enc = jwt.encode(
         {
-            'userId': user.user_id,
-            'exp': datetime.datetime.now() + datetime.timedelta(days=30)
+            "userId": user.user_id,
+            "exp": datetime.datetime.now() + datetime.timedelta(days=30),
         },
         settings.DB_SEARCH_SERVICE_JWT_SECRET,
-        algorithm='HS256'
+        algorithm="HS256",
     )
 
     search_params = f"search: \"{kwargs.get('search', '')}\""
@@ -63,11 +63,10 @@ def perform_db_search(user, kwargs):
     try:
         # Initiate the request to the job controller
         result = requests.request(
-            "POST", f"{settings.GWCLOUD_DB_SEARCH_API_URL}",
-            data={'query': query},
-            headers={
-                "Authorization": 'JWT ' + jwt_enc.decode()
-            }
+            "POST",
+            f"{settings.GWCLOUD_DB_SEARCH_API_URL}",
+            data={"query": query},
+            headers={"Authorization": "JWT " + jwt_enc.decode()},
         )
 
         # Check that the request was successful

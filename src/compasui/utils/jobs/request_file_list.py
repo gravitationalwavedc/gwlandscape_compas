@@ -23,35 +23,32 @@ def request_file_list(job, path, recursive, user_id=None):
     # Create the jwt token
     jwt_enc = jwt.encode(
         {
-            'userId': user_id or job.user_id,
-            'exp': datetime.datetime.now() + datetime.timedelta(days=30)
+            "userId": user_id or job.user_id,
+            "exp": datetime.datetime.now() + datetime.timedelta(days=30),
         },
         settings.JOB_CONTROLLER_JWT_SECRET,
-        algorithm='HS256'
+        algorithm="HS256",
     )
 
     # Build the data object
-    data = {
-        'jobId': job.job_controller_id,
-        'recursive': recursive,
-        'path': path
-    }
+    data = {"jobId": job.job_controller_id, "recursive": recursive, "path": path}
 
     try:
         # Initiate the request to the job controller
         result = requests.request(
-            "PATCH", f"{settings.GWCLOUD_JOB_CONTROLLER_API_URL}/file/",
+            "PATCH",
+            f"{settings.GWCLOUD_JOB_CONTROLLER_API_URL}/file/",
             data=json.dumps(data),
-            headers={
-                "Authorization": jwt_enc
-            }
+            headers={"Authorization": jwt_enc},
         )
 
         # Check that the request was successful
         if result.status_code != 200:
             # Oops
-            msg = f"Error getting job file list, got error code: " \
-                  f"{result.status_code}\n\n{result.headers}\n\n{result.content}"
+            msg = (
+                f"Error getting job file list, got error code: "
+                f"{result.status_code}\n\n{result.headers}\n\n{result.content}"
+            )
             print(msg)
             raise Exception(msg)
 

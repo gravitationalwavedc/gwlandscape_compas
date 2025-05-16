@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('compasui', '0003_singlebinaryjob_max_time'),
+        ("compasui", "0003_singlebinaryjob_max_time"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='max_time',
+            model_name="singlebinaryjob",
+            name="max_time",
         ),
     ]

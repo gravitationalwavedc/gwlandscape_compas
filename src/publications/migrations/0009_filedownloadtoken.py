@@ -8,18 +8,35 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('publications', '0008_alter_compasmodel_name'),
+        ("publications", "0008_alter_compasmodel_name"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FileDownloadToken',
+            name="FileDownloadToken",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('token', models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)),
-                ('path', models.TextField()),
-                ('created', models.DateTimeField(auto_now_add=True, db_index=True)),
-                ('dataset', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='publications.compasdatasetmodel')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "token",
+                    models.UUIDField(db_index=True, default=uuid.uuid4, unique=True),
+                ),
+                ("path", models.TextField()),
+                ("created", models.DateTimeField(auto_now_add=True, db_index=True)),
+                (
+                    "dataset",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="publications.compasdatasetmodel",
+                    ),
+                ),
             ],
         ),
     ]

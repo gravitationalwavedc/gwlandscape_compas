@@ -6,30 +6,34 @@ from django.test import override_settings
 from django.utils import timezone
 
 from compasui.tests.testcases import CompasTestCase
-from publications.models import FileDownloadToken, CompasModel, CompasPublication, CompasDatasetModel
+from publications.models import (
+    FileDownloadToken,
+    CompasModel,
+    CompasPublication,
+    CompasDatasetModel,
+)
 
 
 @override_settings(MEDIA_ROOT=TemporaryDirectory().name)
 class TestFileDownloadToken(CompasTestCase):
     def setUp(self):
-        self.model = CompasModel.create_model('test', 'summary', 'description')
+        self.model = CompasModel.create_model("test", "summary", "description")
 
         self.publication = CompasPublication.create_publication(
-            author='test author',
-            title='test title',
-            arxiv_id='test arxiv_id'
+            author="test author", title="test title", arxiv_id="test arxiv_id"
         )
 
         self.placeholder_dataset = SimpleUploadedFile(
-            name='COMPAS_Output.h5',
-            content=open('./publications/tests/test_data/test_job/COMPAS_Output/COMPAS_Output.h5', 'rb').read(),
-            content_type='application/x-bag'
+            name="COMPAS_Output.h5",
+            content=open(
+                "./publications/tests/test_data/test_job/COMPAS_Output/COMPAS_Output.h5",
+                "rb",
+            ).read(),
+            content_type="application/x-bag",
         )
 
         self.dataset = CompasDatasetModel.create_dataset_model(
-            self.publication,
-            self.model,
-            self.placeholder_dataset
+            self.publication, self.model, self.placeholder_dataset
         )
 
     def test_create(self):
@@ -83,7 +87,9 @@ class TestFileDownloadToken(CompasTestCase):
 
         # Check objects just inside the deletion time are not deleted
         for r in FileDownloadToken.objects.all():
-            r.created = after - timezone.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY - 1)
+            r.created = after - timezone.timedelta(
+                seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY - 1
+            )
             r.save()
 
         FileDownloadToken.prune()
@@ -92,7 +98,9 @@ class TestFileDownloadToken(CompasTestCase):
 
         # Check objects just outside the deletion time are deleted
         for r in FileDownloadToken.objects.all():
-            r.created = after - timezone.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1)
+            r.created = after - timezone.timedelta(
+                seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1
+            )
             r.save()
 
         FileDownloadToken.prune()
@@ -129,7 +137,9 @@ class TestFileDownloadToken(CompasTestCase):
         # Check that prune works as expected
         # Check objects just inside the deletion time are not deleted
         for r in FileDownloadToken.objects.all():
-            r.created = after - timezone.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY - 1)
+            r.created = after - timezone.timedelta(
+                seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY - 1
+            )
             r.save()
 
         result = FileDownloadToken.get_paths(self.dataset, tokens)
@@ -139,7 +149,9 @@ class TestFileDownloadToken(CompasTestCase):
 
         # Set one object outside the expiry window
         r = FileDownloadToken.objects.all()[2]
-        r.created = after - timezone.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1
+        )
         r.save()
 
         result = FileDownloadToken.get_paths(self.dataset, tokens)
@@ -152,7 +164,9 @@ class TestFileDownloadToken(CompasTestCase):
 
         # Check objects just outside the deletion time are deleted
         for r in FileDownloadToken.objects.all():
-            r.created = after - timezone.timedelta(seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1)
+            r.created = after - timezone.timedelta(
+                seconds=settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1
+            )
             r.save()
 
         result = FileDownloadToken.get_paths(self.dataset, tokens)

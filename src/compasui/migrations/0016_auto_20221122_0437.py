@@ -6,100 +6,100 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('compasui', '0015_auto_20220823_0631'),
+        ("compasui", "0015_auto_20220823_0631"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='black_hole_kicks',
+            model_name="singlebinaryjob",
+            name="black_hole_kicks",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='common_envelope_lambda',
+            model_name="singlebinaryjob",
+            name="common_envelope_lambda",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='kick_velocity_sigma_CCSN_BH',
+            model_name="singlebinaryjob",
+            name="kick_velocity_sigma_CCSN_BH",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='kick_velocity_sigma_CCSN_NS',
+            model_name="singlebinaryjob",
+            name="kick_velocity_sigma_CCSN_NS",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='kick_velocity_sigma_ECSN',
+            model_name="singlebinaryjob",
+            name="kick_velocity_sigma_ECSN",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='kick_velocity_sigma_USSN',
+            model_name="singlebinaryjob",
+            name="kick_velocity_sigma_USSN",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='mass_transfer_jloss',
+            model_name="singlebinaryjob",
+            name="mass_transfer_jloss",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='maximum_neutron_star_mass',
+            model_name="singlebinaryjob",
+            name="maximum_neutron_star_mass",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='mean_anomaly_1',
+            model_name="singlebinaryjob",
+            name="mean_anomaly_1",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='mean_anomaly_2',
+            model_name="singlebinaryjob",
+            name="mean_anomaly_2",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pair_instability_supernovae',
+            model_name="singlebinaryjob",
+            name="pair_instability_supernovae",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='phi_1',
+            model_name="singlebinaryjob",
+            name="phi_1",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='phi_2',
+            model_name="singlebinaryjob",
+            name="phi_2",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pisn_lower_limit',
+            model_name="singlebinaryjob",
+            name="pisn_lower_limit",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pisn_upper_limit',
+            model_name="singlebinaryjob",
+            name="pisn_upper_limit",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='ppi_lower_limit',
+            model_name="singlebinaryjob",
+            name="ppi_lower_limit",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='ppi_upper_limit',
+            model_name="singlebinaryjob",
+            name="ppi_upper_limit",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pulsational_pair_instability_prescription',
+            model_name="singlebinaryjob",
+            name="pulsational_pair_instability_prescription",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='pulsational_pair_instability_supernovae',
+            model_name="singlebinaryjob",
+            name="pulsational_pair_instability_supernovae",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='theta_1',
+            model_name="singlebinaryjob",
+            name="theta_1",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='theta_2',
+            model_name="singlebinaryjob",
+            name="theta_2",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='velocity_random_number_1',
+            model_name="singlebinaryjob",
+            name="velocity_random_number_1",
         ),
         migrations.RemoveField(
-            model_name='singlebinaryjob',
-            name='velocity_random_number_2',
+            model_name="singlebinaryjob",
+            name="velocity_random_number_2",
         ),
     ]

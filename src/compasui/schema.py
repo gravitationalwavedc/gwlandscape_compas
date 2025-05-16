@@ -32,7 +32,9 @@ from .utils.get_compas_version import get_compas_version
 from .status import JobStatus
 
 matplotlib.use("agg")
-from compas_python_utils.detailed_evolution_plotter.plot_to_json import get_plot_json  # noqa: E402
+from compas_python_utils.detailed_evolution_plotter.plot_to_json import (
+    get_plot_json,
+)  # noqa: E402
 
 
 def basic_parameter_resolvers(name):

@@ -7,13 +7,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('compasui', '0002_singlebinaryjob'),
+        ("compasui", "0002_singlebinaryjob"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='singlebinaryjob',
-            name='max_time',
-            field=models.FloatField(blank=True, default=0, help_text='Maximum time to evolve binary for. 0 < Value <= 1400', null=True, validators=[django.core.validators.MinValueValidator(0.0), django.core.validators.MaxValueValidator(1400)]),
+            model_name="singlebinaryjob",
+            name="max_time",
+            field=models.FloatField(
+                blank=True,
+                default=0,
+                help_text="Maximum time to evolve binary for. 0 < Value <= 1400",
+                null=True,
+                validators=[
+                    django.core.validators.MinValueValidator(0.0),
+                    django.core.validators.MaxValueValidator(1400),
+                ],
+            ),
         ),
     ]

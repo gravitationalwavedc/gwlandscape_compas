@@ -7,28 +7,59 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('compasui', '0009_auto_20220209_0715'),
+        ("compasui", "0009_auto_20220209_0715"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='singlebinaryjob',
-            name='mass_transfer_accertion_efficiency_prescription',
-            field=models.CharField(blank=True, choices=[('THERMAL', 'THERMAL'), ('FIXED', 'FIXED')], default='THERMAL', help_text='--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion efficiency prescription', max_length=55, null=True),
+            model_name="singlebinaryjob",
+            name="mass_transfer_accertion_efficiency_prescription",
+            field=models.CharField(
+                blank=True,
+                choices=[("THERMAL", "THERMAL"), ("FIXED", "FIXED")],
+                default="THERMAL",
+                help_text="--mass-transfer-accretion-efficiency-prescription: Mass transfer accretion efficiency prescription",
+                max_length=55,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='singlebinaryjob',
-            name='mass_transfer_angular_momentum_loss_prescription',
-            field=models.CharField(blank=True, choices=[('ARBITRARY', 'ARBITRARY'), ('ISOTROPIC', 'ISOTROPIC'), ('JEANS', 'JEANS'), ('CIRCUMBINARY', 'CIRCUMBINARY')], default='ISOTROPIC', help_text='--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular Momentum Loss prescription', max_length=55, null=True),
+            model_name="singlebinaryjob",
+            name="mass_transfer_angular_momentum_loss_prescription",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("ARBITRARY", "ARBITRARY"),
+                    ("ISOTROPIC", "ISOTROPIC"),
+                    ("JEANS", "JEANS"),
+                    ("CIRCUMBINARY", "CIRCUMBINARY"),
+                ],
+                default="ISOTROPIC",
+                help_text="--mass-transfer-angular-momentum-loss-prescription: Mass Transfer Angular Momentum Loss prescription",
+                max_length=55,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='singlebinaryjob',
-            name='mass_transfer_fa',
-            field=models.FloatField(blank=True, default=0.5, help_text='--mass-transfer-fa: Mass Transfer fraction accreted in FIXED prescription', null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="singlebinaryjob",
+            name="mass_transfer_fa",
+            field=models.FloatField(
+                blank=True,
+                default=0.5,
+                help_text="--mass-transfer-fa: Mass Transfer fraction accreted in FIXED prescription",
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0.0)],
+            ),
         ),
         migrations.AddField(
-            model_name='singlebinaryjob',
-            name='mass_transfer_jloss',
-            field=models.FloatField(blank=True, default=1.0, help_text='--mass-transfer-jloss: Specific angular momentum with which the non-accreted system leaves the system', null=True, validators=[django.core.validators.MinValueValidator(0.0)]),
+            model_name="singlebinaryjob",
+            name="mass_transfer_jloss",
+            field=models.FloatField(
+                blank=True,
+                default=1.0,
+                help_text="--mass-transfer-jloss: Specific angular momentum with which the non-accreted system leaves the system",
+                null=True,
+                validators=[django.core.validators.MinValueValidator(0.0)],
+            ),
         ),
     ]

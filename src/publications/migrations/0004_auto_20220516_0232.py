@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('publications', '0003_auto_20220412_0908'),
+        ("publications", "0003_auto_20220412_0908"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='compasdatasetmodel',
-            old_name='files',
-            new_name='file',
+            model_name="compasdatasetmodel",
+            old_name="files",
+            new_name="file",
         ),
     ]

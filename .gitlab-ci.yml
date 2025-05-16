@@ -79,3 +79,10 @@ flake8:
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
+
+
+black-check:
+  stage: test
+  script:
+    - cd $WD
+    - black --check src/

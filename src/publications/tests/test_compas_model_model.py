@@ -6,23 +6,23 @@ from publications.models import CompasModel
 class TestCompasModelModel(testcases.TestCase):
     def setUp(self):
         self.model_input = {
-            'name': 'test',
-            'summary': 'summary',
-            'description': 'description'
+            "name": "test",
+            "summary": "summary",
+            "description": "description",
         }
 
         self.update_model_input = {
-            'name': 'new_test',
-            'summary': 'new summary',
-            'description': 'new description'
+            "name": "new_test",
+            "summary": "new summary",
+            "description": "new description",
         }
 
     def test_create(self):
         CompasModel.create_model(**self.model_input)
         self.assertEqual(1, CompasModel.objects.all().count())
-        self.assertTrue('test', CompasModel.objects.last().name)
-        self.assertTrue('summary', CompasModel.objects.last().summary)
-        self.assertTrue('description', CompasModel.objects.last().description)
+        self.assertTrue("test", CompasModel.objects.last().name)
+        self.assertTrue("summary", CompasModel.objects.last().summary)
+        self.assertTrue("description", CompasModel.objects.last().description)
 
     def test_delete(self):
         o = CompasModel.create_model(**self.model_input)
@@ -30,7 +30,7 @@ class TestCompasModelModel(testcases.TestCase):
 
         with self.assertRaises(
             CompasModel.DoesNotExist,
-            msg="CompasModel was deleted successfully when it should have failed"
+            msg="CompasModel was deleted successfully when it should have failed",
         ):
             CompasModel.delete_model(o.id)
 

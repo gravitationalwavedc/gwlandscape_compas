@@ -6,20 +6,20 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('publications', '0004_auto_20220516_0232'),
+        ("publications", "0004_auto_20220516_0232"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='compasmodel',
-            options={'ordering': ['name']},
+            name="compasmodel",
+            options={"ordering": ["name"]},
         ),
         migrations.AlterModelOptions(
-            name='compaspublication',
-            options={'ordering': ['title']},
+            name="compaspublication",
+            options={"ordering": ["title"]},
         ),
         migrations.AlterModelOptions(
-            name='keyword',
-            options={'ordering': ['tag']},
+            name="keyword",
+            options={"ordering": ["tag"]},
         ),
     ]

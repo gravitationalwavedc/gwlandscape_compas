@@ -12,6 +12,8 @@ asgiref==3.8.1
     #   django-cors-headers
 billiard==4.2.1
     # via celery
+black==25.1.0
+    # via -r requirements.in
 build==1.2.2.post1
     # via pip-tools
 celery==5.5.2
@@ -24,6 +26,7 @@ charset-normalizer==3.4.2
     # via requests
 click==8.2.0
     # via
+    #   black
     #   celery
     #   click-didyoumean
     #   click-plugins
@@ -96,6 +99,8 @@ matplotlib==3.10.3
     # via -r requirements.in
 mccabe==0.7.0
     # via flake8
+mypy-extensions==1.1.0
+    # via black
 numpy==2.2.5
     # via
     #   contourpy
@@ -103,14 +108,19 @@ numpy==2.2.5
     #   matplotlib
 packaging==25.0
     # via
+    #   black
     #   build
     #   matplotlib
+pathspec==0.12.1
+    # via black
 pep8==1.7.1
     # via -r requirements.in
 pillow==11.2.1
     # via matplotlib
 pip-tools==7.4.1
     # via -r requirements.in
+platformdirs==4.3.8
+    # via black
 promise==2.3
     # via graphene-django
 prompt-toolkit==3.0.51
