@@ -17,10 +17,7 @@ default:
     - export WD=`pwd`
     - git clone https://github.com/TeamCOMPAS/COMPAS.git
     - cd COMPAS
-    - export COMPAS_ROOT_DIR=`pwd`
-    - cd src
-    - make -f Makefile
-    - pip install ..
+    - pip install .
 
 django-tests:
   stage: test
