@@ -9,24 +9,22 @@ from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
 
 
-def check_output_file_generated(outputfilepath, timeout_seconds=20):
+def check_output_file_generated(outputfilepath):
     """
     Check if the job finished successfully by checking that output file is created
-    This will keep checking for up to timeout_seconds
+    This will keep running until file is created or Celery raises SoftTimeLimitExceeded
     :param outputfilepath: full path of output file
-    :param timeout_seconds: maximum time to wait in seconds
-    :return: TASK_SUCCESS if file exists, TASK_TIMEOUT if it times out
+    :return: TASK_SUCCESS if file exists
     """
     import time
 
-    start_time = time.time()
-    while time.time() - start_time < timeout_seconds:
+    while True:
         if os.path.exists(outputfilepath):
             return TASK_SUCCESS
-        time.sleep(0.5)  # Check every half second
+        time.sleep(0.5)  # Check every half second to reduce CPU usage
 
-    # If we get here, we've timed out
-    return TASK_TIMEOUT
+    # This will never be reached as Celery will raise SoftTimeLimitExceeded
+    # when the time limit is exceeded
 
 
 @shared_task

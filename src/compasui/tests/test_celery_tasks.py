@@ -79,13 +79,13 @@ class TestCeleryTasks(TestCase):
 
     @patch("compasui.tasks.call")
     @patch("compasui.tasks.check_output_file_generated")
-    def test_run_compas_file_not_generated(
+    def test_run_compas_file_check_timeout(
         self, mock_check_output, mock_subprocess_call
     ):
         # Set up the mocks
-        mock_check_output.return_value = (
-            TASK_TIMEOUT  # Simulate file not being created (timeout)
-        )
+        mock_check_output.side_effect = (
+            SoftTimeLimitExceeded()
+        )  # Simulate Celery timeout
         mock_subprocess_call.return_value = 0  # Command runs successfully
 
         # Run the test
@@ -116,11 +116,9 @@ class TestCheckOutputFileGenerated(TestCase):
 
     @patch("os.path.exists")
     @patch("time.sleep")
-    @patch("time.time")
-    def test_file_exists_after_delay(self, mock_time, mock_sleep, mock_exists):
+    def test_file_exists_after_delay(self, mock_sleep, mock_exists):
         # Set up the mocks
         mock_exists.side_effect = [False, False, True]
-        mock_time.side_effect = [0, 1, 2, 3]  # Start, 1st loop, 2nd loop, 3rd loop
 
         # Run the test
         from compasui.tasks import check_output_file_generated
@@ -134,22 +132,16 @@ class TestCheckOutputFileGenerated(TestCase):
 
     @patch("os.path.exists")
     @patch("time.sleep")
-    @patch("time.time")
-    def test_timeout_no_file(self, mock_time, mock_sleep, mock_exists):
+    def test_celery_timeout(self, mock_sleep, mock_exists):
         # Set up the mocks
         mock_exists.return_value = False
+        mock_sleep.side_effect = SoftTimeLimitExceeded()  # Simulate Celery timeout
 
-        # Mock time to simulate timeout
-        time_values = [0]
-        for i in range(1, 30):
-            time_values.append(i)  # Each call increments by 1 second
-        mock_time.side_effect = time_values
-
-        # Run the test with short timeout
+        # Run the test
         from compasui.tasks import check_output_file_generated
 
-        result = check_output_file_generated("some/file/path.txt")
+        with self.assertRaises(SoftTimeLimitExceeded):
+            check_output_file_generated("some/file/path.txt")
 
         # Assertions
-        self.assertEqual(result, TASK_TIMEOUT)
-        self.assertGreater(mock_exists.call_count, 1)
+        self.assertGreaterEqual(mock_exists.call_count, 1)
