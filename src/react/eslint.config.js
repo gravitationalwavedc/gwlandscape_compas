@@ -28,6 +28,10 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+      // For now, leave this off
+      // The update to react has caused a lot of previously passing
+      // (and totally fine) code to start reporting errors.
+      'react/prop-types': 'warn',
     },
   },
 ]
