@@ -1,7 +1,10 @@
 from .base import *
 
 INSTALLED_APPS += ("corsheaders",)
-CORS_ORIGIN_ALLOW_ALL = True
+# For requests to include credentials (i.e., http-only cookies) the
+# CORS_ALLOWED_ORIGINS must not be ['*']
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+CORS_ALLOW_CREDENTIALS = True
 
 MIDDLEWARE.append("corsheaders.middleware.CorsMiddleware")
 

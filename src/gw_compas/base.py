@@ -139,11 +139,11 @@ EMAIL_HOST = "mail.swin.edu.au"
 EMAIL_PORT = 25
 
 GRAPHENE = {
-    "SCHEMA": "gw_compas.schema.schema",
-    "SCHEMA_OUTPUT": "react/data/schema.json",  # defaults to schema.json,
-    "SCHEMA_INDENT": 2,  # Defaults to None (displays all data on a single line),
-    "MIDDLEWARE": [
-        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    'SCHEMA': 'gw_compas.schema.schema',
+    'SCHEMA_OUTPUT': 'react/data/schema.graphql',  # defaults to schema.json,
+    'SCHEMA_INDENT': 2,  # Defaults to None (displays all data on a single line),
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
 
