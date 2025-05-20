@@ -3,6 +3,8 @@ import { BrowserProtocol, queryMiddleware } from 'farce';
 import getRoutes from './Routes';
 import { Resolver } from 'found-relay';
 import environment from './environment';
+import './assets/styles.scss';
+import './assets/scss/theme.scss';
 
 function App() {
 

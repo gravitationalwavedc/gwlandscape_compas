@@ -12,6 +12,7 @@ import ViewJob from './Pages/ViewJob';
 import ViewPublication from './Pages/ViewPublication';
 import MyJobs from './Pages/MyJobs';
 import PublicJobs from './Pages/PublicJobs';
+import Layout from './Layout';
 
 // List of components that require authentication
 const PROTECTED_COMPONENTS = [
@@ -33,11 +34,9 @@ const handleRender = ({ Component, props }) => {
 
 function getRoutes() {
   return (
-    <Route>
+    <Route path="/" Component={Layout} render={handleRender}>
       <Route
-        path="/"
         Component={Home}
-        environment={harnessApi.getEnvironment('compas')}
         render={handleRender} />
       <Route
         path="job-form"
@@ -54,12 +53,10 @@ function getRoutes() {
         prepareVariables={() => ({
           count: 100,
         })}
-        environment={harnessApi.getEnvironment('compas')}
         Component={Publications}
         render={handleRender} />
       <Route
         path="single-binary-form"
-        environment={harnessApi.getEnvironment('compas')}
         Component={NewSingleBinaryJob}
         query={graphql`
                     query Routes_NewSingleBinaryJob_Query {
@@ -69,7 +66,6 @@ function getRoutes() {
         render={handleRender} />
       <Route
         path="job-results/:jobId/"
-        environment={harnessApi.getEnvironment('compas')}
         Component={ViewJob}
         query={graphql`
                     query Routes_ViewJob_Query($jobId: ID!){
@@ -83,7 +79,6 @@ function getRoutes() {
       />
       <Route
         path="publication/:publicationId/"
-        environment={harnessApi.getEnvironment('compas')}
         Component={ViewPublication}
         query={graphql`
                     query Routes_ViewPublication_Query(
@@ -107,7 +102,6 @@ function getRoutes() {
       />
       <Route
         path="my-jobs"
-        environment={harnessApi.getEnvironment('compas')}
         Component={MyJobs}
         query={graphql`
                     query Routes_MyJobs_Query(
@@ -141,7 +135,6 @@ function getRoutes() {
           timeRange: 'all',
           count: 10
         })}
-        environment={harnessApi.getEnvironment('compas')}
         render={handleRender} />
     </Route>
   );
