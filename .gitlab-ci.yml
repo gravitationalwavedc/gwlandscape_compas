@@ -46,6 +46,15 @@ npm-tests:
     - npm run relay
     - npm run test-ci
 
+eslint:
+  script:
+    - cd $WD/src/
+    - cd react/
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
+    - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
+    - npm install --legacy-peer-deps
+    - npm run eslint
+
   artifacts:
     reports:
       coverage_report:
