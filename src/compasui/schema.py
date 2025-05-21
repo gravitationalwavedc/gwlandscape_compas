@@ -2,6 +2,10 @@ import traceback
 from _decimal import Decimal
 from pathlib import Path
 import matplotlib
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 import django_filters
 import graphene
@@ -390,7 +394,7 @@ class CompasJobMutation(relay.ClientIDMutation):
         existing_job = CompasJob.get_by_name(info.context.user, start.name)
         if existing_job is not None:
             err_msg = "Job name is already in use!"
-            print(err_msg)
+            logger.error(err_msg)
             raise Exception(err_msg)
 
         # Create the compas job
@@ -537,9 +541,8 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                     f"/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5",
                 )
             )
-        except Exception:
-            traceback.print_exc()
-            print("COMPAS job didn't run successfully")
+        except Exception as e:
+            logger.error("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
                     job_id="", json_data="", detailed_output_file_path=""

@@ -3,6 +3,7 @@ import numpy as np
 import h5py
 
 from django.test import TestCase
+from compasui.tests.utils import silence_logging
 
 from publications.utils.h5_functions import (
     get_h5_keys,
@@ -141,6 +142,7 @@ class TestGetH5SubgroupData(TestCase):
                 "/base_group/string_dataset", data=np.array([b"string_type"])
             )
 
+    @silence_logging(logger_name="publications.utils.h5_functions")
     def test_returns_none_if_string_type(self):
         with h5py.File(self.tf, "w") as f:
             self.assertIsNone(

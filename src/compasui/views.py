@@ -1,12 +1,16 @@
 import datetime
 import json
 import re
+import logging
 from pathlib import Path
 
 import jwt
 import requests
 from django.conf import settings
 from django.db import transaction
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
 from .tasks import run_compas
@@ -78,10 +82,10 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
         if result.status_code != 200:
             # Oops
             msg = f"Error submitting job, got error code: {result.status_code}\n\n{result.headers}\n\n{result.content}"
-            print(msg)
+            logger.error(msg)
             raise Exception(msg)
 
-        print(f"Job submitted OK.\n{result.headers}\n\n{result.content}")
+        logger.info(f"Job submitted OK.\n{result.headers}\n\n{result.content}")
 
         # Parse the response from the job controller
         result = json.loads(result.content)

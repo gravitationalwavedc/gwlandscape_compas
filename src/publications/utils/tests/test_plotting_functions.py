@@ -1,7 +1,9 @@
 import json
 import numpy as np
+import warnings
 
 from django.test import TestCase
+from compasui.tests.utils import silence_logging
 
 from publications.utils.plotting_functions import (
     get_surrounding_bins,
@@ -215,16 +217,18 @@ class TestGetLogAndLimits(TestCase):
         self.assertFalse(null_check)
 
     def test_array_outside_bounds_with_zero(self):
-        test_array = np.array([0, 10, 50, 100])
-        returned, log_check, min_max, null_check = get_log_and_limits(
-            test_array, False, max_cond=50, min_cond=5
-        )
-        expected = np.log10(test_array[1:]).tolist()
-        expected.insert(0, 0.75)
-        self.assertSequenceEqual(expected, returned.tolist())
-        self.assertTrue(log_check)
-        self.assertCountEqual(min_max, [0.75, 2])
-        self.assertTrue(null_check)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            test_array = np.array([0, 10, 50, 100])
+            returned, log_check, min_max, null_check = get_log_and_limits(
+                test_array, False, max_cond=50, min_cond=5
+            )
+            expected = np.log10(test_array[1:]).tolist()
+            expected.insert(0, 0.75)
+            self.assertSequenceEqual(expected, returned.tolist())
+            self.assertTrue(log_check)
+            self.assertCountEqual(min_max, [0.75, 2])
+            self.assertTrue(null_check)
 
     def test_boolean(self):
         test_array = np.array([0, 1, 0, 1])
