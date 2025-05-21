@@ -37,9 +37,9 @@ npm-tests:
   stage: test
   script:
     - cd $WD/src/
+    - mkdir react/data
     - python3 development-manage.py graphql_schema
     - cd react/
-    - mkdir data
     - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
     - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
     - npm install --legacy-peer-deps
