@@ -17,13 +17,13 @@ const subMenu = (name) => {
         <Nav.Link to="/" as={Link}>
           Home
         </Nav.Link>
-        <Nav.Link to="/compas/my-jobs/" as={Link}>
+        <Nav.Link to="/my-jobs/" as={Link}>
           Jobs
         </Nav.Link>
-        <Nav.Link to="/compas/single-binary-form/" as={Link}>
+        <Nav.Link to="/single-binary-form/" as={Link}>
           Binary evolution
         </Nav.Link>
-        <Nav.Link to="/compas/publications/" as={Link}>
+        <Nav.Link to="/publications/" as={Link}>
           Published Datasets
         </Nav.Link>
         <Nav.Link
