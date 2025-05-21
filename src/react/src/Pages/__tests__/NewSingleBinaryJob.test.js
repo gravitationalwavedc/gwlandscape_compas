@@ -13,12 +13,12 @@ describe('new single binary job page', () => {
         <QueryRenderer
             environment={environment}
             query={graphql`
-            query NewSingleBinaryJobTestQuery @relay_test_operation {
-                ...NewSingleBinaryJob_data
+                query NewSingleBinaryJobTestQuery @relay_test_operation {
+                    ...NewSingleBinaryJob_data
                 }
             `}
-            render={({error, props}) => {
-                if(props) {
+            render={({ error, props }) => {
+                if (props) {
                     return <NewSingleBinaryJob data={props} router={router} />;
                 } else if (error) {
                     return error.message;
@@ -34,7 +34,7 @@ describe('new single binary job page', () => {
                 jsonData: '{}',
                 detailedOutputFilePath: '',
             };
-        }
+        },
     };
 
     it('should reset parameter values to defaults when use clicks reset form button', async () => {
@@ -42,9 +42,9 @@ describe('new single binary job page', () => {
 
         const user = userEvent.setup();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) => MockPayloadGenerator.generate(operation)),
+        );
 
         const separationInput = screen.getByTestId('separation');
         const orbitalInput = screen.getByTestId('orbitalPeriod');
@@ -62,17 +62,16 @@ describe('new single binary job page', () => {
 
         const user = userEvent.setup();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) => MockPayloadGenerator.generate(operation)),
+        );
         await waitFor(() => user.click(screen.getByTestId('submit-btn')));
 
         const operation = await waitFor(() => environment.mock.getMostRecentOperation());
 
-        await waitFor(() => environment.mock.resolve(
-            operation,
-            MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)
-        ));
+        await waitFor(() =>
+            environment.mock.resolve(operation, MockPayloadGenerator.generate(operation, mockNewSingleBinaryResult)),
+        );
 
         const error = await waitFor(() => screen.getByTestId('error-message'));
 

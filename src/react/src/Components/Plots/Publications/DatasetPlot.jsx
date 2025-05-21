@@ -4,7 +4,7 @@ import {
     interpolateCividis,
     interpolateMagma,
     interpolateInferno,
-    interpolateSpectral
+    interpolateSpectral,
 } from 'd3-scale-chromatic';
 import {
     ReferenceArea,
@@ -15,7 +15,7 @@ import {
     YAxis,
     ResponsiveContainer,
     Tooltip,
-    ZAxis
+    ZAxis,
 } from 'recharts';
 import { logString, formatAxis, getColourbarData, getTickMarks } from './Utils';
 import CustomTooltip from './CustomTooltip';
@@ -23,11 +23,11 @@ import CustomTooltip from './CustomTooltip';
 const NUM_TICKS = 6;
 
 const colourScales = {
-    'viridis': interpolateViridis,
-    'cividis': interpolateCividis,
-    'magma': interpolateMagma,
-    'inferno': interpolateInferno,
-    'spectral': interpolateSpectral
+    viridis: interpolateViridis,
+    cividis: interpolateCividis,
+    magma: interpolateMagma,
+    inferno: interpolateInferno,
+    spectral: interpolateSpectral,
 };
 
 // Can't really help complexity in Recharts, because you can't really make reusable components
@@ -53,9 +53,9 @@ const DatasetPlot = ({
     const ticksY = boolCheckY ? [0, 1] : getTickMarks(minMaxY[0], minMaxY[1], NUM_TICKS);
 
     const plotMinX = boolCheckX ? minMaxX[0] : ticksX[0];
-    const plotMaxX = boolCheckX ? minMaxX[1] : ticksX[ticksX.length-1];
+    const plotMaxX = boolCheckX ? minMaxX[1] : ticksX[ticksX.length - 1];
     const plotMinY = boolCheckY ? minMaxY[0] : ticksY[0];
-    const plotMaxY = boolCheckY ? minMaxY[1] : ticksY[ticksY.length-1];
+    const plotMaxY = boolCheckY ? minMaxY[1] : ticksY[ticksY.length - 1];
 
     const cb = getColourbarData(histData, [plotMinX, plotMaxX], [plotMinY, plotMaxY], colourScales[colourMap]);
 
@@ -106,9 +106,8 @@ const DatasetPlot = ({
                     domain={[plotMinY, plotMaxY]}
                 />
                 <ZAxis zAxisId="standard" dataKey="counts" range={[15, 15]} />
-                {
-                    histData.length && <>
-
+                {histData.length && (
+                    <>
                         <ZAxis zAxisId="invis-z" dataKey="counts" range={[100, 100]} />
                         <ReferenceArea
                             key={'extra'}
@@ -128,53 +127,43 @@ const DatasetPlot = ({
                             }}
                         />
 
-                        {
-                            cb.colourRange.map((sector, index) => (
-                                <ReferenceArea
-                                    key={`cb${index}`}
-                                    x1={cb.x}
-                                    x2={cb.x + cb.width}
-                                    y1={cb.y - cb.cellHeight * ((cb.numCells - index) + 0.5)}
-                                    y2={cb.y - cb.cellHeight * ((cb.numCells - index) - 0.5)}
-                                    fill={cb.colourFn(sector)}
-                                    fillOpacity={1}
-                                    stroke="#dadada"
-                                    strokeOpacity={0.3}
-                                    ifOverflow="visible"
-                                    label={{
-                                        value: `${
-                                            index == 0
-                                                ? cb.countMin
-                                                : index == cb.numCells
-                                                    ? cb.countMax
-                                                    : ''
-                                        }`,
-                                        stroke: '#898989',
-                                        position: 'right',
-                                        opacity: 0.8,
-                                        dx: 0,
-                                        fontSize: 10,
-                                    }}
-                                />
-                            ))
-                        }
+                        {cb.colourRange.map((sector, index) => (
+                            <ReferenceArea
+                                key={`cb${index}`}
+                                x1={cb.x}
+                                x2={cb.x + cb.width}
+                                y1={cb.y - cb.cellHeight * (cb.numCells - index + 0.5)}
+                                y2={cb.y - cb.cellHeight * (cb.numCells - index - 0.5)}
+                                fill={cb.colourFn(sector)}
+                                fillOpacity={1}
+                                stroke="#dadada"
+                                strokeOpacity={0.3}
+                                ifOverflow="visible"
+                                label={{
+                                    value: `${index == 0 ? cb.countMin : index == cb.numCells ? cb.countMax : ''}`,
+                                    stroke: '#898989',
+                                    position: 'right',
+                                    opacity: 0.8,
+                                    dx: 0,
+                                    fontSize: 10,
+                                }}
+                            />
+                        ))}
 
-                        {
-                            histData.map((sector, index) => (
-                                <ReferenceArea
-                                    key={`hist${index}`}
-                                    x1={sector.x - sides[0] / 2}
-                                    x2={sector.x + sides[0] / 2}
-                                    y1={sector.y - sides[1] / 2}
-                                    y2={sector.y + sides[1] / 2}
-                                    fill={cb.colourFn(Math.log10(sector.counts))}
-                                    fillOpacity={1}
-                                    stroke="#dadada"
-                                    strokeOpacity={0.3}
-                                    ifOverflow="extendDomain"
-                                />
-                            ))
-                        }
+                        {histData.map((sector, index) => (
+                            <ReferenceArea
+                                key={`hist${index}`}
+                                x1={sector.x - sides[0] / 2}
+                                x2={sector.x + sides[0] / 2}
+                                y1={sector.y - sides[1] / 2}
+                                y2={sector.y + sides[1] / 2}
+                                fill={cb.colourFn(Math.log10(sector.counts))}
+                                fillOpacity={1}
+                                stroke="#dadada"
+                                strokeOpacity={0.3}
+                                ifOverflow="extendDomain"
+                            />
+                        ))}
                         <Scatter
                             data={histData}
                             zAxisId="invis-z"
@@ -184,7 +173,7 @@ const DatasetPlot = ({
                             ifOverflow="visible"
                         />
                     </>
-                }
+                )}
                 <Tooltip
                     content={CustomTooltip}
                     zeroValX={nullCheckX && minMaxX[0] + sides[0] / 2}
@@ -242,7 +231,6 @@ const DatasetPlot = ({
                         ifOverflow="visible"
                     />
                 )}
-                
             </ScatterChart>
         </ResponsiveContainer>
     );

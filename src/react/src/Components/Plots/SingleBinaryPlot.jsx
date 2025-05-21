@@ -5,8 +5,13 @@ import useZoomableDomain from './useZoomableDomain';
 import PlotLineZoom from './PlotLineZoom';
 
 const SingleBinaryPlot = memo(function RenderPlot({ data }) {
-    const {meta: {xAxis, yAxis}, groups, refLines, texts} = data;
-    const {isZoomed, xTicks, yTicks, xDomain, yDomain, ...handlers} = useZoomableDomain({xAxis, yAxis});
+    const {
+        meta: { xAxis, yAxis },
+        groups,
+        refLines,
+        texts,
+    } = data;
+    const { isZoomed, xTicks, yTicks, xDomain, yDomain, ...handlers } = useZoomableDomain({ xAxis, yAxis });
     const xLabel = xAxis.label.reduce((label, token) => label + token[1], '');
     const yLabel = yAxis.label.reduce((label, token) => label + token[1], '');
     const isLogX = xAxis.scale === 'log';
@@ -53,7 +58,7 @@ const SingleBinaryPlot = memo(function RenderPlot({ data }) {
                 layout="vertical"
                 align="right"
                 verticalAlign="top"
-                iconType='plainline'
+                iconType="plainline"
             />
         </PlotLineZoom>
     );

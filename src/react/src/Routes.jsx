@@ -14,76 +14,68 @@ import PublicJobs from './Pages/PublicJobs';
 import Layout from './Layout';
 
 // List of components that require authentication
-const PROTECTED_COMPONENTS = [
-  ViewJob,
-  NewJob,
-  MyJobs
-];
+const PROTECTED_COMPONENTS = [ViewJob, NewJob, MyJobs];
 
 const handleRender = ({ Component, props }) => {
-  if (!Component || !props)
-    return <Loading />;
+    if (!Component || !props) return <Loading />;
 
-  // TODO : implement auth
-  const harnessApi = {
-    hasAuthToken: () => false
-  }
-  // redirect to login page for authentication if a route is protected
-  if (!harnessApi.hasAuthToken() && PROTECTED_COMPONENTS.includes(Component))
-    throw new RedirectException('/auth/?next=' + props.match.location.pathname);
+    // TODO : implement auth
+    const harnessApi = {
+        hasAuthToken: () => false,
+    };
+    // redirect to login page for authentication if a route is protected
+    if (!harnessApi.hasAuthToken() && PROTECTED_COMPONENTS.includes(Component))
+        throw new RedirectException('/auth/?next=' + props.match.location.pathname);
 
-  return <Component data={props} {...props} />;
+    return <Component data={props} {...props} />;
 };
 
 function getRoutes() {
-  return (
-    <Route path="/" Component={Layout} render={handleRender}>
-      <Route
-        Component={Home}
-        render={handleRender} />
-      <Route
-        path="job-form"
-        Component={NewJob}
-        render={handleRender} />
+    return (
+        <Route path="/" Component={Layout} render={handleRender}>
+            <Route Component={Home} render={handleRender} />
+            <Route path="job-form" Component={NewJob} render={handleRender} />
 
-      <Route
-        path="publications"
-        query={graphql`
+            <Route
+                path="publications"
+                query={graphql`
                     query Routes_Publications_Query {
                         ...Publications_data
                     }
                 `}
-        prepareVariables={() => ({
-          count: 100,
-        })}
-        Component={Publications}
-        render={handleRender} />
-      <Route
-        path="single-binary-form"
-        Component={NewSingleBinaryJob}
-        query={graphql`
+                prepareVariables={() => ({
+                    count: 100,
+                })}
+                Component={Publications}
+                render={handleRender}
+            />
+            <Route
+                path="single-binary-form"
+                Component={NewSingleBinaryJob}
+                query={graphql`
                     query Routes_NewSingleBinaryJob_Query {
                         ...NewSingleBinaryJob_data
                     }
                 `}
-        render={handleRender} />
-      <Route
-        path="job-results/:jobId/"
-        Component={ViewJob}
-        query={graphql`
-                    query Routes_ViewJob_Query($jobId: ID!){
+                render={handleRender}
+            />
+            <Route
+                path="job-results/:jobId/"
+                Component={ViewJob}
+                query={graphql`
+                    query Routes_ViewJob_Query($jobId: ID!) {
                         ...ViewJob_data @arguments(jobId: $jobId)
                     }
                 `}
-        prepareVariables={(params) => ({
-          jobId: params.jobId
-        })}
-        render={handleRender}
-      />
-      <Route
-        path="publication/:publicationId/"
-        Component={ViewPublication}
-        query={graphql`
+                prepareVariables={(params) => ({
+                    jobId: params.jobId,
+                })}
+                render={handleRender}
+            />
+            <Route
+                path="publication/:publicationId/"
+                Component={ViewPublication}
+                query={graphql`
                     query Routes_ViewPublication_Query(
                         $publicationId: ID!
                         $datasetId: ID
@@ -91,56 +83,46 @@ function getRoutes() {
                         $subgroupX: String
                         $subgroupY: String
                         $strideLength: Int
-                    ){
-                        ...ViewPublication_data @arguments(
-                            publicationId: $publicationId
-                            datasetId: $datasetId
-                        )
-                    }
-                `}
-        prepareVariables={(params) => ({
-          publicationId: params.publicationId,
-        })}
-        render={handleRender}
-      />
-      <Route
-        path="my-jobs"
-        Component={MyJobs}
-        query={graphql`
-                    query Routes_MyJobs_Query(
-                      $count: Int!,
-                      $cursor: String,
-                      $orderBy: String
                     ) {
-                      ...MyJobs_data
+                        ...ViewPublication_data @arguments(publicationId: $publicationId, datasetId: $datasetId)
                     }
                 `}
-        prepareVariables={() => ({
-          count: 10,
-          orderBy: '-lastUpdated'
-          // timeRange: 'all',
-        })}
-        render={handleRender}
-      />
-      <Route
-        Component={PublicJobs}
-        path="jobs"
-        query={graphql`
-                query Routes_PublicJobs_Query (
-                  $count: Int!,
-                  $cursor: String,
-                  $search: String,
-                ) {
-                    ...PublicJobs_data
-                }
-              `}
-        prepareVariables={() => ({
-          timeRange: 'all',
-          count: 10
-        })}
-        render={handleRender} />
-    </Route>
-  );
+                prepareVariables={(params) => ({
+                    publicationId: params.publicationId,
+                })}
+                render={handleRender}
+            />
+            <Route
+                path="my-jobs"
+                Component={MyJobs}
+                query={graphql`
+                    query Routes_MyJobs_Query($count: Int!, $cursor: String, $orderBy: String) {
+                        ...MyJobs_data
+                    }
+                `}
+                prepareVariables={() => ({
+                    count: 10,
+                    orderBy: '-lastUpdated',
+                    // timeRange: 'all',
+                })}
+                render={handleRender}
+            />
+            <Route
+                Component={PublicJobs}
+                path="jobs"
+                query={graphql`
+                    query Routes_PublicJobs_Query($count: Int!, $cursor: String, $search: String) {
+                        ...PublicJobs_data
+                    }
+                `}
+                prepareVariables={() => ({
+                    timeRange: 'all',
+                    count: 10,
+                })}
+                render={handleRender}
+            />
+        </Route>
+    );
 }
 
 export default getRoutes;

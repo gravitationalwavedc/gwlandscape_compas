@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { clampTicks, getLogTickMarks, getTickMarks } from './tickHelper';
 
-const useZoomableDomain = ({xAxis, yAxis}) => {
+const useZoomableDomain = ({ xAxis, yAxis }) => {
     const initialDomain = {
         x1: xAxis.limits[0],
         x2: xAxis.limits[1],
@@ -30,7 +30,7 @@ const useZoomableDomain = ({xAxis, yAxis}) => {
     if (isZoomed) {
         const xTickFunction = xAxis.scale === 'log' ? getLogTickMarks : getTickMarks;
         const yTickFunction = yAxis.scale === 'log' ? getLogTickMarks : getTickMarks;
-    
+
         xTicks = xTickFunction(domain.x1, domain.x2, xTicks.length, isZoomed);
         yTicks = yTickFunction(domain.y1, domain.y2, yTicks.length, isZoomed);
     }

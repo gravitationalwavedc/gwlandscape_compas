@@ -1,11 +1,11 @@
 // Fix layout issue with Form error messages
 p.text-danger.small {
-   margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 // Inputs
 .form-group {
-    .form-control, 
+    .form-control,
     .custom-select,
     .gw-select__control {
         border: 3px solid $primary;
@@ -15,7 +15,7 @@ p.text-danger.small {
     }
 
     .text-left {
-      text-align: left;
+        text-align: left;
     }
 
     .input-group-text {
@@ -27,7 +27,7 @@ p.text-danger.small {
     }
 
     .input-group-prepend + .form-control {
-      border-left: None;
+        border-left: None;
     }
 }
 
@@ -44,4 +44,3 @@ p.text-danger.small {
     border: 3px solid $primary;
     font-weight: bold;
 }
-

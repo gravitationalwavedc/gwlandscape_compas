@@ -5,7 +5,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 
 export default [
-  { ignores: ['dist'] },
+  { ignores: ['dist', '**/__generated__/**', '**/__tests__/**', '**/__test__/**'] },
   {
     files: ['**/*.{js,jsx}'],
     languageOptions: {
@@ -31,7 +31,7 @@ export default [
       'react/jsx-no-target-blank': 'off',
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'react-refresh/only-export-components': [
-        'warn',
+        'off',
         { allowConstantExport: true },
       ],
       // For now, leave this off

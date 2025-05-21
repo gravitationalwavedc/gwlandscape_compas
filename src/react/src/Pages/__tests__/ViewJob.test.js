@@ -1,8 +1,8 @@
 import React from 'react';
 import ViewJob from '../ViewJob';
-import {graphql, QueryRenderer} from 'react-relay';
-import {MockPayloadGenerator} from 'relay-test-utils';
-import {render, waitFor} from '@testing-library/react';
+import { graphql, QueryRenderer } from 'react-relay';
+import { MockPayloadGenerator } from 'relay-test-utils';
+import { render, waitFor } from '@testing-library/react';
 import 'regenerator-runtime/runtime';
 
 /* global global */
@@ -12,15 +12,15 @@ describe('view Compas Job details page', () => {
         <QueryRenderer
             environment={global.environment}
             query={graphql`
-            query ViewJobTestQuery($jobId: ID!) @relay_test_operation {
-                ...ViewJob_data @arguments(jobId: $jobId)
+                query ViewJobTestQuery($jobId: ID!) @relay_test_operation {
+                    ...ViewJob_data @arguments(jobId: $jobId)
                 }
             `}
             variables={{
-                jobId: 'Q29tcGFzSm9iTm9kZToxNTA='
+                jobId: 'Q29tcGFzSm9iTm9kZToxNTA=',
             }}
-            render={({error, props}) => {
-                if(props) {
+            render={({ error, props }) => {
+                if (props) {
                     return <ViewJob data={props} />;
                 } else if (error) {
                     return error.message;
@@ -30,7 +30,7 @@ describe('view Compas Job details page', () => {
     );
 
     const mockViewCompasJobReturn = {
-        CompasJobNode(){
+        CompasJobNode() {
             return {
                 id: 'Q29tcGFzSm9iTm9kZToxNTA=',
                 user: 'Eman Ali',
@@ -39,11 +39,11 @@ describe('view Compas Job details page', () => {
                 start: {
                     name: 'my-test-job',
                     description: 'my first test job',
-                    private: true
+                    private: true,
                 },
-                jobStatus:{
+                jobStatus: {
                     name: 'Completed',
-                    number: '500'
+                    number: '500',
                 },
                 numberOfSystems: '10.0',
                 minInitialMass: '5.0',
@@ -70,9 +70,9 @@ describe('view Compas Job details page', () => {
                 fryerSupernovaEngine: 'DELAYED',
                 kickVelocityDistribution: 'MAXWELLIAN',
                 velocity1: '0.0',
-                velocity2: '0.0'
+                velocity2: '0.0',
             };
-        }
+        },
     };
 
     const mockCompasJobResultsFiles = {
@@ -81,20 +81,24 @@ describe('view Compas Job details page', () => {
                 path: 'a_cool_path',
                 isDir: false,
                 fileSize: 1234,
-                downloadId: 'anDownloadId'
+                downloadId: 'anDownloadId',
             };
-        }
+        },
     };
 
     it('should render the actual page', async () => {
         expect.hasAssertions();
         const { getByTestId, getAllByText, getByText } = render(<ViewJobRenderer />);
-        await waitFor(() => global.environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockViewCompasJobReturn)
-        ));
-        await waitFor(() => global.environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockCompasJobResultsFiles)
-        ));
+        await waitFor(() =>
+            global.environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockViewCompasJobReturn),
+            ),
+        );
+        await waitFor(() =>
+            global.environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockCompasJobResultsFiles),
+            ),
+        );
         expect(getByText('my-test-job')).toBeInTheDocument();
         expect(getAllByText('a_cool_path')[0]).toBeInTheDocument();
         expect(getByTestId('jobInfo')).toHaveTextContent('Eman Ali');
