@@ -1,8 +1,6 @@
 import React, { memo } from 'react';
 import { Col, Image, Row, Table } from 'react-bootstrap';
 
-const DOMAIN = process.env.NODE_ENV !== 'development' ? '' : 'http://localhost:3000';
-
 export default memo(function VanDenHeuvel({ data }) {
   const { events } = data;
   return (
@@ -18,7 +16,7 @@ export default memo(function VanDenHeuvel({ data }) {
             <Col>
               <Image
                 fluid
-                src={`${DOMAIN}/compas/static/assets/${event.imageNum}.png`}
+                src={`${import.meta.env.VITE_FRONTEND_URL}/compas/static/assets/${event.imageNum}.png`}
                 style={event.flipImage ? { transform: 'scaleX(-1)' } : {}}
               />
             </Col>

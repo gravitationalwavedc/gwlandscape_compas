@@ -3,7 +3,6 @@ import { commitMutation } from 'relay-runtime';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { Container, Col, Nav, Row, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
-import { IS_DEV } from '../Utils/misc';
 import BasicParametersForm from '../Components/Forms/BasicParametersForm';
 import ReviewJob from '../Components/Forms/ReviewJob';
 import SingleBinaryTab from '../Components/SingleBinaryTab';
@@ -27,8 +26,6 @@ const submitMutation = graphql`
         }
     }
 `;
-
-const server_url = IS_DEV ? 'http://localhost:8003' : 'https://gwlandscape.org.au';
 
 const resultButtonLabel = (isLoadingOutput) => {
   if (isLoadingOutput) {
@@ -125,7 +122,7 @@ const NewSingleBinaryJob = ({ data }) => {
         else {
           try {
             setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
-            setDetailedOutputFile(server_url + response.newSingleBinary.result.detailedOutputFilePath);
+            setDetailedOutputFile(`${import.meta.env.VITE_BACKEND_URL}${response.newSingleBinary.result.detailedOutputFilePath}`)
             setIsLoadingOutput(false);
             setDisableButtons(false);
           } catch (error) {

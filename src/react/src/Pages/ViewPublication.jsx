@@ -2,14 +2,10 @@ import React from 'react';
 import { graphql, createRefetchContainer } from 'react-relay';
 import { Formik } from 'formik';
 import { Row, Col, Container, Button } from 'react-bootstrap';
-import { IS_DEV } from '../Utils/misc';
 import MenuPlot from '../Components/Plots/Publications/MenuPlot';
 import SelectInput from '../Components/Forms/Atoms/SelectInput';
 
-const fileDownloadUrl = IS_DEV
-  ? 'http://localhost:8003/file_download/?fileId='
-  : 'https://gwlandscape.org.au/file_download/?fileId=';
-
+const fileDownloadUrl = `${import.meta.env.VITE_BACKEND_URL}/file_download/?fileId=`;
 
 const ViewPublication = ({ data, relay }) => {
   const { title, author, year, datasets, keywords, plotInfo } = data && data.compasPublication;
