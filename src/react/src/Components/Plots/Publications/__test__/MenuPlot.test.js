@@ -1,8 +1,8 @@
 import React from 'react';
 import MenuPlot from '../MenuPlot';
-import {graphql, QueryRenderer} from 'react-relay';
-import {MockPayloadGenerator} from 'relay-test-utils';
-import {render, waitFor, screen} from '@testing-library/react';
+import { graphql, QueryRenderer } from 'react-relay';
+import { MockPayloadGenerator } from 'relay-test-utils';
+import { render, waitFor, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import 'regenerator-runtime/runtime';
 
@@ -21,7 +21,7 @@ const plotData = {
             "x": 1,
             "y": 1
         }
-    ]`
+    ]`,
 };
 
 const plotMeta = {
@@ -30,7 +30,7 @@ const plotMeta = {
     subgroups: ['test_subgroup_x', 'test_subgroup_y', 'test_subgroup_z'],
     subgroupX: 'test_subgroup_x',
     subgroupY: 'test_subgroup_y',
-    strideLength: 1
+    strideLength: 1,
 };
 
 describe('interactive plot for publications', () => {
@@ -39,24 +39,25 @@ describe('interactive plot for publications', () => {
             environment={environment}
             query={graphql`
                 query MenuPlotTestQuery(
-                    $publicationId: ID!,
-                    $datasetId: ID,
+                    $publicationId: ID!
+                    $datasetId: ID
                     $rootGroup: String
                     $subgroupX: String
                     $subgroupY: String
                     $strideLength: Int
                 ) @relay_test_operation {
                     compasPublication(id: $publicationId) {
-                        plotInfo: datasetModels (first: 1, id: $datasetId) {
+                        plotInfo: datasetModels(first: 1, id: $datasetId) {
                             edges {
                                 node {
                                     id
-                                    ...MenuPlot_data @arguments(
-                                        rootGroup: $rootGroup,
-                                        subgroupX: $subgroupX,
-                                        subgroupY: $subgroupY,
-                                        strideLength: $strideLength
-                                    )
+                                    ...MenuPlot_data
+                                        @arguments(
+                                            rootGroup: $rootGroup
+                                            subgroupX: $subgroupX
+                                            subgroupY: $subgroupY
+                                            strideLength: $strideLength
+                                        )
                                 }
                             }
                         }
@@ -68,9 +69,9 @@ describe('interactive plot for publications', () => {
                 rootGroup: 'test',
                 subgroupX: 'test',
                 subgroupY: 'test',
-                strideLength: 1
+                strideLength: 1,
             }}
-            render={({error, props}) => {
+            render={({ error, props }) => {
                 if (props) {
                     return <MenuPlot data={props.compasPublication.plotInfo.edges[0].node} />;
                 } else if (error) {
@@ -92,9 +93,11 @@ describe('interactive plot for publications', () => {
     it('should render', async () => {
         expect.hasAssertions();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockMenuPlotReturn),
+            ),
+        );
         expect(screen.getByText('Group')).toBeInTheDocument();
     });
 
@@ -102,22 +105,24 @@ describe('interactive plot for publications', () => {
         expect.hasAssertions();
         const user = userEvent.setup();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockMenuPlotReturn),
+            ),
+        );
         user.selectOptions(screen.getByTestId('group'), 'another_test_group');
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, 
-                {
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, {
                     PlotDataType() {
                         return plotData;
                     },
                     PlotMetaType() {
-                        return {...plotMeta, group: 'another_test_group'};
+                        return { ...plotMeta, group: 'another_test_group' };
                     },
-                }
-            )
-        ));
+                }),
+            ),
+        );
         // The value of the select only changes based on the props of the MenuPlot component, so this works as a test
         expect(screen.getByDisplayValue('another_test_group')).toBeInTheDocument();
     });
@@ -126,22 +131,24 @@ describe('interactive plot for publications', () => {
         expect.hasAssertions();
         const user = userEvent.setup();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockMenuPlotReturn),
+            ),
+        );
         user.selectOptions(screen.getByTestId('x-axis'), 'test_subgroup_z');
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, 
-                {
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, {
                     PlotDataType() {
                         return plotData;
                     },
                     PlotMetaType() {
-                        return {...plotMeta, subgroupX: 'test_subgroup_z'};
+                        return { ...plotMeta, subgroupX: 'test_subgroup_z' };
                     },
-                }
-            )
-        ));
+                }),
+            ),
+        );
         // The value of the select only changes based on the props of the MenuPlot component, so this works as a test
         expect(screen.getByDisplayValue('test_subgroup_z')).toBeInTheDocument();
     });
@@ -150,22 +157,24 @@ describe('interactive plot for publications', () => {
         expect.hasAssertions();
         const user = userEvent.setup();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, mockMenuPlotReturn)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockMenuPlotReturn),
+            ),
+        );
         user.selectOptions(screen.getByTestId('y-axis'), 'test_subgroup_z');
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation =>
-            MockPayloadGenerator.generate(operation, 
-                {
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, {
                     PlotDataType() {
                         return plotData;
                     },
                     PlotMetaType() {
-                        return {...plotMeta, subgroupY: 'test_subgroup_z'};
+                        return { ...plotMeta, subgroupY: 'test_subgroup_z' };
                     },
-                }
-            )
-        ));
+                }),
+            ),
+        );
         // The value of the select only changes based on the props of the MenuPlot component, so this works as a test
         expect(screen.getByDisplayValue('test_subgroup_z')).toBeInTheDocument();
     });

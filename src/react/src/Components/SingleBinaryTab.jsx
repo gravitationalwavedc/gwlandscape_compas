@@ -1,7 +1,7 @@
 import React from 'react';
 import { Col, Row, Tab } from 'react-bootstrap';
 
-const SingleBinaryTab = ({ title, children, eventKey }) =>
+const SingleBinaryTab = ({ title, children, eventKey }) => (
     <Tab.Pane eventKey={eventKey}>
         <Row>
             <Col>
@@ -9,10 +9,9 @@ const SingleBinaryTab = ({ title, children, eventKey }) =>
             </Col>
         </Row>
         <Row>
-            <Col>
-                {children}
-            </Col>
+            <Col>{children}</Col>
         </Row>
-    </Tab.Pane>;
+    </Tab.Pane>
+);
 
 export default SingleBinaryTab;

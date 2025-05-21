@@ -1,15 +1,15 @@
 // Custom styles
 .gwlandscape-menu.navbar {
-  background: $white;
+    background: $white;
 }
 
 .gwlandscape-menu.navbar .navbar-nav .nav-link {
-  padding: 0.5rem 1rem 1rem 1rem;
-  margin: auto 1rem;
-  color: $blue-900;
+    padding: 0.5rem 1rem 1rem 1rem;
+    margin: auto 1rem;
+    color: $blue-900;
 
-  &:hover {
-    box-shadow: inset 0 -5px 0 0 orange;
-    color: $blue;
-  }
+    &:hover {
+        box-shadow: inset 0 -5px 0 0 orange;
+        color: $blue;
+    }
 }

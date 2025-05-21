@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const DEFAULT_ZOOM = { x1: null, y1: null, x2: null, y2: null };
 
-const useZoom = ({onZoomIn, chartRef}) => {
+const useZoom = ({ onZoomIn, chartRef }) => {
     const [zoomArea, setZoomArea] = useState(DEFAULT_ZOOM);
     const [isZooming, setIsZooming] = useState(false);
     const [isMoving, setIsMoving] = useState(false);
@@ -39,7 +39,7 @@ const useZoom = ({onZoomIn, chartRef}) => {
                 setIsMoving(false);
                 setZoomArea(DEFAULT_ZOOM);
 
-                onZoomIn({x1, y1, x2, y2});
+                onZoomIn({ x1, y1, x2, y2 });
             }
         }
     };
@@ -48,10 +48,9 @@ const useZoom = ({onZoomIn, chartRef}) => {
         handleMouseDown,
         handleMouseMove,
         handleMouseUp,
-        isZooming, 
-        zoomArea
+        isZooming,
+        zoomArea,
     };
 };
-
 
 export default useZoom;

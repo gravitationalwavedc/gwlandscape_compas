@@ -5,15 +5,15 @@ const wideFilter = (data, i, key, data1, data2) => {
     let nextInRange = false;
     let prevInRange = false;
     if (i > 0 && i <= data.length - 1) {
-        prev = data[i-1][key];
+        prev = data[i - 1][key];
         prevInRange = prev >= data1 && prev <= data2;
     }
     if (i >= 0 && i < data.length - 1) {
-        next = data[i+1][key];
+        next = data[i + 1][key];
         nextInRange = next >= data1 && next <= data2;
     }
-    const rangeInPrevNext = (prev && next) && (prev <= data1 && data2 <= next);
-    return prevInRange || nextInRange || rangeInPrevNext; 
+    const rangeInPrevNext = prev && next && prev <= data1 && data2 <= next;
+    return prevInRange || nextInRange || rangeInPrevNext;
 };
 
 const filterGroupDataByDomain = (group, domain) => {
@@ -30,8 +30,8 @@ const filterGroupDataByDomain = (group, domain) => {
     });
     return {
         meta: meta,
-        data: filteredData
+        data: filteredData,
     };
 };
 
-export {filterGroupDataByDomain};
+export { filterGroupDataByDomain };

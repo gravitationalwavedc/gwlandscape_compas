@@ -39,10 +39,8 @@ export const getTickMarks = (minVal, maxVal, numTicks) => {
 };
 
 export const getLogTickMarks = (minVal, maxVal, numTicks) => {
-    const ticks = getTickMarks(
-        minVal > 0 ? Math.log10(minVal) : 0, maxVal > 0 ? Math.log10(maxVal) : 0, numTicks
-    );
+    const ticks = getTickMarks(minVal > 0 ? Math.log10(minVal) : 0, maxVal > 0 ? Math.log10(maxVal) : 0, numTicks);
     return ticks.map((tick) => Math.pow(10, tick));
 };
 
-export const clampTicks = (minVal, maxVal, tickMarks) => tickMarks.filter(tick => tick >= minVal && tick <= maxVal);
+export const clampTicks = (minVal, maxVal, tickMarks) => tickMarks.filter((tick) => tick >= minVal && tick <= maxVal);

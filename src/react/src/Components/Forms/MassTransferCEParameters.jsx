@@ -1,11 +1,13 @@
 import React from 'react';
-import {Col, Row} from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import Input from './Atoms/Input';
 import SelectInput from './Atoms/SelectInput';
-import {massTransferAccretionEfficiencyPrescriptionOptions,
+import {
+    massTransferAccretionEfficiencyPrescriptionOptions,
     massTransferAngularMomentumLossPrescriptionOptions,
-    lambdaPrescriptionOptions} from '../../Utils/parameters';
-import {useFormikContext} from 'formik';
+    lambdaPrescriptionOptions,
+} from '../../Utils/parameters';
+import { useFormikContext } from 'formik';
 
 const MassTransferCEParametersForm = () => {
     const { values } = useFormikContext();
@@ -16,9 +18,9 @@ const MassTransferCEParametersForm = () => {
             <Row>
                 <Col md={6}>
                     <SelectInput
-                        title='Angular Momentum Loss Prescription'
-                        name='massTransferAngularMomentumLossPrescription'
-                        type='string'
+                        title="Angular Momentum Loss Prescription"
+                        name="massTransferAngularMomentumLossPrescription"
+                        type="string"
                         options={massTransferAngularMomentumLossPrescriptionOptions}
                     />
                 </Col>
@@ -26,32 +28,23 @@ const MassTransferCEParametersForm = () => {
             <Row>
                 <Col>
                     <SelectInput
-                        title='Accretion Efficiency Prescription'
-                        name='massTransferAccretionEfficiencyPrescription'
+                        title="Accretion Efficiency Prescription"
+                        name="massTransferAccretionEfficiencyPrescription"
                         options={massTransferAccretionEfficiencyPrescriptionOptions}
                     />
                 </Col>
                 <Col>
-                    <Input
-                        show={showMassTransferFA}
-                        title="Fraction Accreted"
-                        name="massTransferFa"
-                        type="number"
-                    />
+                    <Input show={showMassTransferFA} title="Fraction Accreted" name="massTransferFa" type="number" />
                 </Col>
             </Row>
             <Row>
                 <Col>
-                    <Input
-                        title="Alpha"
-                        name="commonEnvelopeAlpha"
-                        type="number"
-                    />
+                    <Input title="Alpha" name="commonEnvelopeAlpha" type="number" />
                 </Col>
                 <Col>
                     <SelectInput
-                        title='Lambda Prescription'
-                        name='commonEnvelopeLambdaPrescription'
+                        title="Lambda Prescription"
+                        name="commonEnvelopeLambdaPrescription"
                         options={lambdaPrescriptionOptions}
                     />
                 </Col>
