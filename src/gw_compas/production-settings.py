@@ -4,7 +4,7 @@ DEBUG = False
 
 SITE_URL = "https://gwlandscape.org.au"
 
-STATIC_URL = "/compas/static/"
+STATIC_URL = "/static/"
 
 ALLOWED_HOSTS = ["*"]
 

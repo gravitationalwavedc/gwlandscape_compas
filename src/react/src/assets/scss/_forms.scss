@@ -1,0 +1,47 @@
+// Fix layout issue with Form error messages
+p.text-danger.small {
+   margin-bottom: 0;
+}
+
+// Inputs
+.form-group {
+    .form-control, 
+    .custom-select,
+    .gw-select__control {
+        border: 3px solid $primary;
+        color: $primary;
+        text-align: right;
+        box-shadow: $shadow-inner;
+    }
+
+    .text-left {
+      text-align: left;
+    }
+
+    .input-group-text {
+        border: none;
+        border: 3px solid $primary;
+        font-size: 0.8rem;
+        background-color: $white;
+        border-right: None;
+    }
+
+    .input-group-prepend + .form-control {
+      border-left: None;
+    }
+}
+
+// Buttons
+.btn.btn-form {
+    color: $blue-100 !important;
+    background-color: $primary;
+    margin: 1rem 0;
+    border: 3px solid $primary;
+    font-weight: bold;
+}
+
+.btn.btn-outline-primary {
+    border: 3px solid $primary;
+    font-weight: bold;
+}
+

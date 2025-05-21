@@ -1,0 +1,94 @@
+// Publication Card
+.publication-card.card {
+  border: None;
+
+  .card-body {
+    padding: 1.25rem 0;
+  }
+}
+
+// GW Form Card
+.gw-form-card.card {
+    background-color: $white;
+    border: none;
+    box-shadow: $shadow-md;
+    margin-bottom: 1rem;
+    border-top: 4px solid $blue;
+
+    &.disabled {
+      background-color: $white;
+      color: $blue-100;
+      box-shadow: none;
+      border: 1px solid $gray-500;
+      border-top: 4px solid $gray-500;
+    }
+}
+
+// Form Card Inputs
+.gw-form-card.card {
+   .form-group {
+      .form-control, 
+      .custom-select,
+      .gw-select__control {
+           box-shadow: $shadow-inner;
+      }
+   
+      .form-control:disabled,
+      .gw-select__control.gw-select__control--is-disabled {
+         background-color: $blue-100;
+         color: #999999;
+      }
+   }
+}
+
+// Detector Card
+.gw-detector-card.card {
+   background-color: $white;
+   margin-bottom: 1rem;
+
+   .card-header {
+       margin-top: -55px;
+       border: none;
+       background-color: rgba($blue-100, 0.8);
+       z-index: 100;
+   }
+
+   img {
+      height: 100px;
+      object-fit: cover;
+   }
+
+   &.active {
+      box-shadow: $shadow-md;
+   }
+
+   &:not(.active) {
+      background-color: $blue-100;
+      color: $gray-500;
+      filter: none;
+      img {
+          z-index: 1;
+          filter: grayscale(100%);
+      }
+   }
+}
+
+// Job Card
+.job-card.card {
+  border: None;
+
+  .card-body {
+    padding: 1.25rem 0;
+  }
+}
+
+// Colored Job Status
+.job-completed {
+  color: green;
+  text-transform: uppercase;
+}
+
+.job-error {
+  color: red;
+  text-transform: uppercase;
+}

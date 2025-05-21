@@ -1,0 +1,7 @@
+.recharts-default-tooltip {
+  box-shadow: $shadow-md;
+
+  /* Have to use !important because the library uses inline styles.*/
+  background-color: rgba(255, 255, 255, 0.8) !important;
+  border: none !important;
+}
