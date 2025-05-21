@@ -1,7 +1,6 @@
 import React from 'react';
 import { Route } from 'found';
 import { graphql } from 'react-relay';
-import { harnessApi } from './index';
 import Loading from './Components/Loading';
 import { RedirectException } from 'found';
 import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
@@ -25,6 +24,10 @@ const handleRender = ({ Component, props }) => {
   if (!Component || !props)
     return <Loading />;
 
+  // TODO : implement auth
+  const harnessApi = {
+    hasAuthToken: () => false
+  }
   // redirect to login page for authentication if a route is protected
   if (!harnessApi.hasAuthToken() && PROTECTED_COMPONENTS.includes(Component))
     throw new RedirectException('/auth/?next=' + props.match.location.pathname);

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
 import { graphql } from 'react-relay';
-import { harnessApi } from '../index';
 import { Container, Col, Row, Nav, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
 import JobTitle from '../Components/Forms/JobTitle';
@@ -11,6 +10,7 @@ import InitialParametersForm from '../Components/Forms/InitialParametersForm';
 import validationSchema from '../Components/Forms/compasJobValidationSchema';
 import SupernovaKickParametersForm from '../Components/Forms/SupernovaKickParametersForm';
 import MassTransferCEParametersForm from '../Components/Forms/MassTransferCEParameters';
+import environment from '../environment';
 
 const submitMutation = graphql`
   mutation NewJobMutation($input: CompasJobMutationInput!) {
@@ -76,7 +76,7 @@ const NewJob = ({ initialValues, router }) => {
       }
     };
 
-    commitMutation(harnessApi.getEnvironment('compas'), {
+    commitMutation(environment, {
       mutation: submitMutation,
       variables: variables,
       onCompleted: (response, errors) => {
