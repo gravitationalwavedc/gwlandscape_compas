@@ -1,12 +1,16 @@
 from celery import shared_task
 
 import os
+import logging
 import traceback
 from pathlib import Path
 from subprocess import call
 
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 
 def check_output_file_generated(outputfilepath):
@@ -46,11 +50,11 @@ def run_compas(parameter_str, output_path):
         result = check_output_file_generated(detailed_output_file_path)
 
     except SoftTimeLimitExceeded:
-        traceback.print_exc()
+        logger.error("Task exceeded time limit", exc_info=True)
         result = TASK_TIMEOUT
     except Exception:
         # return fail code if job failed for some other reason
-        traceback.print_exc()
+        logger.error("Task failed with exception", exc_info=True)
         result = TASK_FAIL
     finally:
         return result

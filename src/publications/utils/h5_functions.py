@@ -1,5 +1,9 @@
 import numpy as np
+import logging
 from .plotting_functions import get_log_and_limits, histo2d_scatter_hybrid
+
+# Set up a logger for this file
+logger = logging.getLogger(__name__)
 
 default_prefs = {
     "BSE_Common_Envelopes": ["SemiMajorAxis>CE", "SemiMajorAxis<CE"],
@@ -89,7 +93,7 @@ def get_h5_subgroup_data(h5_file, root_group, subgroup_x, subgroup_y, stride_len
     data_group_y = h5_file[root_group][subgroup_y][::stride_length]
 
     if data_group_x.dtype.type is np.bytes_ or data_group_y.dtype.type is np.bytes_:
-        print("One of the subgroups has a dtype of string")
+        logger.warning("One of the subgroups has a dtype of string")
         return None
 
     data_group_x, data_group_y = remove_null_coords(data_group_x, data_group_y)

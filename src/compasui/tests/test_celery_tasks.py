@@ -5,6 +5,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 from django.test import TestCase
 from compasui.tasks import run_compas
 from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
+from compasui.tests.utils import silence_logging
 
 
 class TestCeleryTasks(TestCase):
@@ -51,6 +52,7 @@ class TestCeleryTasks(TestCase):
         mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
         mock_check_output.assert_called_once_with(self.expected_output_file)
 
+    @silence_logging(logger_name="compasui.tasks")
     @patch("compasui.tasks.call")
     def test_run_compas_failure(self, mock_subprocess_call):
         # Set up the mocks
@@ -64,6 +66,7 @@ class TestCeleryTasks(TestCase):
         self.assertEqual(result, TASK_FAIL)
         mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
 
+    @silence_logging(logger_name="compasui.tasks")
     @patch("compasui.tasks.call")
     def test_run_compas_timeout(self, mock_subprocess_call):
         # Set up the mocks
@@ -77,6 +80,7 @@ class TestCeleryTasks(TestCase):
         self.assertEqual(result, TASK_TIMEOUT)
         mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
 
+    @silence_logging(logger_name="compasui.tasks")
     @patch("compasui.tasks.call")
     @patch("compasui.tasks.check_output_file_generated")
     def test_run_compas_file_check_timeout(

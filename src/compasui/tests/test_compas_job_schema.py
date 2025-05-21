@@ -1,4 +1,3 @@
-from datetime import datetime
 import uuid
 
 from django.contrib.auth import get_user_model
@@ -8,6 +7,7 @@ from django.utils import timezone
 from graphql_relay import to_global_id
 from compasui.models import CompasJob, FileDownloadToken
 from compasui.tests.testcases import CompasTestCase
+from compasui.tests.utils import silence_logging
 from unittest.mock import patch, Mock
 
 User = get_user_model()
@@ -71,6 +71,7 @@ class TestCompasJobSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
         self.assertEqual(CompasJob.objects.all().count(), 1)
 
+    @silence_logging(logger_name="compasui.views")
     @patch("compasui.views.requests")
     def test_create_compas_job_job_controller_fail(self, request_mock):
         mock_response = Mock()
@@ -92,6 +93,7 @@ class TestCompasJobSchema(CompasTestCase):
             "Error submitting job, got error code: 400\n\nheaders\n\nBad request",
         )
 
+    @silence_logging(logger_name="compasui.schema")
     @patch("compasui.views.requests")
     def test_create_compas_job_name_exists(self, request_mock):
         mock_response = Mock()
@@ -140,7 +142,7 @@ class TestCompasJobSchema(CompasTestCase):
         )
 
         new_token = FileDownloadToken(
-            job=job, token=uuid.uuid4(), path="/job/file.txt", created=datetime.now()
+            job=job, token=uuid.uuid4(), path="/job/file.txt", created=timezone.now()
         )
 
         create_token.return_value = [new_token]
@@ -227,7 +229,7 @@ class TestCompasJobSchema(CompasTestCase):
         self.assertDictEqual(response.data, expected)
 
         # Test failure when token is expired
-        new_token.created = datetime.now() - timezone.timedelta(
+        new_token.created = timezone.now() - timezone.timedelta(
             settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1
         )
         new_token.save()

@@ -8,6 +8,7 @@ from django.test import override_settings
 from compasui.tests.testcases import CompasTestCase
 from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from compasui.utils.h5ToJson import read_h5_data_as_json
+from compasui.tests.utils import silence_logging
 
 
 temp_output_dir = TemporaryDirectory()
@@ -56,6 +57,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             "./compasui/tests/test_data/BSE_Detailed_Output_0.h5"
         )
 
+    @silence_logging(logger_name="compasui.utils.h5ToJson")
     def test_h5_file_to_json(self):
         json_data = read_h5_data_as_json(self.test_detailed_output_file_path)
         self.assertIsNotNone(json_data)
@@ -64,6 +66,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         json_data = read_h5_data_as_json(f"../{self.test_detailed_output_file_path}")
         self.assertIsNone(json_data)
 
+    @silence_logging(logger_name="compasui.schema")
     @patch("compasui.views.run_compas")
     def test_celery_tasks_called(self, run_compas):
         run_compas.delay().get.return_value = TASK_SUCCESS
@@ -75,6 +78,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
         run_compas.delay.assert_called_with(self.parameter_str, output_path)
 
+    @silence_logging(logger_name="compasui.schema")
     @patch("compasui.views.run_compas")
     def test_new_single_binary_mutation_when_tasks_fail(self, run_compas):
         run_compas.delay().get.return_value = TASK_FAIL

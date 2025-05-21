@@ -558,7 +558,6 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
 
     def test_compas_dataset_model_query_unauthenticated(self):
         response = self.execute_query()
-        print(response)
 
         self.assertIsNone(response.errors)
         self.assertDictEqual(self.expected_output, response.data)
