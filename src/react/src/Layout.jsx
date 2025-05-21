@@ -10,6 +10,7 @@ const noMenuURLs = [
 
 
 const Layout = ({ children, match, }) => {
+  // TODO: Auth
   // const name = "Frank Walker"
   const name = "";
   const showMenu = !noMenuURLs.some(regex => regex.test(match.location.pathname));
