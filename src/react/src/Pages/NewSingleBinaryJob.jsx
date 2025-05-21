@@ -155,7 +155,7 @@ const NewSingleBinaryJob = ({ data }) => {
             <Col>
               <Alert variant='danger' dismissible onClose={() => setOutputError('')}>
                 <Alert.Heading>Something went wrong.</Alert.Heading>
-                <p>Error was "{outputError}". That's all we know. Please try again in a few minutes.</p>
+                <p>Error was &quot;{outputError}&quot;. That&apos;s all we know. Please try again in a few minutes.</p>
               </Alert>
             </Col>
           </Row>
@@ -238,8 +238,8 @@ export default createFragmentContainer(NewSingleBinaryJob,
   {
     data: graphql`
             fragment NewSingleBinaryJob_data on Query {
-                compasVersion
+              compasVersion
             }
-        `,
+              `,
   },
 );

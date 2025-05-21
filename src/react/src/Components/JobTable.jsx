@@ -62,7 +62,7 @@ const JobTable = ({ data, match, router, hasMore, loadMore, myJobs }) => (
             </Link>
           </td>
         </tr>)
-          : <tr><td colSpan='5'>Create a new job or try searching 'Any time'.</td></tr>}
+          : <tr><td colSpan='5'>Create a new job or try searching &apos;Any time&apos;.</td></tr>}
       </tbody>
     </Table>
   </InfiniteScroll>
