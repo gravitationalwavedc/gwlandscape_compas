@@ -159,7 +159,7 @@ export default createPaginationContainer(PublicJobs,
       };
     },
 
-    getVariables(props, { count, cursor }, { }) {
+    getVariables(props, { count, cursor }) {
       return {
         count,
         cursor

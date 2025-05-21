@@ -32,6 +32,7 @@ const NewJob = ({ initialValues, router }) => {
 
     // The mutation requires all number values to be strings.
     Object.entries(values)
+      // eslint-disable-next-line no-unused-vars
       .filter(([key, value]) => typeof (value) === 'number')
       .map(([key, value]) => values[key] = value.toString());
 

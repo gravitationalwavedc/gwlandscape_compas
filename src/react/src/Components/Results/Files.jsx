@@ -38,7 +38,7 @@ const Files = ({ jobId }) =>
               return <React.Fragment>
                 {
                   props.compasResultFiles.files.map(
-                    (f, i) =>
+                    (f) =>
                       <ResultFile jobId={jobId} file={f} key={f.downloadToken} />
                   )
                 }
