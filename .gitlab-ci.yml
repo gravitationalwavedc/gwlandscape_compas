@@ -64,6 +64,16 @@ eslint:
     - npm run lint
 
 
+prettier:
+  script:
+    - cd $WD/src/
+    - cd react/
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
+    - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
+    - npm install --legacy-peer-deps
+    - npm run prettier
+
+
 code-quality:
   image: docker:25
   variables:
