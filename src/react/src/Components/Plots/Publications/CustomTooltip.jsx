@@ -1,4 +1,3 @@
-import React from 'react';
 import { format } from 'd3-format';
 import { Card } from 'react-bootstrap';
 

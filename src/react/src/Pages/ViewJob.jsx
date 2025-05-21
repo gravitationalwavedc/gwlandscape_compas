@@ -1,4 +1,3 @@
-import React from 'react';
 import { graphql, createFragmentContainer } from 'react-relay';
 import { Row, Col, Container, Nav, Tab } from 'react-bootstrap';
 import Files from '../Components/Results/Files';

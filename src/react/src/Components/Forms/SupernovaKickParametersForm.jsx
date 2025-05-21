@@ -1,4 +1,3 @@
-import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Input from './Atoms/Input';
 import {
@@ -15,7 +14,7 @@ const SupernovaKickParametersForm = () => {
     const showVelocity = values['kickVelocityDistribution'] === 'FIXED';
 
     return (
-        <React.Fragment>
+        <>
             <Row>
                 <Col md={5}>
                     <SelectInput
@@ -62,7 +61,7 @@ const SupernovaKickParametersForm = () => {
                     />
                 </Col>
             </Row>
-        </React.Fragment>
+        </>
     );
 };
 

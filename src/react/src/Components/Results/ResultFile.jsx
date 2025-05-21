@@ -1,4 +1,3 @@
-import React from 'react';
 import { commitMutation, graphql } from 'react-relay';
 import environment from '../../environment';
 

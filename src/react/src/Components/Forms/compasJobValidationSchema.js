@@ -15,7 +15,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Initial Mass vs Max Initial Mass',
                 'Min Initial Mass should be < Max Initial Mass',
-                (value, { parent }) => value < parent.maxInitialMass.value,
+                (value, { parent }) => value < parent.maxInitialMass,
             ),
         maxInitialMass: Yup.number()
             .max(150.0)
@@ -23,14 +23,14 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Initial Mass vs Max Initial Mass',
                 'Min Initial Mass should be < Max Initial Mass',
-                (value, { parent }) => value > parent.minInitialMass.value,
+                (value, { parent }) => value > parent.minInitialMass,
             ),
         minMassRatio: Yup.number()
             .nullable()
             .test(
                 'Min Mass Ratio vs Max Mass Ratio',
                 'Min Mass Ratio should be > 0 and < Max Mass Ratio',
-                (value, { parent }) => value > 0 && value < parent.maxMassRatio.value,
+                (value, { parent }) => value > 0 && value < parent.maxMassRatio,
             ),
         maxMassRatio: Yup.number()
             .nullable()
@@ -38,7 +38,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Mass Ratio vs Max Mass Ratio',
                 'Min Mass Ratio should be < Max Mass Ratio',
-                (value, { parent }) => value > parent.minMassRatio.value,
+                (value, { parent }) => value > parent.minMassRatio,
             ),
         minSemiMajorAxis: Yup.number()
             .min(0.001)
@@ -46,7 +46,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Semi Major Axis vs Max Semi Major Axis',
                 'Min Semi Major Axis should be < Max Semi Major Axis',
-                (value, { parent }) => value < parent.maxSemiMajorAxis.value,
+                (value, { parent }) => value < parent.maxSemiMajorAxis,
             ),
         maxSemiMajorAxis: Yup.number()
             .nullable()
@@ -54,7 +54,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Semi Major Axis vs Max Semi Major Axis',
                 'Min Semi Major Axis should be < Max Semi Major Axis',
-                (value, { parent }) => value > parent.minSemiMajorAxis.value,
+                (value, { parent }) => value > parent.minSemiMajorAxis,
             ),
         minOrbitalPeriod: Yup.number()
             .min(1.0)
@@ -62,7 +62,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Orbital Period vs Max Orbital Period',
                 'Min Orital Period should be < Max Orbital Period',
-                (value, { parent }) => value < parent.maxOrbitalPeriod.value,
+                (value, { parent }) => value < parent.maxOrbitalPeriod,
             ),
         maxOrbitalPeriod: Yup.number()
             .nullable()
@@ -70,7 +70,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Min Orbital Period vs Max Orbital Period',
                 'Min Orbital Period should be < Max Orbital Period',
-                (value, { parent }) => value > parent.minOrbitalPeriod.value,
+                (value, { parent }) => value > parent.minOrbitalPeriod,
             ),
         velocity1: Yup.number()
             .min(0.0)

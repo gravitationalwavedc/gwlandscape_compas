@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
     "preview": "vite preview",
     "relay": "relay-compiler",
     "test-ci": "return 0",
-    "prettier": "prettier src --check"
+    "prettier": "prettier src --check",
+    "prettier:write": "prettier src --write"
   },
   "dependencies": {
     "babel-plugin-relay": "^18.2.0",

@@ -1,13 +1,12 @@
-import React from 'react';
 import { HiOutlinePencil, HiOutlineCheck, HiOutlineX } from 'react-icons/hi';
 import EdiText from 'react-editext';
 import { useField, useFormikContext } from 'formik';
 import { Form } from 'react-bootstrap';
 
 const EditButton = () => (
-    <React.Fragment>
+    <>
         <HiOutlinePencil /> edit
-    </React.Fragment>
+    </>
 );
 const SaveButton = () => <HiOutlineCheck />;
 const CancelButton = () => <HiOutlineX />;
@@ -18,7 +17,7 @@ const JobTitle = () => {
     const [{ value: descriptionValue }, _, { setValue: setDescriptionValue }] = useField('description');
 
     return (
-        <React.Fragment>
+        <>
             <EdiText
                 type="text"
                 name="name"
@@ -71,7 +70,7 @@ const JobTitle = () => {
                 />
                 <small className="text-muted">Enabling detailed output results in very large output files</small>
             </div>
-        </React.Fragment>
+        </>
     );
 };
 

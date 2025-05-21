@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { useFormikContext } from 'formik';
 
@@ -17,7 +17,7 @@ const ReviewJob = ({ disableButtons }) => {
     };
 
     return (
-        <React.Fragment>
+        <>
             {handleSubmit && (
                 <Row>
                     <Col>
@@ -42,12 +42,8 @@ const ReviewJob = ({ disableButtons }) => {
                     </Col>
                 </Row>
             )}
-        </React.Fragment>
+        </>
     );
-};
-
-ReviewJob.defaultProps = {
-    handleSubmit: null,
 };
 
 export default ReviewJob;

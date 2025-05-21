@@ -6,12 +6,12 @@ let validationSchema = Yup.object().shape(
             .required()
             .min(0.0)
             .max(150.0)
-            .test('mass2 vs mass1', 'Mass 1 should be > Mass 2', (value, { parent }) => value >= parent.mass2.value),
+            .test('mass2 vs mass1', 'Mass 1 should be > Mass 2', (value, { parent }) => value >= parent.mass2),
         mass2: Yup.number()
             .required()
             .min(0.1)
             .max(150.0)
-            .test('mass1 vs mass2', 'Mass 2 should be < Mass 1', (value, { parent }) => parent.mass1.value >= value),
+            .test('mass1 vs mass2', 'Mass 2 should be < Mass 1', (value, { parent }) => parent.mass1 >= value),
         metallicity: Yup.number().required().min(1e-4).max(0.03),
         eccentricity: Yup.number().required().min(0.0).lessThan(1.0),
         separation: Yup.number()
@@ -21,7 +21,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Spearation or Orbital Period',
                 'Separation and Orbital Period cannot be used together. Specify only one of them',
-                (value, { parent }) => !(value && parent.orbitalPeriod.value),
+                (value, { parent }) => !(value && parent.orbitalPeriod),
             ),
         orbitalPeriod: Yup.number()
             .min(0.0)
@@ -30,7 +30,7 @@ let validationSchema = Yup.object().shape(
             .test(
                 'Spearation or Orbital Period',
                 'Separation and Orbital Period cannot be used together. Specify only one of them',
-                (value, { parent }) => !(value && parent.separation.value),
+                (value, { parent }) => !(value && parent.separation),
             ),
         velocity1: Yup.number()
             .min(0.0)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { Container, Col, Nav, Row, Tab, Alert } from 'react-bootstrap';

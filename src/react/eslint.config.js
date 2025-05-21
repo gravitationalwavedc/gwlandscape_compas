@@ -3,8 +3,9 @@ import globals from 'globals';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import { defineConfig } from 'eslint/config';
 
-export default [
+export default defineConfig([
   { ignores: ['dist', '**/__generated__/**', '**/__tests__/**', '**/__test__/**'] },
   {
     files: ['**/*.{js,jsx}'],
@@ -40,4 +41,4 @@ export default [
       'react/prop-types': 'warn',
     },
   },
-]
+]);

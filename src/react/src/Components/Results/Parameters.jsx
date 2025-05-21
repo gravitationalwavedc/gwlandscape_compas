@@ -1,10 +1,9 @@
-import React from 'react';
 import { graphql, createFragmentContainer } from 'react-relay';
 import { Row, Col } from 'react-bootstrap';
 import ParameterTableRow from './ParameterTableRow';
 
 const Parameters = (props) => (
-    <React.Fragment>
+    <>
         <Row>
             <Col>
                 <h2 className="mb-md-3 mt-md-2">Basic Options</h2>
@@ -123,7 +122,7 @@ const Parameters = (props) => (
                 { name: 'Lambda Prescription', value: props.jobData.commonEnvelopeLambdaPrescription },
             ]}
         />
-    </React.Fragment>
+    </>
 );
 
 export default createFragmentContainer(Parameters, {
