@@ -1,4 +1,3 @@
-import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Input from './Atoms/Input';
 import SelectInput from './Atoms/SelectInput';
@@ -36,7 +35,7 @@ const InitialParametersForm = () => {
     const showMetallicities = values['metallicityDistribution'] !== 'ZSOLAR';
 
     return (
-        <React.Fragment>
+        <>
             <Row>
                 <Col>
                     <h2>Population</h2>
@@ -142,7 +141,7 @@ const InitialParametersForm = () => {
                     <Input title="Max Metallicity" name="maxMetallicity" type="number" show={showMetallicities} />
                 </Col>
             </Row>
-        </React.Fragment>
+        </>
     );
 };
 

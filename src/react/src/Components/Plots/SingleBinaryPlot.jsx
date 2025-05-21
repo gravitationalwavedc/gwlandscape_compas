@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { XAxis, YAxis, CartesianGrid, Legend, Label } from 'recharts';
 import ExponentTick from './ExponentTick';
 import useZoomableDomain from './useZoomableDomain';

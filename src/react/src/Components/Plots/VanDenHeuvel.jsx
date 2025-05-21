@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { Col, Image, Row, Table } from 'react-bootstrap';
 
 export default memo(function VanDenHeuvel({ data }) {

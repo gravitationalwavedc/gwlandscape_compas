@@ -1,10 +1,9 @@
-import React from 'react';
 import Link from 'found/Link';
 import { Table, Badge } from 'react-bootstrap';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import getBadgeType from './getBadgeType';
 
-const JobTable = ({ data, match, router, hasMore, loadMore, myJobs }) => (
+const JobTable = ({ data, match, router, hasMore, loadMore, myJobs = false }) => (
     <InfiniteScroll dataLength={data.edges.length} next={loadMore} hasMore={hasMore} loader="Scroll to load more...">
         <Table>
             <thead>
@@ -61,9 +60,5 @@ const JobTable = ({ data, match, router, hasMore, loadMore, myJobs }) => (
         </Table>
     </InfiniteScroll>
 );
-
-JobTable.defaultProps = {
-    myJobs: false,
-};
 
 export default JobTable;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { commitMutation } from 'relay-runtime';
 import { graphql } from 'react-relay';
 import { Container, Col, Row, Nav, Tab, Alert } from 'react-bootstrap';
@@ -22,8 +22,9 @@ const submitMutation = graphql`
     }
 `;
 
-const NewJob = ({ initialValues, router }) => {
+const NewJob = ({ router }) => {
     const [outputError, setOutputError] = useState(null);
+    const initialValues = compasJobInitialValues;
 
     const handleJobSubmission = (values) => {
         setOutputError(null);
@@ -165,10 +166,6 @@ const NewJob = ({ initialValues, router }) => {
             </Container>
         </Formik>
     );
-};
-
-NewJob.defaultProps = {
-    initialValues: compasJobInitialValues,
 };
 
 export default NewJob;

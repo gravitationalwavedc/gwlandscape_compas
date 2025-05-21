@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Col, Container, Form, InputGroup, Card, Button } from 'react-bootstrap';
 import { HiOutlineSearch } from 'react-icons/hi';
 import InfiniteScroll from 'react-infinite-scroll-component';

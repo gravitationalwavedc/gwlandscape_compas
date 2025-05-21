@@ -1,4 +1,3 @@
-import React from 'react';
 import { Col, Row, Tab } from 'react-bootstrap';
 
 const SingleBinaryTab = ({ title, children, eventKey }) => (

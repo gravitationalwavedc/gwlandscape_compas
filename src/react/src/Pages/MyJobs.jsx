@@ -1,4 +1,3 @@
-import React from 'react';
 import { Col, Container, Card, Button, Row } from 'react-bootstrap';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { createPaginationContainer, graphql } from 'react-relay';

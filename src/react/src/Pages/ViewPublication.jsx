@@ -1,4 +1,3 @@
-import React from 'react';
 import { graphql, createRefetchContainer } from 'react-relay';
 import { Formik } from 'formik';
 import { Row, Col, Container, Button } from 'react-bootstrap';

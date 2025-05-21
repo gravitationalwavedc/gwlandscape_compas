@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route } from 'found';
 import { graphql } from 'react-relay';
 import Loading from './Components/Loading';

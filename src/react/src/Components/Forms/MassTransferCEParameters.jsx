@@ -1,4 +1,3 @@
-import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Input from './Atoms/Input';
 import SelectInput from './Atoms/SelectInput';
@@ -14,7 +13,7 @@ const MassTransferCEParametersForm = () => {
     const showMassTransferFA = values['massTransferAccretionEfficiencyPrescription'] === 'FIXED';
 
     return (
-        <React.Fragment>
+        <>
             <Row>
                 <Col md={6}>
                     <SelectInput
@@ -49,7 +48,7 @@ const MassTransferCEParametersForm = () => {
                     />
                 </Col>
             </Row>
-        </React.Fragment>
+        </>
     );
 };
 

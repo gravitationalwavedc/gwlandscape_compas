@@ -1,4 +1,3 @@
-import React from 'react';
 import Link from 'found/Link';
 import { Card, Button } from 'react-bootstrap';
 

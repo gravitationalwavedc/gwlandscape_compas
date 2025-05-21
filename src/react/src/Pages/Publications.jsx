@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { Container, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { HiOutlineSearch } from 'react-icons/hi';

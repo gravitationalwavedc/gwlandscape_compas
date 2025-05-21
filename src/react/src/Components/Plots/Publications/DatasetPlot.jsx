@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     interpolateViridis,
     interpolateCividis,
@@ -33,7 +32,7 @@ const colourScales = {
 // Can't really help complexity in Recharts, because you can't really make reusable components
 // I could move all the logic to other functions, but it would
 // just clutter the code with heaps of effectively useless functions
-/* eslint-disable complexity */
+
 const DatasetPlot = ({
     histData,
     minMaxX,
