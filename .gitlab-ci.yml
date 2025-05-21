@@ -46,6 +46,14 @@ npm-tests:
     - npm run relay
     - npm run test-ci
 
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: src/react/coverage/cobertura-coverage.xml
+      junit: src/react/junit.xml
+
+
 eslint:
   script:
     - cd $WD/src/
@@ -53,14 +61,7 @@ eslint:
     - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
     - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
     - npm install --legacy-peer-deps
-    - npm run eslint
-
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: src/react/coverage/cobertura-coverage.xml
-      junit: src/react/junit.xml
+    - npm run lint
 
 
 code-quality:
