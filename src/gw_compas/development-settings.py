@@ -17,7 +17,7 @@ FILE_UPLOAD_TEMP_DIR = os.path.join(EXTERNAL_STORAGE_PATH, "upload")
 
 # On both login and logout, redirect to the frontend react app
 LOGIN_REDIRECT_URL = "http://localhost:3000/"
-LOGIN_REDIRECT_URL = "http://localhost:3000/"
+LOGOUT_REDIRECT_URL = "http://localhost:3000/"
 
 # adacs-sso settings
 ADACS_SSO_CLIENT_NAME = "gwlandscape_compas_dev"
