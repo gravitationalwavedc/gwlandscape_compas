@@ -19,3 +19,4 @@ h5py
 matplotlib
 pyjwt
 black
+git+https://gitlab.com/CAS-eResearch/internal/adacs-sso-plugin.git
