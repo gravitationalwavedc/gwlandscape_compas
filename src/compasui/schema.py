@@ -142,7 +142,7 @@ class CompasJobNode(
         try:
             # Get job details from the job controller git commit
             _, jc_jobs = request_job_filter(
-                info.context.user.user_id, ids=[parent.job_controller_id]
+                info.context.user.id, ids=[parent.job_controller_id]
             )
 
             status_number, status_name, status_date = derive_job_status(
@@ -159,11 +159,9 @@ class CompasJobNode(
 
     @login_required
     def resolve_user(parent, info):
-        success, users = request_lookup_users(
-            [parent.user_id], info.context.user.user_id
-        )
+        success, users = request_lookup_users([parent.id], info.context.user.id)
         if success and users:
-            return f"{users[0]['firstName']} {users[0]['lastName']}"
+            return users[0]["name"]
         return "Unknown User"
 
 

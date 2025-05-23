@@ -35,7 +35,7 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
     with transaction.atomic():
 
         compas_job = CompasJob(
-            user_id=user.user_id,
+            user_id=user.id,
             name=start.name,
             description=start.description,
             private=start.private,
@@ -53,7 +53,7 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
         # Create the jwt token
         jwt_enc = jwt.encode(
             {
-                "userId": user.user_id,
+                "userId": user.id,
                 "exp": datetime.datetime.now() + datetime.timedelta(days=30),
             },
             settings.JOB_CONTROLLER_JWT_SECRET,
@@ -99,7 +99,7 @@ def create_compas_job(user, start, basic_parameters, advanced_parameters):
 def update_compas_job(job_id, user, private=None, labels=None):
     compas_job = CompasJob.get_by_id(job_id, user)
 
-    if user.user_id == compas_job.user_id:
+    if user.id == compas_job.user_id:
         if labels is not None:
             compas_job.labels.set(Label.filter_by_name(labels))
 

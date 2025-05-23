@@ -4,7 +4,6 @@ graphene-file-upload
 pip-tools
 django-filter
 django-cors-headers
-django-graphql-jwt
 python-jwt
 requests
 django4-jenkins

@@ -17,7 +17,7 @@ def perform_db_search(user, kwargs):
     # Create the jwt token
     jwt_enc = jwt.encode(
         {
-            "userId": user.user_id,
+            "userId": user.id,
             "exp": datetime.datetime.now() + datetime.timedelta(days=30),
         },
         settings.DB_SEARCH_SERVICE_JWT_SECRET,

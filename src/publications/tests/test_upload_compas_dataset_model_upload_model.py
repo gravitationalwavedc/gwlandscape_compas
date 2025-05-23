@@ -10,7 +10,7 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
     def setUpTestData(cls):
         class TestUser:
             def __init__(self):
-                self.user_id = 1234
+                self.id = 1234
 
         cls.user = TestUser()
 
@@ -21,14 +21,14 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
         result = CompasDatasetModelUploadToken.create(self.user)
         after = timezone.now()
 
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
         self.assertTrue(before < result.created < after)
 
         self.assertEqual(CompasDatasetModelUploadToken.objects.count(), 1)
 
         result = CompasDatasetModelUploadToken.objects.last()
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
         self.assertTrue(before < result.created < after)
 
@@ -74,7 +74,7 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
 
         result = CompasDatasetModelUploadToken.get_by_token(token)
 
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
         self.assertTrue(before < result.created < after)
 
@@ -88,7 +88,7 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
 
         result = CompasDatasetModelUploadToken.get_by_token(token)
 
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
 
         # Set the object outside the expiry window
