@@ -1,10 +1,15 @@
 import { graphql } from 'react-relay';
 import { createFragmentContainer } from 'react-relay';
 import Menu from './Components/Menu';
+import Loading from './Components/Loading';
 
 import { UserContext } from './sessionUser';
 
 const Layout = ({ children, match, data }) => {
+  if (data === null) {
+    return <Loading />
+  }
+
   return (
     <UserContext.Provider value={data.sessionUser}>
       <header>
