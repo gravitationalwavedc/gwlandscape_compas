@@ -4,8 +4,6 @@ from pathlib import Path
 import matplotlib
 import logging
 
-# Configure logger
-logger = logging.getLogger(__name__)
 
 import django_filters
 import graphene
@@ -15,7 +13,6 @@ from graphene import relay
 from graphql import GraphQLError
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.types import DjangoObjectType
-from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
 
@@ -34,6 +31,10 @@ from .utils.auth.lookup_users import request_lookup_users
 from .utils.db_search.db_search import perform_db_search
 from .utils.get_compas_version import get_compas_version
 from .status import JobStatus
+from .utils.decorators import login_required
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 matplotlib.use("agg")
 from compas_python_utils.detailed_evolution_plotter.plot_to_json import (
@@ -159,7 +160,7 @@ class CompasJobNode(
 
     @login_required
     def resolve_user(parent, info):
-        success, users = request_lookup_users([parent.id], info.context.user.id)
+        success, users = request_lookup_users([parent.id])
         if success and users:
             return users[0]["name"]
         return "Unknown User"
