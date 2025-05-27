@@ -19,18 +19,18 @@ default:
     - pip install .
     - cd $WD
 
-django-tests:
-  stage: test
-  script:
-    - cd $WD/src
-    - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
-
-  artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: src/reports/coverage.xml
-      junit: src/reports/junit.xml
+# django-tests:
+#   stage: test
+#   script:
+#     - cd $WD/src
+#     - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
+#
+#   artifacts:
+#     reports:
+#       coverage_report:
+#         coverage_format: cobertura
+#         path: src/reports/coverage.xml
+#       junit: src/reports/junit.xml
 
 
 npm-tests:

@@ -8,8 +8,8 @@ const iconStyle = {
     margin: '-2px 2px 0 0',
 };
 
-const subMenu = (name) => {
-    if (name) {
+const subMenu = (name, isAuthenticated) => {
+    if (isAuthenticated) {
         return (
             <Nav>
                 <Nav.Link to="/" as={Link}>
@@ -25,22 +25,23 @@ const subMenu = (name) => {
                     Published Datasets
                 </Nav.Link>
                 <Nav.Link href="https://gwlandscape-python.readthedocs.io/en/latest/gettingstarted.html">API</Nav.Link>
-                <Nav.Link onClick={() => undefined}>Logout</Nav.Link>
+                <Nav.Link className="justify-content-end mr-3" href="/api-token">
+                    API Token
+                </Nav.Link>
+                <Nav.Link href={`${import.meta.env.VITE_BACKEND_URL}/sso/logout/`}>Logout</Nav.Link>
             </Nav>
         );
     }
 
     return (
         <Nav>
-            <Link to="/auth/" exact>
-                Login
-            </Link>
+            <a href={`${import.meta.env.VITE_BACKEND_URL}/sso/login/`}>Login</a>
         </Nav>
     );
 };
 
-const Menu = ({ name }) => {
-    const SubMenu = subMenu(name);
+const Menu = ({ name, isAuthenticated }) => {
+    const SubMenu = subMenu(name, isAuthenticated);
     return (
         <Navbar fixed="top" className="gwlandscape-menu">
             <Navbar.Brand className="mr-auto">

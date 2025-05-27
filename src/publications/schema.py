@@ -9,8 +9,8 @@ from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_file_upload.scalars import Upload
 from graphql import GraphQLError
-from graphql_jwt.decorators import login_required, user_passes_test
 from graphql_relay import from_global_id, to_global_id
+from compasui.utils.decorators import login_required, user_passes_test
 
 from publications.models import (
     Keyword,

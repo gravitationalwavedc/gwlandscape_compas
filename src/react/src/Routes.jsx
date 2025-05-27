@@ -1,7 +1,5 @@
 import { Route } from 'found';
 import { graphql } from 'react-relay';
-import Loading from './Components/Loading';
-import { RedirectException } from 'found';
 import NewSingleBinaryJob from './Pages/NewSingleBinaryJob';
 import Home from './Pages/Home';
 import Publications from './Pages/Publications';
@@ -11,29 +9,23 @@ import ViewPublication from './Pages/ViewPublication';
 import MyJobs from './Pages/MyJobs';
 import PublicJobs from './Pages/PublicJobs';
 import Layout from './Layout';
-
-// List of components that require authentication
-const PROTECTED_COMPONENTS = [ViewJob, NewJob, MyJobs];
-
-const handleRender = ({ Component, props }) => {
-    if (!Component || !props) return <Loading />;
-
-    // TODO : implement auth
-    const harnessApi = {
-        hasAuthToken: () => false,
-    };
-    // redirect to login page for authentication if a route is protected
-    if (!harnessApi.hasAuthToken() && PROTECTED_COMPONENTS.includes(Component))
-        throw new RedirectException('/auth/?next=' + props.match.location.pathname);
-
-    return <Component data={props} {...props} />;
-};
+import HandleRender from './HandleRender';
+import HandleLayoutRender from './HandleLayoutRender';
 
 function getRoutes() {
     return (
-        <Route path="/" Component={Layout} render={handleRender}>
-            <Route Component={Home} render={handleRender} />
-            <Route path="job-form" Component={NewJob} render={handleRender} />
+        <Route
+            path="/"
+            Component={Layout}
+            render={HandleLayoutRender}
+            query={graphql`
+                query Routes_Layout_Query {
+                    ...Layout_sessionUser
+                }
+            `}
+        >
+            <Route Component={Home} render={HandleRender} />
+            <Route path="job-form" Component={NewJob} render={HandleRender} />
 
             <Route
                 path="publications"
@@ -46,7 +38,7 @@ function getRoutes() {
                     count: 100,
                 })}
                 Component={Publications}
-                render={handleRender}
+                render={HandleRender}
             />
             <Route
                 path="single-binary-form"
@@ -56,7 +48,7 @@ function getRoutes() {
                         ...NewSingleBinaryJob_data
                     }
                 `}
-                render={handleRender}
+                render={HandleRender}
             />
             <Route
                 path="job-results/:jobId/"
@@ -69,7 +61,7 @@ function getRoutes() {
                 prepareVariables={(params) => ({
                     jobId: params.jobId,
                 })}
-                render={handleRender}
+                render={HandleRender}
             />
             <Route
                 path="publication/:publicationId/"
@@ -89,7 +81,7 @@ function getRoutes() {
                 prepareVariables={(params) => ({
                     publicationId: params.publicationId,
                 })}
-                render={handleRender}
+                render={HandleRender}
             />
             <Route
                 path="my-jobs"
@@ -101,10 +93,10 @@ function getRoutes() {
                 `}
                 prepareVariables={() => ({
                     count: 10,
-                    orderBy: '-lastUpdated',
+                    orderBY: '-lastUpdated',
                     // timeRange: 'all',
                 })}
-                render={handleRender}
+                render={HandleRender}
             />
             <Route
                 Component={PublicJobs}
@@ -118,7 +110,7 @@ function getRoutes() {
                     timeRange: 'all',
                     count: 10,
                 })}
-                render={handleRender}
+                render={HandleRender}
             />
         </Route>
     );

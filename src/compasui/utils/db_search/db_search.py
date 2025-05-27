@@ -14,17 +14,20 @@ def perform_db_search(user, kwargs):
     :param user_id: The id of the user making the request (Usually passed down from request context)
     """
 
+    # TODO reimplement
+    return True, []
+
     # Create the jwt token
     jwt_enc = jwt.encode(
         {
-            "userId": user.user_id,
+            "userId": user.id,
             "exp": datetime.datetime.now() + datetime.timedelta(days=30),
         },
         settings.DB_SEARCH_SERVICE_JWT_SECRET,
         algorithm="HS256",
     )
 
-    search_params = f"search: \"{kwargs.get('search', '')}\""
+    search_params = f'search: "{kwargs.get("search", "")}"'
     # Fetch one extra record to trigger "hasNextPage"
     search_params += f", count: {kwargs.get('first', 0) + 1}"
 

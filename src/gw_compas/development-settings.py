@@ -15,6 +15,14 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EXTERNAL_STORAGE_PATH = os.path.join(BASE_DIR, "files")
 FILE_UPLOAD_TEMP_DIR = os.path.join(EXTERNAL_STORAGE_PATH, "upload")
 
+# On both login and logout, redirect to the frontend react app
+LOGIN_REDIRECT_URL = "http://localhost:3000/"
+LOGOUT_REDIRECT_URL = "http://localhost:3000/"
+
+# adacs-sso settings
+ADACS_SSO_CLIENT_NAME = "gwlandscape_compas_dev"
+ADACS_SSO_AUTH_HOST = "http://localhost:8000"
+
 try:
     from .local import *
 except:

@@ -290,7 +290,7 @@ class CompasDatasetModelUploadToken(models.Model):
         cls.prune()
 
         # Next create and return a new token instance
-        return cls.objects.create(user_id=user.user_id)
+        return cls.objects.create(user_id=user.id)
 
     @classmethod
     def prune(cls):

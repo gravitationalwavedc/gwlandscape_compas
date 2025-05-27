@@ -24,13 +24,13 @@ class TestCompasJobModel(TestCase):
 
     def test_get_job_by_name_exists(self):
         mock_user = Mock()
-        mock_user.user_id = 1
+        mock_user.id = 1
         job = CompasJob.get_by_name(name=self.job.name, user=mock_user)
         self.assertIsNotNone(job)
 
     def test_get_job_by_name_not_found(self):
         mock_user = Mock()
-        mock_user.user_id = 1
+        mock_user.id = 1
         job = CompasJob.get_by_name(name="another name", user=mock_user)
         self.assertIsNone(job)
 

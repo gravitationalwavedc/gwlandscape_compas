@@ -1,40 +1,36 @@
-// import { graphql } from 'react-relay';
-// import { createFragmentContainer } from 'react-relay';
+import { graphql } from 'react-relay';
+import { createFragmentContainer } from 'react-relay';
 import Menu from './Components/Menu';
+import Loading from './Components/Loading';
 
-// regex list to match urls where the menu should be hidden.
-const noMenuURLs = [/\/auth\/(?!api-token).*/];
+import { UserContext } from './sessionUser';
 
-const Layout = ({ children, match }) => {
-    // TODO: Auth
-    // const name = "Frank Walker"
-    const name = '';
-    const showMenu = !noMenuURLs.some((regex) => regex.test(match.location.pathname));
+const Layout = ({ children, data }) => {
+    if (data === null) {
+        return <Loading />;
+    }
 
     return (
-        <>
-            {showMenu && (
-                <header>
-                    <Menu name={name} match={match} />
-                </header>
-            )}
-            <main className="h-100" style={showMenu ? { paddingTop: '64px' } : null}>
+        <UserContext.Provider value={data.sessionUser}>
+            <header>
+                <Menu name={data.sessionUser.name} isAuthenticated={data.sessionUser.isAuthenticated} />
+            </header>
+            <main className="h-100" style={{ paddingTop: '64px' }}>
                 {children}
             </main>
-        </>
+        </UserContext.Provider>
     );
 };
 
-export default Layout;
-
-// export default createFragmentContainer(Layout, {
-//   gwclouduser: graphql`
-//         fragment Layout_gwclouduser on UserDetails {
-//           userId
-//           username
-//           firstName
-//           lastName
-//           isLigoUser
-//         }
-//     `
-// });
+export default createFragmentContainer(Layout, {
+    data: graphql`
+        fragment Layout_sessionUser on Query {
+            sessionUser {
+                pk
+                name
+                authenticationMethod
+                isAuthenticated
+            }
+        }
+    `,
+});
