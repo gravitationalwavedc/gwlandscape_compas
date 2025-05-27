@@ -55,8 +55,8 @@ class TestCompasJobSchema(CompasTestCase):
 
         self.client.authenticate(self.user)
 
-        response = self.client.execute(
-            self.create_compas_job_mutation, self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
         expected = {
@@ -83,8 +83,8 @@ class TestCompasJobSchema(CompasTestCase):
 
         self.client.authenticate(self.user)
 
-        response = self.client.execute(
-            self.create_compas_job_mutation, self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
         self.assertIsNotNone(response.errors)
@@ -105,12 +105,12 @@ class TestCompasJobSchema(CompasTestCase):
 
         self.client.authenticate(self.user)
 
-        response = self.client.execute(
-            self.create_compas_job_mutation, self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
-        response = self.client.execute(
-            self.create_compas_job_mutation, self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
         self.assertNotEqual(None, response.errors)
@@ -147,7 +147,7 @@ class TestCompasJobSchema(CompasTestCase):
 
         create_token.return_value = [new_token]
 
-        response = self.client.execute(
+        response = self.query(
             f"""
             query{{
                 compasResultFiles(jobId: "{to_global_id("CompasJobNode", job.id)}") {{
@@ -209,8 +209,8 @@ class TestCompasJobSchema(CompasTestCase):
                 "downloadTokens": [str(new_token.token)],
             }
         }
-        response = self.client.execute(
-            generate_file_download_id_mutation, mutation_input
+        response = self.query(
+            generate_file_download_id_mutation, input_data=mutation_input["input"]
         )
 
         expected = {"generateFileDownloadIds": {"result": ["123456"]}}
@@ -222,8 +222,8 @@ class TestCompasJobSchema(CompasTestCase):
             "Error getting job file download url",
         )
 
-        response = self.client.execute(
-            generate_file_download_id_mutation, mutation_input
+        response = self.query(
+            generate_file_download_id_mutation, input_data=mutation_input["input"]
         )
         expected = {"generateFileDownloadIds": None}
         self.assertDictEqual(response.data, expected)
@@ -234,8 +234,8 @@ class TestCompasJobSchema(CompasTestCase):
         )
         new_token.save()
 
-        response = self.client.execute(
-            generate_file_download_id_mutation, mutation_input
+        response = self.query(
+            generate_file_download_id_mutation, input_data=mutation_input["input"]
         )
         expected = {"generateFileDownloadIds": None}
         self.assertDictEqual(response.data, expected)

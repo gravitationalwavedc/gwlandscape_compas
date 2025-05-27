@@ -34,8 +34,8 @@ class TestAddCompasModelSchema(CompasTestCase):
         self.null_output = {"addCompasModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.add_compas_model_mutation, self.compas_model_input
+        return self.query(
+            self.add_compas_model_mutation, input_data=self.compas_model_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -113,8 +113,8 @@ class TestDeleteCompasModelSchema(CompasTestCase):
         self.null_output = {"deleteCompasModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.delete_compas_model_mutation, self.compas_model_input
+        return self.query(
+            self.delete_compas_model_mutation, input_data=self.compas_model_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -213,8 +213,8 @@ class TestUpdateCompasModelSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(
-            self.update_compas_model_mutation, self.compas_model_input
+        return self.query(
+            self.update_compas_model_mutation, input_data=self.compas_model_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -323,7 +323,7 @@ class TestQueryCompasModelSchema(CompasTestCase):
         }
 
     def test_model_query_unauthenticated(self):
-        response = self.client.execute(self.model_query)
+        response = self.query(self.model_query)
 
         self.assertEqual(None, response.errors)
         self.assertDictEqual(self.expected_output, response.data)
@@ -331,7 +331,7 @@ class TestQueryCompasModelSchema(CompasTestCase):
     def test_model_query_authenticated(self):
         self.client.authenticate(self.user)
 
-        response = self.client.execute(self.model_query)
+        response = self.query(self.model_query)
 
         self.assertEqual(None, response.errors)
         self.assertDictEqual(self.expected_output, response.data)

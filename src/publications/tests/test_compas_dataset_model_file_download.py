@@ -47,7 +47,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
 
         self.model, self.publication = create_model_publication()
 
-        response = self.client.execute(
+        response = self.query(
             """
                 query {
                     generateCompasDatasetModelUploadToken {
@@ -76,7 +76,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
             }
         }
 
-        response = self.client.execute(
+        response = self.query(
             """
                 mutation UploadCompasDatasetModelMutation($input: UploadCompasDatasetModelMutationInput!) {
                     uploadCompasDatasetModel(input: $input) {
@@ -84,7 +84,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
                     }
                 }
             """,
-            self.test_input,
+            input_data=self.test_input["input"],
         )
 
         self.dataset_id = response.data["uploadCompasDatasetModel"]["id"]
@@ -104,7 +104,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
         self.http_client = Client()
 
     def generate_file_download_tokens(self):
-        response = self.client.execute(self.query, {"id": self.dataset_id})
+        response = self.query(self.query, input_data={"id": self.dataset_id})
         download_tokens = [
             f["downloadToken"] for f in response.data["compasDatasetModel"]["files"]
         ]

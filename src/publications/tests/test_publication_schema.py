@@ -85,8 +85,8 @@ class TestAddPublicationSchema(CompasTestCase):
         self.null_output = {"addPublication": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.add_publication_mutation, self.publication_input_required
+        return self.query(
+            self.add_publication_mutation, input_data=self.publication_input_required["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -109,8 +109,8 @@ class TestAddPublicationSchema(CompasTestCase):
     def test_add_full_publication_authenticated(self):
         self.client.authenticate(self.user)
 
-        response = self.client.execute(
-            self.add_publication_mutation, self.publication_input_full
+        response = self.query(
+            self.add_publication_mutation, input_data=self.publication_input_full["input"]
         )
 
         self.assertIsNone(response.errors)
@@ -199,8 +199,8 @@ class TestDeletePublicationSchema(CompasTestCase):
         self.null_output = {"deletePublication": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.delete_publication_mutation, self.publication_input
+        return self.query(
+            self.delete_publication_mutation, input_data=self.publication_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -327,8 +327,8 @@ class TestUpdatePublicationSchema(CompasTestCase):
         return vals
 
     def execute_query(self):
-        return self.client.execute(
-            self.update_publication_mutation, self.publication_input
+        return self.query(
+            self.update_publication_mutation, input_data=self.publication_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -481,7 +481,7 @@ class TestQueryPublicationSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.publication_query)
+        return self.query(self.publication_query)
 
     def test_publication_query_unauthenticated(self):
         response = self.execute_query()

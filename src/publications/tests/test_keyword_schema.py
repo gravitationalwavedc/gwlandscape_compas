@@ -27,7 +27,7 @@ class TestAddKeywordSchema(CompasTestCase):
         self.keyword_input = {"input": {"tag": "test"}}
 
     def execute_query(self):
-        return self.client.execute(self.add_keyword_mutation, self.keyword_input)
+        return self.query(self.add_keyword_mutation, input_data=self.keyword_input["input"])
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_authenticated(self):
@@ -128,7 +128,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.delete_keyword_mutation, self.keyword_input)
+        return self.query(self.delete_keyword_mutation, input_data=self.keyword_input["input"])
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_keyword_authenticated(self):
@@ -213,7 +213,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.update_keyword_mutation, self.keyword_input)
+        return self.query(self.update_keyword_mutation, input_data=self.keyword_input["input"])
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_keyword_authenticated(self):
@@ -303,7 +303,7 @@ class TestQueryKeywordSchema(CompasTestCase):
 
     @silence_errors
     def test_keyword_query_unauthenticated(self):
-        response = self.client.execute(self.keyword_query)
+        response = self.query(self.keyword_query)
 
         expected = {
             "keywords": {
@@ -322,7 +322,7 @@ class TestQueryKeywordSchema(CompasTestCase):
     def test_keyword_query_authenticated(self):
         self.client.authenticate(self.user)
 
-        response = self.client.execute(self.keyword_query)
+        response = self.query(self.keyword_query)
 
         expected = {
             "keywords": {

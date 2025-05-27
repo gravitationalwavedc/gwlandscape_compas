@@ -57,7 +57,7 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
         request_lookup_users.side_effect = self.request_lookup_users_mock
         job = CompasJob.objects.create(user_id=self.user.id)
         global_id = to_global_id("CompasJobNode", job.id)
-        response = self.client.execute(
+        response = self.query(
             f"""
             query {{
                 compasJob(id:"{global_id}"){{
@@ -97,7 +97,7 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
 
         # If it returns no user
         User.objects.first().delete()
-        response = self.client.execute(
+        response = self.query(
             f"""
             query {{
                 compasJob(id:"{global_id}"){{

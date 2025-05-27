@@ -107,7 +107,7 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
         self.null_output = {"generateCompasDatasetModelUploadToken": None}
 
     def execute_token_query(self):
-        return self.client.execute(
+        return self.query(
             self.generate_compas_dataset_model_upload_token_query
         )
 
@@ -120,8 +120,8 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
             "generateCompasDatasetModelUploadToken"
         ]["token"]
 
-        response = self.client.execute(
-            self.upload_compas_dataset_model_mutation, self.archive_input
+        response = self.query(
+            self.upload_compas_dataset_model_mutation, input_data=self.archive_input["input"]
         )
 
         self.assertIsNone(response.errors)
@@ -155,8 +155,8 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
             "generateCompasDatasetModelUploadToken"
         ]["token"]
 
-        response = self.client.execute(
-            self.upload_compas_dataset_model_mutation, self.single_input
+        response = self.query(
+            self.upload_compas_dataset_model_mutation, input_data=self.single_input["input"]
         )
 
         self.assertIsNone(response.errors)
@@ -218,8 +218,8 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
         # Verify that illegal tokens are not accepted
         self.single_input["input"]["uploadToken"] = str(uuid.uuid4())
 
-        response = self.client.execute(
-            self.upload_compas_dataset_model_mutation, self.single_input
+        response = self.query(
+            self.upload_compas_dataset_model_mutation, input_data=self.single_input["input"]
         )
 
         expected = {"uploadCompasDatasetModel": None}
@@ -269,8 +269,8 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
         self.null_output = {"deleteCompasDatasetModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.delete_compas_dataset_model_mutation, self.dataset_model_input
+        return self.query(
+            self.delete_compas_dataset_model_mutation, input_data=self.dataset_model_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -384,8 +384,8 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
         self.null_output = {"updateCompasDatasetModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.update_compas_dataset_model_mutation, self.dataset_model_input
+        return self.query(
+            self.update_compas_dataset_model_mutation, input_data=self.dataset_model_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -554,7 +554,7 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.dataset_model_query)
+        return self.query(self.dataset_model_query)
 
     def test_compas_dataset_model_query_unauthenticated(self):
         response = self.execute_query()
