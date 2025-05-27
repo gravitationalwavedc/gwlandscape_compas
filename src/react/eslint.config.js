@@ -38,7 +38,7 @@ export default defineConfig([
       // For now, leave this off
       // The update to react has caused a lot of previously passing
       // (and totally fine) code to start reporting errors.
-      'react/prop-types': 'warn',
+      'react/prop-types': 'off',
     },
   },
 ]);
