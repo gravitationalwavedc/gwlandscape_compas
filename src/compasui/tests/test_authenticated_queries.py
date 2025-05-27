@@ -9,10 +9,7 @@ User = get_user_model()
 
 class TestQueriesWithAuthenticatedUser(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-        self.client.authenticate(self.user)
+        self.authenticate()
 
     def perform_db_search_mock(*args, **kwargs):
         return True, [

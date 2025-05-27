@@ -12,10 +12,6 @@ User = get_user_model()
 
 class TestAddKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         self.add_keyword_mutation = """
             mutation AddKeywordMutation($input: AddKeywordMutationInput!) {
                 addKeyword(input: $input) {
@@ -31,7 +27,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -51,7 +47,7 @@ class TestAddKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_add_keyword_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -86,7 +82,7 @@ class TestAddKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_duplicate_tag(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.execute_query()
 
@@ -108,9 +104,6 @@ class TestAddKeywordSchema(CompasTestCase):
 
 class TestDeleteKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.kw = Keyword.create_keyword("test")
 
         self.delete_keyword_mutation = """
@@ -132,7 +125,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_keyword_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -146,7 +139,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_keyword_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -177,7 +170,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_keyword_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.keyword_input["input"]["id"] = to_global_id("Keyword", self.kw.id + 1)
 
@@ -195,9 +188,6 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
 class TestUpdateKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.kw = Keyword.create_keyword("test")
 
         self.update_keyword_mutation = """
@@ -217,7 +207,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_keyword_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -231,7 +221,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_update_keyword_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -262,7 +252,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_keyword_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.keyword_input["input"]["id"] = to_global_id("Keyword", self.kw.id + 1)
 
@@ -280,9 +270,6 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
 class TestQueryKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         Keyword.create_keyword("test")
         Keyword.create_keyword("test1")
         Keyword.create_keyword("test2")
@@ -320,7 +307,7 @@ class TestQueryKeywordSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
 
     def test_keyword_query_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.query(self.keyword_query)
 

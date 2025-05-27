@@ -15,10 +15,6 @@ User = get_user_model()
 
 class TestCompasJobSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="User1", first_name="first", last_name="last"
-        )
-
         self.create_compas_job_mutation = """
             mutation NewCompasJobMutation($input: CompasJobMutationInput!) {
                 newCompasJob(input: $input) {
@@ -53,7 +49,7 @@ class TestCompasJobSchema(CompasTestCase):
 
         request_mock.request.return_value = mock_response
 
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.query(
             self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
@@ -81,7 +77,7 @@ class TestCompasJobSchema(CompasTestCase):
 
         request_mock.request.side_effect = mock_response
 
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.query(
             self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
@@ -103,7 +99,7 @@ class TestCompasJobSchema(CompasTestCase):
 
         request_mock.request.return_value = mock_response
 
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.query(
             self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
@@ -119,7 +115,7 @@ class TestCompasJobSchema(CompasTestCase):
     @patch("compasui.models.request_file_list")
     @patch("compasui.schema.FileDownloadToken.create")
     def test_get_job_result_files(self, create_token, request_file_list):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         job = CompasJob.objects.create(
             user_id=self.user.id,
@@ -177,7 +173,7 @@ class TestCompasJobSchema(CompasTestCase):
 
     @patch("compasui.schema.request_file_download_id")
     def test_generate_file_download_id(self, request_file_download_id):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         job = CompasJob.objects.create(
             user_id=self.user.id,
