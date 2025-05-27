@@ -34,17 +34,16 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
         return True, 26
 
     def request_lookup_users_mock(*args, **kwargs):
-        user = User.objects.first()
-        if user:
-            return True, [
-                {
-                    "userId": user.id,
-                    "username": user.username,
-                    "firstName": user.first_name,
-                    "lastName": user.last_name,
-                }
-            ]
-        return False, []
+        return True, [
+            {
+                "userId": 1,
+                "username": "buffy_summers",
+                "name": "buffy summers",
+            }
+        ]
+
+    def request_lookup_users_mock_empty(*args, **kwargs):
+        return True, []
 
     @patch("compasui.schema.request_lookup_users")
     def test_compas_job_query(self, request_lookup_users):
@@ -92,8 +91,11 @@ class TestQueriesWithAuthenticatedUser(CompasTestCase):
             expected, response.data, "compasJob query returned unexpected data."
         )
 
-        # If it returns no user
-        User.objects.first().delete()
+    @patch("compasui.schema.request_lookup_users")
+    def test_compas_job_no_user(self, request_lookup_users):
+        request_lookup_users.side_effect = self.request_lookup_users_mock_empty
+        job = CompasJob.objects.create(user_id=self.user.id)
+        global_id = to_global_id("CompasJobNode", job.id)
         response = self.query(
             f"""
             query {{
