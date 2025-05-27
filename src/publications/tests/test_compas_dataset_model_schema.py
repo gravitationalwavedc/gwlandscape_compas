@@ -185,7 +185,7 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -202,7 +202,7 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -226,7 +226,7 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "Compas Dataset Model upload token is invalid or expired.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -302,7 +302,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -315,7 +315,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -334,7 +334,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasDatasetModel matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -413,7 +413,7 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -428,7 +428,7 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -449,7 +449,7 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasDatasetModel matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 

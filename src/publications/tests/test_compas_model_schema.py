@@ -62,7 +62,7 @@ class TestAddCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -76,7 +76,7 @@ class TestAddCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -132,7 +132,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -144,7 +144,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -161,7 +161,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
         response = self.execute_query()
 
         self.assertEqual(
-            "CompasModel matching query does not exist.", response.errors[0].message
+            "CompasModel matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -233,7 +233,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -248,7 +248,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -268,7 +268,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
         self.model.refresh_from_db()
 
         self.assertEqual(
-            "CompasModel matching query does not exist.", response.errors[0].message
+            "CompasModel matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(self.null_output, response.data)
 

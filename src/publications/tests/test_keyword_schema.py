@@ -55,7 +55,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -71,7 +71,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -93,7 +93,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "UNIQUE constraint failed: publications_keyword.tag",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -147,7 +147,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -161,7 +161,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -179,7 +179,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
         expected = {"deleteKeyword": None}
 
         self.assertEqual(
-            "Keyword matching query does not exist.", response.errors[0].message
+            "Keyword matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(expected, response.data)
 
@@ -229,7 +229,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -243,7 +243,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -261,7 +261,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
         expected = {"updateKeyword": None}
 
         self.assertEqual(
-            "Keyword matching query does not exist.", response.errors[0].message
+            "Keyword matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(expected, response.data)
 

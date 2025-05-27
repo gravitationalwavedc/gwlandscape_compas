@@ -139,7 +139,7 @@ class TestAddPublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -156,7 +156,7 @@ class TestAddPublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -215,7 +215,7 @@ class TestDeletePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -227,7 +227,7 @@ class TestDeletePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -245,7 +245,7 @@ class TestDeletePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasPublication matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -344,7 +344,7 @@ class TestUpdatePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -360,7 +360,7 @@ class TestUpdatePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -382,7 +382,7 @@ class TestUpdatePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasPublication matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
