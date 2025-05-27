@@ -107,7 +107,8 @@ class TestDeleteCompasModelSchema(CompasTestCase):
 
     def execute_query(self):
         return self.query(
-            self.delete_compas_model_mutation, input_data=self.compas_model_input["input"]
+            self.delete_compas_model_mutation,
+            input_data=self.compas_model_input["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -204,7 +205,8 @@ class TestUpdateCompasModelSchema(CompasTestCase):
 
     def execute_query(self):
         return self.query(
-            self.update_compas_model_mutation, input_data=self.compas_model_input["input"]
+            self.update_compas_model_mutation,
+            input_data=self.compas_model_input["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])

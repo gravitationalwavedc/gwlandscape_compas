@@ -23,7 +23,9 @@ class TestAddKeywordSchema(CompasTestCase):
         self.keyword_input = {"input": {"tag": "test"}}
 
     def execute_query(self):
-        return self.query(self.add_keyword_mutation, input_data=self.keyword_input["input"])
+        return self.query(
+            self.add_keyword_mutation, input_data=self.keyword_input["input"]
+        )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_authenticated(self):
@@ -121,7 +123,9 @@ class TestDeleteKeywordSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.query(self.delete_keyword_mutation, input_data=self.keyword_input["input"])
+        return self.query(
+            self.delete_keyword_mutation, input_data=self.keyword_input["input"]
+        )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_keyword_authenticated(self):
@@ -203,7 +207,9 @@ class TestUpdateKeywordSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.query(self.update_keyword_mutation, input_data=self.keyword_input["input"])
+        return self.query(
+            self.update_keyword_mutation, input_data=self.keyword_input["input"]
+        )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_keyword_authenticated(self):

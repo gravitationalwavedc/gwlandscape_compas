@@ -82,7 +82,8 @@ class TestAddPublicationSchema(CompasTestCase):
 
     def execute_query(self):
         return self.query(
-            self.add_publication_mutation, input_data=self.publication_input_required["input"]
+            self.add_publication_mutation,
+            input_data=self.publication_input_required["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
@@ -106,7 +107,8 @@ class TestAddPublicationSchema(CompasTestCase):
         self.authenticate()
 
         response = self.query(
-            self.add_publication_mutation, input_data=self.publication_input_full["input"]
+            self.add_publication_mutation,
+            input_data=self.publication_input_full["input"],
         )
 
         self.assertIsNone(response.errors)

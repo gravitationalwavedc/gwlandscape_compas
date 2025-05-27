@@ -72,7 +72,8 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         run_compas.delay().get.return_value = TASK_SUCCESS
 
         self.query(
-            self.create_single_binary_job_mutation, input_data=self.single_binary_job_input["input"]
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
         output_path = path.join(settings.COMPAS_IO_PATH, "1")
 
@@ -84,7 +85,8 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         run_compas.delay().get.return_value = TASK_FAIL
 
         response = self.query(
-            self.create_single_binary_job_mutation, input_data=self.single_binary_job_input["input"]
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
 
         self.assertRaises(Exception, "1")
@@ -92,7 +94,8 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
         run_compas.delay().get.return_value = TASK_TIMEOUT
         response = self.query(
-            self.create_single_binary_job_mutation, input_data=self.single_binary_job_input["input"]
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
         self.assertEqual(self.expected_failed, response.data)
 
@@ -113,7 +116,8 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         run_compas.delay().get.return_value = TASK_SUCCESS
 
         response = self.query(
-            self.create_single_binary_job_mutation, input_data=self.single_binary_job_input["input"]
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
 
         expected_success = {
