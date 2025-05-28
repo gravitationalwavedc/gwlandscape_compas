@@ -4,9 +4,10 @@ import NewJob from './Pages/NewJob';
 import ViewJob from './Pages/ViewJob';
 import MyJobs from './Pages/MyJobs';
 import { UserContext } from './sessionUser';
+import APIToken from './Pages/APIToken';
 
 // List of components that require authentication
-const PROTECTED_COMPONENTS = [ViewJob, NewJob, MyJobs];
+const PROTECTED_COMPONENTS = [ViewJob, NewJob, MyJobs, APIToken];
 
 const HandleRender = ({ Component, props, match }) => {
     const user = useContext(UserContext);

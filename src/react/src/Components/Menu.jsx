@@ -21,11 +21,14 @@ const subMenu = (name, isAuthenticated) => {
                 <Nav.Link to="/single-binary-form/" as={Link}>
                     Binary evolution
                 </Nav.Link>
+                <Nav.Link to="/job-form/" as={Link}>
+                    Simulate population
+                </Nav.Link>
                 <Nav.Link to="/publications/" as={Link}>
                     Published Datasets
                 </Nav.Link>
                 <Nav.Link href="https://gwlandscape-python.readthedocs.io/en/latest/gettingstarted.html">API</Nav.Link>
-                <Nav.Link className="justify-content-end mr-3" href="/api-token">
+                <Nav.Link to="/api-token" as={Link}>
                     API Token
                 </Nav.Link>
                 <Nav.Link href={`${import.meta.env.VITE_BACKEND_URL}/sso/logout/`}>Logout</Nav.Link>
@@ -34,9 +37,19 @@ const subMenu = (name, isAuthenticated) => {
     }
 
     return (
-        <Nav>
-            <a href={`${import.meta.env.VITE_BACKEND_URL}/sso/login/`}>Login</a>
-        </Nav>
+        <>
+            <Nav.Link to="/" as={Link}>
+                Home
+            </Nav.Link>
+            <Nav.Link to="/single-binary-form/" as={Link}>
+                Binary evolution
+            </Nav.Link>
+            <Nav.Link to="/publications/" as={Link}>
+                Published Datasets
+            </Nav.Link>
+            <Nav.Link href="https://gwlandscape-python.readthedocs.io/en/latest/gettingstarted.html">API</Nav.Link>
+            <Nav.Link href={`${import.meta.env.VITE_BACKEND_URL}/sso/login/`}>Login</Nav.Link>
+        </>
     );
 };
 

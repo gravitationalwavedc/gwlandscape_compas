@@ -11,6 +11,7 @@ import PublicJobs from './Pages/PublicJobs';
 import Layout from './Layout';
 import HandleRender from './HandleRender';
 import HandleLayoutRender from './HandleLayoutRender';
+import APIToken from './Pages/APIToken';
 
 function getRoutes() {
     return (
@@ -110,6 +111,16 @@ function getRoutes() {
                     timeRange: 'all',
                     count: 10,
                 })}
+                render={HandleRender}
+            />
+            <Route
+                Component={APIToken}
+                path="api-token"
+                query={graphql`
+                    query Routes_APIToken_Query {
+                        ...APIToken_data
+                    }
+                `}
                 render={HandleRender}
             />
         </Route>
