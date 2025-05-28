@@ -48,9 +48,7 @@ const subMenu = (name, isAuthenticated) => {
                 Published Datasets
             </Nav.Link>
             <Nav.Link href="https://gwlandscape-python.readthedocs.io/en/latest/gettingstarted.html">API</Nav.Link>
-            <Nav>
-                <a href={`${import.meta.env.VITE_BACKEND_URL}/sso/login/`}>Login</a>
-            </Nav>
+            <Nav.Link href={`${import.meta.env.VITE_BACKEND_URL}/sso/login/`}>Login</Nav.Link>
         </>
     );
 };
