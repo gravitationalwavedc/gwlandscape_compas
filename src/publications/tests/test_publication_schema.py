@@ -37,10 +37,6 @@ def create_publication(**kwargs):
 
 class TestAddPublicationSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         create_keywords()
         self.keyword_global_ids = [
             to_global_id("KeywordNode", _id)
@@ -85,13 +81,14 @@ class TestAddPublicationSchema(CompasTestCase):
         self.null_output = {"addPublication": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.add_publication_mutation, self.publication_input_required
+        return self.query(
+            self.add_publication_mutation,
+            input_data=self.publication_input_required["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_publication_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -107,10 +104,11 @@ class TestAddPublicationSchema(CompasTestCase):
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_full_publication_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
-        response = self.client.execute(
-            self.add_publication_mutation, self.publication_input_full
+        response = self.query(
+            self.add_publication_mutation,
+            input_data=self.publication_input_full["input"],
         )
 
         self.assertIsNone(response.errors)
@@ -137,13 +135,13 @@ class TestAddPublicationSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_add_publication_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -160,7 +158,7 @@ class TestAddPublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -174,10 +172,6 @@ class TestAddPublicationSchema(CompasTestCase):
 
 class TestDeletePublicationSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         self.delete_publication_mutation = """
             mutation DeletePublicationMutation($input: DeletePublicationMutationInput!) {
                 deletePublication(input: $input) {
@@ -199,13 +193,13 @@ class TestDeletePublicationSchema(CompasTestCase):
         self.null_output = {"deletePublication": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.delete_publication_mutation, self.publication_input
+        return self.query(
+            self.delete_publication_mutation, input_data=self.publication_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_publication_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -217,13 +211,13 @@ class TestDeletePublicationSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_publication_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -235,7 +229,7 @@ class TestDeletePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -244,7 +238,7 @@ class TestDeletePublicationSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_publication_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.publication_input["input"]["id"] = to_global_id(
             "CompasPublicationNode", self.publication.id + 1
@@ -253,7 +247,7 @@ class TestDeletePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasPublication matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -262,10 +256,6 @@ class TestDeletePublicationSchema(CompasTestCase):
 
 class TestUpdatePublicationSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         self.update_publication_mutation = """
             mutation UpdatePublicationMutation($input: UpdatePublicationMutationInput!) {
                 updatePublication(input: $input) {
@@ -327,13 +317,13 @@ class TestUpdatePublicationSchema(CompasTestCase):
         return vals
 
     def execute_query(self):
-        return self.client.execute(
-            self.update_publication_mutation, self.publication_input
+        return self.query(
+            self.update_publication_mutation, input_data=self.publication_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_publication_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
         self.publication.refresh_from_db()
@@ -349,14 +339,14 @@ class TestUpdatePublicationSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_update_publication_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
         self.publication.refresh_from_db()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -372,7 +362,7 @@ class TestUpdatePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -384,7 +374,7 @@ class TestUpdatePublicationSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_publication_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.publication_input["input"]["id"] = to_global_id(
             "CompasPublicationNode", self.publication.id + 1
@@ -394,7 +384,7 @@ class TestUpdatePublicationSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasPublication matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -406,10 +396,6 @@ class TestUpdatePublicationSchema(CompasTestCase):
 
 class TestQueryPublicationSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         self.publication_query = """
             query {
                 compasPublications {
@@ -481,7 +467,7 @@ class TestQueryPublicationSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.publication_query)
+        return self.query(self.publication_query)
 
     def test_publication_query_unauthenticated(self):
         response = self.execute_query()
@@ -490,7 +476,7 @@ class TestQueryPublicationSchema(CompasTestCase):
         self.assertDictEqual(self.expected_output, response.data)
 
     def test_publication_query_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -504,7 +490,7 @@ class TestQueryPublicationSchema(CompasTestCase):
         self.assertDictEqual(self.expected_output, response.data)
 
     def test_publication_query_filter_public_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -513,7 +499,7 @@ class TestQueryPublicationSchema(CompasTestCase):
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_publication_query_filter_public_authenticated_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 

@@ -12,10 +12,6 @@ User = get_user_model()
 
 class TestAddKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         self.add_keyword_mutation = """
             mutation AddKeywordMutation($input: AddKeywordMutationInput!) {
                 addKeyword(input: $input) {
@@ -27,11 +23,13 @@ class TestAddKeywordSchema(CompasTestCase):
         self.keyword_input = {"input": {"tag": "test"}}
 
     def execute_query(self):
-        return self.client.execute(self.add_keyword_mutation, self.keyword_input)
+        return self.query(
+            self.add_keyword_mutation, input_data=self.keyword_input["input"]
+        )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -51,7 +49,7 @@ class TestAddKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_add_keyword_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -59,7 +57,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -75,7 +73,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -86,7 +84,7 @@ class TestAddKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_keyword_duplicate_tag(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.execute_query()
 
@@ -97,7 +95,7 @@ class TestAddKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "UNIQUE constraint failed: publications_keyword.tag",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -108,9 +106,6 @@ class TestAddKeywordSchema(CompasTestCase):
 
 class TestDeleteKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.kw = Keyword.create_keyword("test")
 
         self.delete_keyword_mutation = """
@@ -128,11 +123,13 @@ class TestDeleteKeywordSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.delete_keyword_mutation, self.keyword_input)
+        return self.query(
+            self.delete_keyword_mutation, input_data=self.keyword_input["input"]
+        )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_keyword_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -146,7 +143,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_keyword_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -154,7 +151,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -168,7 +165,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -177,7 +174,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_keyword_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.keyword_input["input"]["id"] = to_global_id("Keyword", self.kw.id + 1)
 
@@ -186,7 +183,7 @@ class TestDeleteKeywordSchema(CompasTestCase):
         expected = {"deleteKeyword": None}
 
         self.assertEqual(
-            "Keyword matching query does not exist.", response.errors[0].message
+            "Keyword matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(expected, response.data)
 
@@ -195,9 +192,6 @@ class TestDeleteKeywordSchema(CompasTestCase):
 
 class TestUpdateKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.kw = Keyword.create_keyword("test")
 
         self.update_keyword_mutation = """
@@ -213,11 +207,13 @@ class TestUpdateKeywordSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.update_keyword_mutation, self.keyword_input)
+        return self.query(
+            self.update_keyword_mutation, input_data=self.keyword_input["input"]
+        )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_keyword_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -231,7 +227,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_update_keyword_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -239,7 +235,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -253,7 +249,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -262,7 +258,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_keyword_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.keyword_input["input"]["id"] = to_global_id("Keyword", self.kw.id + 1)
 
@@ -271,7 +267,7 @@ class TestUpdateKeywordSchema(CompasTestCase):
         expected = {"updateKeyword": None}
 
         self.assertEqual(
-            "Keyword matching query does not exist.", response.errors[0].message
+            "Keyword matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(expected, response.data)
 
@@ -280,9 +276,6 @@ class TestUpdateKeywordSchema(CompasTestCase):
 
 class TestQueryKeywordSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         Keyword.create_keyword("test")
         Keyword.create_keyword("test1")
         Keyword.create_keyword("test2")
@@ -303,7 +296,7 @@ class TestQueryKeywordSchema(CompasTestCase):
 
     @silence_errors
     def test_keyword_query_unauthenticated(self):
-        response = self.client.execute(self.keyword_query)
+        response = self.query(self.keyword_query)
 
         expected = {
             "keywords": {
@@ -320,9 +313,9 @@ class TestQueryKeywordSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
 
     def test_keyword_query_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
-        response = self.client.execute(self.keyword_query)
+        response = self.query(self.keyword_query)
 
         expected = {
             "keywords": {

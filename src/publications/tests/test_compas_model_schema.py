@@ -11,10 +11,6 @@ User = get_user_model()
 
 class TestAddCompasModelSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-
         self.add_compas_model_mutation = """
             mutation AddCompasModelMutation($input: AddCompasModelMutationInput!) {
                 addCompasModel(input: $input) {
@@ -34,13 +30,13 @@ class TestAddCompasModelSchema(CompasTestCase):
         self.null_output = {"addCompasModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.add_compas_model_mutation, self.compas_model_input
+        return self.query(
+            self.add_compas_model_mutation, input_data=self.compas_model_input["input"]
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_add_compas_model_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -60,13 +56,13 @@ class TestAddCompasModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_add_compas_model_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -80,7 +76,7 @@ class TestAddCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -91,9 +87,6 @@ class TestAddCompasModelSchema(CompasTestCase):
 
 class TestDeleteCompasModelSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.model = CompasModel.create_model("test", "summary", "description")
 
         self.delete_compas_model_mutation = """
@@ -113,13 +106,14 @@ class TestDeleteCompasModelSchema(CompasTestCase):
         self.null_output = {"deleteCompasModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.delete_compas_model_mutation, self.compas_model_input
+        return self.query(
+            self.delete_compas_model_mutation,
+            input_data=self.compas_model_input["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_compas_model_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -133,13 +127,13 @@ class TestDeleteCompasModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_compas_model_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -151,7 +145,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -160,7 +154,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_compas_model_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.compas_model_input["input"]["id"] = to_global_id(
             "CompasModelNode", self.model.id + 1
@@ -168,7 +162,7 @@ class TestDeleteCompasModelSchema(CompasTestCase):
         response = self.execute_query()
 
         self.assertEqual(
-            "CompasModel matching query does not exist.", response.errors[0].message
+            "CompasModel matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -177,9 +171,6 @@ class TestDeleteCompasModelSchema(CompasTestCase):
 
 class TestUpdateCompasModelSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.model = CompasModel.create_model("test", "summary", "description")
 
         self.update_compas_model_mutation = """
@@ -213,13 +204,14 @@ class TestUpdateCompasModelSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(
-            self.update_compas_model_mutation, self.compas_model_input
+        return self.query(
+            self.update_compas_model_mutation,
+            input_data=self.compas_model_input["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_compas_model_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
         self.model.refresh_from_db()
@@ -236,14 +228,14 @@ class TestUpdateCompasModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_update_compas_model_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
         self.model.refresh_from_db()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -258,7 +250,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -269,7 +261,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_compas_model_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.compas_model_input["input"]["id"] = to_global_id(
             "CompasModelNode", self.model.id + 1
@@ -278,7 +270,7 @@ class TestUpdateCompasModelSchema(CompasTestCase):
         self.model.refresh_from_db()
 
         self.assertEqual(
-            "CompasModel matching query does not exist.", response.errors[0].message
+            "CompasModel matching query does not exist.", response.errors[0]["message"]
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -289,9 +281,6 @@ class TestUpdateCompasModelSchema(CompasTestCase):
 
 class TestQueryCompasModelSchema(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
         self.model = CompasModel.create_model("test", "summary", "description")
 
         self.model_query = """
@@ -323,15 +312,15 @@ class TestQueryCompasModelSchema(CompasTestCase):
         }
 
     def test_model_query_unauthenticated(self):
-        response = self.client.execute(self.model_query)
+        response = self.query(self.model_query)
 
         self.assertEqual(None, response.errors)
         self.assertDictEqual(self.expected_output, response.data)
 
     def test_model_query_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
-        response = self.client.execute(self.model_query)
+        response = self.query(self.model_query)
 
         self.assertEqual(None, response.errors)
         self.assertDictEqual(self.expected_output, response.data)

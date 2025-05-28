@@ -40,14 +40,11 @@ def create_model_publication(i=1):
 )
 class TestUploadedJobFileDownload(CompasTestCase):
     def setUp(self):
-        self.user = User.objects.create(
-            username="buffy", first_name="buffy", last_name="summers"
-        )
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.model, self.publication = create_model_publication()
 
-        response = self.client.execute(
+        response = self.query(
             """
                 query {
                     generateCompasDatasetModelUploadToken {
@@ -66,17 +63,21 @@ class TestUploadedJobFileDownload(CompasTestCase):
                     "CompasPublication", self.publication.id
                 ),
                 "compasModel": to_global_id("CompasModel", self.model.id),
-                "jobFile": SimpleUploadedFile(
-                    name="test.tar.gz",
-                    content=open(
-                        "./publications/tests/test_data/test_job.tar.gz", "rb"
-                    ).read(),
-                    content_type="application/gzip",
-                ),
+                "jobFile": None,
             }
         }
 
-        response = self.client.execute(
+        self.test_file = {
+            "input.jobFile": SimpleUploadedFile(
+                name="test.tar.gz",
+                content=open(
+                    "./publications/tests/test_data/test_job.tar.gz", "rb"
+                ).read(),
+                content_type="application/gzip",
+            ),
+        }
+
+        response = self.file_query(
             """
                 mutation UploadCompasDatasetModelMutation($input: UploadCompasDatasetModelMutationInput!) {
                     uploadCompasDatasetModel(input: $input) {
@@ -84,12 +85,13 @@ class TestUploadedJobFileDownload(CompasTestCase):
                     }
                 }
             """,
-            self.test_input,
+            input_data=self.test_input["input"],
+            files=self.test_file,
         )
 
         self.dataset_id = response.data["uploadCompasDatasetModel"]["id"]
 
-        self.query = """
+        self.query_string = """
             query ($id: ID!){
                 compasDatasetModel (id: $id) {
                     files {
@@ -104,7 +106,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
         self.http_client = Client()
 
     def generate_file_download_tokens(self):
-        response = self.client.execute(self.query, {"id": self.dataset_id})
+        response = self.query(self.query_string, variables={"id": self.dataset_id})
         download_tokens = [
             f["downloadToken"] for f in response.data["compasDatasetModel"]["files"]
         ]
@@ -112,7 +114,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
 
     @silence_errors
     def test_no_token(self):
-        response = self.http_client.get(f'{reverse(viewname="file_download")}')
+        response = self.http_client.get(f"{reverse(viewname='file_download')}")
         self.assertEqual(response.status_code, 404)
 
     @silence_errors
@@ -122,12 +124,12 @@ class TestUploadedJobFileDownload(CompasTestCase):
         token = download_tokens[0] + "_not_real"
 
         response = self.http_client.get(
-            f'{reverse(viewname="file_download")}?fileId={token}'
+            f"{reverse(viewname='file_download')}?fileId={token}"
         )
         self.assertEqual(response.status_code, 404)
 
         response = self.http_client.get(
-            f'{reverse(viewname="file_download")}?fileId={uuid.uuid4()}'
+            f"{reverse(viewname='file_download')}?fileId={uuid.uuid4()}"
         )
         self.assertEqual(response.status_code, 404)
 
@@ -140,7 +142,7 @@ class TestUploadedJobFileDownload(CompasTestCase):
             path = Path(f["path"])
 
             response = self.http_client.get(
-                f'{reverse(viewname="file_download")}?fileId={token}'
+                f"{reverse(viewname='file_download')}?fileId={token}"
             )
             self.assertEqual(response.status_code, 200)
             self.assertEqual(

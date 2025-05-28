@@ -71,14 +71,17 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
                     "CompasPublication", self.publication.id
                 ),
                 "compasModel": to_global_id("CompasModel", self.model.id),
-                "jobFile": SimpleUploadedFile(
-                    name="test.tar.gz",
-                    content=open(
-                        "./publications/tests/test_data/test_job.tar.gz", "rb"
-                    ).read(),
-                    content_type="application/gzip",
-                ),
+                "jobFile": None,
             }
+        }
+        self.archive_file = {
+            "input.jobFile": SimpleUploadedFile(
+                name="test.tar.gz",
+                content=open(
+                    "./publications/tests/test_data/test_job.tar.gz", "rb"
+                ).read(),
+                content_type="application/gzip",
+            ),
         }
 
         self.single_input = {
@@ -87,15 +90,18 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
                     "CompasPublication", self.publication.id
                 ),
                 "compasModel": to_global_id("CompasModel", self.model.id),
-                "jobFile": SimpleUploadedFile(
-                    name="COMPAS_Output.h5",
-                    content=open(
-                        "./publications/tests/test_data/test_job/COMPAS_Output/COMPAS_Output.h5",
-                        "rb",
-                    ).read(),
-                    content_type="application/x-bag",
-                ),
+                "jobFile": None,
             }
+        }
+        self.single_file = {
+            "input.jobFile": SimpleUploadedFile(
+                name="COMPAS_Output.h5",
+                content=open(
+                    "./publications/tests/test_data/test_job/COMPAS_Output/COMPAS_Output.h5",
+                    "rb",
+                ).read(),
+                content_type="application/x-bag",
+            ),
         }
 
         self.expected_output = {
@@ -107,21 +113,21 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
         self.null_output = {"generateCompasDatasetModelUploadToken": None}
 
     def execute_token_query(self):
-        return self.client.execute(
-            self.generate_compas_dataset_model_upload_token_query
-        )
+        return self.query(self.generate_compas_dataset_model_upload_token_query)
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_upload_compas_dataset_model_authenticated_archive(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_token_query()
         self.archive_input["input"]["uploadToken"] = response.data[
             "generateCompasDatasetModelUploadToken"
         ]["token"]
 
-        response = self.client.execute(
-            self.upload_compas_dataset_model_mutation, self.archive_input
+        response = self.file_query(
+            self.upload_compas_dataset_model_mutation,
+            input_data=self.archive_input["input"],
+            files=self.archive_file,
         )
 
         self.assertIsNone(response.errors)
@@ -148,15 +154,17 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
     def test_upload_compas_dataset_model_authenticated_single(self):
         # Test that a user who is in PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS can create a dataset model for a single
         # file
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_token_query()
         self.single_input["input"]["uploadToken"] = response.data[
             "generateCompasDatasetModelUploadToken"
         ]["token"]
 
-        response = self.client.execute(
-            self.upload_compas_dataset_model_mutation, self.single_input
+        response = self.file_query(
+            self.upload_compas_dataset_model_mutation,
+            input_data=self.single_input["input"],
+            files=self.single_file,
         )
 
         self.assertIsNone(response.errors)
@@ -179,13 +187,13 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
     def test_upload_compas_dataset_model_authenticated_not_publication_manager(self):
         # Shouldn't be able to create a dataset model upload token if a user isn't in
         # PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_token_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -202,7 +210,7 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -218,15 +226,17 @@ class TestUploadCompasDatasetModelSchema(CompasTestCase):
         # Verify that illegal tokens are not accepted
         self.single_input["input"]["uploadToken"] = str(uuid.uuid4())
 
-        response = self.client.execute(
-            self.upload_compas_dataset_model_mutation, self.single_input
+        response = self.file_query(
+            self.upload_compas_dataset_model_mutation,
+            input_data=self.single_input["input"],
+            files=self.single_file,
         )
 
         expected = {"uploadCompasDatasetModel": None}
 
         self.assertEqual(
             "Compas Dataset Model upload token is invalid or expired.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(expected, response.data)
 
@@ -269,13 +279,14 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
         self.null_output = {"deleteCompasDatasetModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.delete_compas_dataset_model_mutation, self.dataset_model_input
+        return self.query(
+            self.delete_compas_dataset_model_mutation,
+            input_data=self.dataset_model_input["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_compas_dataset_model_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         file = self.dataset_model.upload_set.first().file.path
         self.assertTrue(pathlib.Path(file).exists())
@@ -296,13 +307,13 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_delete_compas_dataset_model_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -315,7 +326,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -325,7 +336,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_delete_compas_dataset_model_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.dataset_model_input["input"]["id"] = to_global_id(
             "CompasDatasetModelNode", self.dataset_model.id + 1
@@ -334,7 +345,7 @@ class TestDeleteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasDatasetModel matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -384,13 +395,14 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
         self.null_output = {"updateCompasDatasetModel": None}
 
     def execute_query(self):
-        return self.client.execute(
-            self.update_compas_dataset_model_mutation, self.dataset_model_input
+        return self.query(
+            self.update_compas_dataset_model_mutation,
+            input_data=self.dataset_model_input["input"],
         )
 
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_compas_dataset_model_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
@@ -407,13 +419,13 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[2])
     def test_update_compas_dataset_model_authenticated_not_publication_manager(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -428,7 +440,7 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "You do not have permission to perform this action",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -440,7 +452,7 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
     @silence_errors
     @override_settings(PERMITTED_PUBLICATION_MANAGEMENT_USER_IDS=[1])
     def test_update_compas_dataset_model_not_exists(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         self.dataset_model_input["input"]["id"] = to_global_id(
             "CompasDatasetModelNode", self.dataset_model.id + 1
@@ -449,7 +461,7 @@ class TestUpdateteCompasDatasetModelSchema(CompasTestCase):
 
         self.assertEqual(
             "CompasDatasetModel matching query does not exist.",
-            response.errors[0].message,
+            response.errors[0]["message"],
         )
         self.assertDictEqual(self.null_output, response.data)
 
@@ -554,7 +566,7 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
         }
 
     def execute_query(self):
-        return self.client.execute(self.dataset_model_query)
+        return self.query(self.dataset_model_query)
 
     def test_compas_dataset_model_query_unauthenticated(self):
         response = self.execute_query()
@@ -563,7 +575,7 @@ class TestQueryCompasDatasetModelSchema(CompasTestCase):
         self.assertDictEqual(self.expected_output, response.data)
 
     def test_compas_dataset_model_query_authenticated(self):
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         response = self.execute_query()
 

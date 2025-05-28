@@ -71,8 +71,9 @@ class TestSingleBinaryJobSchema(CompasTestCase):
     def test_celery_tasks_called(self, run_compas):
         run_compas.delay().get.return_value = TASK_SUCCESS
 
-        self.client.execute(
-            self.create_single_binary_job_mutation, self.single_binary_job_input
+        self.query(
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
         output_path = path.join(settings.COMPAS_IO_PATH, "1")
 
@@ -83,16 +84,18 @@ class TestSingleBinaryJobSchema(CompasTestCase):
     def test_new_single_binary_mutation_when_tasks_fail(self, run_compas):
         run_compas.delay().get.return_value = TASK_FAIL
 
-        response = self.client.execute(
-            self.create_single_binary_job_mutation, self.single_binary_job_input
+        response = self.query(
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
 
         self.assertRaises(Exception, "1")
         self.assertEqual(self.expected_failed, response.data)
 
         run_compas.delay().get.return_value = TASK_TIMEOUT
-        response = self.client.execute(
-            self.create_single_binary_job_mutation, self.single_binary_job_input
+        response = self.query(
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
         self.assertEqual(self.expected_failed, response.data)
 
@@ -112,8 +115,9 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         shutil.copy(self.test_detailed_output_file_path, output_file_path)
         run_compas.delay().get.return_value = TASK_SUCCESS
 
-        response = self.client.execute(
-            self.create_single_binary_job_mutation, self.single_binary_job_input
+        response = self.query(
+            self.create_single_binary_job_mutation,
+            input_data=self.single_binary_job_input["input"],
         )
 
         expected_success = {
