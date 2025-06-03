@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Row, Col, Button, Container, Table, Form, Alert } from 'react-bootstrap';
+import { Row, Col, Button, Container, Card, Form, Alert } from 'react-bootstrap';
 import { graphql, createFragmentContainer, commitMutation } from 'react-relay';
 import FormCard from '../Components/Forms/FormCard';
 import { CopyButton, CheckButton } from '../Components/CustomButtons';
@@ -38,6 +38,7 @@ const APIToken = ({ data }) => {
                     createApiToken(name: $name) {
                         id
                         token
+                        expiry
                     }
                 }
             `,
@@ -55,6 +56,8 @@ const APIToken = ({ data }) => {
                             token: response.createApiToken.token,
                             lastUsed: Date.now(),
                             name: name,
+                            expired: false,
+                            expiry: response.createApiToken.expiry,
                         },
                         ...tokens,
                     ]);
@@ -78,6 +81,7 @@ const APIToken = ({ data }) => {
                     <div className="alert alert-warning">
                         <strong>Warning:</strong> This is the only time this token will be visible.
                         <div className="align-items-center mt-2">
+                            <h5>{newlyCreatedToken.name}</h5>
                             <code className="mr-4">{newlyCreatedToken.token}</code>
                             <CopyButton
                                 variant="outline-secondary"
@@ -129,7 +133,7 @@ const APIToken = ({ data }) => {
         } else {
             // Show the Create Token button
             return (
-                <Button variant="primary" onClick={() => setIsCreatingToken(true)}>
+                <Button variant="primary" style={{ float: 'right' }} onClick={() => setIsCreatingToken(true)}>
                     Create Token
                 </Button>
             );
@@ -152,41 +156,49 @@ const APIToken = ({ data }) => {
                         </a>{' '}
                         to authenticate you, allowing you to view proprietary data and submit new jobs.
                     </p>
-                    <FormCard title="Tokens">
-                        {tokens.length ? (
-                            <Table>
-                                <thead>
-                                    <tr>
-                                        <th>Token</th>
-                                        <th>Last Used</th>
-                                        <th>Revoke</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {tokens.map((e) => (
-                                        <tr key={e.token}>
-                                            <td className="align-items-center">{e.name}</td>
-                                            <td>
-                                                {moment(e.lastUsed).format()} ({moment(e.lastUsed).fromNow()})
-                                            </td>
-                                            <td>
-                                                <CheckButton
-                                                    variant="text text-danger"
-                                                    content="Revoke"
-                                                    cancelContent="Revoke Token?"
-                                                    onClick={() => revoke(e.id)}
-                                                />
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        ) : (
-                            <p>You do not have any API tokens associated with your account.</p>
-                        )}
+                    {tokens.length ? (
+                        <Row xs={1}>
+                            {tokens.map((token) => (
+                                <Col key={token.id} className="mb-2">
+                                    <FormCard
+                                        className={`${token.expired ? 'border-warning gw-form-card' : 'gw-form-card'}`}
+                                    >
+                                        <Card.Body
+                                            className="d-flex align-items-center justify-content-between"
+                                            style={{ padding: 0 }}
+                                        >
+                                            <div>
+                                                <h5>{token.name}</h5>
+                                                <p style={{ marginBottom: 0 }}>
+                                                    Added on {moment(token.created).format('Do MMMM, YYYY')}
+                                                    <br />
+                                                    Last used {moment(token.lastUsed).fromNow()}
+                                                    <br />
+                                                    {token.expiry && token.expired ? (
+                                                        <span className="text-warning">
+                                                            Expired on {moment(token.expiry).format('Do MMMM, YYYY')}
+                                                        </span>
+                                                    ) : (
+                                                        `Expires on ${moment(token.expiry).format('Do MMMM, YYYY')}`
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <CheckButton
+                                                variant="outline-danger"
+                                                content="Revoke"
+                                                cancelContent="Revoke Token?"
+                                                onClick={() => revoke(token.id)}
+                                            />
+                                        </Card.Body>
+                                    </FormCard>
+                                </Col>
+                            ))}
+                        </Row>
+                    ) : (
+                        <p>You do not have any API tokens associated with your account.</p>
+                    )}
 
-                        {renderTokenActions()}
-                    </FormCard>
+                    {renderTokenActions()}
                 </Col>
             </Row>
         </Container>
@@ -199,6 +211,9 @@ export default createFragmentContainer(APIToken, {
                 id
                 name
                 lastUsed
+                created
+                expiry
+                expired
             }
         }
     `,
