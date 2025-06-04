@@ -39,25 +39,28 @@ const APIToken = ({ data }) => {
                         id
                         token
                         expiry
+                        shortcode
                     }
                 }
             `,
             variables: { name },
             onCompleted: (response) => {
                 if (response && response.createApiToken.token) {
+                    const { createApiToken: newToken } = response;
                     setNewlyCreatedToken({
-                        id: response.createApiToken.id,
-                        token: response.createApiToken.token,
+                        id: newToken.id,
+                        token: newToken.token,
                         name: name,
                     });
                     setTokens([
                         {
-                            id: response.createApiToken.id,
-                            token: response.createApiToken.token,
+                            id: newToken.id,
+                            token: newToken.token,
                             lastUsed: Date.now(),
                             name: name,
                             expired: false,
-                            expiry: response.createApiToken.expiry,
+                            expiry: newToken.expiry,
+                            shortcode: newToken.shortcode,
                         },
                         ...tokens,
                     ]);
@@ -170,6 +173,7 @@ const APIToken = ({ data }) => {
                                             <div>
                                                 <h5>{token.name}</h5>
                                                 <p style={{ marginBottom: 0 }}>
+                                                    <pre className="mb-0">{token.shortcode}...</pre>
                                                     Added on {moment(token.created).format('Do MMMM, YYYY')}
                                                     <br />
                                                     Last used {moment(token.lastUsed).fromNow()}
@@ -214,6 +218,7 @@ export default createFragmentContainer(APIToken, {
                 created
                 expiry
                 expired
+                shortcode
             }
         }
     `,
