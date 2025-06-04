@@ -155,9 +155,9 @@ const APIToken = ({ data }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                         >
-                            gwcloud-python
+                            gwlandscape-python
                         </a>{' '}
-                        to authenticate you, allowing you to view proprietary data and submit new jobs.
+                        to authenticate you, allowing you to submit jobs and upload publications.
                     </p>
                     {tokens.length ? (
                         <Row xs={1}>
