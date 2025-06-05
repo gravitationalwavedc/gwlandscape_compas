@@ -18,4 +18,5 @@ h5py
 matplotlib
 pyjwt
 black
+python-decouple
 git+https://gitlab.com/CAS-eResearch/internal/adacs-sso-plugin.git
