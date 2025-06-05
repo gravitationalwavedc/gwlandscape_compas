@@ -1,0 +1,41 @@
+services:
+  django:
+    build:
+      dockerfile: ./docker/gwlandscape_compas.Dockerfile
+      context: ..
+      target: django-runner
+    container_name: gwlandscape-compas-django
+    restart: unless-stopped
+    env_file: ../.env
+    ports: 
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  static:
+    build:
+        dockerfile: ./docker/gwlandscape_compas.Dockerfile
+        context: ..
+        target: static-runner
+    container_name: gwlandscape-compas-static
+    restart: unless-stopped
+    ports: 
+      - "8000:8000"
+    depends_on:
+      - django
+
+  db:
+    image: mysql:8.4.5
+    container_name: gwlandscape-compas-db
+    restart: unless-stopped
+    env_file: ../.env
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./db:/var/lib/mysql
+
