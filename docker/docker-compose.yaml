@@ -6,13 +6,17 @@ services:
       target: django-runner
     container_name: gwlandscape-compas-django
     restart: unless-stopped
-    env_file: ../.env
+    env_file: 
+      - ../.env
+      - ../.env.production
     ports: 
       - "8000"
     depends_on:
       db:
         condition: service_healthy
         restart: true
+    volumes:
+      - media_files:/files/
 
   static:
     build:
@@ -30,12 +34,51 @@ services:
     image: mysql:8.4.5
     container_name: gwlandscape-compas-db
     restart: unless-stopped
-    env_file: ../.env
+    env_file: 
+      - ../.env
+      - ../.env.production
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
       interval: 2s
       timeout: 20s
       retries: 10
     volumes:
-      - ./db:/var/lib/mysql
+      - var_lib_mysql:/var/lib/mysql
 
+  redis:
+    image: redis:latest
+    container_name: gwlandscape-compas-redis
+    ports:
+      - "6379"
+    restart: unless-stopped
+
+  celery:
+    build:
+        dockerfile: ./docker/gwlandscape_compas.Dockerfile
+        context: ..
+        target: celery-runner
+    container_name: gwlandscape-compas-celery
+    restart: always
+    env_file: 
+      - ../.env
+      - ../.env.production
+    volumes:
+      - media_files:/files/
+    depends_on:
+      - redis
+      - django
+
+volumes:
+  var_lib_mysql:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./data/mysql
+  media_files:
+    # Comment the following block if using this locally
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/oz324
+  

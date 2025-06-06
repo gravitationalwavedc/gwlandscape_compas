@@ -12,8 +12,8 @@ EMAIL_HOST = "mail.swin.edu.au"
 EMAIL_PORT = 25
 
 GWCLOUD_JOB_CONTROLLER_API_URL = "http://jobcontroller.adacs.org.au/job/apiv1"
-CELERY_BROKER_URL = "redis://gwlandscape-compas-redis:6379"
-CELERY_RESULT_BACKEND = "redis://gwlandscape-compas-redis:6379"
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
 
 # On both login and logout, redirect to the frontend react app
 LOGIN_REDIRECT_URL = "/"

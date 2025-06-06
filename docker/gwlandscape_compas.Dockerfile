@@ -4,6 +4,7 @@ ENV PYTHONUNBUFFERED 1
 
 ENV VIRTUAL_ENV /venv
 ENV COMPAS_ROOT_DIR /COMPAS
+ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # Update and install packages
 RUN apt-get update \
@@ -55,8 +56,6 @@ RUN apt-get remove --purge -y build-essential python3-dev \
 
 
 
-# Set the working directory and start script
-ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 
 FROM base AS django-runner
@@ -65,6 +64,7 @@ ENV DJANGO_SETTINGS_MODULE gw_compas.production-settings
 
 COPY --from=django-builder /src /src
 COPY --from=django-builder /venv /venv
+COPY --from=django-builder /COMPAS /COMPAS
 
 # Don't need any of the javascipt code now
 RUN rm -Rf /src/react
@@ -98,3 +98,29 @@ COPY --from=react-builder /react/dist /static
 COPY ./nginx/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 EXPOSE 8000
+
+FROM base AS celery-builder
+
+# Update the container and install the required packages
+WORKDIR /
+
+RUN apt-get install -y texlive-latex-extra cm-super dvipng
+RUN apt-get install -y git g++ libhdf5-serial-dev libboost-all-dev libgsl-dev zip
+RUN apt-get -y install python3-virtualenv default-libmysqlclient-dev python3-dev build-essential curl
+
+# Install and build COMPAS
+RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
+RUN cd /COMPAS/src && make -j`nproc` -f Makefile
+
+
+# Install src and venv (note this is done _after_ the lengthy COMPAS build process)
+COPY --from=django-builder /src /src
+COPY --from=django-builder /venv /venv
+
+
+FROM celery-builder AS celery-runner
+
+ENV DJANGO_SETTINGS_MODULE gw_compas.production-settings
+
+WORKDIR /src
+CMD ["celery", "-A", "gw_compas.celery", "worker", "-l", "INFO"]
