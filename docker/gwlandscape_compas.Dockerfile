@@ -8,22 +8,17 @@ ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # Update and install packages
 RUN apt-get update \
-  && apt-get install --no-install-recommends -y \
-  curl \
-  && apt-get clean \
-  && rm -rf /var/lib/apt-lists/* \
-  && apt-get autoremove --purge -y
+  &&  apt-get install --no-install-recommends -y \
+  curl git python3-dev build-essential python3-virtualenv default-libmysqlclient-dev
+
+# Clone COMPAS
+WORKDIR /
+RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
 
 
 FROM base AS django-builder
 
 WORKDIR /src
-
-# Install packages specific for the django-builder
-RUN apt-get update \
-  && apt-get install --no-install-recommends -y \
-  python3-virtualenv default-libmysqlclient-dev python3-dev build-essential curl
-
 
 # Create python virtualenv
 RUN virtualenv -p python3 /venv
@@ -33,8 +28,6 @@ COPY src/requirements.txt ./
 RUN ${VIRTUAL_ENV}/bin/pip install -r requirements.txt && ${VIRTUAL_ENV}/bin/pip install mysqlclient gunicorn
 
 # Install COMPAS
-WORKDIR /
-RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
 WORKDIR /COMPAS
 RUN ${VIRTUAL_ENV}/bin/pip install .
 
@@ -44,18 +37,16 @@ COPY src /src
 # Get rid of an already existing venv if it's there
 RUN rm -rf /src/venv
 
-WORKDIR /src
 # Generate graphql schema
+WORKDIR /src
 RUN ${VIRTUAL_ENV}/bin/python development-manage.py graphql_schema
 
 # Clean up unneeded packages and files
-RUN apt-get remove --purge -y build-essential python3-dev \
+RUN apt-get remove --purge -y \
+  curl git python3-dev build-essential python3-virtualenv default-libmysqlclient-dev \
   && apt-get clean \
   && rm -rf /var/lib/apt-lists/* \
   && apt-get autoremove --purge -y
-
-
-
 
 
 FROM base AS django-runner
@@ -75,7 +66,6 @@ RUN chmod +x /runserver.sh
 
 # Expose the port and set the run script
 EXPOSE 8000
-
 WORKDIR /src
 CMD [ "/runserver.sh" ]
 
@@ -99,19 +89,26 @@ COPY ./nginx/nginx.conf /etc/nginx/conf.d/nginx.conf
 
 EXPOSE 8000
 
+
 FROM base AS celery-builder
 
 # Update the container and install the required packages
-WORKDIR /
+WORKDIR /COMPAS/src
 
-RUN apt-get install -y texlive-latex-extra cm-super dvipng
-RUN apt-get install -y git g++ libhdf5-serial-dev libboost-all-dev libgsl-dev zip
-RUN apt-get -y install python3-virtualenv default-libmysqlclient-dev python3-dev build-essential curl
+RUN apt-get install --no-install-recommends -y \
+  texlive-latex-extra cm-super dvipng g++ libhdf5-serial-dev \
+  libboost-all-dev libgsl-dev zip
+#
+# Build COMPAS
+RUN make -j`nproc` -f Makefile
 
-# Install and build COMPAS
-RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
-RUN cd /COMPAS/src && make -j`nproc` -f Makefile
-
+# Clean up unneeded packages and files
+RUN apt-get remove --purge -y \
+  build-essential \
+  texlive-latex-extra cm-super dvipng g++ libhdf5-serial-dev zip \
+  && apt-get clean \
+  && rm -rf /var/lib/apt-lists/* \
+  && apt-get autoremove --purge -y
 
 # Install src and venv (note this is done _after_ the lengthy COMPAS build process)
 COPY --from=django-builder /src /src
