@@ -2,6 +2,8 @@ import traceback
 from _decimal import Decimal
 from pathlib import Path
 import matplotlib
+import logging
+
 
 import django_filters
 import graphene
@@ -11,12 +13,16 @@ from graphene import relay
 from graphql import GraphQLError
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.types import DjangoObjectType
-from graphql_jwt.decorators import login_required
 from graphql_relay.node.node import from_global_id, to_global_id
 
 
 from .models import CompasJob, Label, SingleBinaryJob, FileDownloadToken
-from .types import OutputStartType, JobStatusType, AbstractBasicParameterType, AbstractAdvancedParametersType
+from .types import (
+    OutputStartType,
+    JobStatusType,
+    AbstractBasicParameterType,
+    AbstractAdvancedParametersType,
+)
 from .views import create_compas_job, update_compas_job, create_single_binary_job
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
@@ -25,25 +31,31 @@ from .utils.auth.lookup_users import request_lookup_users
 from .utils.db_search.db_search import perform_db_search
 from .utils.get_compas_version import get_compas_version
 from .status import JobStatus
+from .utils.decorators import login_required
+
+# Configure logger
+logger = logging.getLogger(__name__)
 
 matplotlib.use("agg")
-from compas_python_utils.detailed_evolution_plotter.plot_to_json import get_plot_json  # noqa: E402
-
+from compas_python_utils.detailed_evolution_plotter.plot_to_json import (
+    get_plot_json,
+)  # noqa: E402
 
 
 def basic_parameter_resolvers(name):
     def func(parent, info):
         try:
             param = parent.basic_parameter.get(name=name)
-            if param.value in ['true', 'True']:
+            if param.value in ["true", "True"]:
                 return True
-            elif param.value in ['false', 'False']:
+            elif param.value in ["false", "False"]:
                 return False
             else:
                 return param.value
 
         except parent.basic_parameter.model.DoesNotExist:
             return None
+
     return func
 
 
@@ -51,15 +63,16 @@ def advanced_parameter_resolvers(name):
     def func(parent, info):
         try:
             param = parent.advanced_parameter.get(name=name)
-            if param.value in ['true', 'True']:
+            if param.value in ["true", "True"]:
                 return True
-            elif param.value in ['false', 'False']:
+            elif param.value in ["false", "False"]:
                 return False
             else:
                 return param.value
 
         except parent.advanced_parameter.model.DoesNotExist:
             return None
+
     return func
 
 
@@ -67,7 +80,11 @@ def advanced_parameter_resolvers(name):
 # Specifically used here to get values from the parameter models
 def populate_fields(object_to_modify, field_list, resolver_func):
     for name in field_list:
-        setattr(object_to_modify, 'resolve_{}'.format(name), staticmethod(resolver_func(name)))
+        setattr(
+            object_to_modify,
+            "resolve_{}".format(name),
+            staticmethod(resolver_func(name)),
+        )
 
 
 class LabelType(DjangoObjectType):
@@ -79,21 +96,25 @@ class LabelType(DjangoObjectType):
 class UserCompasJobFilter(FilterSet):
     class Meta:
         model = CompasJob
-        fields = '__all__'
+        fields = "__all__"
 
     order_by = OrderingFilter(
         fields=(
-            ('last_updated', 'last_updated'),
-            ('name', 'name'),
+            ("last_updated", "last_updated"),
+            ("name", "name"),
         )
     )
 
     @property
     def qs(self):
-        return CompasJob.user_compas_job_filter(super(UserCompasJobFilter, self).qs, self)
+        return CompasJob.user_compas_job_filter(
+            super(UserCompasJobFilter, self).qs, self
+        )
 
 
-class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvancedParametersType):
+class CompasJobNode(
+    DjangoObjectType, AbstractBasicParameterType, AbstractAdvancedParametersType
+):
     class Meta:
         model = CompasJob
         convert_choices_to_enum = False
@@ -122,29 +143,26 @@ class CompasJobNode(DjangoObjectType, AbstractBasicParameterType, AbstractAdvanc
         try:
             # Get job details from the job controller git commit
             _, jc_jobs = request_job_filter(
-                info.context.user.user_id,
-                ids=[parent.job_controller_id]
+                info.context.user.id, ids=[parent.job_controller_id]
             )
 
-            status_number, status_name, status_date = derive_job_status(jc_jobs[0]["history"])
+            status_number, status_name, status_date = derive_job_status(
+                jc_jobs[0]["history"]
+            )
 
             return {
                 "name": status_name,
                 "number": status_number,
-                "date": status_date.strftime("%Y-%m-%d %H:%M:%S UTC")
+                "date": status_date.strftime("%Y-%m-%d %H:%M:%S UTC"),
             }
         except Exception:
-            return {
-                "name": "Unknown",
-                "number": 0,
-                "data": "Unknown"
-            }
+            return {"name": "Unknown", "number": 0, "data": "Unknown"}
 
     @login_required
     def resolve_user(parent, info):
-        success, users = request_lookup_users([parent.user_id], info.context.user.user_id)
+        success, users = request_lookup_users([parent.id])
         if success and users:
-            return f"{users[0]['firstName']} {users[0]['lastName']}"
+            return users[0]["name"]
         return "Unknown User"
 
 
@@ -169,11 +187,12 @@ populate_fields(
         "max_orbital_period",
         "detailed_output",
     ],
-    basic_parameter_resolvers
+    basic_parameter_resolvers,
 )
 
 populate_fields(
-    CompasJobNode, [
+    CompasJobNode,
+    [
         "mass_transfer_angular_momentum_loss_prescription",
         "mass_transfer_accretion_efficiency_prescription",
         "mass_transfer_fa",
@@ -183,25 +202,26 @@ populate_fields(
         "fryer_supernova_engine",
         "kick_velocity_distribution",
         "velocity_1",
-        "velocity_2"
+        "velocity_2",
     ],
-    advanced_parameter_resolvers
+    advanced_parameter_resolvers,
 )
 
 
 class SingleBinaryJobFilter(django_filters.FilterSet):
     class Meta:
         model = SingleBinaryJob
-        fields = '__all__'
+        fields = "__all__"
 
 
 class SingleBinaryJobNode(DjangoObjectType):
     """
     Type for Single Binary Jobs without authentication
     """
+
     class Meta:
         model = SingleBinaryJob
-        fields = '__all__'
+        fields = "__all__"
         interfaces = (relay.Node,)
 
 
@@ -213,9 +233,6 @@ class CompasResultFile(graphene.ObjectType):
 
 
 class CompasResultFiles(graphene.ObjectType):
-    class Meta:
-        interfaces = (relay.Node,)
-
     class Input:
         job_id = graphene.ID()
 
@@ -239,15 +256,20 @@ class CompasPublicJobConnection(relay.Connection):
 class Query(object):
     compas_version = graphene.String()
     compas_job = relay.Node.Field(CompasJobNode)
-    compas_jobs = DjangoFilterConnectionField(CompasJobNode, filterset_class=UserCompasJobFilter)
-    compas_result_files = graphene.Field(CompasResultFiles, job_id=graphene.ID(required=True))
+    compas_jobs = DjangoFilterConnectionField(
+        CompasJobNode, filterset_class=UserCompasJobFilter
+    )
+    compas_result_files = graphene.Field(
+        CompasResultFiles, job_id=graphene.ID(required=True)
+    )
     public_compas_jobs = relay.ConnectionField(
-        CompasPublicJobConnection,
-        search=graphene.String()
+        CompasPublicJobConnection, search=graphene.String()
     )
 
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
-    single_binary_jobs = DjangoFilterConnectionField(SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter)
+    single_binary_jobs = DjangoFilterConnectionField(
+        SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter
+    )
 
     def resolve_compas_version(self, info, **kwargs):
         return get_compas_version()
@@ -266,16 +288,16 @@ class Query(object):
         if not success:
             raise Exception("Error getting file list. " + str(files))
 
-        paths = [f['path'] for f in filter(lambda x: not x['isDir'], files)]
+        paths = [f["path"] for f in filter(lambda x: not x["isDir"], files)]
         tokens = FileDownloadToken.create(job, paths)
 
         token_dict = {tok.path: tok.token for tok in tokens}
         result = [
             CompasResultFile(
-                path=f['path'],
-                is_dir=f['isDir'],
-                file_size=Decimal(f['fileSize']),
-                download_token=token_dict.get(f['path'], None)
+                path=f["path"],
+                is_dir=f["isDir"],
+                file_size=Decimal(f["fileSize"]),
+                download_token=token_dict.get(f["path"], None),
             )
             for f in files
         ]
@@ -283,7 +305,6 @@ class Query(object):
 
     @login_required
     def resolve_public_compas_jobs(self, info, **kwargs):
-
         success, jobs = perform_db_search(info.context.user, kwargs)
         if not success:
             return []
@@ -292,15 +313,15 @@ class Query(object):
         for job in jobs:
             CompasPublicJobNode(
                 user=f"{job['user']['firstName']} {job['user']['lastName']}",
-                name=job['job']['name'],
-                description=job['job']['description'],
+                name=job["job"]["name"],
+                description=job["job"]["description"],
                 job_status=JobStatusType(
-                    name=JobStatus.display_name(job['history'][0]['state']),
-                    number=job['history'][0]['state'],
-                    date=job['history'][0]['timestamp']
+                    name=JobStatus.display_name(job["history"][0]["state"]),
+                    number=job["history"][0]["state"],
+                    date=job["history"][0]["timestamp"],
                 ),
-                timestamp=job['history'][0]['timestamp'],
-                id=to_global_id("CompasJobNode", job['job']['id'])
+                timestamp=job["history"][0]["timestamp"],
+                id=to_global_id("CompasJobNode", job["job"]["id"]),
             )
 
         return result
@@ -329,7 +350,7 @@ class BasicParametersInput(graphene.InputObjectType):
     semi_major_axis_distribution = graphene.String()
     min_orbital_period = graphene.String()
     max_orbital_period = graphene.String()
-    detailed_output = graphene.String()
+    detailed_output = graphene.Boolean()
 
 
 class AdvancedParametersInput(graphene.InputObjectType):
@@ -365,24 +386,26 @@ class CompasJobMutation(relay.ClientIDMutation):
 
     @classmethod
     @login_required
-    def mutate_and_get_payload(cls, root, info, start, basic_parameters, advanced_parameters):
+    def mutate_and_get_payload(
+        cls, root, info, start, basic_parameters, advanced_parameters
+    ):
         # Check job name is already used
         existing_job = CompasJob.get_by_name(info.context.user, start.name)
         if existing_job is not None:
             err_msg = "Job name is already in use!"
-            print(err_msg)
+            logger.error(err_msg)
             raise Exception(err_msg)
 
         # Create the compas job
-        compas_job = create_compas_job(info.context.user, start, basic_parameters, advanced_parameters)
+        compas_job = create_compas_job(
+            info.context.user, start, basic_parameters, advanced_parameters
+        )
 
         # Convert the compas job id to a global id
         job_id = to_global_id("CompasJobNode", compas_job.id)
 
         # Return the compas job id to the client
-        return CompasJobMutation(
-            result=CompasJobCreationResult(job_id=job_id)
-        )
+        return CompasJobMutation(result=CompasJobCreationResult(job_id=job_id))
 
 
 class UpdateCompasJobMutation(relay.ClientIDMutation):
@@ -398,18 +421,19 @@ class UpdateCompasJobMutation(relay.ClientIDMutation):
         job_id = kwargs.pop("job_id")
 
         # Update privacy of compas job
-        message = update_compas_job(from_global_id(job_id)[1], info.context.user, **kwargs)
+        message = update_compas_job(
+            from_global_id(job_id)[1], info.context.user, **kwargs
+        )
 
         # Return the compas job id to the client
-        return UpdateCompasJobMutation(
-            result=message
-        )
+        return UpdateCompasJobMutation(result=message)
 
 
 class GenerateFileDownloadIds(relay.ClientIDMutation):
     """
     Copied from GWLab
     """
+
     class Input:
         job_id = graphene.ID(required=True)
         download_tokens = graphene.List(graphene.String, required=True)
@@ -446,7 +470,6 @@ class UniqueNameMutation(relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, name):
-
         return UniqueNameMutation(result=name)
 
 
@@ -486,37 +509,44 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 orbital_period=input.get("orbital_period"),
                 velocity_1=input.get("velocity_1"),
                 velocity_2=input.get("velocity_2"),
-                common_envelope_alpha=input.get('common_envelope_alpha'),
-                common_envelope_lambda_prescription=input.get('common_envelope_lambda_prescription'),
-                remnant_mass_prescription=input.get('remnant_mass_prescription'),
-                fryer_supernova_engine=input.get('fryer_supernova_engine'),
-                kick_velocity_distribution=input.get('kick_velocity_distribution'),
+                common_envelope_alpha=input.get("common_envelope_alpha"),
+                common_envelope_lambda_prescription=input.get(
+                    "common_envelope_lambda_prescription"
+                ),
+                remnant_mass_prescription=input.get("remnant_mass_prescription"),
+                fryer_supernova_engine=input.get("fryer_supernova_engine"),
+                kick_velocity_distribution=input.get("kick_velocity_distribution"),
                 mass_transfer_angular_momentum_loss_prescription=input.get(
-                    'mass_transfer_angular_momentum_loss_prescription'),
+                    "mass_transfer_angular_momentum_loss_prescription"
+                ),
                 mass_transfer_accretion_efficiency_prescription=input.get(
-                    'mass_transfer_accretion_efficiency_prescription'),
-                mass_transfer_fa=input.get('mass_transfer_fa')
+                    "mass_transfer_accretion_efficiency_prescription"
+                ),
+                mass_transfer_fa=input.get("mass_transfer_fa"),
             )
 
-            detailed_output_file_path = \
-                Path(settings.COMPAS_IO_PATH) / str(job.id) / 'COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
+            detailed_output_file_path = (
+                Path(settings.COMPAS_IO_PATH)
+                / str(job.id)
+                / "COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
+            )
             json_data = get_plot_json(str(detailed_output_file_path))
 
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
                     job_id=job.id,
                     json_data=json_data,
-                    detailed_output_file_path=f'{settings.MEDIA_URL}jobs/{job.id}'
-                                              f'/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5'
-
+                    detailed_output_file_path=f"{settings.MEDIA_URL}jobs/{job.id}"
+                    f"/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5",
                 )
             )
-        except Exception:
-            traceback.print_exc()
-            print("COMPAS job didn't run successfully")
+        except Exception as e:
+            logger.error("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
-                    job_id='', json_data='', detailed_output_file_path=''))
+                    job_id="", json_data="", detailed_output_file_path=""
+                )
+            )
 
 
 class Mutation(graphene.ObjectType):

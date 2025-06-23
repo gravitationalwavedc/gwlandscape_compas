@@ -6,7 +6,6 @@ import PublicationList from '../PublicationList';
 
 describe('publications Page', () => {
     const publications = [
-
         {
             id: '1',
             author: 'Buffy Summers',
@@ -15,17 +14,17 @@ describe('publications Page', () => {
             keywords: {
                 edges: [
                     {
-                        node: {tag: 'Keyword1'}
-                    }
-                ]
+                        node: { tag: 'Keyword1' },
+                    },
+                ],
             },
             datasetModels: {
                 edges: [
                     {
-                        node: {id: 'test-id'}
-                    }
-                ]
-            }
+                        node: { id: 'test-id' },
+                    },
+                ],
+            },
         },
         {
             id: '2',
@@ -35,29 +34,29 @@ describe('publications Page', () => {
             keywords: {
                 edges: [
                     {
-                        node: {tag: 'Keyword2'}
-                    }
-                ]
+                        node: { tag: 'Keyword2' },
+                    },
+                ],
             },
             datasetModels: {
                 edges: [
                     {
-                        node: {id: 'test-id'}
-                    }
-                ]
-            }
-        }
+                        node: { id: 'test-id' },
+                    },
+                ],
+            },
+        },
     ];
 
     it('renders', async () => {
         expect.hasAssertions();
-        render(<PublicationList publications={publications} match={{}} router={router}/>);
+        render(<PublicationList publications={publications} match={{}} router={router} />);
         expect(screen.getByText(publications[0].title)).toBeInTheDocument();
         expect(screen.getByText(publications[1].title)).toBeInTheDocument();
     });
     it('renders message if no publications', async () => {
         expect.hasAssertions();
-        render(<PublicationList publications={[]}/>);
+        render(<PublicationList publications={[]} />);
         expect(screen.getByText('No publications have been uploaded.')).toBeInTheDocument();
     });
 });

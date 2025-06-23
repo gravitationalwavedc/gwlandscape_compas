@@ -17,3 +17,5 @@ files/*
 .run/
 .env.production
 data/
+.tmuxinator.yml
+src/react.bk/*

@@ -1,0 +1,90 @@
+@import url('https://use.typekit.net/tjm1oak.css');
+
+$font-sabon: 'linotype-sabon', 'san-serif';
+$font-gothic: 'itc-avant-garde-gothic-pro', 'sans-serif';
+
+html {
+    font-size: 18px;
+}
+
+#root {
+    h1,
+    .h1,
+    .headline {
+        font-family: $font-gothic;
+        font-size: 3.5em;
+        font-weight: 500;
+    }
+
+    h3,
+    .h3 {
+        font-family: $font-gothic;
+        font-weight: 500;
+        font-size: 2.2em;
+    }
+
+    h5,
+    .h5,
+    .heading {
+        font-family: $font-gothic;
+        font-size: 1.1em;
+        font-weight: 700;
+    }
+
+    h6,
+    .h6,
+    .byline {
+        font-family: $font-sabon;
+        font-size: 0.9em;
+        font-weight: 400;
+    }
+
+    small.form-text {
+        font-family: $font-sabon;
+        font-size: 0.7em;
+        font-weight: 400;
+    }
+
+    p.card-text,
+    .tags {
+        font-family: $font-sabon;
+        font-size: 0.9em;
+        font-weight: 700;
+        font-style: italic;
+    }
+
+    p {
+        font-family: $font-sabon;
+        font-size: 1em;
+        font-weight: 500;
+    }
+
+    .navbar-nav .nav-link {
+        font-family: $font-gothic;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 0.8em;
+    }
+
+    button,
+    select,
+    a,
+    .btn,
+    .btn-primary {
+        font-family: $font-gothic;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 0.8em;
+    }
+
+    input {
+        font-family: $font-gothic;
+        font-size: 0.8em;
+    }
+
+    label {
+        font-family: $font-sabon;
+        font-weight: 400;
+        font-size: 1em;
+    }
+}

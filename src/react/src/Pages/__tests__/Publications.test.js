@@ -18,7 +18,7 @@ describe('publications Page', () => {
             `}
             render={({ error, props }) => {
                 if (props) {
-                    return <Publications data={props} match={{}} router={router}/>;
+                    return <Publications data={props} match={{}} router={router} />;
                 } else if (error) {
                     return error.message;
                 }
@@ -41,12 +41,12 @@ describe('publications Page', () => {
                                 edges: [
                                     {
                                         node: {
-                                            tag: 'keyword1'
-                                        }
-                                    }
-                                ]
-                            }
-                        }
+                                            tag: 'keyword1',
+                                        },
+                                    },
+                                ],
+                            },
+                        },
                     },
                     {
                         node: {
@@ -58,24 +58,26 @@ describe('publications Page', () => {
                                 edges: [
                                     {
                                         node: {
-                                            tag: 'keyword2'
-                                        }
-                                    }
-                                ]
-                            }
-                        }
+                                            tag: 'keyword2',
+                                        },
+                                    },
+                                ],
+                            },
+                        },
                     },
-                ]
+                ],
             };
-        }
+        },
     };
 
     it('renders', async () => {
         expect.hasAssertions();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation => 
-            MockPayloadGenerator.generate(operation, mockReturn)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockReturn),
+            ),
+        );
         expect(screen.getByText('Published Datasets')).toBeInTheDocument();
         expect(screen.getByText('TestPublication1')).toBeInTheDocument();
         expect(screen.getByText('TestPublication2')).toBeInTheDocument();
@@ -85,14 +87,16 @@ describe('publications Page', () => {
         expect.hasAssertions();
         const user = userEvent.setup();
         render(<TestRenderer />);
-        await waitFor(() => environment.mock.resolveMostRecentOperation(operation => 
-            MockPayloadGenerator.generate(operation, mockReturn)
-        ));
+        await waitFor(() =>
+            environment.mock.resolveMostRecentOperation((operation) =>
+                MockPayloadGenerator.generate(operation, mockReturn),
+            ),
+        );
         const search = screen.getByPlaceholderText(/Search/);
         await waitFor(() => user.type(search, 'buffy'));
         expect(screen.getByText('TestPublication1')).toBeInTheDocument();
         expect(screen.queryByText('TestPublication2')).not.toBeInTheDocument();
-        
+
         // Restores list if search bar is cleared
         await waitFor(() => user.clear(search));
         expect(screen.getByText('TestPublication1')).toBeInTheDocument();

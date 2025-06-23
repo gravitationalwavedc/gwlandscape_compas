@@ -10,41 +10,38 @@ from scheduler.slurm import slurm_submit
 
 
 string_params = {
-
-    'initial_mass_function': '--initial-mass-function',
-    'metallicity_distribution': '--metallicity-distribution',
-    'mass_ratio_distribution': '--mass-ratio-distribution',
-    'semi_major_axis_distribution': '--semi-major-axis-distribution',
-    'mass_transfer_angular_momentum_loss_prescription': '--mass-transfer-angular-momentum-loss-prescription',
-    'mass_transfer_accretion_efficiency_prescription': '--mass-transfer-accretion-efficiency-prescription',
-    'common_envelope_lambda_prescription': '--common-envelope-lambda-prescription',
-    'remnant_mass_prescription': '--remnant-mass-prescription',
-    'fryer_supernova_engine': '--fryer-supernova-engine',
-    'kick_velocity_distribution': '--kick-magnitude-distribution',
+    "initial_mass_function": "--initial-mass-function",
+    "metallicity_distribution": "--metallicity-distribution",
+    "mass_ratio_distribution": "--mass-ratio-distribution",
+    "semi_major_axis_distribution": "--semi-major-axis-distribution",
+    "mass_transfer_angular_momentum_loss_prescription": "--mass-transfer-angular-momentum-loss-prescription",
+    "mass_transfer_accretion_efficiency_prescription": "--mass-transfer-accretion-efficiency-prescription",
+    "common_envelope_lambda_prescription": "--common-envelope-lambda-prescription",
+    "remnant_mass_prescription": "--remnant-mass-prescription",
+    "fryer_supernova_engine": "--fryer-supernova-engine",
+    "kick_velocity_distribution": "--kick-magnitude-distribution",
 }
 
-boolean_params = {
-    'detailed_output': '--detailed-output'
-}
+boolean_params = {"detailed_output": "--detailed-output"}
 
 numeric_params = {
-    'number_of_systems': '--number-of-systems',
-    'min_initial_mass': '--initial-mass-min',
-    'max_initial_mass': '--initial-mass-max',
-    'initial_mass_power': '--initial-mass-power',
-    'min_metallicity': '--metallicity-min',
-    'max_metallicity': '--metallicity-max',
-    'min_mass_ratio': '--mass-ratio-min',
-    'max_mass_ratio': '--mass-ratio-max',
-    'min_semi_major_axis': '--semi-major-axis-min',
-    'max_semi_major_axis': '--semi-major-axis-max',
-    'min_orbital_period': '--orbital-period-min',
-    'max_orbital_period': '--orbital-period-max',
-    'mass_transfer_fa': '--mass-transfer-fa',
-    'common_envelope_alpha': '--common-envelope-alpha',
-    'velocity_1': '--kick-magnitude-1',
-    'velocity_2': '--kick-magnitude-2',
-    'detailed_output': '--detailed-output'
+    "number_of_systems": "--number-of-systems",
+    "min_initial_mass": "--initial-mass-min",
+    "max_initial_mass": "--initial-mass-max",
+    "initial_mass_power": "--initial-mass-power",
+    "min_metallicity": "--metallicity-min",
+    "max_metallicity": "--metallicity-max",
+    "min_mass_ratio": "--mass-ratio-min",
+    "max_mass_ratio": "--mass-ratio-max",
+    "min_semi_major_axis": "--semi-major-axis-min",
+    "max_semi_major_axis": "--semi-major-axis-max",
+    "min_orbital_period": "--orbital-period-min",
+    "max_orbital_period": "--orbital-period-max",
+    "mass_transfer_fa": "--mass-transfer-fa",
+    "common_envelope_alpha": "--common-envelope-alpha",
+    "velocity_1": "--kick-magnitude-1",
+    "velocity_2": "--kick-magnitude-2",
+    "detailed_output": "--detailed-output",
 }
 
 
@@ -134,34 +131,40 @@ srun python /fred/oz324/GWLandscape/COMPAS/compas_python_utils/h5copy.py input {
 
 
 def get_string_value(value):
-    return value if value != '' else None
+    return value if value != "" else None
 
 
 def get_numerical_value(value):
-    return float(value) if value != '' else None
+    return float(value) if value != "" else None
 
 
 def get_boolean_value(value):
-    return True if value in ['true', 'True'] else False
+    return True if value in ["true", "True"] else False
 
 
 def update_yaml_config(input_params):
-    params = {**input_params['basic'], **input_params['advanced']}
-    commands = {'stringChoices': {},
-                'booleanChoices': {},
-                'numericalChoices': {},
-                'listChoices': {}}
+    params = {**input_params["basic"], **input_params["advanced"]}
+    commands = {
+        "stringChoices": {},
+        "booleanChoices": {},
+        "numericalChoices": {},
+        "listChoices": {},
+    }
     for name, value in params.items():
         try:
             # command = params_to_compas_commands[name]
             if name in string_params.keys():
-                commands['stringChoices'][string_params[name]] = get_string_value(value)
+                commands["stringChoices"][string_params[name]] = get_string_value(value)
             elif name in boolean_params.keys():
-                commands['booleanChoices'][boolean_params[name]] = get_boolean_value(value)
+                commands["booleanChoices"][boolean_params[name]] = get_boolean_value(
+                    value
+                )
             elif name in numeric_params.keys():
-                commands['numericalChoices'][numeric_params[name]] = get_numerical_value(value)
+                commands["numericalChoices"][
+                    numeric_params[name]
+                ] = get_numerical_value(value)
             else:
-                print(f'parameter {name} does not have a corresponding compas command')
+                print(f"parameter {name} does not have a corresponding compas command")
         except KeyError as e:
             print(e)
             continue
@@ -190,43 +193,45 @@ def submit(details, input_params):
     Path(submit_dir).mkdir(parents=True, exist_ok=True)
 
     # create the directory where the actual job output exists
-    compas_dir = Path(wk_dir) / 'compas'
+    compas_dir = Path(wk_dir) / "compas"
     Path(compas_dir).mkdir(parents=True, exist_ok=True)
 
     updated_yaml_config = update_yaml_config(input_params)
 
     no_of_systems = input_params["basic"]["number_of_systems"]
     no_of_nodes = 1
-    PYTHONSUBMITPATH = '/fred/oz324/GWLandscape/COMPAS/compas_python_utils/preprocessing/runSubmit.py'
+    PYTHONSUBMITPATH = (
+        "/fred/oz324/GWLandscape/COMPAS/compas_python_utils/preprocessing/runSubmit.py"
+    )
 
     nsys_per_patch = int(no_of_systems) / int(no_of_nodes)
     nsys_remainder = int(no_of_systems) % int(no_of_nodes)
 
     # setup runs directories
     for i in range(no_of_nodes):
-        run_dir = f'{wk_dir}/compas/run{i+1}'
+        run_dir = f"{wk_dir}/compas/run{i+1}"
         Path(run_dir).mkdir()
-        shutil.copyfile(PYTHONSUBMITPATH, Path(run_dir) / f'runSubmit_{i+1}.py')
+        shutil.copyfile(PYTHONSUBMITPATH, Path(run_dir) / f"runSubmit_{i+1}.py")
 
         nsysi = nsys_per_patch if i < no_of_nodes else nsys_per_patch + nsys_remainder
-        updated_yaml_config['numericalChoices']['--number-of-systems'] = int(nsysi)
+        updated_yaml_config["numericalChoices"]["--number-of-systems"] = int(nsysi)
 
-        with open(Path(run_dir) / 'compasConfigDefault.yaml', 'w') as yaml_file:
+        with open(Path(run_dir) / "compasConfigDefault.yaml", "w") as yaml_file:
             yaml.dump(updated_yaml_config, yaml_file)
 
-        start_seed = (i+1) * nsys_per_patch
-        updated_yaml_config['numericalChoices']['--random-seed'] = int(start_seed)
+        start_seed = (i + 1) * nsys_per_patch
+        updated_yaml_config["numericalChoices"]["--random-seed"] = int(start_seed)
 
     # Write slurm scripts
-    slurm_script = Path(wk_dir) / 'submit' / f'{job_name}_slurm.sh'
+    slurm_script = Path(wk_dir) / "submit" / f"{job_name}_slurm.sh"
     with open(slurm_script, "w") as f:
         f.write(submit_template(wk_dir, job_name))
 
-    compas_script = Path(wk_dir) / 'submit' / f'{job_name}_compas.sh'
+    compas_script = Path(wk_dir) / "submit" / f"{job_name}_compas.sh"
     with open(compas_script, "w") as f:
         f.write(compas_run_template(wk_dir, job_name, no_of_nodes))
 
-    combine_script = Path(wk_dir) / 'submit' / f'{job_name}_combineh5.sh'
+    combine_script = Path(wk_dir) / "submit" / f"{job_name}_combineh5.sh"
     with open(combine_script, "w") as f:
         f.write(combine_output_template(wk_dir, job_name))
 
@@ -240,14 +245,14 @@ def submit(details, input_params):
 
     # Create a new job to store details
     job = {
-        'job_id': 0,
-        'submit_id': submit_bash_id,
-        'working_directory': wk_dir,
-        'submit_directory': submit_dir_name
+        "job_id": 0,
+        "submit_id": submit_bash_id,
+        "working_directory": wk_dir,
+        "submit_directory": submit_dir_name,
     }
 
     # Save the job in the database
     create_or_update_job(job)
 
     # return the job id
-    return job['job_id']
+    return job["job_id"]

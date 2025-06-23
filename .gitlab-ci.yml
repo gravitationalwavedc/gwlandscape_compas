@@ -1,30 +1,27 @@
 default:
   image:
-    name: ubuntu:20.04
+    name: ubuntu:24.04
     entrypoint: ["/usr/bin/env"]
 
   before_script:
     - export DEBIAN_FRONTEND=noninteractive
     - apt -y update
     - apt -y upgrade
-    - apt -y install texlive-latex-extra cm-super dvipng
-    - apt -y install apt-utils net-tools python3.8 python3-pip git curl g++ libboost-all-dev libgsl-dev libhdf5-serial-dev
+    - apt -y install python3.12 virtualenv python3-pip git curl 
     - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+    - virtualenv -p3.12 venv
+    - . venv/bin/activate
+    - pip install -r src/requirements.txt
+    - mkdir -p src/files/upload
     - export WD=`pwd`
     - git clone https://github.com/TeamCOMPAS/COMPAS.git
     - cd COMPAS
-    - export COMPAS_ROOT_DIR=`pwd`
-    - cd src
-    - make -f Makefile
+    - pip install .
     - cd $WD
 
 django-tests:
   stage: test
   script:
-    - cd src/
-    - pip3 install -r requirements.txt
-    - cd $COMPAS_ROOT_DIR
-    - pip3 install .
     - cd $WD/src
     - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
@@ -39,11 +36,8 @@ django-tests:
 npm-tests:
   stage: test
   script:
-    - cd src/
-    - pip3 install -r requirements.txt
-    - cd $COMPAS_ROOT_DIR
-    - pip3 install .
     - cd $WD/src/
+    - mkdir react/data
     - python3 development-manage.py graphql_schema
     - cd react/
     - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
@@ -58,6 +52,26 @@ npm-tests:
         coverage_format: cobertura
         path: src/react/coverage/cobertura-coverage.xml
       junit: src/react/junit.xml
+
+
+eslint:
+  script:
+    - cd $WD/src/
+    - cd react/
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
+    - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
+    - npm install --legacy-peer-deps
+    - npm run lint
+
+
+prettier:
+  script:
+    - cd $WD/src/
+    - cd react/
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
+    - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
+    - npm install --legacy-peer-deps
+    - npm run prettier
 
 
 code-quality:
@@ -82,8 +96,14 @@ code-quality:
 
 flake8:
   script:
-    - pip3 install flake8-gl-codeclimate
+    - pip install flake8-gl-codeclimate
     - flake8 --exit-zero --format gl-codeclimate --output-file gl-code-quality-report.json src/
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
+
+
+black-check:
+  stage: test
+  script:
+    - black --check src/

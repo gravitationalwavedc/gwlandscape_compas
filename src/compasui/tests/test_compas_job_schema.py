@@ -1,4 +1,3 @@
-from datetime import datetime
 import uuid
 
 from django.contrib.auth import get_user_model
@@ -8,16 +7,14 @@ from django.utils import timezone
 from graphql_relay import to_global_id
 from compasui.models import CompasJob, FileDownloadToken
 from compasui.tests.testcases import CompasTestCase
+from compasui.tests.utils import silence_logging
 from unittest.mock import patch, Mock
 
 User = get_user_model()
 
 
 class TestCompasJobSchema(CompasTestCase):
-
     def setUp(self):
-        self.user = User.objects.create(username="User1", first_name="first", last_name="last")
-
         self.create_compas_job_mutation = """
             mutation NewCompasJobMutation($input: CompasJobMutationInput!) {
                 newCompasJob(input: $input) {
@@ -29,25 +26,22 @@ class TestCompasJobSchema(CompasTestCase):
         """
 
         self.compas_job_input = {
-            'input': {
-                'start': {
-                    'name': 'first_job',
-                    'description': 'first job description',
-                    'private': 'true'
+            "input": {
+                "start": {
+                    "name": "first_job",
+                    "description": "first job description",
+                    "private": True,
                 },
-                'basicParameters': {
-                    'numberOfSystems': '100'
+                "basicParameters": {"numberOfSystems": "100"},
+                "advancedParameters": {
+                    "massTransferFa": "0.5",
+                    "massTransferAccretionEfficiencyPrescription": "FIXED",
                 },
-                'advancedParameters': {
-                    'massTransferFa': '0.5',
-                    'massTransferAccretionEfficiencyPrescription': 'FIXED',
-                }
             }
         }
 
-    @patch('compasui.views.requests')
+    @patch("compasui.views.requests")
     def test_create_compas_job_success(self, request_mock):
-
         mock_response = Mock()
         mock_response.status_code = 200
         mock_response.content = b'{"jobId":441}'
@@ -55,17 +49,16 @@ class TestCompasJobSchema(CompasTestCase):
 
         request_mock.request.return_value = mock_response
 
-        self.client.authenticate(self.user)
+        self.authenticate()
 
-        response = self.client.execute(
-            self.create_compas_job_mutation,
-            self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
         expected = {
-            'newCompasJob': {
-                'result': {
-                    'jobId': to_global_id('CompasJobNode', CompasJob.objects.last().id)
+            "newCompasJob": {
+                "result": {
+                    "jobId": to_global_id("CompasJobNode", CompasJob.objects.last().id)
                 }
             }
         }
@@ -74,9 +67,9 @@ class TestCompasJobSchema(CompasTestCase):
         self.assertDictEqual(expected, response.data)
         self.assertEqual(CompasJob.objects.all().count(), 1)
 
-    @patch('compasui.views.requests')
+    @silence_logging(logger_name="compasui.views")
+    @patch("compasui.views.requests")
     def test_create_compas_job_job_controller_fail(self, request_mock):
-
         mock_response = Mock()
         mock_response.status_code = 400
         mock_response.content = "Bad request"
@@ -84,17 +77,20 @@ class TestCompasJobSchema(CompasTestCase):
 
         request_mock.request.side_effect = mock_response
 
-        self.client.authenticate(self.user)
+        self.authenticate()
 
-        response = self.client.execute(
-            self.create_compas_job_mutation,
-            self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
         self.assertIsNotNone(response.errors)
-        self.assertRaises(Exception, "Error submitting job, got error code: 400\n\nheaders\n\nBad request")
+        self.assertRaises(
+            Exception,
+            "Error submitting job, got error code: 400\n\nheaders\n\nBad request",
+        )
 
-    @patch('compasui.views.requests')
+    @silence_logging(logger_name="compasui.schema")
+    @patch("compasui.views.requests")
     def test_create_compas_job_name_exists(self, request_mock):
         mock_response = Mock()
         mock_response.status_code = 200
@@ -103,49 +99,54 @@ class TestCompasJobSchema(CompasTestCase):
 
         request_mock.request.return_value = mock_response
 
-        self.client.authenticate(self.user)
+        self.authenticate()
 
-        response = self.client.execute(
-            self.create_compas_job_mutation,
-            self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
-        response = self.client.execute(
-            self.create_compas_job_mutation,
-            self.compas_job_input
+        response = self.query(
+            self.create_compas_job_mutation, input_data=self.compas_job_input["input"]
         )
 
         self.assertNotEqual(None, response.errors)
         self.assertRaises(Exception, "Job name is already in use!")
 
-    @patch('compasui.models.request_file_list')
-    @patch('compasui.schema.FileDownloadToken.create')
+    @patch("compasui.models.request_file_list")
+    @patch("compasui.schema.FileDownloadToken.create")
     def test_get_job_result_files(self, create_token, request_file_list):
-
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         job = CompasJob.objects.create(
             user_id=self.user.id,
             name="Test1",
             description="first job",
             job_controller_id=2,
-            private=False
+            private=False,
         )
 
-        request_file_list.return_value = True, [{'path': '/job/file.txt',
-                                                 'isDir': False,
-                                                 'fileSize': 33,
-                                                 'downloadToken': 1}]
+        request_file_list.return_value = (
+            True,
+            [
+                {
+                    "path": "/job/file.txt",
+                    "isDir": False,
+                    "fileSize": 33,
+                    "downloadToken": 1,
+                }
+            ],
+        )
 
         new_token = FileDownloadToken(
-            job=job, token=uuid.uuid4(), path='/job/file.txt', created=datetime.now())
+            job=job, token=uuid.uuid4(), path="/job/file.txt", created=timezone.now()
+        )
 
         create_token.return_value = [new_token]
 
-        response = self.client.execute(
+        response = self.query(
             f"""
             query{{
-                compasResultFiles(jobId: "{to_global_id('CompasJobNode', job.id)}") {{
+                compasResultFiles(jobId: "{to_global_id("CompasJobNode", job.id)}") {{
                     files {{
                         path
                         isDir
@@ -157,34 +158,38 @@ class TestCompasJobSchema(CompasTestCase):
             """
         )
         expected = {
-            'compasResultFiles': {
-                'files': [
-                    {'path': '/job/file.txt', 'isDir': False, 'fileSize': '33', 'downloadToken': str(new_token.token)}
+            "compasResultFiles": {
+                "files": [
+                    {
+                        "path": "/job/file.txt",
+                        "isDir": False,
+                        "fileSize": "33",
+                        "downloadToken": str(new_token.token),
+                    }
                 ]
             }
         }
         self.assertDictEqual(response.data, expected)
 
-    @patch('compasui.schema.request_file_download_id')
+    @patch("compasui.schema.request_file_download_id")
     def test_generate_file_download_id(self, request_file_download_id):
-
-        self.client.authenticate(self.user)
+        self.authenticate()
 
         job = CompasJob.objects.create(
             user_id=self.user.id,
             name="Test1",
             description="first job",
             job_controller_id=2,
-            private=False
+            private=False,
         )
 
         new_token = FileDownloadToken.objects.create(
             job=job,
-            path='/job/file.txt',
+            path="/job/file.txt",
         )
 
         # Test successful request when token is valid
-        request_file_download_id.return_value = True, ['123456']
+        request_file_download_id.return_value = True, ["123456"]
 
         generate_file_download_id_mutation = """
             mutation ResultFileMutation($input: GenerateFileDownloadIdsInput!) {
@@ -195,46 +200,43 @@ class TestCompasJobSchema(CompasTestCase):
             """
 
         mutation_input = {
-            'input': {
-                'jobId': to_global_id('CompasJobNode', job.id),
-                'downloadTokens': [str(new_token.token)]
+            "input": {
+                "jobId": to_global_id("CompasJobNode", job.id),
+                "downloadTokens": [str(new_token.token)],
             }
         }
-        response = self.client.execute(
-            generate_file_download_id_mutation,
-            mutation_input
+        response = self.query(
+            generate_file_download_id_mutation, input_data=mutation_input["input"]
         )
 
-        expected = {
-            'generateFileDownloadIds': {
-                'result': ['123456']
-            }
-        }
+        expected = {"generateFileDownloadIds": {"result": ["123456"]}}
         self.assertDictEqual(response.data, expected)
 
         # Test failure to get file download url
-        request_file_download_id.return_value = False, "Error getting job file download url"
-
-        response = self.client.execute(
-            generate_file_download_id_mutation,
-            mutation_input
+        request_file_download_id.return_value = (
+            False,
+            "Error getting job file download url",
         )
-        expected = {
-            'generateFileDownloadIds': None
-        }
+
+        response = self.query(
+            generate_file_download_id_mutation, input_data=mutation_input["input"]
+        )
+        expected = {"generateFileDownloadIds": None}
         self.assertDictEqual(response.data, expected)
 
         # Test failure when token is expired
-        new_token.created = datetime.now() - timezone.timedelta(settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1)
+        new_token.created = timezone.now() - timezone.timedelta(
+            settings.FILE_DOWNLOAD_TOKEN_EXPIRY + 1
+        )
         new_token.save()
 
-        response = self.client.execute(
-            generate_file_download_id_mutation,
-            mutation_input
+        response = self.query(
+            generate_file_download_id_mutation, input_data=mutation_input["input"]
         )
-        expected = {
-            'generateFileDownloadIds': None
-        }
+        expected = {"generateFileDownloadIds": None}
         self.assertDictEqual(response.data, expected)
 
-        request_file_download_id.return_value = False, "Error getting job file download url"
+        request_file_download_id.return_value = (
+            False,
+            "Error getting job file download url",
+        )

@@ -7,26 +7,24 @@ import PrivacyToggle from '../PrivacyToggle';
 /* global environment, router */
 
 describe('the privacy toggle component', () => {
-
     const TestRenderer = () => (
         <QueryRenderer
             environment={environment}
             query={graphql`
-            query PrivacyToggleTestQuery ($jobId: ID!)
-              @relay_test_operation {
-                compasJob(id: $jobId) {
-                  start {
-                    ...PrivacyToggle_data
-                  }
-               }
-             }
-          `}
+                query PrivacyToggleTestQuery($jobId: ID!) @relay_test_operation {
+                    compasJob(id: $jobId) {
+                        start {
+                            ...PrivacyToggle_data
+                        }
+                    }
+                }
+            `}
             variables={{
-                jobId: '1234' 
+                jobId: '1234',
             }}
             render={({ error, props }) => {
                 if (props) {
-                    return <PrivacyToggle data={props.compasJob.start} match={{}} router={router}/>;
+                    return <PrivacyToggle data={props.compasJob.start} match={{}} router={router} />;
                 } else if (error) {
                     return error.message;
                 }
@@ -39,17 +37,17 @@ describe('the privacy toggle component', () => {
         CompasJobNode() {
             return {
                 start: {
-                    private: true
-                }
+                    private: true,
+                },
             };
-        }
+        },
     };
 
     it('should render the privacy toggle with correct query data', () => {
         expect.hasAssertions();
         const { getByLabelText } = render(<TestRenderer />);
-        environment.mock.resolveMostRecentOperation(operation => 
-            MockPayloadGenerator.generate(operation, mockReturn)
+        environment.mock.resolveMostRecentOperation((operation) =>
+            MockPayloadGenerator.generate(operation, mockReturn),
         );
         expect(getByLabelText('Share with LIGO collaborators')).not.toBeChecked();
     });
@@ -57,8 +55,8 @@ describe('the privacy toggle component', () => {
     it('should toggle the checked value on click', () => {
         expect.hasAssertions();
         const { getByLabelText } = render(<TestRenderer />);
-        environment.mock.resolveMostRecentOperation(operation => 
-            MockPayloadGenerator.generate(operation, mockReturn)
+        environment.mock.resolveMostRecentOperation((operation) =>
+            MockPayloadGenerator.generate(operation, mockReturn),
         );
         const privacyCheck = getByLabelText('Share with LIGO collaborators');
         expect(privacyCheck).not.toBeChecked();
@@ -69,14 +67,12 @@ describe('the privacy toggle component', () => {
     it('should send a mutation when clicked', () => {
         expect.hasAssertions();
         const { getByLabelText } = render(<TestRenderer />);
-        environment.mock.resolveMostRecentOperation(operation => 
-            MockPayloadGenerator.generate(operation, mockReturn)
+        environment.mock.resolveMostRecentOperation((operation) =>
+            MockPayloadGenerator.generate(operation, mockReturn),
         );
         const privacyCheck = getByLabelText('Share with LIGO collaborators');
         fireEvent.click(privacyCheck);
-        environment.mock.resolveMostRecentOperation(operation => 
-            MockPayloadGenerator.generate(operation)
-        );
+        environment.mock.resolveMostRecentOperation((operation) => MockPayloadGenerator.generate(operation));
         expect(privacyCheck).toBeChecked();
     });
 });

@@ -18,7 +18,6 @@ const initialValues = {
     massTransferAccretionEfficiencyPrescription: 'THERMAL',
     massTransferFa: 0.5,
     // massTransferJloss: 0.1,
-
 };
 
 export default initialValues;

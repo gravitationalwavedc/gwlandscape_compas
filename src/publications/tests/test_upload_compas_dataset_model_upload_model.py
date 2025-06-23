@@ -10,7 +10,7 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
     def setUpTestData(cls):
         class TestUser:
             def __init__(self):
-                self.user_id = 1234
+                self.id = 1234
 
         cls.user = TestUser()
 
@@ -21,14 +21,14 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
         result = CompasDatasetModelUploadToken.create(self.user)
         after = timezone.now()
 
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
         self.assertTrue(before < result.created < after)
 
         self.assertEqual(CompasDatasetModelUploadToken.objects.count(), 1)
 
         result = CompasDatasetModelUploadToken.objects.last()
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
         self.assertTrue(before < result.created < after)
 
@@ -46,7 +46,9 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
 
         # Check objects just inside the deletion time are not deleted
         r = CompasDatasetModelUploadToken.objects.last()
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1
+        )
         r.save()
 
         CompasDatasetModelUploadToken.prune()
@@ -54,7 +56,9 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
         self.assertEqual(CompasDatasetModelUploadToken.objects.all().count(), 1)
 
         # Check objects just outside the deletion time are deleted
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1
+        )
         r.save()
 
         CompasDatasetModelUploadToken.prune()
@@ -70,24 +74,28 @@ class TestCompasDatasetModelUploadToken(testcases.TestCase):
 
         result = CompasDatasetModelUploadToken.get_by_token(token)
 
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
         self.assertTrue(before < result.created < after)
 
         # Check that prune works as expected
         # Check objects just inside the deletion time are not deleted
         r = CompasDatasetModelUploadToken.objects.last()
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY - 1
+        )
         r.save()
 
         result = CompasDatasetModelUploadToken.get_by_token(token)
 
-        self.assertEqual(result.user_id, self.user.user_id)
+        self.assertEqual(result.user_id, self.user.id)
         self.assertTrue(result.token)
 
         # Set the object outside the expiry window
         r = CompasDatasetModelUploadToken.objects.last()
-        r.created = after - timezone.timedelta(seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1)
+        r.created = after - timezone.timedelta(
+            seconds=settings.COMPAS_DATASET_MODEL_UPLOAD_TOKEN_EXPIRY + 1
+        )
         r.save()
 
         result = CompasDatasetModelUploadToken.get_by_token(token)

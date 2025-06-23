@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('compasui', '0007_auto_20220209_0614'),
+        ("compasui", "0007_auto_20220209_0614"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='singlebinaryjob',
-            name='pair_instability_supernovae',
-            field=models.BooleanField(blank=True, default=True, help_text='--pair-instability-supernovae: Enable pair instability supernovae (PISN)', null=True),
+            model_name="singlebinaryjob",
+            name="pair_instability_supernovae",
+            field=models.BooleanField(
+                blank=True,
+                default=True,
+                help_text="--pair-instability-supernovae: Enable pair instability supernovae (PISN)",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='singlebinaryjob',
-            name='pulsational_pair_instability_supernovae',
-            field=models.BooleanField(blank=True, default=True, help_text='--pulsational-pair-instability: Enable mass loss due to pulsational-pair-instability (PPI)', null=True),
+            model_name="singlebinaryjob",
+            name="pulsational_pair_instability_supernovae",
+            field=models.BooleanField(
+                blank=True,
+                default=True,
+                help_text="--pulsational-pair-instability: Enable mass loss due to pulsational-pair-instability (PPI)",
+                null=True,
+            ),
         ),
     ]
