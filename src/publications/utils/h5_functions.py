@@ -40,7 +40,7 @@ def check_subgroup_boolean(h5_file, root_group, subgroup):
 
 
 def get_h5_subgroup_meta(h5_file, **kwargs):
-    root_group = kwargs.pop("root_group", get_h5_keys(h5_file)[0])
+    root_group = kwargs.get("root_group") or get_h5_keys(h5_file)[0]
     subgroup_list = get_h5_subgroups(h5_file, root_group)
 
     total_length = h5_file[root_group][subgroup_list[0]].shape[0]
@@ -48,11 +48,12 @@ def get_h5_subgroup_meta(h5_file, **kwargs):
 
     default_values = default_prefs.get(root_group, None)
 
-    subgroup_x = kwargs.get(
-        "subgroup_x", default_values[0] if default_values else subgroup_list[0]
+    subgroup_x = kwargs.get("subgroup_x") or (
+        default_values[0] if default_values else subgroup_list[0]
     )
-    subgroup_y = kwargs.get(
-        "subgroup_y", default_values[1] if default_values else subgroup_list[1]
+
+    subgroup_y = kwargs.get("subgroup_y") or (
+        default_values[1] if default_values else subgroup_list[1]
     )
 
     return {

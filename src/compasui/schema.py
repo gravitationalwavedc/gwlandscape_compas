@@ -159,8 +159,8 @@ class CompasJobNode(
             return {"name": "Unknown", "number": 0, "data": "Unknown"}
 
     @login_required
-    def resolve_user(parent, info):
-        success, users = request_lookup_users([parent.id])
+    def resolve_user(parent, info, **kwargs):
+        success, users = request_lookup_users([parent.user_id])
         if success and users:
             return users[0]["name"]
         return "Unknown User"

@@ -68,12 +68,12 @@ const PlotControls = ({ relay, groups, subgroups, colourMaps }) => {
                 min={1}
                 max={20}
                 onMouseUp={(e) => {
-                    setFieldValue('strideLength', e.target.value);
+                    setFieldValue('strideLength', parseInt(e.target.value));
                     relay.refetch({
                         rootGroup: values.group,
                         subgroupX: values.subgroupX,
                         subgroupY: values.subgroupY,
-                        strideLength: e.target.value,
+                        strideLength: parseInt(e.target.value),
                     });
                 }}
             />
