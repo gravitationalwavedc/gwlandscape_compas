@@ -111,7 +111,7 @@ celery -A gw_compas.celery worker -l INFO
 
 ## Graphene/Relay
 
-Any time changes are made to the graphene schema in python, you need to rebuild the graphql schema for javascript
+Any time changes are made to the graphene schema in python, you need to rebuild the GraphQL schema for javascript
 
 **This also needs to be executed once before running the project for the first time**
 
@@ -121,7 +121,7 @@ cd gwlandscape_compas/src/
 python development-manage.py graphql_schema
 ```
 
-Any time changes are made to the javascript graphql queries, you need to rebuild the graphql query files. This is not automatic, and may require stopping the node server, generating the graphql files, then starting the node server again.
+Any time changes are made to the javascript GraphQL queries, you need to rebuild the GraphQL query files. This is not automatic, and may require stopping the node server, generating the GraphQL files, then starting the node server again.
 
 **This also needs to be executed once before running the project for the first time**
 
@@ -137,10 +137,11 @@ Once the project is running, you should be able to visit <http://localhost:3000/
 
 ## Building for production
 
-The docker configuration in `gwlandscape_compas/docker` can be used to build and run the project in production.
+The docker configuration in the `docker` directory can be used to build and run the project in production.
 
 The production build uses `.env` and `.env.production` files to determine runtime configuration and secrets, rather than `src/gw_compas/local.py`. The `src/react/.env` template will also have to be updated when building for production.
 
 ```bash
+cd gwlandscape_compas/docker
 sudo docker-compose up --build -d
 ```
