@@ -139,7 +139,7 @@ Once the project is running, you should be able to visit <http://localhost:3000/
 
 The docker configuration in `gwlandscape_compas/docker` can be used to build and run the project in production.
 
-The production build uses `.env` and `.env.production` files to determine runtime configuration and secrets, rather than `local.py`. The `/src/react/.env` template will also have to be updated when building for production.
+The production build uses `.env` and `.env.production` files to determine runtime configuration and secrets, rather than `src/gw_compas/local.py`. The `src/react/.env` template will also have to be updated when building for production.
 
 ```bash
 sudo docker-compose up --build -d
