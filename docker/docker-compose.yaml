@@ -28,6 +28,8 @@ services:
       - "8000:8000"
     depends_on:
       - django
+    volumes:
+      - media_files:/media/
 
   db:
     image: mysql:8.4.5
