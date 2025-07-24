@@ -12,6 +12,7 @@ import Layout from './Layout';
 import HandleRender from './HandleRender';
 import HandleLayoutRender from './HandleLayoutRender';
 import APIToken from './Pages/APIToken';
+import Error404 from './Pages/Error404';
 
 function getRoutes() {
     return (
@@ -123,6 +124,7 @@ function getRoutes() {
                 `}
                 render={HandleRender}
             />
+            <Route path="*" Component={Error404} />
         </Route>
     );
 }
