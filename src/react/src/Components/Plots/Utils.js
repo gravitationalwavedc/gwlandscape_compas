@@ -1,4 +1,3 @@
-// eslint-disable-next-line complexity
 const wideFilter = (data, i, key, data1, data2) => {
     let next = null;
     let prev = null;
