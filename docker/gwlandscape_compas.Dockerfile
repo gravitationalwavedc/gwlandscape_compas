@@ -11,9 +11,11 @@ RUN apt-get update \
   &&  apt-get install --no-install-recommends -y \
   curl git python3-dev build-essential python3-virtualenv default-libmysqlclient-dev
 
+ARG COMPAS_TAG
+
 # Clone COMPAS
 WORKDIR /
-RUN git clone https://github.com/TeamCOMPAS/COMPAS.git
+RUN git clone --depth 1 --branch $COMPAS_TAG https://github.com/TeamCOMPAS/COMPAS.git
 
 
 FROM base AS django-builder

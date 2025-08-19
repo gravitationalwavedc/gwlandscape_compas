@@ -21,7 +21,7 @@ LOGOUT_REDIRECT_URL = "http://localhost:3000/"
 
 # adacs-sso settings
 ADACS_SSO_CLIENT_NAME = "gwlandscape_compas_dev"
-ADACS_SSO_AUTH_HOST = "http://localhost:8000"
+ADACS_SSO_AUTH_HOST = "http://localhost:8001"
 
 try:
     from .local import *

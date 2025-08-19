@@ -27,6 +27,9 @@ cd gwlandscape_compas/src/
 virtualenv -p python3.12 venv # or whatever version of python you have installed > 3.12
 source venv/bin/activate
 pip install -r requirements.txt
+cd $COMPAS_ROOT_DIR
+pip install . # install compas_python_utils, needed for plots
+cd gwlandscape_compas/src
 python development-manage.py migrate
 ```
 
