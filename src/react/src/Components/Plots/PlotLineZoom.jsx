@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ResponsiveContainer, LineChart, Line, ReferenceArea, Tooltip, ReferenceLine, Customized } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, ReferenceArea, ReferenceLine, Customized } from 'recharts';
 import useZoom from './useZoom';
 import { filterGroupDataByDomain } from './Utils';
 
@@ -79,7 +79,6 @@ const PlotLineZoom = ({
     onZoomOut: handleZoomOut,
     isZoomed,
     children,
-    yunit,
 }) => {
     const [groups, setGroups] = useState(initialGroups);
 
@@ -118,7 +117,7 @@ const PlotLineZoom = ({
                     syncId={syncId}
                     data={!hasLineGroups && groups[0].data}
                     margin={{
-                        top: 5,
+                        top: 25,
                         right: 20,
                         left: 20,
                         bottom: 25,
@@ -137,17 +136,6 @@ const PlotLineZoom = ({
                     {texts.map((text) => (
                         <Customized key={text.meta.label} component={drawText} text={text} />
                     ))}
-                    <Tooltip
-                        allowEscapeViewBox={{ x: true, y: false }}
-                        offset={20}
-                        formatter={(value) => (
-                            <>
-                                {value.toFixed(2)} {yunit}
-                            </>
-                        )}
-                        labelFormatter={(label) => `Time : ${label.toFixed(2)} Myr`}
-                        filterNull={false}
-                    />
                 </LineChart>
             </ResponsiveContainer>
         </div>

@@ -19,6 +19,7 @@ const useZoom = ({ onZoomIn, chartRef }) => {
 
     const handleMouseMove = (e) => {
         const { chartX, chartY } = e || {};
+        if (!chartX || !chartY) return;
         if (isZooming) {
             setIsMoving(true);
             let xValue = chartRef.current.state.xAxisMap[0].scale.invert(chartX);

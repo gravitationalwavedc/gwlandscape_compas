@@ -4,6 +4,8 @@ services:
       dockerfile: ./docker/gwlandscape_compas.Dockerfile
       context: ..
       target: django-runner
+      args:
+        COMPAS_TAG: ${COMPAS_TAG}
     container_name: gwlandscape-compas-django
     restart: unless-stopped
     env_file: 
@@ -22,6 +24,8 @@ services:
         dockerfile: ./docker/gwlandscape_compas.Dockerfile
         context: ..
         target: static-runner
+        args:
+          COMPAS_TAG: ${COMPAS_TAG}
     container_name: gwlandscape-compas-static
     restart: unless-stopped
     ports: 
@@ -58,6 +62,8 @@ services:
         dockerfile: ./docker/gwlandscape_compas.Dockerfile
         context: ..
         target: celery-runner
+        args:
+          COMPAS_TAG: ${COMPAS_TAG}
     container_name: gwlandscape-compas-celery
     restart: always
     env_file: 
