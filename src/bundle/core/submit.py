@@ -160,9 +160,9 @@ def update_yaml_config(input_params):
                     value
                 )
             elif name in numeric_params.keys():
-                commands["numericalChoices"][
-                    numeric_params[name]
-                ] = get_numerical_value(value)
+                commands["numericalChoices"][numeric_params[name]] = (
+                    get_numerical_value(value)
+                )
             else:
                 print(f"parameter {name} does not have a corresponding compas command")
         except KeyError as e:

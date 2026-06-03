@@ -2,6 +2,7 @@
 Test utilities for compasui app.
 Contains helper functions and decorators for testing.
 """
+
 import functools
 import logging
 

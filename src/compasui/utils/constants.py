@@ -1,6 +1,7 @@
 """
 Mapping model field names and values
 """
+
 MASS_1_LABEL = "MASS 1"
 MASS_2_LABEL = "MASS 2"
 METALICITY_LABEL = "Metallicity"
