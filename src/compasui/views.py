@@ -13,7 +13,7 @@ from django.db import transaction
 logger = logging.getLogger(__name__)
 
 from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
-from .tasks import run_compas
+from .tasks import run_compas, run_vimes
 from .utils.constants import TASK_FAIL, TASK_TIMEOUT, SINGLE_BINARY_FIELD_COMMANDS
 
 
@@ -173,3 +173,22 @@ def create_single_binary_job(
         raise Exception(model_id)
 
     return single_binary_job
+
+
+def create_single_binary_job_movie(job_id, scaling="log", images="default"):
+    job_detailed_output_path = (
+        Path(settings.COMPAS_IO_PATH) / job_id / "COMPAS_Output" / "Detailed_Output"
+    )
+    job_detailed_output = job_detailed_output_path / "BSE_Detailed_Output_0.h5"
+    if not job_detailed_output.exists():
+        raise Exception("Job output file does not exist")
+
+    task = run_vimes.delay(str(job_detailed_output_path.resolve()), scaling, images)
+
+    # get task result
+    result = task.get()
+
+    if result in (TASK_FAIL, TASK_TIMEOUT):
+        raise Exception(job_id)
+
+    return True

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { useFormikContext } from 'formik';
 
-const ReviewJob = ({ disableButtons }) => {
+const FormButtons = ({ submitButtonContent, showReset = true, disableButtons }) => {
     const [errors, setErrors] = useState([]);
 
     const { handleSubmit, handleReset, validateForm } = useFormikContext();
@@ -27,11 +27,13 @@ const ReviewJob = ({ disableButtons }) => {
                             disabled={disableButtons}
                             className="mr-3"
                         >
-                            Start Simulation
+                            {submitButtonContent}
                         </Button>
-                        <Button data-testid="reset-btn" disabled={disableButtons} onClick={handleReset}>
-                            Reset Form
-                        </Button>
+                        {showReset && (
+                            <Button data-testid="reset-btn" disabled={disableButtons} onClick={handleReset}>
+                                Reset Form
+                            </Button>
+                        )}
                         <ul>
                             {errors.map((value) => (
                                 <li className="text-danger" key={value}>
@@ -46,4 +48,4 @@ const ReviewJob = ({ disableButtons }) => {
     );
 };
 
-export default ReviewJob;
+export default FormButtons;

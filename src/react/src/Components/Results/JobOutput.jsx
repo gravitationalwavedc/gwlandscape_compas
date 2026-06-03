@@ -5,9 +5,14 @@ const JobOutput = ({ detailedOutputFileName, isLoading }) => (
         <Row className="mt-2">
             <Col>
                 {detailedOutputFileName ? (
-                    <a data-testid="download-link" href={detailedOutputFileName}>
-                        Download Output File
-                    </a>
+                    <>
+                        <a className="mr-4" data-testid="download-link" href={detailedOutputFileName}>
+                            Download Output File
+                        </a>
+                        <a data-testid="download-link" href={detailedOutputFileName}>
+                            Download VIMES Movie
+                        </a>
+                    </>
                 ) : (
                     isLoading && <div>Loading...</div>
                 )}

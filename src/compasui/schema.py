@@ -23,7 +23,12 @@ from .types import (
     AbstractBasicParameterType,
     AbstractAdvancedParametersType,
 )
-from .views import create_compas_job, update_compas_job, create_single_binary_job
+from .views import (
+    create_compas_job,
+    update_compas_job,
+    create_single_binary_job,
+    create_single_binary_job_movie,
+)
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
 from .utils.jobs.request_file_download_id import request_file_download_id
@@ -376,6 +381,10 @@ class SingleBinaryJobCreationResult(graphene.ObjectType):
     detailed_output_file_path = graphene.String()
 
 
+class SingleBinaryJobMovieCreationResult(graphene.ObjectType):
+    movie_file_path = graphene.String()
+
+
 class CompasJobMutation(relay.ClientIDMutation):
     class Input:
         start = StartInput()
@@ -549,9 +558,41 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             )
 
 
+class SingleBinaryJobMovieMutation(relay.ClientIDMutation):
+    class Input:
+        job_id = graphene.ID()
+        scaling = graphene.String()
+        images = graphene.String()
+
+    result = graphene.Field(SingleBinaryJobMovieCreationResult)
+
+    @classmethod
+    def mutate_and_get_payload(cls, root, info, **input):
+        try:
+            job_id = input.get("job_id")
+            scaling = input.get("scaling", "log")
+            images = input.get("images", "default")
+            create_single_binary_job_movie(
+                job_id=job_id, scaling=scaling, images=images
+            )
+
+            return SingleBinaryJobMovieMutation(
+                result=SingleBinaryJobMovieCreationResult(
+                    movie_file_path=f"{settings.MEDIA_URL}jobs/{job_id}"
+                    f"/COMPAS_Output/Detailed_Output/{scaling}_{images}_movie.mp4",
+                )
+            )
+        except Exception as e:
+            logger.error("VIMES job didn't run successfully")
+            return SingleBinaryJobMovieMutation(
+                result=SingleBinaryJobMovieCreationResult(movie_file_path="")
+            )
+
+
 class Mutation(graphene.ObjectType):
     new_compas_job = CompasJobMutation.Field()
     update_compas_job = UpdateCompasJobMutation.Field()
     generate_file_download_ids = GenerateFileDownloadIds.Field()
     is_name_unique = UniqueNameMutation.Field()
     new_single_binary = SingleBinaryJobMutation.Field()
+    new_single_binary_movie = SingleBinaryJobMovieMutation.Field()
