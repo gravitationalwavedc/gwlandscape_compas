@@ -4,7 +4,7 @@ import os
 import logging
 import traceback
 from pathlib import Path
-from subprocess import call
+from subprocess import call, run
 
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
@@ -72,15 +72,19 @@ def run_vimes(job_output_dir, scaling="log", images="default"):
             return TASK_SUCCESS
 
         if not os.path.exists(frames_file_path):
-            call(
-                f"vimes-preprocess {detailed_output_file_path} {frames_file_path}",
+            run(
+                f"vimes-preprocess asdas{detailed_output_file_path} {frames_file_path}",
                 shell=True,
+                check=True,
             )
 
-        call(
-            f"vimes {frames_file_path} --scaling {scaling} --images {images} --save-mp4 {movie_file_path} --no-display",
-            shell=True,
-        )
+        if os.path.exists(frames_file_path):
+            run(
+                f"vimes {frames_file_path} --scaling {scaling} --images {images} --save-mp4 {movie_file_path} --no-display",
+                shell=True,
+                check=True,
+            )
+
         result = check_output_file_generated(movie_file_path)
 
     except SoftTimeLimitExceeded:
