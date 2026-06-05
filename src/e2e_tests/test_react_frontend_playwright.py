@@ -223,3 +223,126 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         # Check for the page heading (h1) specifically, not just any text
         await expect(page.locator("h1")).to_contain_text("Published Datasets", timeout=10000)
         await expect(page.get_by_placeholder("Search by Author, Title, Keyword or Publication Date")).to_be_visible()
+
+    @async_playwright_test
+    @mock.patch(
+        "compasui.utils.auth.lookup_users.request_lookup_users",
+        side_effect=request_lookup_users_mock,
+    )
+    async def test_single_binary_page_loads(self, lookup):
+        """
+        Test that the single binary simulation page loads correctly.
+        
+        This test verifies:
+        1. Can navigate to the homepage
+        2. Can click the "Simulate Binary" button
+        3. The single binary page loads with the expected form
+        """
+        page = await self.browser_context.new_page()
+
+        # Navigate to the homepage
+        print(f"Navigating to {self.react_url}")
+        await page.goto(self.react_url)
+        await self.wait_for_page_load(page)
+
+        # Click on Simulate Binary button
+        await page.get_by_role("link", name="Simulate Binary").click()
+        await self.wait_for_page_load(page)
+        
+        # Verify single binary page content
+        # Check for the page heading
+        await expect(page.locator("h1")).to_contain_text("Simulate the evolution of a binary", timeout=10000)
+        
+        # Check that the form is present (look for key form fields)
+        # The form should have fields for metallicity, mass, etc.
+        await expect(page.get_by_label("Metallicity (Z)")).to_be_visible(timeout=5000)
+        await expect(page.get_by_label("Mass 1 (M☉)")).to_be_visible()
+
+    @async_playwright_test
+    @mock.patch(
+        "compasui.utils.auth.lookup_users.request_lookup_users",
+        side_effect=request_lookup_users_mock,
+    )
+    async def test_single_binary_form_submission(self, lookup):
+        """
+        Test that the single binary form can be submitted and generates results.
+        
+        This test verifies:
+        1. Can navigate to the single binary page
+        2. Can fill out and submit the form
+        3. Celery processes the job
+        4. Results are displayed
+        
+        Note: This test requires Redis and Celery worker to be running.
+        """
+        page = await self.browser_context.new_page()
+
+        # Navigate to the homepage
+        print(f"Navigating to {self.react_url}")
+        await page.goto(self.react_url)
+        await self.wait_for_page_load(page)
+
+        # Click on Simulate Binary button
+        await page.get_by_role("link", name="Simulate Binary").click()
+        await self.wait_for_page_load(page)
+        
+        # Verify form is present
+        await expect(page.locator("h1")).to_contain_text("Simulate the evolution of a binary", timeout=10000)
+        
+        # Fill out the form with minimal test values
+        # Metallicity (required field)
+        await page.get_by_label("Metallicity (Z)").fill("0.01")
+        
+        # Mass 1 (required field)
+        await page.get_by_label("Mass 1 (M").fill("20")
+        
+        # Mass 2 (required field)
+        await page.get_by_label("Mass 2 (M").fill("10")
+        
+        # Find and click the submit button
+        # The submit button has text "Start Simulation"
+        submit_button = page.get_by_role("button", name="Start Simulation")
+        
+        print("Submitting single binary simulation form...")
+        await submit_button.click()
+        
+        # Wait for the page to navigate to results
+        await self.wait_for_page_load(page)
+        
+        # Wait for job to be processed by Celery (with timeout)
+        print("Waiting for Celery to process the job...")
+        max_wait = 60  # seconds
+        start_time = time.time()
+        job_successful = False
+        
+        while time.time() - start_time < max_wait:
+            # Check for error messages first
+            error_message = page.get_by_text("Error")
+            if await error_message.count() > 0:
+                # Check if it's actually an error state vs just the word "Error" somewhere
+                error_visible = await error_message.is_visible()
+                if error_visible:
+                    print("Error message found on page")
+                    # Take screenshot for debugging
+                    await page.screenshot(path="test_single_binary_error.png")
+                    raise AssertionError("Job submission failed - error message displayed")
+            
+            # Check if results are displayed
+            result_heading = page.get_by_text("COMPAS Output")
+            if await result_heading.count() > 0:
+                result_visible = await result_heading.is_visible()
+                if result_visible:
+                    print("Job results found!")
+                    job_successful = True
+                    break
+            
+            await page.wait_for_timeout(2000)
+        
+        # Verify we got successful results
+        if not job_successful:
+            await page.screenshot(path="test_single_binary_timeout.png")
+            raise AssertionError("Job did not complete within timeout period")
+        
+        # The page should have navigated to a results view
+        await page.wait_for_selector("#root", timeout=10000)
+        print("Single binary job submission test completed successfully")

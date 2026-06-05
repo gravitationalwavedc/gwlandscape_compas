@@ -11,9 +11,12 @@ from adacs_django_playwright.adacs_django_playwright import (
 # Module-level variables to store the Vite server process
 vite_process = None
 react_app_built = False
+redis_process = None
+celery_process = None
 
 FRONTEND_PORT = 4173
 BACKEND_PORT = 8000
+REDIS_PORT = 6380  # Use non-standard port to avoid conflicts
 
 
 def build_react_app():
@@ -146,6 +149,113 @@ def stop_vite_preview():
 atexit.register(stop_vite_preview)
 
 
+def start_redis():
+    """Start Redis server for Celery."""
+    global redis_process
+
+    if redis_process is not None:
+        return
+
+    print("Starting Redis server...")
+    redis_process = subprocess.Popen(
+        ["redis-server", "--port", str(REDIS_PORT)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        preexec_fn=os.setsid,
+    )
+
+    # Wait for Redis to start
+    max_wait = 5
+    start_time = time.time()
+
+    while time.time() - start_time < max_wait:
+        try:
+            import socket
+
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(1)
+            result = sock.connect_ex(("localhost", REDIS_PORT))
+            sock.close()
+
+            if result == 0:
+                print("Redis server started successfully")
+                return
+        except Exception as e:
+            print(f"Error checking Redis: {e}")
+
+        time.sleep(0.5)
+
+    stop_redis()
+    raise Exception("Timed out waiting for Redis to start")
+
+
+def stop_redis():
+    """Stop Redis server."""
+    global redis_process
+
+    if redis_process is not None:
+        print("Stopping Redis server...")
+        try:
+            os.killpg(os.getpgid(redis_process.pid), signal.SIGTERM)
+            redis_process.wait(timeout=5)
+        except Exception as e:
+            print(f"Error stopping Redis: {e}")
+            try:
+                os.killpg(os.getpgid(redis_process.pid), signal.SIGKILL)
+            except:
+                pass
+
+        redis_process = None
+        print("Redis server stopped")
+
+
+def start_celery_worker():
+    """Start Celery worker for processing tasks."""
+    global celery_process
+
+    if celery_process is not None:
+        return
+
+    print("Starting Celery worker...")
+    celery_process = subprocess.Popen(
+        ["celery", "-A", "gw_compas", "worker", "--loglevel=info"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        preexec_fn=os.setsid,
+        env=dict(os.environ, DJANGO_SETTINGS_MODULE="gw_compas.development-settings"),
+    )
+
+    # Give Celery time to start
+    time.sleep(3)
+    print("Celery worker started")
+
+
+def stop_celery_worker():
+    """Stop Celery worker."""
+    global celery_process
+
+    if celery_process is not None:
+        print("Stopping Celery worker...")
+        try:
+            os.killpg(os.getpgid(celery_process.pid), signal.SIGTERM)
+            celery_process.wait(timeout=10)
+        except Exception as e:
+            print(f"Error stopping Celery: {e}")
+            try:
+                os.killpg(os.getpgid(celery_process.pid), signal.SIGKILL)
+            except:
+                pass
+
+        celery_process = None
+        print("Celery worker stopped")
+
+
+# Register cleanup functions
+atexit.register(stop_vite_preview)
+atexit.register(stop_redis)
+atexit.register(stop_celery_worker)
+
+
 class ReactPlaywrightTestCase(PlaywrightTestCase):
     """
     A test case class that extends PlaywrightTestCase to add support for testing
@@ -158,6 +268,10 @@ class ReactPlaywrightTestCase(PlaywrightTestCase):
     def setUpClass(cls):
         """Set up the test environment."""
         super().setUpClass()
+        # Start Redis for Celery
+        start_redis()
+        # Start Celery worker
+        start_celery_worker()
         # Ensure React app is built and Vite server is running
         build_react_app()
         start_vite_preview()
@@ -180,6 +294,10 @@ class AsyncReactPlaywrightTestCase(AsyncPlaywrightTestCase):
     def setUpClass(cls):
         """Set up the test environment."""
         super().setUpClass()
+        # Start Redis for Celery
+        start_redis()
+        # Start Celery worker
+        start_celery_worker()
         # Ensure React app is built and Vite server is running
         build_react_app()
         start_vite_preview()
