@@ -73,7 +73,7 @@ def run_vimes(job_output_dir, scaling="log", images="default"):
 
         if not os.path.exists(frames_file_path):
             run(
-                f"vimes-preprocess asdas{detailed_output_file_path} {frames_file_path}",
+                f"vimes-preprocess {detailed_output_file_path} {frames_file_path}",
                 shell=True,
                 check=True,
             )
