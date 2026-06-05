@@ -12,6 +12,14 @@ asgiref==3.8.1
     # via
     #   django
     #   django-cors-headers
+astro-tulips==1.0.3
+    # via vimes
+astropy==7.2.0
+    # via astro-tulips
+astropy-iers-data==0.2026.4.20.0.58.15
+    # via astropy
+asttokens==3.0.1
+    # via stack-data
 billiard==4.2.1
     # via celery
 black==25.1.0
@@ -40,6 +48,12 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.3.0
     # via celery
+cmasher==1.9.2
+    # via astro-tulips
+colorspacious==1.1.2
+    # via cmasher
+comm==0.2.3
+    # via ipywidgets
 contourpy==1.3.2
     # via matplotlib
 coverage==4.5.4
@@ -48,6 +62,8 @@ cryptography==45.0.3
     # via jwcrypto
 cycler==0.12.1
     # via matplotlib
+decorator==5.2.1
+    # via ipython
 django==5.2.2
     # via
     #   -r requirements.in
@@ -62,6 +78,8 @@ django-filter==25.1
     # via -r requirements.in
 django4-jenkins==1.0.0
     # via -r requirements.in
+executing==2.2.1
+    # via stack-data
 flake8==7.2.0
     # via -r requirements.in
 fonttools==4.58.1
@@ -81,10 +99,28 @@ graphql-relay==3.2.0
     # via
     #   graphene
     #   graphene-django
-h5py==3.13.0
-    # via -r requirements.in
+h5py==3.16.0
+    # via
+    #   -r requirements.in
+    #   vimes
 idna==3.10
     # via requests
+imageio==2.37.3
+    # via vimes
+imageio-ffmpeg==0.6.0
+    # via astro-tulips
+importlib-metadata==9.0.0
+    # via mesaplot
+ipython==9.12.0
+    # via ipywidgets
+ipython-pygments-lexers==1.1.1
+    # via ipython
+ipywidgets==8.1.8
+    # via astro-tulips
+jedi==0.19.2
+    # via ipython
+jupyterlab-widgets==3.0.16
+    # via ipywidgets
 jwcrypto==1.5.6
     # via python-jwt
 kiwisolver==1.4.8
@@ -92,28 +128,56 @@ kiwisolver==1.4.8
 kombu==5.5.4
     # via celery
 matplotlib==3.10.3
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   astro-tulips
+    #   cmasher
+    #   mesaplot
+matplotlib-inline==0.2.1
+    # via ipython
 mccabe==0.7.0
     # via flake8
+mesaplot==2.0.11
+    # via astro-tulips
 mypy-extensions==1.1.0
     # via black
 numpy==2.2.6
     # via
+    #   astro-tulips
+    #   astropy
+    #   cmasher
+    #   colorspacious
     #   contourpy
     #   h5py
+    #   imageio
     #   matplotlib
+    #   mesaplot
+    #   pandas
+    #   pyerfa
+    #   scipy
+    #   vimes
 packaging==25.0
     # via
+    #   astropy
     #   black
     #   build
     #   kombu
     #   matplotlib
+pandas==3.0.2
+    # via mesaplot
+parso==0.8.6
+    # via jedi
 pathspec==0.12.1
     # via black
 pep8==1.7.1
     # via -r requirements.in
-pillow==11.2.1
-    # via matplotlib
+pexpect==4.9.0
+    # via ipython
+pillow==12.2.0
+    # via
+    #   imageio
+    #   matplotlib
+    #   vimes
 pip-tools==7.4.1
     # via -r requirements.in
 platformdirs==4.3.8
@@ -121,15 +185,29 @@ platformdirs==4.3.8
 promise==2.3
     # via graphene-django
 prompt-toolkit==3.0.51
-    # via click-repl
+    # via
+    #   click-repl
+    #   ipython
+ptyprocess==0.7.0
+    # via pexpect
+pure-eval==0.2.3
+    # via stack-data
 pycodestyle==2.13.0
     # via flake8
 pycparser==2.22
     # via cffi
+pyerfa==2.0.1.5
+    # via astropy
 pyflakes==3.3.2
     # via
     #   -r requirements.in
     #   flake8
+pygame==2.6.1
+    # via vimes
+pygments==2.20.0
+    # via
+    #   ipython
+    #   ipython-pygments-lexers
 pyhumps==3.8.0
     # via -r requirements.in
 pyjwt==2.10.1
@@ -147,16 +225,21 @@ python-dateutil==2.9.0.post0
     #   celery
     #   graphene
     #   matplotlib
+    #   pandas
 python-decouple==3.8
     # via -r requirements.in
 python-jwt==4.1.0
     # via -r requirements.in
+pyyaml==6.0.3
+    # via astropy
 redis==6.2.0
     # via -r requirements.in
 requests==2.32.3
     # via
     #   -r requirements.in
     #   adacs-sso-plugin
+scipy==1.17.1
+    # via mesaplot
 six==1.17.0
     # via
     #   graphene-file-upload
@@ -164,8 +247,17 @@ six==1.17.0
     #   python-dateutil
 sqlparse==0.5.3
     # via django
+stack-data==0.6.3
+    # via ipython
 text-unidecode==1.3
     # via graphene-django
+tqdm==4.67.3
+    # via astro-tulips
+traitlets==5.14.3
+    # via
+    #   ipython
+    #   ipywidgets
+    #   matplotlib-inline
 typing-extensions==4.14.0
     # via
     #   graphene
@@ -174,6 +266,8 @@ tzdata==2025.2
     # via kombu
 urllib3==2.4.0
     # via requests
+vimes @ git+https://github.com/layabinu/VIMES_VIsualization_of_Massive_Evolving_Stars.git@v1.0.0
+    # via -r requirements.in
 vine==5.1.0
     # via
     #   amqp
@@ -183,6 +277,10 @@ wcwidth==0.2.13
     # via prompt-toolkit
 wheel==0.45.1
     # via pip-tools
+widgetsnbextension==4.0.15
+    # via ipywidgets
+zipp==3.23.1
+    # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

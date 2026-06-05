@@ -4,7 +4,7 @@ import { graphql } from 'react-relay';
 import { Container, Col, Row, Nav, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
 import JobTitle from '../Components/Forms/JobTitle';
-import ReviewJob from '../Components/Forms/ReviewJob';
+import FormButtons from '../Components/Forms/FormButtons';
 import compasJobInitialValues from '../Components/Forms/compasJobInitialValues';
 import InitialParametersForm from '../Components/Forms/InitialParametersForm';
 import validationSchema from '../Components/Forms/compasJobValidationSchema';
@@ -160,7 +160,7 @@ const NewJob = ({ router }) => {
                 <Row>
                     <Col md={2}> </Col>
                     <Col md={7}>
-                        <ReviewJob />
+                        <FormButtons />
                     </Col>
                 </Row>
             </Container>

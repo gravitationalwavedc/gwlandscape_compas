@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Button, Container, Fade, Overlay, OverlayTrigger, Popover, Row, Tooltip } from 'react-bootstrap';
+import { Button, Container, Overlay, OverlayTrigger, Popover, Row, Tooltip } from 'react-bootstrap';
 
 const CheckButton = ({ content, cancelContent, onClick, ...props }) => {
     const [open, setOpen] = useState(false);
