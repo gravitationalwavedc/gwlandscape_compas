@@ -550,6 +550,8 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 )
             )
         except Exception as e:
+            logger.error("Error creating single binary job", exc_info=True)
+            logger.error(e)
             logger.error("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(

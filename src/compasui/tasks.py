@@ -13,22 +13,25 @@ from celery.exceptions import SoftTimeLimitExceeded
 logger = logging.getLogger(__name__)
 
 
-def check_output_file_generated(outputfilepath):
+def check_output_file_generated(outputfilepath, timeout=300):
     """
     Check if the job finished successfully by checking that output file is created
-    This will keep running until file is created or Celery raises SoftTimeLimitExceeded
+    This will keep running until file is created or timeout is reached
     :param outputfilepath: full path of output file
-    :return: TASK_SUCCESS if file exists
+    :param timeout: maximum time to wait in seconds (default 300 = 5 minutes)
+    :return: TASK_SUCCESS if file exists, TASK_TIMEOUT if timeout reached
     """
     import time
 
+    start_time = time.time()
     while True:
         if os.path.exists(outputfilepath):
+            print(f"Output file found after {time.time() - start_time:.1f}s")
             return TASK_SUCCESS
+        if time.time() - start_time > timeout:
+            print(f"Timeout after {timeout}s waiting for output file")
+            return TASK_TIMEOUT
         time.sleep(0.5)  # Check every half second to reduce CPU usage
-
-    # This will never be reached as Celery will raise SoftTimeLimitExceeded
-    # when the time limit is exceeded
 
 
 @shared_task
@@ -47,6 +50,7 @@ def run_compas(parameter_str, output_path):
         )
 
         call(compas_command, shell=True)
+
         result = check_output_file_generated(detailed_output_file_path)
 
     except SoftTimeLimitExceeded:

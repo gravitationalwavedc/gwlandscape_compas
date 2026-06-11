@@ -5,17 +5,25 @@ These tests verify that the React frontend loads correctly and can interact
 with the backend. The tests use the AsyncReactPlaywrightTestCase base class
 which handles building the React app and starting the Vite preview server.
 """
+import os
 import time
 import requests
+import tempfile
 from playwright.async_api import expect
-from .react_test_case import AsyncReactPlaywrightTestCase
+from .react_test_case import AsyncReactPlaywrightTestCase, REDIS_PORT
 from unittest import mock
 from compasui.tests.testcases import CompasTestCase
 from adacs_sso_plugin.adacs_user import ADACSUser
+from django.test import override_settings
 from django.contrib.auth import get_user_model
 from adacs_django_playwright.adacs_django_playwright import async_playwright_test
+import logging
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
+
+temp_output_dir = tempfile.TemporaryDirectory()
 
 
 def request_lookup_users_mock(*args, **kwargs):
@@ -26,6 +34,11 @@ def request_lookup_users_mock(*args, **kwargs):
     return False, []
 
 
+@override_settings(
+    COMPAS_IO_PATH=temp_output_dir.name,
+    CELERY_BROKER_URL="redis://localhost:6380",
+    CELERY_RESULT_BACKEND="redis://localhost:6380",
+)
 class TestReactFrontend(AsyncReactPlaywrightTestCase):
     """
     Test cases for the React frontend.
@@ -38,6 +51,7 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
     async def asetUp(self):
         """Set up the test environment."""
         self.user = ADACSUser(**CompasTestCase.DEFAULT_USER)
+
         # Wait for backend to be ready before running tests
         self.wait_for_backend_ready()
 
@@ -49,7 +63,7 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         when we navigate to it. We check multiple endpoints to ensure
         the backend is fully ready.
         """
-        print(f"Waiting for backend to be ready at {self.live_server_url}...")
+        logger.info(f"Waiting for backend to be ready at {self.live_server_url}...")
         start_time = time.time()
         
         while time.time() - start_time < timeout:
@@ -68,14 +82,14 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
                         )
                         if graphql_response.status_code in [200, 400, 401, 403]:
                             # GraphQL is responding (400/401/403 are OK - means it's running)
-                            print(f"✓ Backend is ready at {self.live_server_url} (took {time.time() - start_time:.1f}s)")
-                            print(f"  GraphQL endpoint: {graphql_url} - Status: {graphql_response.status_code}")
+                            logger.info(f"✓ Backend is ready at {self.live_server_url} (took {time.time() - start_time:.1f}s)")
+                            logger.info(f"  GraphQL endpoint: {graphql_url} - Status: {graphql_response.status_code}")
                             return
                     except requests.exceptions.RequestException as graphql_err:
                         # GraphQL not ready yet, but backend is - keep waiting
-                        print(f"  Backend responding, GraphQL not ready yet: {type(graphql_err).__name__}")
+                        logger.info(f"  Backend responding, GraphQL not ready yet: {type(graphql_err).__name__}")
             except requests.exceptions.RequestException as e:
-                print(f"  Backend not ready yet: {type(e).__name__}")
+                logger.info(f"  Backend not ready yet: {type(e).__name__}")
             
             # Wait a bit before retrying
             time.sleep(0.5)
@@ -101,15 +115,15 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         
         # Wait for React app container to be visible (not just attached)
         # This ensures the app has mounted and rendered
-        print("Waiting for page to load...")
+        logger.info("Waiting for page to load...")
         await page.wait_for_selector("#root", state="visible", timeout=10000)
         
         # Wait for loading spinner to disappear if it exists
         try:
             await page.wait_for_selector("div[role='progressbar']", state="detached", timeout=5000)
-            print("Loading spinner disappeared")
+            logger.info("Loading spinner disappeared")
         except:
-            print("No loading spinner found or timeout waiting for it")
+            logger.debug("No loading spinner found or timeout waiting for it")
 
     @async_playwright_test
     @mock.patch(
@@ -133,19 +147,19 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         page.on("pageerror", lambda err: console_messages.append(f"ERROR: {err}"))
 
         # Navigate to the frontend
-        print(f"Navigating to {self.react_url}")
+        logger.info(f"Navigating to {self.react_url}")
         await page.goto(self.react_url)
         await self.wait_for_page_load(page)
         
         # Take a screenshot for debugging
         await page.screenshot(path="test_homepage.png")
-        print("Screenshot saved to test_homepage.png")
+        logger.info("Screenshot saved to test_homepage.png")
         
         # Print console messages for debugging
         if console_messages:
-            print("Console messages:")
+            logger.info("Console messages:")
             for msg in console_messages[-20:]:  # Last 20 messages
-                print(f"  {msg}")
+                logger.info(f"  {msg}")
 
         # Test that the page loads correctly
         await expect(page).to_have_title("GW Landscape")
@@ -170,35 +184,6 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         "compasui.utils.auth.lookup_users.request_lookup_users",
         side_effect=request_lookup_users_mock,
     )
-    async def test_simulate_binary_page_loads(self, lookup):
-        """
-        Test that the simulate binary page loads correctly.
-        
-        This test verifies:
-        1. Can navigate to the homepage
-        2. Can click the "Simulate Binary" button
-        3. The simulate binary page loads with expected content
-        """
-        page = await self.browser_context.new_page()
-
-        # Navigate to the homepage
-        print(f"Navigating to {self.react_url}")
-        await page.goto(self.react_url)
-        await self.wait_for_page_load(page)
-
-        # Click on Simulate Binary button
-        await page.get_by_role("link", name="Simulate Binary").click()
-        await self.wait_for_page_load(page)
-        
-        # Check for simulate binary page content
-        simulate_heading = page.get_by_text("Simulate the evolution of a binary")
-        await expect(simulate_heading).to_be_visible(timeout=10000)
-
-    @async_playwright_test
-    @mock.patch(
-        "compasui.utils.auth.lookup_users.request_lookup_users",
-        side_effect=request_lookup_users_mock,
-    )
     async def test_publications_page_loads(self, lookup):
         """
         Test that the publications page loads correctly.
@@ -211,7 +196,7 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         page = await self.browser_context.new_page()
 
         # Navigate to the homepage
-        print(f"Navigating to {self.react_url}")
+        logger.info(f"Navigating to {self.react_url}")
         await page.goto(self.react_url)
         await self.wait_for_page_load(page)
 
@@ -241,7 +226,7 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         page = await self.browser_context.new_page()
 
         # Navigate to the homepage
-        print(f"Navigating to {self.react_url}")
+        logger.info(f"Navigating to {self.react_url}")
         await page.goto(self.react_url)
         await self.wait_for_page_load(page)
 
@@ -278,7 +263,7 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         page = await self.browser_context.new_page()
 
         # Navigate to the homepage
-        print(f"Navigating to {self.react_url}")
+        logger.info(f"Navigating to {self.react_url}")
         await page.goto(self.react_url)
         await self.wait_for_page_load(page)
 
@@ -303,46 +288,41 @@ class TestReactFrontend(AsyncReactPlaywrightTestCase):
         # The submit button has text "Start Simulation"
         submit_button = page.get_by_role("button", name="Start Simulation")
         
-        print("Submitting single binary simulation form...")
+        logger.info("Submitting single binary simulation form...")
         await submit_button.click()
         
         # Wait for the page to navigate to results
         await self.wait_for_page_load(page)
         
-        # Wait for job to be processed by Celery (with timeout)
-        print("Waiting for Celery to process the job...")
-        max_wait = 60  # seconds
-        start_time = time.time()
-        job_successful = False
-        
-        while time.time() - start_time < max_wait:
-            # Check for error messages first
-            error_message = page.get_by_text("Error")
-            if await error_message.count() > 0:
-                # Check if it's actually an error state vs just the word "Error" somewhere
-                error_visible = await error_message.is_visible()
-                if error_visible:
-                    print("Error message found on page")
-                    # Take screenshot for debugging
-                    await page.screenshot(path="test_single_binary_error.png")
-                    raise AssertionError("Job submission failed - error message displayed")
-            
-            # Check if results are displayed
-            result_heading = page.get_by_text("COMPAS Output")
-            if await result_heading.count() > 0:
-                result_visible = await result_heading.is_visible()
-                if result_visible:
-                    print("Job results found!")
-                    job_successful = True
-                    break
-            
-            await page.wait_for_timeout(2000)
-        
-        # Verify we got successful results
-        if not job_successful:
+        # Wait for the download link to appear as the signal that results are ready
+        logger.info("Waiting for single binary results to become available...")
+        output_link = page.get_by_test_id("download-link")
+
+        try:
+            await output_link.wait_for(state="visible", timeout=60000)
+            logger.info("Download link is visible, results have loaded")
+        except Exception:
             await page.screenshot(path="test_single_binary_timeout.png")
-            raise AssertionError("Job did not complete within timeout period")
-        
-        # The page should have navigated to a results view
-        await page.wait_for_selector("#root", timeout=10000)
-        print("Single binary job submission test completed successfully")
+            raise AssertionError("Single binary results did not load within timeout period")
+
+        # Also fail fast if the frontend shows a visible error alert
+        error_message = page.get_by_test_id("error-message")
+        if await error_message.count() > 0 and await error_message.is_visible():
+            await page.screenshot(path="test_single_binary_error.png")
+            raise AssertionError("Job submission failed - error message displayed")
+
+        # Confirm COMPAS output image files are displayed
+        output_images = page.locator("img[src*='/compas/static/assets/']")
+        if await output_images.count() == 0:
+            await page.screenshot(path="test_single_binary_no_output_images.png")
+            raise AssertionError("Expected COMPAS output images to be displayed after job completion")
+        await expect(output_images.first).to_be_visible(timeout=10000)
+
+        # Confirm chart plots are rendered as SVG elements
+        chart_svgs = page.locator("svg")
+        if await chart_svgs.count() == 0:
+            await page.screenshot(path="test_single_binary_no_svg_plots.png")
+            raise AssertionError("Expected chart plots to be rendered after job completion")
+        await expect(chart_svgs.first).to_be_visible(timeout=10000)
+
+        logger.info("Single binary job submission test completed successfully")

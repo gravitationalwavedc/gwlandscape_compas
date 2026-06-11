@@ -1,46 +1,74 @@
 import subprocess
+import tempfile
 import time
 import os
 import signal
-import atexit
+import socket
+import logging
+from pathlib import Path
 from adacs_django_playwright.adacs_django_playwright import (
     AsyncPlaywrightTestCase,
     PlaywrightTestCase,
 )
 
-# Module-level variables to store the Vite server process
-vite_process = None
-react_app_built = False
-redis_process = None
-celery_process = None
+class SharedServiceState:
+    def __init__(self):
+        self.vite_process = None
+        self.react_app_built = False
+        self.react_build_tempdir = None
+        self.react_build_dir = None
+        self.redis_process = None
+        self.celery_process = None
+
+state = SharedServiceState()
+
+# Module logger
+# logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logger = logging.getLogger(__name__)
 
 FRONTEND_PORT = 4173
 BACKEND_PORT = 8000
 REDIS_PORT = 6380  # Use non-standard port to avoid conflicts
 
 
+def wait_for_port(host: str, port: int, timeout: float = 10.0, interval: float = 0.5):
+    """Wait until a TCP port is accepting connections."""
+    deadline = time.monotonic() + timeout
+
+    while True:
+        try:
+            with socket.create_connection((host, port), timeout=interval):
+                return
+        except OSError:
+            if time.monotonic() >= deadline:
+                raise TimeoutError(f"Timed out waiting for {host}:{port}")
+            time.sleep(interval)
+
+
 def build_react_app():
     """Build the React app using npm run build."""
-    global react_app_built
 
-    if react_app_built:
+    if state.react_app_built:
         return
 
-    print("Building React app...")
-    # Path to the react directory
-    react_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "react"
-    )
+    logger.info("Building React app...")
 
-    # Clean the dist folder first to ensure fresh build
-    dist_path = os.path.join(react_dir, "dist")
-    if os.path.exists(dist_path):
-        import shutil
-        shutil.rmtree(dist_path)
-        print(f"Cleaned {dist_path}")
+    # Path to the react directory
+    react_dir = Path(__file__).resolve().parent.parent / "react"
+
+    # Build into a temporary directory so we don't overwrite or remove any existing dist
+    state.react_build_tempdir = tempfile.TemporaryDirectory()
+    state.react_build_dir = state.react_build_tempdir.name
 
     result = subprocess.run(
-        ["npm", "run", "build"],
+        [
+            "npm",
+            "run",
+            "build",
+            "--",
+            "--outDir",
+            state.react_build_dir,
+        ],
         cwd=react_dir,
         capture_output=True,
         text=True,
@@ -52,35 +80,35 @@ def build_react_app():
     )
 
     if result.returncode != 0:
-        print(f"Error building React app: {result.stderr}")
+        logger.error(f"Error building React app: {result.stderr}")
         raise Exception(f"Failed to build React app: {result.stderr}")
 
-    react_app_built = True
-    print("React app built successfully")
-    print(f"  Backend URL: http://localhost:{BACKEND_PORT}")
-    print(f"  Frontend URL: http://localhost:{FRONTEND_PORT}")
+    state.react_app_built = True
+    logger.info("React app built successfully")
+    logger.info(f"  React build directory: {state.react_build_dir}")
+    logger.info(f"  Backend URL: http://localhost:{BACKEND_PORT}")
+    logger.info(f"  Frontend URL: http://localhost:{FRONTEND_PORT}")
 
 
 def start_vite_preview():
     """Start the Vite preview server to serve the built React app."""
-    global vite_process
 
-    if vite_process is not None:
+    if state.vite_process is not None:
         return
 
-    print("Starting Vite preview server...")
+    logger.info("Starting Vite preview server...")
     # Path to the react directory
-    react_dir = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "react"
-    )
+    react_dir = Path(__file__).resolve().parent.parent / "react"
 
     # Start vite preview server
-    vite_process = subprocess.Popen(
+    state.vite_process = subprocess.Popen(
         [
             "npm",
             "run",
             "preview",
             "--",
+            "--outDir",
+            state.react_build_dir,
             "--port",
             "4173",
             "--strictPort",
@@ -91,73 +119,50 @@ def start_vite_preview():
         preexec_fn=os.setsid,  # Use process group for easier termination
     )
 
-    # Wait for server to start (could be improved with actual readiness check)
     max_wait = 10  # seconds
-    start_time = time.time()
 
-    while time.time() - start_time < max_wait:
-        # Check if process is still running
-        if vite_process.poll() is not None:
-            stderr = vite_process.stderr.read().decode("utf-8")
-            raise Exception(f"Vite preview server failed to start: {stderr}")
+    try:
+        wait_for_port("localhost", FRONTEND_PORT, timeout=max_wait)
+        logger.info("Vite preview server started successfully")
+    except TimeoutError as exc:
+        if state.vite_process.poll() is not None:
+            stderr = state.vite_process.stderr.read().decode("utf-8")
+            stop_vite_preview()
+            raise Exception(f"Vite preview server failed to start: {stderr}") from exc
 
-        # Try to connect to the server
-        try:
-            import socket
-
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            result = sock.connect_ex(("localhost", 4173))
-            sock.close()
-
-            if result == 0:
-                print("Vite preview server started successfully")
-                return
-        except Exception as e:
-            print(f"Error checking server: {e}")
-
-        time.sleep(0.5)
-
-    # If we get here, the server didn't start in time
-    stop_vite_preview()
-    raise Exception("Timed out waiting for Vite preview server to start")
+        stop_vite_preview()
+        raise Exception("Timed out waiting for Vite preview server to start") from exc
 
 
 def stop_vite_preview():
     """Stop the Vite preview server."""
-    global vite_process
 
-    if vite_process is not None:
-        print("Stopping Vite preview server...")
+    if state.vite_process is not None:
+        logger.info("Stopping Vite preview server...")
         try:
             # Kill the process group
-            os.killpg(os.getpgid(vite_process.pid), signal.SIGTERM)
-            vite_process.wait(timeout=5)
+            os.killpg(os.getpgid(state.vite_process.pid), signal.SIGTERM)
+            state.vite_process.wait(timeout=5)
         except Exception as e:
-            print(f"Error stopping Vite preview server: {e}")
+            logger.error(f"Error stopping Vite preview server: {e}")
             # Try to force kill if normal termination fails
             try:
-                os.killpg(os.getpgid(vite_process.pid), signal.SIGKILL)
+                os.killpg(os.getpgid(state.vite_process.pid), signal.SIGKILL)
             except:
                 pass
 
-        vite_process = None
-        print("Vite preview server stopped")
-
-
-# Register the stop_vite_preview function to be called when the Python interpreter exits
-atexit.register(stop_vite_preview)
+        state.vite_process = None
+        logger.info("Vite preview server stopped")
 
 
 def start_redis():
     """Start Redis server for Celery."""
-    global redis_process
 
-    if redis_process is not None:
+    if state.redis_process is not None:
         return
 
-    print("Starting Redis server...")
-    redis_process = subprocess.Popen(
+    logger.info("Starting Redis server...")
+    state.redis_process = subprocess.Popen(
         ["redis-server", "--port", str(REDIS_PORT)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -166,94 +171,102 @@ def start_redis():
 
     # Wait for Redis to start
     max_wait = 5
-    start_time = time.time()
 
-    while time.time() - start_time < max_wait:
-        try:
-            import socket
-
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(1)
-            result = sock.connect_ex(("localhost", REDIS_PORT))
-            sock.close()
-
-            if result == 0:
-                print("Redis server started successfully")
-                return
-        except Exception as e:
-            print(f"Error checking Redis: {e}")
-
-        time.sleep(0.5)
-
-    stop_redis()
-    raise Exception("Timed out waiting for Redis to start")
+    try:
+        wait_for_port("localhost", REDIS_PORT, timeout=max_wait)
+        logger.info("Redis server started successfully")
+    except TimeoutError as exc:
+        stop_redis()
+        raise Exception("Timed out waiting for Redis to start") from exc
 
 
 def stop_redis():
     """Stop Redis server."""
-    global redis_process
 
-    if redis_process is not None:
-        print("Stopping Redis server...")
+    if state.redis_process is not None:
+        logger.info("Stopping Redis server...")
         try:
-            os.killpg(os.getpgid(redis_process.pid), signal.SIGTERM)
-            redis_process.wait(timeout=5)
+            os.killpg(os.getpgid(state.redis_process.pid), signal.SIGTERM)
+            state.redis_process.wait(timeout=5)
         except Exception as e:
-            print(f"Error stopping Redis: {e}")
+            logger.error(f"Error stopping Redis: {e}")
             try:
-                os.killpg(os.getpgid(redis_process.pid), signal.SIGKILL)
+                os.killpg(os.getpgid(state.redis_process.pid), signal.SIGKILL)
             except:
                 pass
 
-        redis_process = None
-        print("Redis server stopped")
+        state.redis_process = None
+        logger.info("Redis server stopped")
 
 
 def start_celery_worker():
     """Start Celery worker for processing tasks."""
-    global celery_process
 
-    if celery_process is not None:
+    if state.celery_process is not None:
         return
 
-    print("Starting Celery worker...")
-    celery_process = subprocess.Popen(
-        ["celery", "-A", "gw_compas", "worker", "--loglevel=info"],
+    logger.info("Starting Celery worker...")
+    # Get the path to the venv's celery executable
+    venv_dir = Path(__file__).parent.parent / "venv"
+    celery_executable = venv_dir / "bin" / "celery"
+
+    # Don't capture stdout/stderr so we can see Celery logs in real-time
+    state.celery_process = subprocess.Popen(
+        [str(celery_executable), "-A", "gw_compas", "worker", "--loglevel=info"],
+        preexec_fn=os.setsid,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        preexec_fn=os.setsid,
         env=dict(os.environ, DJANGO_SETTINGS_MODULE="gw_compas.development-settings"),
     )
 
     # Give Celery time to start
     time.sleep(3)
-    print("Celery worker started")
+    logger.info("Celery worker started")
 
 
 def stop_celery_worker():
     """Stop Celery worker."""
-    global celery_process
 
-    if celery_process is not None:
-        print("Stopping Celery worker...")
+    if state.celery_process is not None:
+        logger.info("Stopping Celery worker...")
         try:
-            os.killpg(os.getpgid(celery_process.pid), signal.SIGTERM)
-            celery_process.wait(timeout=10)
+            os.killpg(os.getpgid(state.celery_process.pid), signal.SIGTERM)
+            state.celery_process.wait(timeout=10)
         except Exception as e:
-            print(f"Error stopping Celery: {e}")
+            logger.error(f"Error stopping Celery: {e}")
             try:
-                os.killpg(os.getpgid(celery_process.pid), signal.SIGKILL)
+                os.killpg(os.getpgid(state.celery_process.pid), signal.SIGKILL)
             except:
                 pass
 
-        celery_process = None
-        print("Celery worker stopped")
+        state.celery_process = None
+        logger.info("Celery worker stopped")
 
 
-# Register cleanup functions
-atexit.register(stop_vite_preview)
-atexit.register(stop_redis)
-atexit.register(stop_celery_worker)
+def start_shared_services():
+    """Start all shared external services used by React Playwright tests."""
+    # Override Celery broker URL to use the test Redis server on port 6380
+    # This must be set BEFORE Django loads settings
+    os.environ["CELERY_BROKER_URL"] = f"redis://localhost:{REDIS_PORT}"
+    os.environ["CELERY_RESULT_BACKEND"] = f"redis://localhost:{REDIS_PORT}"
+    
+    start_redis()
+    start_celery_worker()
+    build_react_app()
+    start_vite_preview()
+
+
+def stop_shared_services():
+    """Stop all shared external services used by React Playwright tests."""
+    stop_vite_preview()
+    stop_celery_worker()
+    stop_redis()
+    if state.react_build_tempdir is not None:
+        try:
+            state.react_build_tempdir.cleanup()
+            logger.info("Cleaned temporary React build directory")
+        except Exception as e:
+            logger.error(f"Error cleaning temporary React build directory: {e}")
 
 
 class ReactPlaywrightTestCase(PlaywrightTestCase):
@@ -268,13 +281,15 @@ class ReactPlaywrightTestCase(PlaywrightTestCase):
     def setUpClass(cls):
         """Set up the test environment."""
         super().setUpClass()
-        # Start Redis for Celery
-        start_redis()
-        # Start Celery worker
-        start_celery_worker()
-        # Ensure React app is built and Vite server is running
-        build_react_app()
-        start_vite_preview()
+        start_shared_services()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down shared services after all tests in the class have run."""
+        try:
+            stop_shared_services()
+        finally:
+            super().tearDownClass()
 
     @property
     def react_url(self):
@@ -294,13 +309,15 @@ class AsyncReactPlaywrightTestCase(AsyncPlaywrightTestCase):
     def setUpClass(cls):
         """Set up the test environment."""
         super().setUpClass()
-        # Start Redis for Celery
-        start_redis()
-        # Start Celery worker
-        start_celery_worker()
-        # Ensure React app is built and Vite server is running
-        build_react_app()
-        start_vite_preview()
+        start_shared_services()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down shared services after all tests in the class have run."""
+        try:
+            stop_shared_services()
+        finally:
+            super().tearDownClass()
 
     @property
     def react_url(self):
