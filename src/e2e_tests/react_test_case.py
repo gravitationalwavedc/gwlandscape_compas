@@ -264,7 +264,7 @@ def start_celery_worker():
 
     logger.info("Starting Celery worker...")
     # Get the path to the venv's celery executable
-    venv_dir = Path(__file__).parent.parent / "venv"
+    venv_dir = Path(__file__).parent.parent.parent / "venv"
     celery_executable = venv_dir / "bin" / "celery"
 
     # Don't capture stdout/stderr so we can see Celery logs in real-time

@@ -148,6 +148,8 @@ mesaplot==2.0.11
     # via astro-tulips
 mypy-extensions==1.1.0
     # via black
+mysqlclient==2.2.8
+    # via -r requirements.in
 numpy==2.2.6
     # via
     #   astro-tulips

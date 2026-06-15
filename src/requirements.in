@@ -19,6 +19,7 @@ matplotlib
 pyjwt
 black
 python-decouple
+mysqlclient
 pytest-playwright
 adacs-django-playwright
 git+https://gitlab.com/CAS-eResearch/internal/adacs-sso-plugin.git@v0.3.2
