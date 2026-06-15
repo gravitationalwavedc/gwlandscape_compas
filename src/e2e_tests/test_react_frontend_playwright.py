@@ -6,19 +6,23 @@ with the backend. The tests use the AsyncReactPlaywrightTestCase base class
 which handles building the React app and starting the Vite preview server.
 """
 
-import os
-import time
-import requests
-import tempfile
-from playwright.async_api import expect
-from .react_test_case import AsyncReactPlaywrightTestCase, REDIS_PORT
-from unittest import mock
-from compasui.tests.testcases import CompasTestCase
-from adacs_sso_plugin.adacs_user import ADACSUser
-from django.test import override_settings
-from django.contrib.auth import get_user_model
-from adacs_django_playwright.adacs_django_playwright import async_playwright_test
 import logging
+import os
+import tempfile
+import time
+from unittest import mock
+
+import requests
+from adacs_django_playwright.adacs_django_playwright import \
+    async_playwright_test
+from adacs_sso_plugin.adacs_user import ADACSUser
+from django.contrib.auth import get_user_model
+from django.test import override_settings
+from playwright.async_api import expect
+
+from compasui.tests.testcases import CompasTestCase
+
+from .react_test_case import REDIS_PORT, AsyncReactPlaywrightTestCase
 
 logger = logging.getLogger(__name__)
 

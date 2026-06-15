@@ -1,17 +1,15 @@
-import requests
-import subprocess
-import tempfile
-import time
+import logging
 import os
 import signal
 import socket
-import logging
+import subprocess
+import tempfile
+import time
 from pathlib import Path
 
+import requests
 from adacs_django_playwright.adacs_django_playwright import (
-    AsyncPlaywrightTestCase,
-    PlaywrightTestCase,
-)
+    AsyncPlaywrightTestCase, PlaywrightTestCase)
 
 
 class SharedServiceState:
