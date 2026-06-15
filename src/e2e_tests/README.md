@@ -1,6 +1,6 @@
 # React Frontend Playwright Tests
 
-This directory contains end-to-end tests for the React frontend using Playwright.
+This directory contains end-to-end tests for the React frontend using Playwright with a Django, GraphQL, Redis, and Celery backend.
 
 ## Running the Tests
 
@@ -18,15 +18,47 @@ To run a specific test:
 python development-manage.py test e2e_tests.test_react_frontend_playwright.TestReactFrontend.test_homepage_loads --verbosity=2
 ```
 
+To run all e2e tests:
+
+```bash
+python development-manage.py test e2e_tests --verbosity=2
+```
+
 ## Test Infrastructure
 
 The tests use the `AsyncReactPlaywrightTestCase` base class from `react_test_case.py`, which:
 
-1. Waits for the backend GraphQL API to be ready before running tests
-2. Builds the React app using `npm run build`
-3. Starts a Vite preview server to serve the built app
-4. Provides a Playwright browser context for testing
-5. Handles cleanup when tests complete
+1. **Sets up Celery configuration** - Environment variables configure Celery to use Redis on port 6380
+2. **Starts Redis server** - Launches Redis on port 6380 for Celery broker
+3. **Starts Celery worker** - Launches Celery worker to process background tasks
+4. **Builds the React app** - Uses `npm run build` to create production build
+5. **Starts Vite preview server** - Serves the built app on port 4173
+6. **Waits for backend readiness** - Checks both Django and GraphQL endpoints before running tests
+7. **Provides Playwright browser context** - Sets up browser for testing
+8. **Handles cleanup** - Stops all services when tests complete
+
+## Test Architecture
+
+### Environment Configuration
+
+Celery broker URLs are set as environment variables at module load time (before Django imports):
+
+```python
+os.environ["CELERY_BROKER_URL"] = "redis://localhost:6380"
+os.environ["CELERY_RESULT_BACKEND"] = "redis://localhost:6380"
+```
+
+This ensures both Django and the Celery worker use the same Redis instance.
+
+### Service Management
+
+The test infrastructure manages all required services:
+
+- **Redis** - Started via `subprocess.Popen` on port 6380
+- **Celery worker** - Started via `subprocess.Popen`, inherits environment variables
+- **Vite preview** - Serves the React build on port 4173
+
+All services are started in `setUpClass()` and stopped in `tearDownClass()` using process groups for clean termination.
 
 ## Test Behavior
 
@@ -46,13 +78,31 @@ This approach ensures tests:
 
 ## Debugging
 
-When tests run, they save screenshots (e.g., `test_homepage.png`) in the src directory. This can help diagnose rendering issues.
+When tests run, they save screenshots (e.g., `test_homepage.png`, `test_single_binary_timeout.png`) in the src directory. This can help diagnose rendering issues.
 
 The tests also print diagnostic information:
 - Backend readiness status
 - Navigation URLs
 - Loading spinner status
 - Console messages and errors
+- Celery task execution logs
+
+### Common Issues
+
+**Tests failing intermittently:**
+- Check for stale Redis/Celery processes: `ps aux | grep -E "redis|celery" | grep 6380`
+- Kill any stale processes and re-run tests
+- Ensure port 6380 is available
+
+**Celery tasks not executing:**
+- Verify Redis is running on port 6380
+- Check Celery worker logs for connection errors
+- Ensure `CELERY_BROKER_URL` environment variable is set correctly
+
+**Timeouts waiting for results:**
+- Check if Celery worker is processing tasks
+- Verify COMPAS executable path is correct
+- Look for error messages in Celery worker output
 
 ## Adding New Tests
 
@@ -89,15 +139,59 @@ async def test_new_feature(self, lookup):
     await expect(page.get_by_placeholder("Search")).to_be_visible()
 ```
 
+### Testing Celery-Dependent Features
+
+For tests that submit tasks to Celery (like job submission):
+
+1. Fill out and submit forms as normal
+2. Wait for results using `wait_for()` with appropriate timeout
+3. Check for success indicators (download links, result content)
+4. Check for error messages if task fails
+
+Example:
+
+```python
+# Submit form that triggers Celery task
+await submit_button.click()
+await self.wait_for_page_load(page)
+
+# Wait for results (with timeout)
+output_link = page.get_by_test_id("download-link")
+await output_link.wait_for(state="visible", timeout=60000)
+
+# Verify results are displayed
+await expect(output_link).to_be_visible()
+```
+
 ## Dependencies
 
 The tests require:
 - `playwright` - Browser automation library
 - `adacs_django_playwright` - Django integration for Playwright
+- `redis-server` - Started automatically by tests
 - Node.js and npm - For building the React app
 - Chromium browser - Installed automatically by Playwright
 
-Install dependencies with:
+Install Python dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+Install Playwright browsers:
+
+```bash
+playwright install
+```
+
+## CI/CD
+
+The e2e tests run in GitLab CI using the Playwright Docker image. See `.gitlab-ci.yml` for configuration. The tests:
+
+- Run separately from Django unit tests
+- Use the Playwright Docker image with browsers pre-installed
+- Start their own Redis and Celery worker
+- Generate JUnit reports and screenshots as artifacts
 
 ```bash
 source venv/bin/activate

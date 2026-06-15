@@ -1,3 +1,4 @@
+import requests
 import subprocess
 import tempfile
 import time
@@ -6,10 +7,12 @@ import signal
 import socket
 import logging
 from pathlib import Path
+
 from adacs_django_playwright.adacs_django_playwright import (
     AsyncPlaywrightTestCase,
     PlaywrightTestCase,
 )
+
 
 class SharedServiceState:
     def __init__(self):
@@ -20,6 +23,7 @@ class SharedServiceState:
         self.redis_process = None
         self.celery_process = None
 
+
 state = SharedServiceState()
 
 # Module logger
@@ -29,6 +33,9 @@ logger = logging.getLogger(__name__)
 FRONTEND_PORT = 4173
 BACKEND_PORT = 8000
 REDIS_PORT = 6380  # Use non-standard port to avoid conflicts
+
+os.environ["CELERY_BROKER_URL"] = f"redis://localhost:{REDIS_PORT}"
+os.environ["CELERY_RESULT_BACKEND"] = f"redis://localhost:{REDIS_PORT}"
 
 
 def wait_for_port(host: str, port: int, timeout: float = 10.0, interval: float = 0.5):
@@ -43,6 +50,56 @@ def wait_for_port(host: str, port: int, timeout: float = 10.0, interval: float =
             if time.monotonic() >= deadline:
                 raise TimeoutError(f"Timed out waiting for {host}:{port}")
             time.sleep(interval)
+
+
+def wait_for_backend_ready(live_server_url, timeout=30):
+    """
+    Wait for the backend to be responsive.
+
+    This ensures the React app can successfully mount and render
+    when we navigate to it. We check multiple endpoints to ensure
+    the backend is fully ready.
+    """
+    logger.info(f"Waiting for backend to be ready at {live_server_url}...")
+    start_time = time.time()
+
+    while time.time() - start_time < timeout:
+        try:
+            # Try to access the root endpoint first (should always work)
+            response = requests.get(live_server_url, timeout=2)
+            if response.status_code in [200, 301, 302, 404]:
+                # Backend is responding, try GraphQL
+                try:
+                    graphql_url = f"{live_server_url}/graphql"
+                    # POST with a simple introspection query
+                    graphql_response = requests.post(
+                        graphql_url, json={"query": "{ __typename }"}, timeout=2
+                    )
+                    if graphql_response.status_code in [200, 400, 401, 403]:
+                        # GraphQL is responding (400/401/403 are OK - means it's running)
+                        logger.info(
+                            f"✓ Backend is ready at {live_server_url} (took {time.time() - start_time:.1f}s)"
+                        )
+                        logger.info(
+                            f"  GraphQL endpoint: {graphql_url} - Status: {graphql_response.status_code}"
+                        )
+                        return
+                except requests.exceptions.RequestException as graphql_err:
+                    # GraphQL not ready yet, but backend is - keep waiting
+                    logger.info(
+                        f"  Backend responding, GraphQL not ready yet: {type(graphql_err).__name__}"
+                    )
+        except requests.exceptions.RequestException as e:
+            logger.info(f"  Backend not ready yet: {type(e).__name__}")
+
+        # Wait a bit before retrying
+        time.sleep(0.5)
+
+    # If we get here, the backend didn't become ready in time
+    raise TimeoutError(
+        f"Backend did not become ready within {timeout} seconds at {live_server_url}. "
+        f"The React app requires a working backend to mount properly."
+    )
 
 
 def build_react_app():
@@ -214,9 +271,12 @@ def start_celery_worker():
     state.celery_process = subprocess.Popen(
         [str(celery_executable), "-A", "gw_compas", "worker", "--loglevel=info"],
         preexec_fn=os.setsid,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        env=dict(os.environ, DJANGO_SETTINGS_MODULE="gw_compas.development-settings"),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        env=dict(
+            os.environ,
+            DJANGO_SETTINGS_MODULE="gw_compas.development-settings",
+        ),
     )
 
     # Give Celery time to start
@@ -245,11 +305,6 @@ def stop_celery_worker():
 
 def start_shared_services():
     """Start all shared external services used by React Playwright tests."""
-    # Override Celery broker URL to use the test Redis server on port 6380
-    # This must be set BEFORE Django loads settings
-    os.environ["CELERY_BROKER_URL"] = f"redis://localhost:{REDIS_PORT}"
-    os.environ["CELERY_RESULT_BACKEND"] = f"redis://localhost:{REDIS_PORT}"
-    
     start_redis()
     start_celery_worker()
     build_react_app()
@@ -291,6 +346,11 @@ class ReactPlaywrightTestCase(PlaywrightTestCase):
         finally:
             super().tearDownClass()
 
+    def setUp(self):
+        """Set up before each test method."""
+        super().setUp()
+        wait_for_backend_ready(self.live_server_url)
+
     @property
     def react_url(self):
         """Return the URL of the Vite preview server."""
@@ -318,6 +378,11 @@ class AsyncReactPlaywrightTestCase(AsyncPlaywrightTestCase):
             stop_shared_services()
         finally:
             super().tearDownClass()
+
+    def setUp(self):
+        """Set up before each test method."""
+        super().setUp()
+        wait_for_backend_ready(self.live_server_url)
 
     @property
     def react_url(self):

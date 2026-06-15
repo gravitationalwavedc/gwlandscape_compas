@@ -19,5 +19,6 @@ matplotlib
 pyjwt
 black
 python-decouple
+pytest-playwright
 git+https://gitlab.com/CAS-eResearch/internal/adacs-sso-plugin.git@v0.3.2
 git+https://github.com/layabinu/VIMES_VIsualization_of_Massive_Evolving_Stars.git@v1.0.0

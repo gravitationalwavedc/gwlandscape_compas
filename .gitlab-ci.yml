@@ -98,6 +98,27 @@ flake8:
   script:
     - pip install flake8-gl-codeclimate
     - flake8 --exit-zero --format gl-codeclimate --output-file gl-code-quality-report.json src/
+
+
+e2e-tests:
+  stage: test
+  image:
+    name: mcr.microsoft.com/playwright/python:v1.59.0-noble
+  variables:
+    PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+    DJANGO_SETTINGS_MODULE: gw_compas.development-settings
+  script:
+    - cd $WD/src
+    # Run e2e tests with Playwright
+    # Tests handle starting/stopping Redis and Celery worker internally
+    - python3 development-manage.py test e2e_tests --verbosity=2
+  artifacts:
+    when: always
+    reports:
+      junit: src/reports/junit-e2e.xml
+    paths:
+      - src/test_*.png
+  allow_failure: false
   artifacts:
     reports:
       codequality: gl-code-quality-report.json
