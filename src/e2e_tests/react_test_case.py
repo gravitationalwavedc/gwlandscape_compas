@@ -9,7 +9,9 @@ from pathlib import Path
 
 import requests
 from adacs_django_playwright.adacs_django_playwright import (
-    AsyncPlaywrightTestCase, PlaywrightTestCase)
+    AsyncPlaywrightTestCase,
+    PlaywrightTestCase,
+)
 
 
 class SharedServiceState:

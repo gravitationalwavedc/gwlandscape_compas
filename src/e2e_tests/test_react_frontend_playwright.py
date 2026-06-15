@@ -13,8 +13,7 @@ import time
 from unittest import mock
 
 import requests
-from adacs_django_playwright.adacs_django_playwright import \
-    async_playwright_test
+from adacs_django_playwright.adacs_django_playwright import async_playwright_test
 from adacs_sso_plugin.adacs_user import ADACSUser
 from django.contrib.auth import get_user_model
 from django.test import override_settings
