@@ -23,7 +23,7 @@ django-tests:
   stage: test
   script:
     - cd $WD/src
-    - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
+    - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc compasui publications
 
   artifacts:
     reports:
@@ -108,6 +108,14 @@ e2e-tests:
     PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     DJANGO_SETTINGS_MODULE: gw_compas.development-settings
   script:
+    - cd $WD/src
+    - mkdir react/data
+    - python3 development-manage.py graphql_schema
+    - cd react/
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
+    - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
+    - npm install --legacy-peer-deps
+    - npm run relay
     - cd $WD/src
     # Run e2e tests with Playwright
     # Tests handle starting/stopping Redis and Celery worker internally

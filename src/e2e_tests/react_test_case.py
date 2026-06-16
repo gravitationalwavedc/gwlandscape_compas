@@ -3,6 +3,7 @@ import os
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -264,7 +265,7 @@ def start_celery_worker():
 
     logger.info("Starting Celery worker...")
     # Get the path to the venv's celery executable
-    venv_dir = Path(__file__).parent.parent.parent / "venv"
+    venv_dir = Path(sys.prefix)
     celery_executable = venv_dir / "bin" / "celery"
 
     # Don't capture stdout/stderr so we can see Celery logs in real-time
