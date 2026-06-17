@@ -103,7 +103,7 @@ flake8:
 e2e-tests:
   stage: test
   image:
-    name: mcr.microsoft.com/playwright/python:v1.59.0-noble
+    name: mcr.microsoft.com/playwright/python:v1.60.0-noble
   variables:
     PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     DJANGO_SETTINGS_MODULE: gw_compas.development-settings
