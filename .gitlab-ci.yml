@@ -117,7 +117,7 @@ e2e-tests:
     - eval "[ -f .nvmrc ] && nvm install && nvm use && nvm install-latest-npm"
     - npm install --legacy-peer-deps
     - npm run relay
-    - cd $COMPAS_ROOT_DIR
+    - cd $COMPAS_ROOT_DIR/src
     - make -f Makefile
     - cd $WD/src
     # Run e2e tests with Playwright
