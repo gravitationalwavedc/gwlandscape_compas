@@ -28,7 +28,7 @@ class SharedServiceState:
 state = SharedServiceState()
 
 # Module logger
-# logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 FRONTEND_PORT = 4173
@@ -222,8 +222,8 @@ def start_redis():
     logger.info("Starting Redis server...")
     state.redis_process = subprocess.Popen(
         ["redis-server", "--port", str(REDIS_PORT)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE,
         preexec_fn=os.setsid,
     )
 
@@ -272,8 +272,8 @@ def start_celery_worker():
     state.celery_process = subprocess.Popen(
         [str(celery_executable), "-A", "gw_compas", "worker", "--loglevel=info"],
         preexec_fn=os.setsid,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        # stdout=subprocess.DEVNULL,
+        # stderr=subprocess.DEVNULL,
         env=dict(
             os.environ,
             DJANGO_SETTINGS_MODULE="gw_compas.development-settings",
