@@ -1,5 +1,6 @@
 import os
-from unittest.mock import patch
+from pathlib import Path
+from unittest.mock import patch, Mock
 from tempfile import TemporaryDirectory
 from celery.exceptions import SoftTimeLimitExceeded
 from django.test import TestCase
@@ -37,115 +38,80 @@ class TestCeleryTasks(TestCase):
     def tearDown(self):
         self.output_dir.cleanup()
 
-    @patch("compasui.tasks.call")
-    @patch("compasui.tasks.check_output_file_generated")
-    def test_run_compas_success(self, mock_check_output, mock_subprocess_call):
+    @patch("compasui.tasks.run")
+    @patch("compasui.tasks.Path.exists")
+    def test_run_compas_success(self, mock_path_exists, mock_subprocess_run):
         # Set up the mocks
-        mock_check_output.return_value = TASK_SUCCESS
-        mock_subprocess_call.return_value = 0  # Successful call returns 0
+        mock_path_exists.return_value = True
+        mock_subprocess_run.return_value = Mock(
+            returncode=0
+        )  # Successful run returns 0
 
         # Run the test
         result = run_compas(self.parameter_str, self.output_path)
 
         # Assertions
-        self.assertEqual(result, TASK_SUCCESS)
-        mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
-        mock_check_output.assert_called_once_with(self.expected_output_file)
+        self.assertEqual(result, self.expected_output_file)
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_command, capture_output=True, text=True, check=False
+        )
 
     @silence_logging(logger_name="compasui.tasks")
-    @patch("compasui.tasks.call")
-    def test_run_compas_failure(self, mock_subprocess_call):
+    @patch("compasui.tasks.run")
+    def test_run_compas_failure(self, mock_subprocess_run):
         # Set up the mocks
-        mock_subprocess_call.side_effect = Exception("something went wrong")
+        mock_subprocess_run.return_value = Mock(
+            returncode=1
+        )  # Successful run returns 0
         # We don't expect check_output_file_generated to be called due to the exception
 
         # Run the test
-        result = run_compas(self.parameter_str, self.output_path)
+        with self.assertRaises(Exception) as exc:
+            result = run_compas(self.parameter_str, self.output_path)
 
         # Assertions
-        self.assertEqual(result, TASK_FAIL)
-        mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_command, capture_output=True, text=True, check=False
+        )
+
+        self.assertIn("COMPAS exited with code 1", str(exc.exception))
 
     @silence_logging(logger_name="compasui.tasks")
-    @patch("compasui.tasks.call")
-    def test_run_compas_timeout(self, mock_subprocess_call):
+    @patch("compasui.tasks.run")
+    def test_run_compas_timeout(self, mock_subprocess_run):
         # Set up the mocks
-        mock_subprocess_call.side_effect = SoftTimeLimitExceeded()
+        mock_subprocess_run.side_effect = SoftTimeLimitExceeded()
         # We don't expect check_output_file_generated to be called due to the exception
 
         # Run the test
-        result = run_compas(self.parameter_str, self.output_path)
-
-        # Assertions
-        self.assertEqual(result, TASK_TIMEOUT)
-        mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
-
-    @silence_logging(logger_name="compasui.tasks")
-    @patch("compasui.tasks.call")
-    @patch("compasui.tasks.check_output_file_generated")
-    def test_run_compas_file_check_timeout(
-        self, mock_check_output, mock_subprocess_call
-    ):
-        # Set up the mocks
-        mock_check_output.side_effect = (
-            SoftTimeLimitExceeded()
-        )  # Simulate Celery timeout
-        mock_subprocess_call.return_value = 0  # Command runs successfully
-
-        # Run the test
-        result = run_compas(self.parameter_str, self.output_path)
-
-        # Assertions
-        self.assertEqual(result, TASK_TIMEOUT)
-        mock_subprocess_call.assert_called_once_with(self.expected_command, shell=True)
-        mock_check_output.assert_called_once_with(self.expected_output_file)
-
-
-class TestCheckOutputFileGenerated(TestCase):
-    @patch("os.path.exists")
-    @patch("time.sleep")
-    def test_file_exists_immediately(self, mock_sleep, mock_exists):
-        # Set up the mocks
-        mock_exists.return_value = True
-
-        # Run the test
-        from compasui.tasks import check_output_file_generated
-
-        result = check_output_file_generated("some/file/path.txt")
-
-        # Assertions
-        self.assertEqual(result, TASK_SUCCESS)
-        mock_exists.assert_called_once_with("some/file/path.txt")
-        mock_sleep.assert_not_called()
-
-    @patch("os.path.exists")
-    @patch("time.sleep")
-    def test_file_exists_after_delay(self, mock_sleep, mock_exists):
-        # Set up the mocks
-        mock_exists.side_effect = [False, False, True]
-
-        # Run the test
-        from compasui.tasks import check_output_file_generated
-
-        result = check_output_file_generated("some/file/path.txt")
-
-        # Assertions
-        self.assertEqual(result, TASK_SUCCESS)
-        self.assertEqual(mock_exists.call_count, 3)
-        self.assertEqual(mock_sleep.call_count, 2)
-
-    @patch("os.path.exists")
-    @patch("time.sleep")
-    def test_celery_timeout(self, mock_sleep, mock_exists):
-        # Set up the mocks
-        mock_exists.return_value = False
-        mock_sleep.side_effect = SoftTimeLimitExceeded()  # Simulate Celery timeout
-
-        # Run the test
-        from compasui.tasks import check_output_file_generated
-
         with self.assertRaises(SoftTimeLimitExceeded):
-            check_output_file_generated("some/file/path.txt")
+            result = run_compas(self.parameter_str, self.output_path)
 
         # Assertions
-        self.assertGreaterEqual(mock_exists.call_count, 1)
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_command, capture_output=True, text=True, check=False
+        )
+
+    @silence_logging(logger_name="compasui.tasks")
+    @patch("compasui.tasks.run")
+    @patch("compasui.tasks.Path.exists")
+    def test_run_compas_success_no_file(self, mock_path_exists, mock_subprocess_run):
+        # Set up the mocks
+        mock_path_exists.return_value = False
+        mock_subprocess_run.return_value = Mock(
+            returncode=0
+        )  # Successful run returns 0
+
+        # Run the test
+        with self.assertRaises(Exception) as exc:
+            result = run_compas(self.parameter_str, self.output_path)
+
+        # Assertions
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_command, capture_output=True, text=True, check=False
+        )
+
+        self.assertIn(
+            f"Expected output file not found: {self.expected_output_file}",
+            str(exc.exception),
+        )

@@ -166,13 +166,15 @@ def create_single_binary_job(
 
     task = run_compas.delay(parameters, str(output_path))
 
+    return task.id, model_id
+
     # get task result
-    result = task.get()
+    # result = task.get()
 
-    if result in (TASK_FAIL, TASK_TIMEOUT):
-        raise Exception(model_id)
+    # if result in (TASK_FAIL, TASK_TIMEOUT):
+    #     raise Exception(model_id)
 
-    return single_binary_job
+    # return single_binary_job
 
 
 def create_single_binary_job_movie(job_id, scaling="log", images="default"):

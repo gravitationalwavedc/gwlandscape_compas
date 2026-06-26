@@ -3,8 +3,12 @@ from _decimal import Decimal
 from pathlib import Path
 import matplotlib
 import logging
+import json
 
 
+from celery import states
+from celery.result import AsyncResult
+from celery.exceptions import SoftTimeLimitExceeded
 import django_filters
 import graphene
 from django_filters import FilterSet, OrderingFilter
@@ -29,6 +33,7 @@ from .views import (
     create_single_binary_job,
     create_single_binary_job_movie,
 )
+from .utils.constants import TASK_FAIL, TASK_PENDING, TASK_SUCCESS, TASK_TIMEOUT
 from .utils.derive_job_status import derive_job_status
 from .utils.jobs.request_job_filter import request_job_filter
 from .utils.jobs.request_file_download_id import request_file_download_id
@@ -229,6 +234,29 @@ class SingleBinaryJobNode(DjangoObjectType):
         fields = "__all__"
         interfaces = (relay.Node,)
 
+    plot_json_data = graphene.String()
+    detailed_output_file_path = graphene.String()
+
+    def resolve_plot_json_data(parent, info):
+        plot_data_file = (
+            Path(settings.COMPAS_IO_PATH)
+            / str(parent.id)
+            / "COMPAS_Output/Detailed_Output/plot_data.json"
+        ).resolve()
+        if not plot_data_file.exists():
+            return None
+        return json.dumps(json.loads(plot_data_file.read_text(encoding="utf-8")))
+
+    def resolve_detailed_output_file_path(parent, info):
+        detailed_output_file = (
+            Path(settings.COMPAS_IO_PATH)
+            / str(parent.id)
+            / "COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
+        ).resolve()
+        if not detailed_output_file.exists():
+            return None
+        return detailed_output_file
+
 
 class CompasResultFile(graphene.ObjectType):
     path = graphene.String()
@@ -258,6 +286,14 @@ class CompasPublicJobConnection(relay.Connection):
         node = CompasPublicJobNode
 
 
+class CeleryTaskStatus(graphene.ObjectType):
+    class Input:
+        task_id = graphene.String()
+
+    status = graphene.String()
+    error = graphene.String()
+
+
 class Query(object):
     compas_version = graphene.String()
     compas_job = relay.Node.Field(CompasJobNode)
@@ -274,6 +310,10 @@ class Query(object):
     single_binary_job = relay.Node.Field(SingleBinaryJobNode)
     single_binary_jobs = DjangoFilterConnectionField(
         SingleBinaryJobNode, filterset_class=SingleBinaryJobFilter
+    )
+
+    celery_task_status = graphene.Field(
+        CeleryTaskStatus, task_id=graphene.String(required=True)
     )
 
     def resolve_compas_version(self, info, **kwargs):
@@ -331,6 +371,27 @@ class Query(object):
 
         return result
 
+    def resolve_celery_task_status(self, info, task_id):
+        res = AsyncResult(task_id)
+
+        if res.state == states.PENDING:
+            return CeleryTaskStatus(status=TASK_PENDING)
+
+        elif res.state == states.SUCCESS:
+            return CeleryTaskStatus(status=TASK_SUCCESS)
+
+        elif res.state == states.FAILURE:
+            error = res.result
+
+            if isinstance(error, SoftTimeLimitExceeded):
+                return CeleryTaskStatus(
+                    status=TASK_TIMEOUT, error="Soft time limit exceeded"
+                )
+
+            return CeleryTaskStatus(status=TASK_FAIL, error=str(error))
+
+        return CeleryTaskStatus(status="UNKNOWN")
+
 
 class StartInput(graphene.InputObjectType):
     name = graphene.String()
@@ -376,9 +437,8 @@ class CompasJobCreationResult(graphene.ObjectType):
 
 
 class SingleBinaryJobCreationResult(graphene.ObjectType):
+    task_id = graphene.String()
     job_id = graphene.String()
-    json_data = graphene.String()
-    detailed_output_file_path = graphene.String()
 
 
 class SingleBinaryJobMovieCreationResult(graphene.ObjectType):
@@ -509,7 +569,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
     @classmethod
     def mutate_and_get_payload(cls, root, info, **input):
         try:
-            job = create_single_binary_job(
+            task_id, job_id = create_single_binary_job(
                 mass1=input.get("mass1"),
                 mass2=input.get("mass2"),
                 metallicity=input.get("metallicity"),
@@ -534,19 +594,20 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 mass_transfer_fa=input.get("mass_transfer_fa"),
             )
 
-            detailed_output_file_path = (
-                Path(settings.COMPAS_IO_PATH)
-                / str(job.id)
-                / "COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
-            )
-            json_data = get_plot_json(str(detailed_output_file_path))
+            # detailed_output_file_path = (
+            #     Path(settings.COMPAS_IO_PATH)
+            #     / str(job.id)
+            #     / "COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
+            # )
+            # json_data = get_plot_json(str(detailed_output_file_path))
 
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
-                    job_id=job.id,
-                    json_data=json_data,
-                    detailed_output_file_path=f"{settings.MEDIA_URL}jobs/{job.id}"
-                    f"/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5",
+                    task_id=task_id,
+                    job_id=job_id,
+                    # json_data=json_data,
+                    # detailed_output_file_path=f"{settings.MEDIA_URL}jobs/{job.id}"
+                    # f"/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5",
                 )
             )
         except Exception as e:

@@ -5,6 +5,7 @@ import logging
 import traceback
 from pathlib import Path
 from subprocess import call, run
+import shlex
 
 from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
 from celery.exceptions import SoftTimeLimitExceeded
@@ -13,51 +14,47 @@ from celery.exceptions import SoftTimeLimitExceeded
 logger = logging.getLogger(__name__)
 
 
-def check_output_file_generated(outputfilepath):
-    """
-    Check if the job finished successfully by checking that output file is created
-    This will keep running until file is created or Celery raises SoftTimeLimitExceeded
-    :param outputfilepath: full path of output file
-    :return: TASK_SUCCESS if file exists
-    """
-    import time
-
-    while True:
-        if os.path.exists(outputfilepath):
-            return TASK_SUCCESS
-        time.sleep(0.5)  # Check every half second to reduce CPU usage
-
-    # This will never be reached as Celery will raise SoftTimeLimitExceeded
-    # when the time limit is exceeded
-
-
 @shared_task
 def run_compas(parameter_str, output_path):
-    result = None
+    git_directory = os.environ.get("COMPAS_ROOT_DIR")
+
+    compas_executable = Path(git_directory) / "src" / "COMPAS"
+
+    output_file = (
+        Path(output_path)
+        / "COMPAS_Output"
+        / "Detailed_Output"
+        / "BSE_Detailed_Output_0.h5"
+    )
+
+    compas_command = (
+        f"{compas_executable} --detailed-output --number-of-systems 1 "
+        f"--output-path {output_path} {parameter_str}"
+    )
+
     try:
-        git_directory = os.environ.get("COMPAS_ROOT_DIR")
-        compas_executable = Path(git_directory) / "src/COMPAS"
-        compas_command = (
-            f"{compas_executable} --detailed-output --number-of-systems 1 "
-            f"--output-path {output_path} {parameter_str}"
+        completed = run(
+            compas_command,
+            capture_output=True,
+            text=True,
+            check=False,
         )
 
-        detailed_output_file_path = (
-            f"{output_path}/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
-        )
+        if completed.returncode != 0:
+            raise Exception(f"COMPAS exited with code {completed.returncode}")
 
-        call(compas_command, shell=True)
-        result = check_output_file_generated(detailed_output_file_path)
+        if not output_file.exists():
+            raise Exception(f"Expected output file not found: {output_file}")
+
+        return str(output_file)
 
     except SoftTimeLimitExceeded:
-        logger.error("Task exceeded time limit", exc_info=True)
-        result = TASK_TIMEOUT
+        logger.exception("COMPAS task exceeded soft time limit")
+        raise
+
     except Exception:
-        # return fail code if job failed for some other reason
-        logger.error("Task failed with exception", exc_info=True)
-        result = TASK_FAIL
-    finally:
-        return result
+        logger.exception("COMPAS task failed")
+        raise
 
 
 @shared_task(soft_time_limit=300, time_limit=600)  # Set time limits for VIMES task
