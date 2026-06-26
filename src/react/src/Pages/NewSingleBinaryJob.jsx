@@ -19,9 +19,8 @@ const submitMutation = graphql`
     mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
         newSingleBinary(input: $input) {
             result {
+                taskId
                 jobId
-                jsonData
-                detailedOutputFilePath
             }
         }
     }
