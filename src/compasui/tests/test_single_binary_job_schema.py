@@ -8,7 +8,13 @@ from django.test import override_settings
 from graphql_relay.node.node import from_global_id, to_global_id
 from compasui.models import SingleBinaryJob
 from compasui.tests.testcases import CompasTestCase
-from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
+from compasui.utils.constants import (
+    TASK_SUCCESS,
+    TASK_FAIL,
+    TASK_TIMEOUT,
+    COMMON_ENVELOPE_LAMBDA_PRESCRIPTION_FIXED_VALUE,
+    FRYER_SUPERNOVA_ENGINE_DELAYED_VALUE,
+)
 from compasui.utils.h5ToJson import read_h5_data_as_json
 from compasui.tests.utils import silence_logging
 
@@ -50,12 +56,16 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 "fryerSupernovaEngine": "DELAYED",
             }
         }
-        self.parameter_str = (
-            "--initial-mass-1 1.5 --initial-mass-2 1.51 --metallicity 0.02 --eccentricity 0.1 "
-            "--semi-major-axis 0.1 "
-            "--common-envelope-alpha 0.1 --common-envelope-lambda-prescription LAMBDA_FIXED "
-            "--fryer-supernova-engine DELAYED "
-        )
+        self.parameters = {
+            "--initial-mass-1": 1.5,
+            "--initial-mass-2": 1.51,
+            "--metallicity": 0.02,
+            "--eccentricity": 0.1,
+            "--semi-major-axis": 0.1,
+            "--common-envelope-alpha": 0.1,
+            "--common-envelope-lambda-prescription": COMMON_ENVELOPE_LAMBDA_PRESCRIPTION_FIXED_VALUE,
+            "--fryer-supernova-engine": FRYER_SUPERNOVA_ENGINE_DELAYED_VALUE,
+        }
 
         self.expected_failed = {
             "newSingleBinary": {
@@ -85,7 +95,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             input_data=self.single_binary_job_input["input"],
         )
         output_path = Path(settings.COMPAS_IO_PATH) / "1"
-        run_compas.delay.assert_called_with(self.parameter_str, str(output_path))
+        run_compas.delay.assert_called_with(self.parameters, str(output_path))
         self.assertEqual(
             {
                 "newSingleBinary": {
