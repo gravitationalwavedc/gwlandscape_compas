@@ -1,20 +1,21 @@
 import datetime
 import json
-import re
 import logging
+import re
 from pathlib import Path
 
 import jwt
 import requests
 from django.conf import settings
 from django.db import transaction
+from graphql_relay.node.node import to_global_id
+
+from .models import AdvancedParameter, BasicParameter, CompasJob, Label, SingleBinaryJob
+from .tasks import run_compas, run_vimes
+from .utils.constants import SINGLE_BINARY_FIELD_COMMANDS, TASK_FAIL, TASK_TIMEOUT
 
 # Configure logger
 logger = logging.getLogger(__name__)
-
-from .models import CompasJob, Label, SingleBinaryJob, BasicParameter, AdvancedParameter
-from .tasks import run_compas, run_vimes
-from .utils.constants import TASK_FAIL, TASK_TIMEOUT, SINGLE_BINARY_FIELD_COMMANDS
 
 
 def validate_job_name(name):
@@ -154,27 +155,19 @@ def create_single_binary_job(
     single_binary_job.save()
     model_id = str(single_binary_job.id)
 
-    parameters = ""
+    parameters = {}
     for field in SingleBinaryJob._meta.get_fields():
         field_value = getattr(single_binary_job, field.name)
         if (field_value is not None) and (field.name in SINGLE_BINARY_FIELD_COMMANDS):
-            parameters += f"{SINGLE_BINARY_FIELD_COMMANDS[field.name]} {field_value} "
+            parameters[SINGLE_BINARY_FIELD_COMMANDS[field.name]] = field_value
 
-    output_path = Path(settings.COMPAS_IO_PATH) / model_id
+    output_path = (Path(settings.COMPAS_IO_PATH) / model_id).resolve()
     if not output_path.exists():
         output_path.mkdir()
 
     task = run_compas.delay(parameters, str(output_path))
 
     return task.id, model_id
-
-    # get task result
-    # result = task.get()
-
-    # if result in (TASK_FAIL, TASK_TIMEOUT):
-    #     raise Exception(model_id)
-
-    # return single_binary_job
 
 
 def create_single_binary_job_movie(job_id, scaling="log", images="default"):

@@ -1,55 +1,47 @@
-import traceback
-from _decimal import Decimal
-from pathlib import Path
-import matplotlib
-import logging
 import json
+import logging
+import traceback
+from pathlib import Path
 
-
-from celery import states
-from celery.result import AsyncResult
-from celery.exceptions import SoftTimeLimitExceeded
 import django_filters
 import graphene
-from django_filters import FilterSet, OrderingFilter
+from _decimal import Decimal
+from celery import states
+from celery.exceptions import SoftTimeLimitExceeded
+from celery.result import AsyncResult
 from django.conf import settings
+from django_filters import FilterSet, OrderingFilter
 from graphene import relay
-from graphql import GraphQLError
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django.types import DjangoObjectType
+from graphql import GraphQLError
 from graphql_relay.node.node import from_global_id, to_global_id
 
-
-from .models import CompasJob, Label, SingleBinaryJob, FileDownloadToken
+from .models import CompasJob, FileDownloadToken, Label, SingleBinaryJob
+from .status import JobStatus
 from .types import (
-    OutputStartType,
-    JobStatusType,
-    AbstractBasicParameterType,
     AbstractAdvancedParametersType,
+    AbstractBasicParameterType,
+    JobStatusType,
+    OutputStartType,
 )
+from .utils.auth.lookup_users import request_lookup_users
+from .utils.constants import TASK_FAIL, TASK_PENDING, TASK_SUCCESS, TASK_TIMEOUT
+from .utils.db_search.db_search import perform_db_search
+from .utils.decorators import login_required
+from .utils.derive_job_status import derive_job_status
+from .utils.get_compas_version import get_compas_version
+from .utils.jobs.request_file_download_id import request_file_download_id
+from .utils.jobs.request_job_filter import request_job_filter
 from .views import (
     create_compas_job,
-    update_compas_job,
     create_single_binary_job,
     create_single_binary_job_movie,
+    update_compas_job,
 )
-from .utils.constants import TASK_FAIL, TASK_PENDING, TASK_SUCCESS, TASK_TIMEOUT
-from .utils.derive_job_status import derive_job_status
-from .utils.jobs.request_job_filter import request_job_filter
-from .utils.jobs.request_file_download_id import request_file_download_id
-from .utils.auth.lookup_users import request_lookup_users
-from .utils.db_search.db_search import perform_db_search
-from .utils.get_compas_version import get_compas_version
-from .status import JobStatus
-from .utils.decorators import login_required
 
 # Configure logger
 logger = logging.getLogger(__name__)
-
-matplotlib.use("agg")
-from compas_python_utils.detailed_evolution_plotter.plot_to_json import (
-    get_plot_json,
-)  # noqa: E402
 
 
 def basic_parameter_resolvers(name):
@@ -241,7 +233,9 @@ class SingleBinaryJobNode(DjangoObjectType):
         plot_data_file = (
             Path(settings.COMPAS_IO_PATH)
             / str(parent.id)
-            / "COMPAS_Output/Detailed_Output/plot_data.json"
+            / "COMPAS_Output"
+            / "Detailed_Output"
+            / "plot_data.json"
         ).resolve()
         if not plot_data_file.exists():
             return None
@@ -251,7 +245,9 @@ class SingleBinaryJobNode(DjangoObjectType):
         detailed_output_file = (
             Path(settings.COMPAS_IO_PATH)
             / str(parent.id)
-            / "COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
+            / "COMPAS_Output"
+            / "Detailed_Output"
+            / "BSE_Detailed_Output_0.h5"
         ).resolve()
         if not detailed_output_file.exists():
             return None
@@ -594,28 +590,16 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                 mass_transfer_fa=input.get("mass_transfer_fa"),
             )
 
-            # detailed_output_file_path = (
-            #     Path(settings.COMPAS_IO_PATH)
-            #     / str(job.id)
-            #     / "COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
-            # )
-            # json_data = get_plot_json(str(detailed_output_file_path))
-
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
                     task_id=task_id,
                     job_id=job_id,
-                    # json_data=json_data,
-                    # detailed_output_file_path=f"{settings.MEDIA_URL}jobs/{job.id}"
-                    # f"/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5",
                 )
             )
         except Exception as e:
             logger.error("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
-                result=SingleBinaryJobCreationResult(
-                    job_id="", json_data="", detailed_output_file_path=""
-                )
+                result=SingleBinaryJobCreationResult(task_id="", job_id="")
             )
 
 

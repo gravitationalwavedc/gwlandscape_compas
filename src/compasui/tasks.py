@@ -1,36 +1,45 @@
-from celery import shared_task
-
-import os
+import json
 import logging
+import os
 import traceback
+from itertools import chain
 from pathlib import Path
 from subprocess import call, run
-import shlex
 
-from .utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT
+import matplotlib
+from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
+
+matplotlib.use("agg")
+from compas_python_utils.detailed_evolution_plotter.plot_to_json import (
+    get_plot_json,
+)  # noqa: E402
+
+from .utils.constants import TASK_FAIL, TASK_SUCCESS, TASK_TIMEOUT
 
 # Configure logger
 logger = logging.getLogger(__name__)
 
 
 @shared_task
-def run_compas(parameter_str, output_path):
+def run_compas(parameters, output_path):
     git_directory = os.environ.get("COMPAS_ROOT_DIR")
 
     compas_executable = Path(git_directory) / "src" / "COMPAS"
 
-    output_file = (
-        Path(output_path)
-        / "COMPAS_Output"
-        / "Detailed_Output"
-        / "BSE_Detailed_Output_0.h5"
-    )
+    detailed_output_path = Path(output_path) / "COMPAS_Output" / "Detailed_Output"
+    output_file = detailed_output_path / "BSE_Detailed_Output_0.h5"
+    json_file = detailed_output_path / "plot_data.json"
 
-    compas_command = (
-        f"{compas_executable} --detailed-output --number-of-systems 1 "
-        f"--output-path {output_path} {parameter_str}"
-    )
+    compas_command = [
+        str(compas_executable),
+        "--detailed-output",
+        "--number-of-systems",
+        "1",
+        "--output-path",
+        str(output_path),
+    ]
+    compas_command.extend(map(str, chain.from_iterable(parameters.items())))
 
     try:
         completed = run(
@@ -46,7 +55,13 @@ def run_compas(parameter_str, output_path):
         if not output_file.exists():
             raise Exception(f"Expected output file not found: {output_file}")
 
-        return str(output_file)
+        json_data = get_plot_json(str(output_file))
+        json_file.write_text(json.dumps(json_data), encoding="utf-8")
+
+        if not json_file.exists():
+            raise Exception(f"Expected json file not found: {json_file}")
+
+        return str(output_file), str(json_file)
 
     except SoftTimeLimitExceeded:
         logger.exception("COMPAS task exceeded soft time limit")
@@ -55,6 +70,11 @@ def run_compas(parameter_str, output_path):
     except Exception:
         logger.exception("COMPAS task failed")
         raise
+
+    finally:
+        import matplotlib.pyplot as plt
+
+        plt.close("all")
 
 
 @shared_task(soft_time_limit=300, time_limit=600)  # Set time limits for VIMES task
