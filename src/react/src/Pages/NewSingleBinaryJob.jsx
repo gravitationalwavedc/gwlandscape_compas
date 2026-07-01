@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { commitMutation } from 'relay-runtime';
+import { useEffect, useState } from 'react';
+import { commitMutation, fetchQuery } from 'relay-runtime';
 import { createFragmentContainer, graphql } from 'react-relay';
 import { Container, Col, Nav, Row, Tab, Alert } from 'react-bootstrap';
 import { Formik } from 'formik';
@@ -14,6 +14,7 @@ import VanDenHeuvel from '../Components/Plots/VanDenHeuvel';
 import SingleBinaryPlot from '../Components/Plots/SingleBinaryPlot';
 import environment from '../environment.js';
 import GenerateMovie from '../Components/Results/GenerateMovie.jsx';
+import useTaskPolling from '../Utils/Hooks.jsx';
 
 const submitMutation = graphql`
     mutation NewSingleBinaryJobMutation($input: SingleBinaryJobMutationInput!) {
@@ -26,18 +27,57 @@ const submitMutation = graphql`
     }
 `;
 
+const singleBinaryJobQuery = graphql`
+    query NewSingleBinaryJobQuery($jobId: ID!) {
+        singleBinaryJob(id: $jobId) {
+            plotJsonData
+            detailedOutputFilePath
+        }
+    }
+`
+
 const NewSingleBinaryJob = ({ data }) => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
-    const [jsonData, setJsonData] = useState('');
+    const [plotJsonData, setplotJsonData] = useState('');
+    const [taskId, setTaskId] = useState('');
     const [jobId, setJobId] = useState('');
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
     const [activeTab, setActiveTab] = useState('binary');
 
+    // Poll for Celery task status
+    const { task, error: pollingError } = useTaskPolling(taskId);
+
+    // When Celery task has a status of SUCCESS, fetch data.
+    // If the task has a status of FAILURE, display the error message.
+    useEffect(() => {
+        if (task?.status === 'SUCCESS') {
+            fetchQuery(environment, singleBinaryJobQuery, { jobId }).subscribe({
+                next: (response) => {
+                    setplotJsonData(JSON.parse(response.singleBinaryJob.plotJsonData));
+                    setDetailedOutputFile(
+                        `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.detailedOutputFilePath}`,
+                    );
+                    setIsLoadingOutput(false);
+                    setDisableButtons(false);
+                },
+                error: (err) => {
+                    handleError(`${err.name}: ${err.message}`);
+                },
+            });
+        } else if (task?.status === 'FAILURE' || task?.status === 'TIMEOUT') {
+            handleError(`Task failed with error: ${task.error}`);
+        }
+
+        if (pollingError) {
+            handleError(`${pollingError.name}: ${pollingError.message}`);
+        }
+    }, [task, jobId, pollingError]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const resetOutput = () => {
         setDetailedOutputFile('');
-        setJsonData('');
+        setplotJsonData('');
         setIsLoadingOutput(false);
         setDisableButtons(false);
     };
@@ -59,7 +99,7 @@ const NewSingleBinaryJob = ({ data }) => {
         setOutputError('');
 
         // Reset the json data so they know something is happening.
-        setJsonData('');
+        setplotJsonData('');
 
         // We don't want to update the Formik values to null because
         // it causes errors with uncontrolled components.
@@ -106,20 +146,9 @@ const NewSingleBinaryJob = ({ data }) => {
                 if (errors) {
                     const errorMessages = errors.reduce((prev, curr) => `${prev}, ${curr.message}`, '');
                     handleError(`Output failed to generate with errors: ${errorMessages}`);
-                } else if (response.newSingleBinary.result.detailedOutputFilePath === '') {
-                    handleError('Output file failed to generate and returned an empty string');
                 } else {
-                    try {
-                        setJsonData(JSON.parse(response.newSingleBinary.result.jsonData));
-                        setJobId(response.newSingleBinary.result.jobId);
-                        setDetailedOutputFile(
-                            `${import.meta.env.VITE_BACKEND_URL}${response.newSingleBinary.result.detailedOutputFilePath}`,
-                        );
-                        setIsLoadingOutput(false);
-                        setDisableButtons(false);
-                    } catch (error) {
-                        handleError(`${error.name}: ${error.message}`);
-                    }
+                    setTaskId(response.newSingleBinary.result.taskId);
+                    setJobId(response.newSingleBinary.result.jobId);
                 }
             },
         });
@@ -167,10 +196,10 @@ const NewSingleBinaryJob = ({ data }) => {
                             </Nav.Item>
                             <h5 className="mt-3 mb-0">Results</h5>
                             <Nav.Item>
-                                <Nav.Link eventKey="job-output" disabled={jsonData === ''}>
+                                <Nav.Link eventKey="job-output" disabled={plotJsonData === ''}>
                                     {isLoadingOutput ? 'Loading...' : 'COMPAS Output'}
                                 </Nav.Link>
-                                {jsonData === '' && !isLoadingOutput && (
+                                {plotJsonData === '' && !isLoadingOutput && (
                                     <p className="mt-0 pt-0 text-muted">Run a simulation to see results</p>
                                 )}
                             </Nav.Item>
@@ -222,11 +251,11 @@ const NewSingleBinaryJob = ({ data }) => {
                                         <a className="mr-4" data-testid="download-link" href={detailedOutputFile}>
                                             Download Output File
                                         </a>
-                                        {jsonData && (
+                                        {plotJsonData && (
                                             <>
-                                                <VanDenHeuvel data={jsonData} />
+                                                <VanDenHeuvel data={plotJsonData} />
                                                 <div className="plotContainer">
-                                                    {jsonData?.plots.map((plotData) => (
+                                                    {plotJsonData?.plots.map((plotData) => (
                                                         <Col key={plotData.meta.label} className="mb-5 mt-5">
                                                             <SingleBinaryPlot className="container" data={plotData} />
                                                         </Col>
