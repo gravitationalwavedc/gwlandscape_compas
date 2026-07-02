@@ -47,7 +47,7 @@ class TestCeleryTasks(TestCase):
         os.environ["COMPAS_ROOT_DIR"] = "/mock/path"
 
         # Prepare expected values for assertions
-        compas_executable = f"/mock/path/src/COMPAS"
+        compas_executable = "/mock/path/src/COMPAS"
         self.expected_command = [
             compas_executable,
             "--detailed-output",
@@ -88,7 +88,7 @@ class TestCeleryTasks(TestCase):
             self.detailed_output_file_path / "BSE_Detailed_Output_0.h5"
         )
         self.expected_json_file = self.detailed_output_file_path / "plot_data.json"
-        self.test_json = {"key": "value"}
+        self.test_json_str = json.dumps({"key": "value"})
 
     def tearDown(self):
         self.output_dir.cleanup()
@@ -97,12 +97,11 @@ class TestCeleryTasks(TestCase):
     @patch("compasui.tasks.run")
     def test_run_compas_success(self, mock_subprocess_run, mock_get_plot_json):
         # Set up the mocks
-        # mock_path_exists.return_value = True
         mock_subprocess_run.return_value = Mock(
             returncode=0
         )  # Successful run returns 0
         mock_subprocess_run.side_effect = self.expected_output_file.touch()
-        mock_get_plot_json.return_value = self.test_json
+        mock_get_plot_json.return_value = self.test_json_str
 
         # Run the test
         result = run_compas(self.parameters, str(self.output_path))
@@ -111,8 +110,8 @@ class TestCeleryTasks(TestCase):
         self.assertEqual(result[0], str(self.expected_output_file))
         self.assertEqual(result[1], str(self.expected_json_file))
         self.assertEqual(
-            self.test_json,
-            json.loads(Path(result[1]).read_text(encoding="utf-8")),
+            self.test_json_str,
+            Path(result[1]).read_text(encoding="utf-8"),
         )
         mock_subprocess_run.assert_called_once_with(
             self.expected_command, capture_output=True, text=True, check=False
@@ -129,7 +128,7 @@ class TestCeleryTasks(TestCase):
 
         # Run the test
         with self.assertRaises(Exception) as exc:
-            result = run_compas(self.parameters, str(self.output_path))
+            run_compas(self.parameters, str(self.output_path))
 
         # Assertions
         mock_subprocess_run.assert_called_once_with(
@@ -146,7 +145,7 @@ class TestCeleryTasks(TestCase):
 
         # Run the test
         with self.assertRaises(SoftTimeLimitExceeded):
-            result = run_compas(self.parameters, str(self.output_path))
+            run_compas(self.parameters, str(self.output_path))
 
         # Assertions
         mock_subprocess_run.assert_called_once_with(
@@ -163,7 +162,7 @@ class TestCeleryTasks(TestCase):
 
         # Run the test
         with self.assertRaises(Exception) as exc:
-            result = run_compas(self.parameters, str(self.output_path))
+            run_compas(self.parameters, str(self.output_path))
 
         # Assertions
         mock_subprocess_run.assert_called_once_with(
@@ -187,11 +186,11 @@ class TestCeleryTasks(TestCase):
             returncode=0
         )  # Successful run returns 0
         mock_subprocess_run.side_effect = self.expected_output_file.touch()
-        mock_get_plot_json.return_value = self.test_json
+        mock_get_plot_json.return_value = self.test_json_str
 
         # Run the test
         with self.assertRaises(Exception) as exc:
-            result = run_compas(self.parameters, str(self.output_path))
+            run_compas(self.parameters, str(self.output_path))
 
         self.assertIn(
             f"Expected json file not found: {self.expected_json_file}",

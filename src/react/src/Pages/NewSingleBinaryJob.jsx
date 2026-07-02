@@ -34,7 +34,7 @@ const singleBinaryJobQuery = graphql`
             detailedOutputFilePath
         }
     }
-`
+`;
 
 const NewSingleBinaryJob = ({ data }) => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
@@ -55,6 +55,7 @@ const NewSingleBinaryJob = ({ data }) => {
         if (task?.status === 'SUCCESS') {
             fetchQuery(environment, singleBinaryJobQuery, { jobId }).subscribe({
                 next: (response) => {
+                    console.log(JSON.parse(response.singleBinaryJob.plotJsonData));
                     setplotJsonData(JSON.parse(response.singleBinaryJob.plotJsonData));
                     setDetailedOutputFile(
                         `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.detailedOutputFilePath}`,

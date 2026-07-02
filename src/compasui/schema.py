@@ -1,6 +1,5 @@
 import json
 import logging
-import traceback
 from pathlib import Path
 
 import django_filters
@@ -19,19 +18,26 @@ from graphql_relay.node.node import from_global_id, to_global_id
 
 from .models import CompasJob, FileDownloadToken, Label, SingleBinaryJob
 from .status import JobStatus
-from .types import (AbstractAdvancedParametersType, AbstractBasicParameterType,
-                    JobStatusType, OutputStartType)
+from .types import (
+    AbstractAdvancedParametersType,
+    AbstractBasicParameterType,
+    JobStatusType,
+    OutputStartType,
+)
 from .utils.auth.lookup_users import request_lookup_users
-from .utils.constants import (TASK_FAIL, TASK_PENDING, TASK_SUCCESS,
-                              TASK_TIMEOUT)
+from .utils.constants import TASK_FAIL, TASK_PENDING, TASK_SUCCESS, TASK_TIMEOUT
 from .utils.db_search.db_search import perform_db_search
 from .utils.decorators import login_required
 from .utils.derive_job_status import derive_job_status
 from .utils.get_compas_version import get_compas_version
 from .utils.jobs.request_file_download_id import request_file_download_id
 from .utils.jobs.request_job_filter import request_job_filter
-from .views import (create_compas_job, create_single_binary_job,
-                    create_single_binary_job_movie, update_compas_job)
+from .views import (
+    create_compas_job,
+    create_single_binary_job,
+    create_single_binary_job_movie,
+    update_compas_job,
+)
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -598,7 +604,7 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
                     job_id=to_global_id("SingleBinaryJobNode", job_id),
                 )
             )
-        except Exception as e:
+        except Exception:
             logger.error("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(task_id="", job_id="")
@@ -629,7 +635,7 @@ class SingleBinaryJobMovieMutation(relay.ClientIDMutation):
                     f"/COMPAS_Output/Detailed_Output/{scaling}_{images}_movie.mp4",
                 )
             )
-        except Exception as e:
+        except Exception:
             logger.error("VIMES job didn't run successfully")
             return SingleBinaryJobMovieMutation(
                 result=SingleBinaryJobMovieCreationResult(movie_file_path="")
