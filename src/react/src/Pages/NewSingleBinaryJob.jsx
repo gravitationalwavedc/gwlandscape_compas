@@ -38,7 +38,7 @@ const singleBinaryJobQuery = graphql`
 
 const NewSingleBinaryJob = ({ data }) => {
     const [detailedOutputFile, setDetailedOutputFile] = useState('');
-    const [plotJsonData, setplotJsonData] = useState('');
+    const [plotJsonData, setPlotJsonData] = useState('');
     const [taskId, setTaskId] = useState('');
     const [jobId, setJobId] = useState('');
     const [outputError, setOutputError] = useState('');
@@ -55,8 +55,7 @@ const NewSingleBinaryJob = ({ data }) => {
         if (task?.status === 'SUCCESS') {
             fetchQuery(environment, singleBinaryJobQuery, { jobId }).subscribe({
                 next: (response) => {
-                    console.log(JSON.parse(response.singleBinaryJob.plotJsonData));
-                    setplotJsonData(JSON.parse(response.singleBinaryJob.plotJsonData));
+                    setPlotJsonData(JSON.parse(response.singleBinaryJob.plotJsonData));
                     setDetailedOutputFile(
                         `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.detailedOutputFilePath}`,
                     );
@@ -78,7 +77,7 @@ const NewSingleBinaryJob = ({ data }) => {
 
     const resetOutput = () => {
         setDetailedOutputFile('');
-        setplotJsonData('');
+        setPlotJsonData('');
         setIsLoadingOutput(false);
         setDisableButtons(false);
     };
@@ -100,7 +99,7 @@ const NewSingleBinaryJob = ({ data }) => {
         setOutputError('');
 
         // Reset the json data so they know something is happening.
-        setplotJsonData('');
+        setPlotJsonData('');
 
         // We don't want to update the Formik values to null because
         // it causes errors with uncontrolled components.
