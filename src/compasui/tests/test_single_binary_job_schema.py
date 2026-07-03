@@ -2,16 +2,13 @@ from pathlib import Path
 import json
 import shutil
 from tempfile import TemporaryDirectory
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from django.conf import settings
 from django.test import override_settings
-from graphql_relay.node.node import from_global_id, to_global_id
+from graphql_relay.node.node import to_global_id
 from compasui.models import SingleBinaryJob
 from compasui.tests.testcases import CompasTestCase
 from compasui.utils.constants import (
-    TASK_SUCCESS,
-    TASK_FAIL,
-    TASK_TIMEOUT,
     COMMON_ENVELOPE_LAMBDA_PRESCRIPTION_FIXED_VALUE,
     FRYER_SUPERNOVA_ENGINE_DELAYED_VALUE,
 )
@@ -101,7 +98,9 @@ class TestSingleBinaryJobSchema(CompasTestCase):
                 "newSingleBinary": {
                     "result": {
                         "taskId": self.test_task_id,
-                        "jobId": str(SingleBinaryJob.objects.last().id),
+                        "jobId": to_global_id(
+                            "SingleBinaryJobNode", SingleBinaryJob.objects.last().id
+                        ),
                     }
                 }
             },
@@ -114,7 +113,15 @@ class TestSingleBinaryJobSchema(CompasTestCase):
             mass1=1.0, mass2=0.5, metallicity=0.0, eccentricity=0.0
         )
 
-        detailed_output_file_url = f"{settings.MEDIA_URL}jobs/{test_job.id}/COMPAS_Output/Detailed_Output/BSE_Detailed_Output_0.h5"
+        detailed_output_file_url = (
+            Path(settings.MEDIA_URL)
+            / "jobs"
+            / str(test_job.id)
+            / "COMPAS_Output"
+            / "Detailed_Output"
+            / "BSE_Detailed_Output_0.h5"
+        )
+
         # mock run_compas_output
         output_path = (
             Path(settings.COMPAS_IO_PATH)
@@ -136,7 +143,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         )
 
         self.assertEqual(
-            str(output_file_path),
+            str(detailed_output_file_url),
             response.data["singleBinaryJob"]["detailedOutputFilePath"],
         )
         self.assertEqual(

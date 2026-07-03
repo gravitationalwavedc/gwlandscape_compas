@@ -8,7 +8,6 @@ import jwt
 import requests
 from django.conf import settings
 from django.db import transaction
-from graphql_relay.node.node import to_global_id
 
 from .models import AdvancedParameter, BasicParameter, CompasJob, Label, SingleBinaryJob
 from .tasks import run_compas, run_vimes

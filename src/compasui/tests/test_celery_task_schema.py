@@ -1,17 +1,10 @@
-import os
-from os import path
-import shutil
 from tempfile import TemporaryDirectory
 from unittest.mock import patch, Mock
 from celery import states
 from celery.exceptions import SoftTimeLimitExceeded
-from django.conf import settings
 from django.test import override_settings
-from compasui.models import SingleBinaryJob
 from compasui.tests.testcases import CompasTestCase
 from compasui.utils.constants import TASK_SUCCESS, TASK_FAIL, TASK_TIMEOUT, TASK_PENDING
-from compasui.utils.h5ToJson import read_h5_data_as_json
-from compasui.tests.utils import silence_logging
 
 
 temp_output_dir = TemporaryDirectory()

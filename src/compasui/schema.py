@@ -1,6 +1,5 @@
 import json
 import logging
-import traceback
 from pathlib import Path
 
 import django_filters
@@ -239,7 +238,9 @@ class SingleBinaryJobNode(DjangoObjectType):
         ).resolve()
         if not plot_data_file.exists():
             return None
-        return json.dumps(json.loads(plot_data_file.read_text(encoding="utf-8")))
+        with plot_data_file.open(encoding="utf-8") as f:
+            json_data = json.load(f)
+        return json.dumps(json_data)
 
     def resolve_detailed_output_file_path(parent, info):
         detailed_output_file = (
@@ -248,10 +249,17 @@ class SingleBinaryJobNode(DjangoObjectType):
             / "COMPAS_Output"
             / "Detailed_Output"
             / "BSE_Detailed_Output_0.h5"
-        ).resolve()
+        )
         if not detailed_output_file.exists():
             return None
-        return detailed_output_file
+        return (
+            Path(settings.MEDIA_URL)
+            / "jobs"
+            / str(parent.id)
+            / "COMPAS_Output"
+            / "Detailed_Output"
+            / "BSE_Detailed_Output_0.h5"
+        )
 
 
 class CompasResultFile(graphene.ObjectType):
@@ -593,10 +601,10 @@ class SingleBinaryJobMutation(relay.ClientIDMutation):
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(
                     task_id=task_id,
-                    job_id=job_id,
+                    job_id=to_global_id("SingleBinaryJobNode", job_id),
                 )
             )
-        except Exception as e:
+        except Exception:
             logger.error("COMPAS job didn't run successfully")
             return SingleBinaryJobMutation(
                 result=SingleBinaryJobCreationResult(task_id="", job_id="")
@@ -627,7 +635,7 @@ class SingleBinaryJobMovieMutation(relay.ClientIDMutation):
                     f"/COMPAS_Output/Detailed_Output/{scaling}_{images}_movie.mp4",
                 )
             )
-        except Exception as e:
+        except Exception:
             logger.error("VIMES job didn't run successfully")
             return SingleBinaryJobMovieMutation(
                 result=SingleBinaryJobMovieCreationResult(movie_file_path="")

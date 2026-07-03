@@ -1,21 +1,21 @@
-import json
 import logging
 import os
-import traceback
 from itertools import chain
 from pathlib import Path
-from subprocess import call, run
+from subprocess import run
 
 import matplotlib
 from celery import shared_task
 from celery.exceptions import SoftTimeLimitExceeded
 
-matplotlib.use("agg")
-from compas_python_utils.detailed_evolution_plotter.plot_to_json import (
-    get_plot_json,
-)  # noqa: E402
-
 from .utils.constants import TASK_FAIL, TASK_SUCCESS, TASK_TIMEOUT
+
+
+matplotlib.use("agg")
+from compas_python_utils.detailed_evolution_plotter.plot_to_json import (  # noqa: E402
+    get_plot_json,
+)
+
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ def run_compas(parameters, output_path):
             raise Exception(f"Expected output file not found: {output_file}")
 
         json_data = get_plot_json(str(output_file))
-        json_file.write_text(json.dumps(json_data), encoding="utf-8")
+        json_file.write_text(json_data, encoding="utf-8")
 
         if not json_file.exists():
             raise Exception(f"Expected json file not found: {json_file}")
