@@ -11,7 +11,7 @@ from django.db import transaction
 
 from .models import AdvancedParameter, BasicParameter, CompasJob, Label, SingleBinaryJob
 from .tasks import run_compas, run_vimes
-from .utils.constants import SINGLE_BINARY_FIELD_COMMANDS, TASK_FAIL, TASK_TIMEOUT
+from .utils.constants import SINGLE_BINARY_FIELD_COMMANDS
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -179,10 +179,4 @@ def create_single_binary_job_movie(job_id, scaling="log", images="default"):
 
     task = run_vimes.delay(str(job_detailed_output_path.resolve()), scaling, images)
 
-    # get task result
-    result = task.get()
-
-    if result in (TASK_FAIL, TASK_TIMEOUT):
-        raise Exception(job_id)
-
-    return True
+    return task.id

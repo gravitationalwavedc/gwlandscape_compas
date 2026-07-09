@@ -31,13 +31,13 @@ const singleBinaryJobQuery = graphql`
     query NewSingleBinaryJobQuery($jobId: ID!) {
         singleBinaryJob(id: $jobId) {
             plotJsonData
-            detailedOutputFilePath
+            detailedOutputFileUrl
         }
     }
 `;
 
 const NewSingleBinaryJob = ({ data }) => {
-    const [detailedOutputFile, setDetailedOutputFile] = useState('');
+    const [detailedOutputFileUrl, setDetailedOutputFileUrl] = useState('');
     const [plotJsonData, setPlotJsonData] = useState('');
     const [taskId, setTaskId] = useState('');
     const [jobId, setJobId] = useState('');
@@ -56,8 +56,8 @@ const NewSingleBinaryJob = ({ data }) => {
             fetchQuery(environment, singleBinaryJobQuery, { jobId }).subscribe({
                 next: (response) => {
                     setPlotJsonData(JSON.parse(response.singleBinaryJob.plotJsonData));
-                    setDetailedOutputFile(
-                        `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.detailedOutputFilePath}`,
+                    setDetailedOutputFileUrl(
+                        `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.detailedOutputFileUrl}`,
                     );
                     setIsLoadingOutput(false);
                     setDisableButtons(false);
@@ -76,7 +76,7 @@ const NewSingleBinaryJob = ({ data }) => {
     }, [task, jobId, pollingError]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const resetOutput = () => {
-        setDetailedOutputFile('');
+        setDetailedOutputFileUrl('');
         setPlotJsonData('');
         setIsLoadingOutput(false);
         setDisableButtons(false);
@@ -112,7 +112,7 @@ const NewSingleBinaryJob = ({ data }) => {
             }
         });
 
-        setDetailedOutputFile('');
+        setDetailedOutputFileUrl('');
         setIsLoadingOutput(true);
         setDisableButtons(true);
 
@@ -248,7 +248,7 @@ const NewSingleBinaryJob = ({ data }) => {
                                     <div>Loading...</div>
                                 ) : (
                                     <>
-                                        <a className="mr-4" data-testid="download-link" href={detailedOutputFile}>
+                                        <a className="mr-4" data-testid="download-link" href={detailedOutputFileUrl}>
                                             Download Output File
                                         </a>
                                         {plotJsonData && (

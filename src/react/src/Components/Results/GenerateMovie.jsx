@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
-import { commitMutation } from 'relay-runtime';
+import { commitMutation, fetchQuery } from 'relay-runtime';
 import { graphql } from 'react-relay';
 import environment from '../../environment.js';
 import { Button, Spinner } from 'react-bootstrap';
 import { Formik } from 'formik';
 import FormButtons from '../Forms/FormButtons.jsx';
 import GenerateMovieForm from '../Forms/GenerateMovieForm.jsx';
+import useTaskPolling from '../../Utils/Hooks.jsx';
 
 const submitMutation = graphql`
     mutation GenerateMovieMutation($input: SingleBinaryJobMovieMutationInput!) {
         newSingleBinaryMovie(input: $input) {
             result {
-                movieFilePath
+                taskId
             }
+        }
+    }
+`;
+
+const singleBinaryJobMovieQuery = graphql`
+    query GenerateMovieQuery($jobId: ID!, $scaling: String, $images: String) {
+        singleBinaryJob(id: $jobId) {
+            movieFileUrl(scaling: $scaling, images: $images)
         }
     }
 `;
@@ -24,12 +33,45 @@ const messages = [
 ];
 
 const GenerateMovie = ({ jobId }) => {
-    const [movieFile, setMovieFile] = useState('');
+    const [movieFileUrl, setMovieFileUrl] = useState('');
     const [movieFileName, setMovieFileName] = useState('');
+    const [taskId, setTaskId] = useState('');
+    const [submittedValues, setSubmittedValues] = useState(null);
     const [outputError, setOutputError] = useState('');
     const [isLoadingOutput, setIsLoadingOutput] = useState(false);
     const [disableButtons, setDisableButtons] = useState(false);
     const [messageIndex, setMessageIndex] = useState(0);
+
+    // Poll for Celery task status
+    const { task, error: pollingError } = useTaskPolling(taskId);
+
+    // When Celery task has a status of SUCCESS, fetch data.
+    // If the task has a status of FAILURE, display the error message.
+    useEffect(() => {
+        if (!submittedValues) return;
+
+        if (task?.status === 'SUCCESS') {
+            fetchQuery(environment, singleBinaryJobMovieQuery, { jobId, ...submittedValues }).subscribe({
+                next: (response) => {
+                    setMovieFileUrl(
+                        `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.movieFileUrl}`,
+                    );
+                    setMovieFileName(`${submittedValues.scaling}_${submittedValues.images}_movie.mp4`);
+                    setIsLoadingOutput(false);
+                    setDisableButtons(false);
+                },
+                error: (err) => {
+                    handleError(`${err.name}: ${err.message}`);
+                },
+            });
+        } else if (task?.status === 'FAILURE' || task?.status === 'TIMEOUT') {
+            handleError(`Task failed with error: ${task.error}`);
+        }
+
+        if (pollingError) {
+            handleError(`${pollingError.name}: ${pollingError.message}`);
+        }
+    }, [task, jobId, pollingError, submittedValues]);
 
     useEffect(() => {
         if (!isLoadingOutput) return;
@@ -44,7 +86,7 @@ const GenerateMovie = ({ jobId }) => {
 
     const handleError = (errorMessage) => {
         setOutputError(errorMessage);
-        setMovieFile('');
+        setMovieFileUrl('');
         setMovieFileName('');
         setIsLoadingOutput(false);
         setDisableButtons(false);
@@ -53,7 +95,7 @@ const GenerateMovie = ({ jobId }) => {
     const handleGenerateMovie = ({ scaling, images }) => {
         // Reset errors if any
         setOutputError('');
-        setMovieFile('');
+        setMovieFileUrl('');
         setMovieFileName('');
         setIsLoadingOutput(true);
         setDisableButtons(true);
@@ -76,26 +118,16 @@ const GenerateMovie = ({ jobId }) => {
                 if (errors) {
                     const errorMessages = errors.reduce((prev, curr) => `${prev}, ${curr.message}`, '');
                     handleError(`Movie failed to generate with errors: ${errorMessages}`);
-                } else if (response.newSingleBinaryMovie.result.movieFilePath === '') {
-                    handleError('Movie file failed to generate and returned an empty string');
                 } else {
-                    try {
-                        setMovieFile(
-                            `${import.meta.env.VITE_BACKEND_URL}${response.newSingleBinaryMovie.result.movieFilePath}`,
-                        );
-                        setMovieFileName(`${scaling}_${images}_movie.mp4`);
-                        setIsLoadingOutput(false);
-                        setDisableButtons(false);
-                    } catch (error) {
-                        handleError(`${error.name}: ${error.message}`);
-                    }
+                    setSubmittedValues({ scaling, images });
+                    setTaskId(response.newSingleBinaryMovie.result.taskId);
                 }
             },
         });
     };
 
     const handleDownload = async (movieFileName) => {
-        const res = await fetch(movieFile);
+        const res = await fetch(movieFileUrl);
         const blob = await res.blob();
 
         const url = window.URL.createObjectURL(blob);
@@ -140,13 +172,13 @@ const GenerateMovie = ({ jobId }) => {
                 </>
             </Formik>
             {outputError && <div className="error">{outputError}</div>}
-            {movieFile && (
+            {movieFileUrl && (
                 <>
                     <Button variant="link" onClick={() => handleDownload(movieFileName)}>
                         Download VIMES Movie
                     </Button>
-                    <video key={movieFile} width="1008" height="800" controls>
-                        <source src={movieFile} type="video/mp4" />
+                    <video key={movieFileUrl} width="1008" height="800" controls>
+                        <source src={movieFileUrl} type="video/mp4" />
                     </video>
                 </>
             )}

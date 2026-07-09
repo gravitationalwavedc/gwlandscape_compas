@@ -1,20 +1,21 @@
-from pathlib import Path
 import json
 import shutil
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
+
 from django.conf import settings
 from django.test import override_settings
 from graphql_relay.node.node import to_global_id
+
 from compasui.models import SingleBinaryJob
 from compasui.tests.testcases import CompasTestCase
+from compasui.tests.utils import silence_logging
 from compasui.utils.constants import (
     COMMON_ENVELOPE_LAMBDA_PRESCRIPTION_FIXED_VALUE,
     FRYER_SUPERNOVA_ENGINE_DELAYED_VALUE,
 )
 from compasui.utils.h5ToJson import read_h5_data_as_json
-from compasui.tests.utils import silence_logging
-
 
 temp_output_dir = TemporaryDirectory()
 
@@ -25,7 +26,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
         self.single_binary_job_results_query = """
             query ($id: ID!){
                 singleBinaryJob(id: $id) {
-                    detailedOutputFilePath
+                    detailedOutputFileUrl
                     plotJsonData
                 }
             }
@@ -66,7 +67,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
         self.expected_failed = {
             "newSingleBinary": {
-                "result": {"jobId": "", "jsonData": "", "detailedOutputFilePath": ""}
+                "result": {"jobId": "", "jsonData": "", "detailedOutputFileUrl": ""}
             }
         }
         self.test_detailed_output_file_path = (
@@ -144,7 +145,7 @@ class TestSingleBinaryJobSchema(CompasTestCase):
 
         self.assertEqual(
             str(detailed_output_file_url),
-            response.data["singleBinaryJob"]["detailedOutputFilePath"],
+            response.data["singleBinaryJob"]["detailedOutputFileUrl"],
         )
         self.assertEqual(
             test_json_string,
