@@ -53,9 +53,7 @@ const GenerateMovie = ({ jobId }) => {
         if (task?.status === 'SUCCESS') {
             fetchQuery(environment, singleBinaryJobMovieQuery, { jobId, ...submittedValues }).subscribe({
                 next: (response) => {
-                    setMovieFileUrl(
-                        `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.movieFileUrl}`,
-                    );
+                    setMovieFileUrl(`${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.movieFileUrl}`);
                     setMovieFileName(`${submittedValues.scaling}_${submittedValues.images}_movie.mp4`);
                     setIsLoadingOutput(false);
                     setDisableButtons(false);
