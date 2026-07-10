@@ -226,7 +226,10 @@ class SingleBinaryJobNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
     plot_json_data = graphene.String()
-    detailed_output_file_path = graphene.String()
+    detailed_output_file_url = graphene.String()
+    movie_file_url = graphene.String(
+        scaling=graphene.String(), images=graphene.String()
+    )
 
     def resolve_plot_json_data(parent, info):
         plot_data_file = (
@@ -242,24 +245,29 @@ class SingleBinaryJobNode(DjangoObjectType):
             json_data = json.load(f)
         return json.dumps(json_data)
 
-    def resolve_detailed_output_file_path(parent, info):
-        detailed_output_file = (
-            Path(settings.COMPAS_IO_PATH)
-            / str(parent.id)
+    def resolve_detailed_output_file_url(parent, info):
+        relative_path = (
+            Path(str(parent.id))
             / "COMPAS_Output"
             / "Detailed_Output"
             / "BSE_Detailed_Output_0.h5"
         )
+        detailed_output_file = Path(settings.COMPAS_IO_PATH) / relative_path
         if not detailed_output_file.exists():
             return None
-        return (
-            Path(settings.MEDIA_URL)
-            / "jobs"
-            / str(parent.id)
+        return Path(settings.MEDIA_URL) / "jobs" / relative_path
+
+    def resolve_movie_file_url(parent, info, scaling="log", images="default"):
+        relative_path = (
+            Path(str(parent.id))
             / "COMPAS_Output"
             / "Detailed_Output"
-            / "BSE_Detailed_Output_0.h5"
+            / f"{scaling}_{images}_movie.mp4"
         )
+        vimes_movie_file = Path(settings.COMPAS_IO_PATH) / relative_path
+        if not vimes_movie_file.exists():
+            return None
+        return Path(settings.MEDIA_URL) / "jobs" / relative_path
 
 
 class CompasResultFile(graphene.ObjectType):
@@ -446,7 +454,7 @@ class SingleBinaryJobCreationResult(graphene.ObjectType):
 
 
 class SingleBinaryJobMovieCreationResult(graphene.ObjectType):
-    movie_file_path = graphene.String()
+    task_id = graphene.String()
 
 
 class CompasJobMutation(relay.ClientIDMutation):
@@ -625,20 +633,21 @@ class SingleBinaryJobMovieMutation(relay.ClientIDMutation):
             job_id = input.get("job_id")
             scaling = input.get("scaling", "log")
             images = input.get("images", "default")
-            create_single_binary_job_movie(
-                job_id=job_id, scaling=scaling, images=images
+
+            task_id = create_single_binary_job_movie(
+                job_id=from_global_id(job_id)[1], scaling=scaling, images=images
             )
 
             return SingleBinaryJobMovieMutation(
                 result=SingleBinaryJobMovieCreationResult(
-                    movie_file_path=f"{settings.MEDIA_URL}jobs/{job_id}"
-                    f"/COMPAS_Output/Detailed_Output/{scaling}_{images}_movie.mp4",
+                    task_id=task_id,
                 )
             )
+
         except Exception:
             logger.error("VIMES job didn't run successfully")
             return SingleBinaryJobMovieMutation(
-                result=SingleBinaryJobMovieCreationResult(movie_file_path="")
+                result=SingleBinaryJobMovieCreationResult(task_id="")
             )
 
 

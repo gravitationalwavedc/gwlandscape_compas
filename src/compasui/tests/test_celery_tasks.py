@@ -2,12 +2,12 @@ import json
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, call, patch
 
 from celery.exceptions import SoftTimeLimitExceeded
 from django.test import TestCase
 
-from compasui.tasks import run_compas
+from compasui.tasks import run_compas, run_vimes
 from compasui.tests.utils import silence_logging
 from compasui.utils.constants import (
     COMMON_ENVELOPE_LAMBDA_PRESCRIPTION_NANJING_VALUE,
@@ -18,7 +18,7 @@ from compasui.utils.constants import (
 )
 
 
-class TestCeleryTasks(TestCase):
+class TestSingleBinaryCeleryTasks(TestCase):
     def setUp(self):
         self.parameters = {
             "--initial-mass-1": 35.0,
@@ -38,10 +38,10 @@ class TestCeleryTasks(TestCase):
         }
         self.output_dir = TemporaryDirectory()
         self.output_path = Path(self.output_dir.name)
-        self.detailed_output_file_path = (
+        self.detailed_output_path = (
             self.output_path / "COMPAS_Output" / "Detailed_Output"
         )
-        self.detailed_output_file_path.mkdir(exist_ok=True, parents=True)
+        self.detailed_output_path.mkdir(exist_ok=True, parents=True)
 
         # Ensure the COMPAS_ROOT_DIR environment variable is set for testing
         os.environ["COMPAS_ROOT_DIR"] = "/mock/path"
@@ -85,9 +85,9 @@ class TestCeleryTasks(TestCase):
             "0.5",
         ]
         self.expected_output_file = (
-            self.detailed_output_file_path / "BSE_Detailed_Output_0.h5"
+            self.detailed_output_path / "BSE_Detailed_Output_0.h5"
         )
-        self.expected_json_file = self.detailed_output_file_path / "plot_data.json"
+        self.expected_json_file = self.detailed_output_path / "plot_data.json"
         self.test_json_str = json.dumps({"key": "value"})
 
     def tearDown(self):
@@ -194,5 +194,230 @@ class TestCeleryTasks(TestCase):
 
         self.assertIn(
             f"Expected json file not found: {self.expected_json_file}",
+            str(exc.exception),
+        )
+
+
+class TestSingleBinaryMovieCeleryTasks(TestCase):
+    def setUp(self):
+        self.output_dir = TemporaryDirectory()
+        self.output_path = Path(self.output_dir.name)
+        self.detailed_output_path = (
+            self.output_path / "COMPAS_Output" / "Detailed_Output"
+        )
+        self.detailed_output_path.mkdir(exist_ok=True, parents=True)
+
+        self.expected_frames_file = self.detailed_output_path / "frames_data.npz"
+        self.expected_output_file = self.detailed_output_path / "log_default_movie.mp4"
+
+        # Prepare expected values for assertions
+        self.expected_vimes_preprocess_command = [
+            "vimes-preprocess",
+            str(self.detailed_output_path / "BSE_Detailed_Output_0.h5"),
+            str(self.expected_frames_file),
+        ]
+        self.expected_vimes_command = [
+            "vimes",
+            str(self.expected_frames_file),
+            "--scaling",
+            "log",
+            "--images",
+            "default",
+            "--save-mp4",
+            str(self.expected_output_file),
+            "--no-display",
+        ]
+
+    def tearDown(self):
+        self.output_dir.cleanup()
+
+    @patch("compasui.tasks.run")
+    def test_run_vimes_success(self, mock_subprocess_run):
+        def mock_run(cmd, *args, **kwargs):
+            if cmd[0] == "vimes-preprocess":
+                self.expected_frames_file.touch()
+            elif cmd[0] == "vimes":
+                self.expected_output_file.touch()
+            return Mock(returncode=0)
+
+        # Set up the mocks
+        mock_subprocess_run.side_effect = mock_run
+
+        # Run the test
+        result = run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        self.assertEqual(result, str(self.expected_output_file))
+        mock_subprocess_run.assert_has_calls(
+            [
+                call(
+                    self.expected_vimes_preprocess_command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                ),
+                call(
+                    self.expected_vimes_command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                ),
+            ]
+        )
+
+    def test_run_vimes_movie_file_exists_success(self):
+        self.expected_output_file.touch()  # Create the movie file to simulate it already exists
+
+        # Run the test
+        result = run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        self.assertEqual(result, str(self.expected_output_file))
+
+    @patch("compasui.tasks.run")
+    def test_run_vimes_frames_file_exists_success(self, mock_subprocess_run):
+        self.expected_frames_file.touch()
+
+        def mock_run(cmd, *args, **kwargs):
+            if cmd[0] == "vimes":
+                self.expected_output_file.touch()
+            return Mock(returncode=0)
+
+        # Set up the mocks
+        mock_subprocess_run.side_effect = mock_run
+
+        # Run the test
+        result = run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        self.assertEqual(result, str(self.expected_output_file))
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_vimes_command, capture_output=True, text=True, check=False
+        )
+
+    @silence_logging(logger_name="compasui.tasks")
+    @patch("compasui.tasks.run")
+    def test_run_vimes_preprocess_failure(self, mock_subprocess_run):
+        # Set up the mocks
+        mock_subprocess_run.return_value = Mock(
+            returncode=1
+        )  # Simulate vimes-preprocess failure
+
+        # Run the test
+        with self.assertRaises(Exception) as exc:
+            run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_vimes_preprocess_command,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertIn("vimes-preprocess exited with code 1", str(exc.exception))
+
+    @silence_logging(logger_name="compasui.tasks")
+    @patch("compasui.tasks.run")
+    def test_run_vimes_failure(self, mock_subprocess_run):
+        def mock_run(cmd, *args, **kwargs):
+            if cmd[0] == "vimes-preprocess":
+                self.expected_frames_file.touch()
+                return Mock(returncode=0)
+            elif cmd[0] == "vimes":
+                self.expected_output_file.touch()
+                return Mock(returncode=1)  # Simulate vimes failure
+
+        # Set up the mocks
+        mock_subprocess_run.side_effect = mock_run
+
+        # Run the test
+        with self.assertRaises(Exception) as exc:
+            run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        mock_subprocess_run.assert_has_calls(
+            [
+                call(
+                    self.expected_vimes_preprocess_command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                ),
+                call(
+                    self.expected_vimes_command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                ),
+            ]
+        )
+
+        self.assertIn("vimes exited with code 1", str(exc.exception))
+
+    @silence_logging(logger_name="compasui.tasks")
+    @patch("compasui.tasks.run")
+    def test_run_vimes_preprocess_frames_creation_failure(self, mock_subprocess_run):
+        def mock_run(cmd, *args, **kwargs):
+            if cmd[0] == "vimes-preprocess":
+                return Mock(returncode=0)
+
+        # Set up the mocks
+        mock_subprocess_run.side_effect = mock_run
+
+        # Run the test
+        with self.assertRaises(Exception) as exc:
+            run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        mock_subprocess_run.assert_called_once_with(
+            self.expected_vimes_preprocess_command,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertIn(
+            f"Expected vimes-preprocess frames file not found: {self.expected_frames_file}",
+            str(exc.exception),
+        )
+
+    @silence_logging(logger_name="compasui.tasks")
+    @patch("compasui.tasks.run")
+    def test_run_vimes_movie_creation_failure(self, mock_subprocess_run):
+        def mock_run(cmd, *args, **kwargs):
+            if cmd[0] == "vimes-preprocess":
+                self.expected_frames_file.touch()
+                return Mock(returncode=0)
+            elif cmd[0] == "vimes":
+                return Mock(returncode=0)
+
+        # Set up the mocks
+        mock_subprocess_run.side_effect = mock_run
+
+        # Run the test
+        with self.assertRaises(Exception) as exc:
+            run_vimes(self.detailed_output_path, scaling="log", images="default")
+
+        # Assertions
+        mock_subprocess_run.assert_has_calls(
+            [
+                call(
+                    self.expected_vimes_preprocess_command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                ),
+                call(
+                    self.expected_vimes_command,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                ),
+            ]
+        )
+
+        self.assertIn(
+            f"Expected movie file not found: {self.expected_output_file}",
             str(exc.exception),
         )
