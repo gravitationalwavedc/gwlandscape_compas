@@ -42,12 +42,12 @@ const NewSingleBinaryJob = ({ data }) => {
     const [taskId, setTaskId] = useState('');
     const [jobId, setJobId] = useState('');
     const [outputError, setOutputError] = useState('');
-    const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    const [disableButtons, setDisableButtons] = useState(false);
     const [activeTab, setActiveTab] = useState('binary');
 
     // Poll for Celery task status
-    const { task, error: pollingError } = useTaskPolling(taskId);
+    const { task, error: pollingError, isPolling } = useTaskPolling(taskId);
+
+    const hasNoOutput = taskId === '' || isPolling;
 
     // When Celery task has a status of SUCCESS, fetch data.
     // If the task has a status of FAILURE, display the error message.
@@ -59,8 +59,6 @@ const NewSingleBinaryJob = ({ data }) => {
                     setDetailedOutputFileUrl(
                         `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.detailedOutputFileUrl}`,
                     );
-                    setIsLoadingOutput(false);
-                    setDisableButtons(false);
                 },
                 error: (err) => {
                     handleError(`${err.name}: ${err.message}`);
@@ -78,9 +76,10 @@ const NewSingleBinaryJob = ({ data }) => {
     const resetOutput = () => {
         setDetailedOutputFileUrl('');
         setPlotJsonData('');
-        setIsLoadingOutput(false);
-        setDisableButtons(false);
+        setTaskId('');
+        setJobId('');
     };
+
     const handleFormReset = () => {
         resetOutput();
         setOutputError('');
@@ -113,8 +112,6 @@ const NewSingleBinaryJob = ({ data }) => {
         });
 
         setDetailedOutputFileUrl('');
-        setIsLoadingOutput(true);
-        setDisableButtons(true);
 
         const variables = {
             input: {
@@ -194,12 +191,12 @@ const NewSingleBinaryJob = ({ data }) => {
                                     Common Envelope
                                 </Nav.Link>
                             </Nav.Item>
-                            <h5 className="mt-3 mb-0">Results</h5>
+                            <h5 className={`mt-3 mb-0 ${hasNoOutput && 'text-muted'}`}>Results</h5>
                             <Nav.Item>
-                                <Nav.Link eventKey="job-output" disabled={plotJsonData === ''}>
-                                    {isLoadingOutput ? 'Loading...' : 'COMPAS Output'}
+                                <Nav.Link eventKey="job-output" disabled={hasNoOutput}>
+                                    {isPolling ? 'Loading...' : 'COMPAS Output'}
                                 </Nav.Link>
-                                {plotJsonData === '' && !isLoadingOutput && (
+                                {hasNoOutput && (
                                     <p className="mt-0 pt-0 text-muted">Run a simulation to see results</p>
                                 )}
                             </Nav.Item>
@@ -208,15 +205,15 @@ const NewSingleBinaryJob = ({ data }) => {
                                     COMPAS - {data?.compasVersion ? `v${data.compasVersion}` : 'Unknown'}
                                 </p>
                             </Nav.Item>
-                            <h5 className="mt-3 mb-0">Post-Processing</h5>
+                            <h5 className={`mt-3 mb-0 ${hasNoOutput && 'text-muted'}`}>Post-Processing</h5>
                             <Nav.Item>
-                                <Nav.Link eventKey="generate-movie" disabled={jobId === ''}>
+                                <Nav.Link eventKey="generate-movie" disabled={hasNoOutput}>
                                     Generate Movie
                                 </Nav.Link>
                             </Nav.Item>
                         </Nav>
                     </Col>
-                    <Col md={activeTab !== 'job-output' ? 6 : 10}>
+                    <Col md={!['job-output', 'generate-movie'].includes(activeTab) ? 6 : 10}>
                         <Tab.Content className="mt-2">
                             <Formik
                                 initialValues={initialValues}
@@ -237,14 +234,14 @@ const NewSingleBinaryJob = ({ data }) => {
                                     {['binary', 'kick', 'mass-transfer'].includes(activeTab) && (
                                         <FormButtons
                                             submitButtonContent="Start Simulation"
-                                            disableButtons={disableButtons}
+                                            disableButtons={isPolling}
                                         />
                                     )}
                                 </>
                             </Formik>
 
                             <SingleBinaryTab title="COMPAS Output" eventKey="job-output">
-                                {isLoadingOutput ? (
+                                {isPolling ? (
                                     <div>Loading...</div>
                                 ) : (
                                     <>
@@ -267,7 +264,9 @@ const NewSingleBinaryJob = ({ data }) => {
                                 )}
                             </SingleBinaryTab>
                             <SingleBinaryTab title="Generate ViMES Movie" eventKey="generate-movie">
-                                {isLoadingOutput ? <div>Loading...</div> : <GenerateMovie jobId={jobId} />}
+                                <div className="w-75">
+                                    {isPolling ? <div>Loading...</div> : <GenerateMovie jobId={jobId} />}
+                                </div>
                             </SingleBinaryTab>
                         </Tab.Content>
                     </Col>

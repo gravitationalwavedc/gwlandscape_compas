@@ -33,17 +33,18 @@ const messages = [
 ];
 
 const GenerateMovie = ({ jobId }) => {
-    const [movieFileUrl, setMovieFileUrl] = useState('');
-    const [movieFileName, setMovieFileName] = useState('');
+    const [movies, setMovies] = useState({});
+    const [displayedKey, setDisplayedKey] = useState('');
     const [taskId, setTaskId] = useState('');
     const [submittedValues, setSubmittedValues] = useState(null);
     const [outputError, setOutputError] = useState('');
-    const [isLoadingOutput, setIsLoadingOutput] = useState(false);
-    const [disableButtons, setDisableButtons] = useState(false);
     const [messageIndex, setMessageIndex] = useState(0);
 
     // Poll for Celery task status
-    const { task, error: pollingError } = useTaskPolling(taskId);
+    const { task, error: pollingError, isPolling } = useTaskPolling(taskId);
+
+    const getMovieKey = (scaling, images) => `${scaling}_${images}`;
+    const displayedMovie = movies[displayedKey] || {};
 
     // When Celery task has a status of SUCCESS, fetch data.
     // If the task has a status of FAILURE, display the error message.
@@ -53,10 +54,17 @@ const GenerateMovie = ({ jobId }) => {
         if (task?.status === 'SUCCESS') {
             fetchQuery(environment, singleBinaryJobMovieQuery, { jobId, ...submittedValues }).subscribe({
                 next: (response) => {
-                    setMovieFileUrl(`${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.movieFileUrl}`);
-                    setMovieFileName(`${submittedValues.scaling}_${submittedValues.images}_movie.mp4`);
-                    setIsLoadingOutput(false);
-                    setDisableButtons(false);
+                    const key = getMovieKey(submittedValues.scaling, submittedValues.images);
+                    setMovies((prevMovies) => ({
+                        ...prevMovies,
+                        [key]: {
+                            fileUrl: `${import.meta.env.VITE_BACKEND_URL}${response.singleBinaryJob.movieFileUrl}`,
+                            fileName: `${submittedValues.scaling}_${submittedValues.images}_movie.mp4`,
+                            scaling: submittedValues.scaling,
+                            images: submittedValues.images,
+                        },
+                    }));
+                    setDisplayedKey(key);
                 },
                 error: (err) => {
                     handleError(`${err.name}: ${err.message}`);
@@ -72,7 +80,7 @@ const GenerateMovie = ({ jobId }) => {
     }, [task, jobId, pollingError, submittedValues]);
 
     useEffect(() => {
-        if (!isLoadingOutput) return;
+        if (!isPolling) return;
         if (messageIndex >= messages.length - 1) return;
 
         const timeout = setTimeout(() => {
@@ -80,23 +88,25 @@ const GenerateMovie = ({ jobId }) => {
         }, 3000);
 
         return () => clearTimeout(timeout);
-    }, [messageIndex, isLoadingOutput]);
+    }, [messageIndex, isPolling]);
 
     const handleError = (errorMessage) => {
         setOutputError(errorMessage);
-        setMovieFileUrl('');
-        setMovieFileName('');
-        setIsLoadingOutput(false);
-        setDisableButtons(false);
     };
 
     const handleGenerateMovie = ({ scaling, images }) => {
         // Reset errors if any
         setOutputError('');
-        setMovieFileUrl('');
-        setMovieFileName('');
-        setIsLoadingOutput(true);
-        setDisableButtons(true);
+        setTaskId('');
+        setMessageIndex(0);
+
+        const key = getMovieKey(scaling, images);
+
+        if (movies[key]) {
+            setSubmittedValues({ scaling, images });
+            setDisplayedKey(key);
+            return;
+        }
 
         const variables = {
             input: {
@@ -124,14 +134,14 @@ const GenerateMovie = ({ jobId }) => {
         });
     };
 
-    const handleDownload = async (movieFileName) => {
-        const res = await fetch(movieFileUrl);
+    const handleDownload = async ({ fileUrl, fileName }) => {
+        const res = await fetch(fileUrl);
         const blob = await res.blob();
 
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = movieFileName;
+        a.download = fileName;
         a.click();
         window.URL.revokeObjectURL(url);
     };
@@ -153,7 +163,7 @@ const GenerateMovie = ({ jobId }) => {
                     <GenerateMovieForm />
                     <FormButtons
                         submitButtonContent={
-                            isLoadingOutput ? (
+                            isPolling ? (
                                 <>
                                     <Spinner animation="border" size="sm" />
                                     <span className="dots" style={{ marginLeft: '0.5rem' }}>
@@ -165,19 +175,33 @@ const GenerateMovie = ({ jobId }) => {
                             )
                         }
                         showReset={false}
-                        disableButtons={disableButtons}
+                        disableButtons={isPolling}
                     />
                 </>
             </Formik>
             {outputError && <div className="error">{outputError}</div>}
-            {movieFileUrl && (
+            {displayedMovie?.fileUrl && (
                 <>
-                    <Button variant="link" onClick={() => handleDownload(movieFileName)}>
-                        Download VIMES Movie
-                    </Button>
-                    <video key={movieFileUrl} width="1008" height="800" controls>
-                        <source src={movieFileUrl} type="video/mp4" />
-                    </video>
+                    <div className="d-flex flex-column align-items-center">
+                        <div className="d-flex justify-content-between align-items-center w-75 mb-2">
+                            <div className="">
+                                <span className="mr-4">
+                                    <span className="font-weight-bold">Scaling:</span> {displayedMovie.scaling}
+                                </span>
+                                <span>
+                                    <span className="font-weight-bold">Images:</span> {displayedMovie.images}
+                                </span>
+                            </div>
+                            <Button variant="link" onClick={() => handleDownload(displayedMovie?.fileName)}>
+                                Download VIMES Movie
+                            </Button>
+                        </div>
+                        <div className="w-75 mb-4">
+                            <video key={displayedMovie?.fileUrl} width="100%" controls>
+                                <source src={displayedMovie?.fileUrl} type="video/mp4" />
+                            </video>
+                        </div>
+                    </div>
                 </>
             )}
         </>
