@@ -192,7 +192,7 @@ const GenerateMovie = ({ jobId }) => {
                                     <span className="font-weight-bold">Images:</span> {displayedMovie.images}
                                 </span>
                             </div>
-                            <Button variant="link" onClick={() => handleDownload(displayedMovie?.fileName)}>
+                            <Button variant="link" onClick={() => handleDownload(displayedMovie)}>
                                 Download VIMES Movie
                             </Button>
                         </div>
