@@ -208,7 +208,7 @@ const NewSingleBinaryJob = ({ data }) => {
                             <h5 className={`mt-3 mb-0 ${hasNoOutput && 'text-muted'}`}>Post-Processing</h5>
                             <Nav.Item>
                                 <Nav.Link eventKey="generate-movie" disabled={hasNoOutput}>
-                                    Generate Movie
+                                    Movie
                                 </Nav.Link>
                             </Nav.Item>
                         </Nav>
